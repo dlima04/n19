@@ -13,7 +13,8 @@ namespace n19 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ... Args>
-auto n19::fmt(const std::format_string<Args...> fmt, Args... args) -> std::string {
+auto n19::fmt(const std::format_string<Args...> fmt, Args... args)
+-> std::string {
   std::string output;
   try {
     output = std::vformat(fmt.get(), std::make_format_args(args...));

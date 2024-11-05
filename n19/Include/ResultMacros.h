@@ -52,7 +52,7 @@
   }                                                         \
 
 // Used for method chaining on classes that use
-// n19::Result<Null> as a return value.
+// n19::Result<None> as a return value.
 // example:
 // foo.do_something()
 //  .THEN(foo.something())

@@ -15,8 +15,8 @@ namespace n19 {
   [[noreturn]] auto panic_impl_(const std::string &file, int line, const std::string &msg) -> void;
 }
 
-[[noreturn]] inline auto
-n19::panic_impl_(const std::string &file, const int line, const std::string &msg) -> void {
+inline auto n19::panic_impl_(const std::string &file, const int line, const std::string &msg)
+-> void {
   // Red bold header
   set_console(ConFg::Red);
   set_console(ConStyle::Bold);
@@ -28,8 +28,8 @@ n19::panic_impl_(const std::string &file, const int line, const std::string &msg
   ::exit(EXIT_FAILURE);
 }
 
-[[noreturn]] inline auto
-n19::exit_impl_(const std::string &msg) -> void {
+inline auto n19::exit_impl_(const std::string &msg)
+-> void {
   set_console(ConFg::Red);
   set_console(ConStyle::Bold);
   std::println("FATAL :: {}", msg);

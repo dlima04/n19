@@ -63,8 +63,24 @@ auto n19::make_result(Args... args) -> Result<T> {
   return Result<T>{ T(args...) };
 }
 
+/*
+  struct Vector $[T]{
+    size : u64
+    ptr  : T*
+  }
+
+   fn core::fmt with T, J (arg: i8^) => i8^ {
+     let str := Vector::new[$i32]();
+     where typeof T is arg with const {
+       return ++arg as T;
+     }
+     otherwise return null;
+  }
+*/
+
 template<typename... Args>
-auto n19::make_error(const ErrC code, std::format_string<Args...> fmt, Args... args) -> Error {
+auto n19::make_error(const ErrC code, std::format_string<Args...> fmt, Args... args)
+-> Error {
   std::string formatted;
   ErrorDescriptor desc;
   try {

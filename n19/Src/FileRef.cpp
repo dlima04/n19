@@ -1,6 +1,7 @@
 #include <FileRef.h>
 
-auto n19::FileRef::create(const std::string &file_name) -> Result<FileRef> {
+auto n19::FileRef::create(const std::string &file_name)
+-> Result<FileRef> {
   if(!fs::exists(file_name)) {
     return make_error(ErrC::InvalidArg, "\"{}\" does not exist.", file_name);
   } if(fs::is_directory(file_name)) {
@@ -12,7 +13,8 @@ auto n19::FileRef::create(const std::string &file_name) -> Result<FileRef> {
   return make_result<FileRef>(FileRef(file_name));
 }
 
-auto n19::FileRef::create(const std::wstring &file_name) -> Result<FileRef> {
+auto n19::FileRef::create(const std::wstring &file_name)
+-> Result<FileRef> {
 #if !defined(N19_WIN32)
   return make_error(ErrC::Platform, "Unexpected wide string on a POSIX platform.");
 #else
@@ -31,12 +33,26 @@ auto n19::FileRef::create(const std::wstring &file_name) -> Result<FileRef> {
   return make_result<FileRef>(FileRef(file_name));
 }
 
-auto n19::FileRef::create(const FileRef &other) -> Result<FileRef> {
-  return make_result<FileRef>(FileRef(other.path_));
+auto n19::FileRef::get_flat(uintmax_t amnt) const
+-> Result<std::vector<char>> {
+
 }
 
-auto n19::FileRef::name() const -> Result<std::string> {
-  return make_result<std::string>(path_.string());
+auto n19::FileRef::get_shared(uintmax_t amnt) const
+-> Result<std::shared_ptr<std::vector<char>>> {
+
+}
+
+auto n19::FileRef::create(const FileRef& other) -> Result<FileRef> {
+#if defined(N19_WIN32)
+  return create(other.path_.wstring());
+#else
+  return create(other.path_.string());
+#endif
+}
+
+auto n19::FileRef::name() const -> std::string {
+  return path_.string();
 }
 
 auto n19::FileRef::size() const -> Result<uintmax_t> try {
@@ -46,5 +62,3 @@ auto n19::FileRef::size() const -> Result<uintmax_t> try {
 } catch(const std::exception& e) {
   return make_error(ErrC::FileIO, "{}", e.what());
 }
-
-

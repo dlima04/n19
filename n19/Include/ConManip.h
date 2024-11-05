@@ -17,10 +17,6 @@ namespace n19 {
     Underline = 4,
   };
 
-  void set_console(ConFg fg);
-  void set_console(ConStyle cs);
-  void reset_console();
-
 #if defined(N19_WIN32)
   auto are_vsequences_enabled()  -> bool;
   auto enable_vsequences()       -> void;
