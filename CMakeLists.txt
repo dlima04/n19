@@ -5,14 +5,28 @@ set(CMAKE_CXX_STANDARD 23)
 set(N19_SOURCE_FILES
   n19/Src/Main.cpp
   n19/Src/ConManip.cpp
+  n19/Src/FileRef.cpp
+  n19/Src/Token.cpp
+  n19/Src/Lexer.cpp
+  n19/Src/ErrorCollector.cpp
+  n19/Src/EntityTable.cpp
+  n19/Src/Entity.cpp
   n19/Include/ConManip.h
   n19/Include/Result.h
   n19/Include/ResultMacros.h
   n19/Include/GlobalLastError.h
-        n19/Include/Panic.h
-        n19/Include/Fmt.h
-        n19/Include/FileRef.h
-        n19/Src/FileRef.cpp
+  n19/Include/Panic.h
+  n19/Include/Fmt.h
+  n19/Include/FileRef.h
+  n19/Include/Defer.h
+  n19/Include/Lexer.h
+  n19/Include/Token.h
+  n19/Include/ErrorCollector.h
+  n19/Include/AstNodes.h
+  n19/Include/TypeDescriptor.h
+  n19/Include/EntityTable.h
+  n19/Include/Entity.h
+        n19/Src/TypeDescriptor.cpp
 )
 
 add_executable(n19 ${N19_SOURCE_FILES})

@@ -78,7 +78,7 @@
   N19_TRANSFORM_RESULT_IMPL_                                \
   if(n19_last_errc_ != ::n19::ErrC::None) {                 \
     PANIC(::n19::fmt(                                       \
-      "A n19::Result evaluated to an error "                \
+      "An n19::Result evaluated to an error "               \
       "in a situation where failure is not allowed.\n"      \
       "Error message = {} ",                                \
       n19_last_msg_                                         \

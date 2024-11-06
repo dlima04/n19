@@ -14,14 +14,15 @@ namespace n19 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class n19::FileRef {
-  [[nodiscard]] auto size() const -> Result<uintmax_t>;
-  [[nodiscard]] auto get_flat(uintmax_t amnt) const -> Result<std::vector<char>>;
-  [[nodiscard]] auto get_shared(uintmax_t amnt) const -> Result<std::shared_ptr<std::vector<char>>>;
-  [[nodiscard]] auto name() const -> std::string;
+public:
+  [[nodiscard]] auto size() const                      -> Result<uintmax_t>;
+  [[nodiscard]] auto get_shared(uintmax_t amnt) const  -> Result<std::shared_ptr<std::vector<char>>>;
+  [[nodiscard]] auto get_flat(uintmax_t amnt) const    -> Result<std::vector<char>>;
+  [[nodiscard]] auto name() const                      -> std::string;
 
-  static auto create(const FileRef &other) -> Result<FileRef>;
+  static auto create(const FileRef &other)          -> Result<FileRef>;
   static auto create(const std::wstring &file_name) -> Result<FileRef>;
-  static auto create(const std::string &file_name) -> Result<FileRef>;
+  static auto create(const std::string &file_name)  -> Result<FileRef>;
 private:
   explicit FileRef(const fs::path& path) : path_(path) {}
   fs::path path_;

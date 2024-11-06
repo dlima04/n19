@@ -1,7 +1,8 @@
 #include <FileRef.h>
+#include <Defer.h>
+#include <fstream>
 
-auto n19::FileRef::create(const std::string &file_name)
--> Result<FileRef> {
+auto n19::FileRef::create(const std::string &file_name) -> Result<FileRef> {
   if(!fs::exists(file_name)) {
     return make_error(ErrC::InvalidArg, "\"{}\" does not exist.", file_name);
   } if(fs::is_directory(file_name)) {
@@ -13,8 +14,7 @@ auto n19::FileRef::create(const std::string &file_name)
   return make_result<FileRef>(FileRef(file_name));
 }
 
-auto n19::FileRef::create(const std::wstring &file_name)
--> Result<FileRef> {
+auto n19::FileRef::create(const std::wstring &file_name) -> Result<FileRef> {
 #if !defined(N19_WIN32)
   return make_error(ErrC::Platform, "Unexpected wide string on a POSIX platform.");
 #else
@@ -29,21 +29,10 @@ auto n19::FileRef::create(const std::wstring &file_name)
     return make_error(ErrC::InvalidArg, "File is not regular.");
   }
 #endif
-
   return make_result<FileRef>(FileRef(file_name));
 }
 
-auto n19::FileRef::get_flat(uintmax_t amnt) const
--> Result<std::vector<char>> {
-
-}
-
-auto n19::FileRef::get_shared(uintmax_t amnt) const
--> Result<std::shared_ptr<std::vector<char>>> {
-
-}
-
-auto n19::FileRef::create(const FileRef& other) -> Result<FileRef> {
+auto n19::FileRef::create(const FileRef &other) -> Result<FileRef> {
 #if defined(N19_WIN32)
   return create(other.path_.wstring());
 #else
@@ -51,14 +40,51 @@ auto n19::FileRef::create(const FileRef& other) -> Result<FileRef> {
 #endif
 }
 
-auto n19::FileRef::name() const -> std::string {
-  return path_.string();
-}
-
 auto n19::FileRef::size() const -> Result<uintmax_t> try {
   const auto fsize = fs::file_size(path_);
   return make_result<uintmax_t>(fsize);
-  // unfortunately std::filesystem::file_size may throw...
 } catch(const std::exception& e) {
   return make_error(ErrC::FileIO, "{}", e.what());
+}
+
+auto n19::FileRef::get_shared(const uintmax_t amnt) const
+-> Result<std::shared_ptr<std::vector<char>>>
+{
+  std::ifstream stream(path_.string(), std::ios::binary);
+  DEFER_IF(stream.is_open(), [&] {
+    stream.close();
+  });
+
+  if(!stream.is_open()) {
+    return make_error(ErrC::FileIO, "Could not open file {}.", path_.string());
+  } if(const auto _size = size(); !_size || amnt > *_size || !amnt) {
+    return make_error(ErrC::Internal, "Invalid file size.");
+  }
+
+  auto buff = std::make_shared<std::vector<char>>(amnt);
+  stream.read(buff->data(), static_cast<std::streamsize>(amnt));
+  return buff;
+}
+
+auto n19::FileRef::get_flat(const uintmax_t amnt) const
+-> Result<std::vector<char>>
+{
+  std::ifstream stream(path_.string(), std::ios::binary);
+  DEFER_IF(stream.is_open(), [&] {
+    stream.close();
+  });
+
+  if(!stream.is_open()) {
+    return make_error(ErrC::FileIO, "Could not open file {}.", path_.string());
+  } if(const auto _size = size(); !_size || amnt > *_size || !amnt) {
+    return make_error(ErrC::Internal, "Invalid file size.");
+  }
+
+  std::vector<char> buff(amnt);
+  stream.read(buff.data(), static_cast<std::streamsize>(amnt));
+  return buff;
+}
+
+auto n19::FileRef::name() const -> std::string {
+  return path_.string();
 }
