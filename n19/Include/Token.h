@@ -10,7 +10,6 @@
   X(EndOfFile, "\\0")            \
   X(Illegal, "")                 \
   X(Identifier, "")              \
-  X(NewLine, "\\n")              \
   X(ValueAssignment, "=")        \
   X(TypeAssignment, ":")         \
   X(NamespaceOperator, "::")     \

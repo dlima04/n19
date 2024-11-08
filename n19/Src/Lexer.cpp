@@ -400,10 +400,8 @@ inline auto n19::Lexer::_token_newline() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
   } else {
-    curr_tok_.type_  = TokenType::NewLine;
-    curr_tok_.cat_   = TokenCategory::Terminator;
-    curr_tok_.value_ = "\\n";
-    curr_tok_.pos_   = index_;
+    curr_tok_.type_ = TokenType::None;
+    curr_tok_.cat_  = TokenCategory::NonCategorical;
     _advance_line();
     _advance_char(1);
   }
