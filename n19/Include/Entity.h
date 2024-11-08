@@ -1,17 +1,17 @@
 #ifndef ENTITY_H
 #define ENTITY_H
+#include <Concepts.h>
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <memory>
-#include <concepts>
-#include <type_traits>
 
-#define N19_ROOT_ENTITY_ID 1
-#define N19_INVALID_ENTITY_ID 0
 #ifndef ENTITYTABLE_H
   static_assert("Must include EntityTable.h before Entity.h.");
 #endif
+
+#define N19_ROOT_ENTITY_ID 1
+#define N19_INVALID_ENTITY_ID 0
 
 #define N19_ENTITY_TYPE_LIST     \
   X(Entity)                      \
@@ -49,15 +49,9 @@ namespace n19 {
     N19_ENTITY_TYPE_LIST
   #undef X
   };
-
   #define X(NAME) class NAME;
   N19_ENTITY_TYPE_LIST
   #undef X
-
-  template<typename T>
-  concept IsEntity =
-    std::derived_from<T, Entity> ||
-    std::is_same_v<T, Entity>;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,6 +99,11 @@ public:
   ~Type() override = default;
 protected:
   explicit Type(const EntityType type) : Entity(type) {}
+};
+
+class n19::Procedure final : public Entity {
+public:
+
 };
 
 // Represents a builtin scalar type,

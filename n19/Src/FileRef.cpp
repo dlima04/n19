@@ -88,3 +88,7 @@ auto n19::FileRef::get_flat(const uintmax_t amnt) const
 auto n19::FileRef::name() const -> std::string {
   return path_.string();
 }
+
+auto n19::FileRef::absolute() const -> std::string {
+  return fs::absolute(path_).string();
+}

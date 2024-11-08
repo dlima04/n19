@@ -16,7 +16,9 @@ auto n19::Lexer::create(const FileRef& file) -> Result<Lexer> {
   auto ptr   = TRY(file.get_shared(*fsize));
 
   Lexer lxr;
+  lxr.file_name_ = file.absolute();
   lxr.src_ = std::move(*ptr);
+
   if(lxr.src_->size() > 3
     && static_cast<uint8_t>(lxr.src_->at(0)) == 0xEF
     && static_cast<uint8_t>(lxr.src_->at(1)) == 0xBB
@@ -29,23 +31,9 @@ auto n19::Lexer::create(const FileRef& file) -> Result<Lexer> {
   return make_result<Lexer>(lxr);
 }
 
-auto n19::Lexer::create(std::vector<char>&& buff) -> Result<Lexer> {
-  Lexer lxr;
-  lxr.src_ = std::make_shared<std::vector<char>>(buff);
-  if(lxr.src_->size() > 3
-    && static_cast<uint8_t>(lxr.src_->at(0)) == 0xEF
-    && static_cast<uint8_t>(lxr.src_->at(1)) == 0xBB
-    && static_cast<uint8_t>(lxr.src_->at(2)) == 0xBF
-  ){
-    lxr.index_ = 3;
-  }
-
-  // Wrap the lexer in a Result
-  return make_result<Lexer>(lxr);
-}
-
-auto n19::Lexer::current() const -> const Token& {
-  return curr_tok_;
+auto n19::Lexer::create(const std::string& file) -> Result<Lexer> {
+  const auto ref = TRY(FileRef::create(file));
+  return create(*ref);
 }
 
 auto n19::Lexer::advance(const uint32_t amnt) -> Lexer& {
@@ -154,6 +142,10 @@ inline auto n19::Lexer::_peek_char(const uint32_t amnt) const -> char {
 
 inline auto n19::Lexer::_advance_line() -> void {
   if(index_ < src_->size()) ++line_;
+}
+
+auto n19::Lexer::current() const -> const Token& {
+  return curr_tok_;
 }
 
 inline auto n19::Lexer::_skip_utf8_sequence() -> void {
@@ -408,8 +400,10 @@ inline auto n19::Lexer::_token_newline() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
   } else {
-    curr_tok_.type_ = TokenType::None;
-    curr_tok_.cat_  = TokenCategory::NonCategorical;
+    curr_tok_.type_  = TokenType::NewLine;
+    curr_tok_.cat_   = TokenCategory::Terminator;
+    curr_tok_.value_ = "\\n";
+    curr_tok_.pos_   = index_;
     _advance_line();
     _advance_char(1);
   }
@@ -486,39 +480,32 @@ inline auto n19::Lexer::_token_tilde() -> void {
 }
 
 inline auto n19::Lexer::_token_at() -> void {
-  _token_single_char(
-    TokenType::At,
+  _token_single_char(TokenType::At,
     TokenCategory::NonCategorical
   );
 }
 
 inline auto n19::Lexer::_token_money() -> void {
-  _token_single_char(
-    TokenType::Money,
+  _token_single_char(TokenType::Money,
     TokenCategory::NonCategorical
   );
 }
 
 inline auto n19::Lexer::_token_lsqbracket() -> void {
-  _token_single_char(
-    TokenType::LeftSqBracket,
-    TokenCategory::Punctuator
-      | TokenCategory::ValidPostfix // For subscript
+  _token_single_char(TokenType::LeftSqBracket,
+    TokenCategory::Punctuator | TokenCategory::ValidPostfix
   );
 }
 
 inline auto n19::Lexer::_token_rsqbracket() -> void {
-  _token_single_char(
-    TokenType::RightSqBracket,
+  _token_single_char(TokenType::RightSqBracket,
     TokenCategory::Punctuator
   );
 }
 
 inline auto n19::Lexer::_token_semicolon() -> void {
-  _token_single_char(
-    TokenType::Semicolon,
-    TokenCategory::Punctuator
-  );
+  _token_single_char(TokenType::Semicolon,
+    TokenCategory::Punctuator | TokenCategory::Terminator);
 }
 
 inline auto n19::Lexer::_token_lparen() -> void {
@@ -526,37 +513,32 @@ inline auto n19::Lexer::_token_lparen() -> void {
     TokenCategory::Punctuator | TokenCategory::ValidPostfix);
 }
 
+inline auto n19::Lexer::_token_comma() -> void {
+  _token_single_char(TokenType::Comma,
+    TokenCategory::Punctuator | TokenCategory::Terminator
+  );
+}
+
 inline auto n19::Lexer::_token_rparen() -> void {
-  _token_single_char(
-    TokenType::RightParen,
+  _token_single_char(TokenType::RightParen,
     TokenCategory::Punctuator
   );
 }
 
 inline auto n19::Lexer::_token_lbrace() -> void {
-  _token_single_char(
-    TokenType::LeftBrace,
+  _token_single_char(TokenType::LeftBrace,
     TokenCategory::Punctuator
   );
 }
 
 inline auto n19::Lexer::_token_rbrace() -> void {
-  _token_single_char(
-    TokenType::RightBrace,
-    TokenCategory::Punctuator
-  );
-}
-
-inline auto n19::Lexer::_token_comma() -> void {
-  _token_single_char(
-    TokenType::Comma,
+  _token_single_char(TokenType::RightBrace,
     TokenCategory::Punctuator
   );
 }
 
 inline auto n19::Lexer::_token_illegal() -> void {
-  _token_single_char(
-    TokenType::Illegal,
+  _token_single_char(TokenType::Illegal,
     TokenCategory::NonCategorical
   );
 }

@@ -10,6 +10,7 @@
   X(EndOfFile, "\\0")            \
   X(Illegal, "")                 \
   X(Identifier, "")              \
+  X(NewLine, "\\n")              \
   X(ValueAssignment, "=")        \
   X(TypeAssignment, ":")         \
   X(NamespaceOperator, "::")     \
@@ -116,6 +117,7 @@
   X(ValidPostfix, 1ULL << 13)    \
   X(ValidPrefix, 1ULL << 14)     \
   X(BitwiseAssignOp, 1ULL << 15) \
+  X(Terminator, 1ULL << 16)      \
 
 namespace n19 {
   class Token;

@@ -23,12 +23,11 @@ public:
   auto expect(TokenType type, const std::string&, bool = true)     -> Result<None>;
 
   //
-  // The factory functions.
   // Used to create the Lexer.
   // No public constructor is available.
   //
   static auto create(const FileRef& file)      -> Result<Lexer>;
-  static auto create(std::vector<char>&& buff) -> Result<Lexer>;
+  static auto create(const std::string& file)  -> Result<Lexer>;
 private:
   Lexer() = default;
 

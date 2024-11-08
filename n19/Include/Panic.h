@@ -15,26 +15,24 @@ namespace n19 {
   [[noreturn]] auto panic_impl_(const std::string &file, int line, const std::string &msg) -> void;
 }
 
-inline auto n19::panic_impl_(const std::string &file, const int line, const std::string &msg)
--> void {
+inline auto n19::panic_impl_(
+  const std::string &file,
+  const int line,
+  const std::string &msg ) -> void
+{
   // Red bold header
-  set_console(ConFg::Red);
-  set_console(ConStyle::Bold);
+  set_console(Con::Red, Con::Bold);
   std::println("PANIC :: {}", msg);
 
   // Location details
-  reset_console();
+  set_console(Con::Reset);
   std::println("In file \"{}\" at line {}.", file, line);
   ::exit(EXIT_FAILURE);
 }
 
-inline auto n19::exit_impl_(const std::string &msg)
--> void {
-  set_console(ConFg::Red);
-  set_console(ConStyle::Bold);
+inline auto n19::exit_impl_(const std::string &msg) -> void {
+  set_console(Con::Red, Con::Bold);
   std::println("FATAL :: {}", msg);
-
-  // Kill the program.
   ::exit(1);
 }
 

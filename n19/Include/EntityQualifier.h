@@ -11,9 +11,9 @@
   X(IsRvalue, 1ULL << 1)    \
 
 namespace n19 {
-  class TypeDescriptorBase;
-  class TypeDescriptor;
-  class TypeDescriptorThunk;
+  class EntityQualifierBase;
+  class EntityQualifier;
+  class EntityQualifierThunk;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,7 +22,7 @@ namespace n19 {
 // n19::TypeDescriptorBase applies qualifications to this type,
 // namely pointer depth, constness and array lengths.
 // this class does not represent the type itself.
-class n19::TypeDescriptorBase {
+class n19::EntityQualifierBase {
 public:
   auto is_constant() const -> bool;
   auto is_rvalue()   const -> bool;
@@ -40,35 +40,37 @@ public:
   uint32_t ptr_depth_ = 0;
   uint8_t flags_      = 0;
 
-  ~TypeDescriptorBase() = default;
-  TypeDescriptorBase() = default;
+  ~EntityQualifierBase() = default;
+  EntityQualifierBase() = default;
 };
 
 // Represents a fully resolved reference to a n19::Type.
 // Holds an entity ID and provides a way to access this
 // entity.
-class n19::TypeDescriptor final : public TypeDescriptorBase {
+class n19::EntityQualifier final
+  : public EntityQualifierBase {
 public:
   auto get(EntityTable &tbl) const -> Entity::Ptr<Type>;
 
-  std::vector<TypeDescriptor> generics_;
+  std::vector<EntityQualifier> generics_;
   Entity::ID id_ = 0;
 
-  ~TypeDescriptor() = default;
-  TypeDescriptor()  = default;
+  ~EntityQualifier() = default;
+  EntityQualifier()  = default;
 };
 
 // Represents an unresolved reference to a n19::Type.
 // Each type is represented as a relative namespace path to
 // a type that may or may not exist. Can be resolved into
 // a joy::TypeDescriptor.
-class n19::TypeDescriptorThunk final : public TypeDescriptorBase {
+class n19::EntityQualifierThunk final
+  : public EntityQualifierBase {
 public:
   std::vector<std::string> name_;
-  std::vector<TypeDescriptorThunk> generics_;
+  std::vector<EntityQualifierThunk> generics_;
 
-  ~TypeDescriptorThunk() = default;
-  TypeDescriptorThunk()  = default;
+  ~EntityQualifierThunk() = default;
+  EntityQualifierThunk()  = default;
 };
 
 #endif //TYPEDESCRIPTOR_H

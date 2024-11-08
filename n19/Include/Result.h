@@ -1,6 +1,7 @@
 #ifndef RESULT_H
 #define RESULT_H
 #include <expected>
+#include <optional>
 #include <cstdint>
 #include <format>
 #include <string>
@@ -36,6 +37,10 @@ namespace n19 {
   template<typename T>
   using Result = std::expected<T, ErrorDescriptor>;
   using Error = std::unexpected<ErrorDescriptor>;
+
+  // For consistency.
+  template<typename T>
+  using Maybe = std::optional<T>;
 
   template<typename T, typename ...Args>
   auto make_result(Args... args) -> Result<T>;

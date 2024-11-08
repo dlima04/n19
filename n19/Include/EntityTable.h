@@ -35,10 +35,10 @@ public:
     const std::string &lname
   ) -> Entity::Ptr<>;
 
-  auto exists(Entity::ID id) const -> bool;
-  auto find(Entity::ID id) -> Entity::Ptr<>;
-  auto get_root_entity() const -> Entity::Ptr<RootEntity>;
-  auto entries() const -> const std::unordered_map<Entity::ID, Entity::Ptr<>>&;
+  auto exists(Entity::ID id) const  -> bool;
+  auto entries() const              -> const std::unordered_map<Entity::ID, Entity::Ptr<>>&;
+  auto find(Entity::ID id)          -> Entity::Ptr<>;
+  auto get_root_entity() const      -> Entity::Ptr<RootEntity>;
 
   ~EntityTable() = default;
   explicit EntityTable(const std::string& name);

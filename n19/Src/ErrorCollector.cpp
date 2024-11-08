@@ -1,9 +1,9 @@
 #include <ErrorCollector.h>
 #include <FileRef.h>
-#include <Panic.h>
-#include <algorithm>
 #include <Result.h>
 #include <ResultMacros.h>
+#include <Panic.h>
+#include <algorithm>
 
 auto n19::ErrorCollector::store_error(
   const std::string &msg,
@@ -65,65 +65,81 @@ auto n19::ErrorCollector::display_error(
 }
 
 auto n19::ErrorCollector::display_error(
-  const std::string &msg,        // The error/warning message.
-  const std::string &file_name,  // The name given to this file.
-  const std::vector<char> &buff, // File buffer.
+  const std::string& msg,        // The error/warning message.
+  const std::string& file_name,  // The name given to this file.
+  const std::vector<char>& buff, // File buffer.
   size_t pos,                    // File buffer offset.
   const uint32_t line,           // Line number, optional
   const bool is_warn ) -> void   // Red/yellow error text
 {
-  std::string filler;
-  std::string whitespace;
-
   if(pos >= buff.size()) {
     pos = buff.size() - 1;
+  } if(buff[pos] == '\n') {
+    pos = !pos ? 1 : pos - 1;
+  } if(buff.empty()) {
+    return;
   }
 
   //
   // Calculate the length of the line that "pos" is on.
   // Get the entire line as a string.
   //
-  auto line_start = pos;
-  auto line_end   = pos;
-
-  while(line_start-- != 0 && buff[line_start] != '\n');
-  while(line_end++ < buff.size() && buff[line_end] != '\n');
-
-  const auto offset = pos - (line_start + 1);
-  auto full_line    = std::string(&buff[line_start], line_end - line_start);
-
-  if(full_line.empty() || offset >= full_line.size()) {
-    FATAL("Unexpected end of file.");
+  size_t line_start = pos;
+  size_t line_end   = pos;
+  try {
+    while(line_start != 0 && buff.at(line_start) != '\n') {
+      --line_start;
+    }
+    while(line_end < buff.size() - 1 && buff.at(line_end) != '\n') {
+      ++line_end;
+    }
+  } catch(const std::exception& e) {
+    PANIC(fmt("ErrorCollector::display_error: {}", e.what()));
   }
-  if(full_line.front() == '\n') {
-    full_line.erase(0,1);
-  }
+
+  const size_t arrow_off = pos - line_start;
+  ASSERT(line_end < buff.size());
+  ASSERT(line_start < buff.size());
+  ASSERT(arrow_off < buff.size());
 
   //
   // Create text filler below full line with arrow.
   //
-  filler.resize(full_line.size());
-  whitespace.resize(offset);
+  std::string filler;
+  std::string whitespace;
+  std::string full_line;
+  try {
+    for(size_t i = line_start; i < line_end; i++)
+      if(const auto& ch = buff.at(i); ch != '\n') {
+        filler += '~';
+        full_line += ch;
+      }
+    if(!filler.empty() && arrow_off < filler.size()) {
+      filler.at(arrow_off) = '^';
+    } else {
+      filler += '^';
+    }
+  } catch(const std::exception& e) {
+    PANIC(fmt("ErrorCollector::display_error: {}", e.what()));
+  }
 
-  std::ranges::fill(filler, '~');
+  whitespace.resize(arrow_off ? arrow_off : 1);
   std::ranges::fill(whitespace, ' ');
 
-  ASSERT(offset < filler.size());
-  filler[offset] = '^';
-
   //
-  // File header: bold. Error message: red/yellow.
+  // Display the error message.
   //
-  set_console(ConStyle::Bold);
-  std::println("In {}{}", file_name, !line ? std::string("") : ':' + std::to_string(line));
+  set_console(Con::Bold);
+  std::println("In {}{}", file_name, !line
+    ? std::string("") : ':' + std::to_string(line));
 
-  reset_console();
+  set_console(Con::Reset);
   std::println("{}", full_line);
   std::println("{}", filler);
 
-  set_console(is_warn ? ConFg::Yellow : ConFg::Red);
+  set_console(is_warn ? Con::Yellow : Con::Red);
   std::println("{}{}\n", whitespace, msg);
-  reset_console();
+  set_console(Con::Reset);
 }
 
 auto n19::ErrorCollector::emit() const -> Result<None> {

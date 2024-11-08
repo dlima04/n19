@@ -1,7 +1,8 @@
 #ifndef ASTNODES_H
 #define ASTNODES_H
 #include <Token.h>
-#include <TypeDescriptor.h>
+#include <EntityQualifier.h>
+#include <Concepts.h>
 #include <vector>
 #include <memory>
 #include <concepts>
@@ -39,19 +40,10 @@
   X(Subscript)                  \
 
 namespace n19 {
+  // Class forward decls.
   #define X(NAME) class Ast##NAME;
   N19_ASTNODE_TYPE_LIST
   #undef X
-
-  //
-  // IsAstNode:
-  // Constrain T to being an AstNode,
-  // or a derived class of AstNode.
-  //
-  template<typename T>
-  concept IsAstNode =
-    std::derived_from<T, AstNode> ||
-    std::is_same_v<T, AstNode>;
 }
 
 class n19::AstNode {
@@ -95,10 +87,33 @@ public:
   Type type_;
 
   //
+  // For debugging/viewing the AST. print() formats the node
+  // and it's children into a string representation and prints it.
+  //
+  virtual auto print(
+    uint32_t depth = 0
+  ) const -> void = 0;
+
+  //
   // Default virtual destructor so that
   // we get a Vtable for this...
   //
   virtual ~AstNode() = default;
+protected:
+  //
+  // Used internally to print
+  // data that is consistent across all
+  // AST nodes: file position, line number, etc.
+  //
+  auto print_(
+    uint32_t depth,
+    const std::string& node_name
+  ) const -> void;
+
+  //
+  // Constructor available to
+  // derived classes.
+  //
   AstNode(
     const size_t pos,
     const uint32_t line,
@@ -112,6 +127,9 @@ public:
 
 class n19::AstBinExpr final : public AstNode {
 public:
+  auto print(uint32_t depth = 0)
+    const -> void override; 
+  
   TokenType op_type_    = TokenType::None;
   TokenCategory op_cat_ = 0;
   AstNode::Ptr<> left_  = nullptr;
@@ -132,6 +150,9 @@ public:
   AstNode::Ptr<> operand_ = nullptr;
   bool is_postfix         = false; // only relevant for '--' and '++'
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+  
   ~AstUnaryExpr() override = default;
   AstUnaryExpr(
     const size_t pos,
@@ -152,6 +173,9 @@ public:
     FloatLit,
   } type_ = None;
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+  
   ~AstScalarLiteral() override = default;
   AstScalarLiteral(
     const size_t pos,
@@ -163,7 +187,10 @@ public:
 class n19::AstAggregateLiteral final : public AstNode {
 public:
   AstNode::Children<> children_;
-
+  
+  auto print(uint32_t depth = 0)
+    const -> void override;
+  
   ~AstAggregateLiteral() override = default;
   AstAggregateLiteral(
     const size_t pos,
@@ -176,6 +203,9 @@ class n19::AstEntityRef final : public AstNode {
 public:
   Entity::ID id_= N19_INVALID_ENTITY_ID;
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+  
   ~AstEntityRef() override = default;
   AstEntityRef(
     const size_t pos,
@@ -188,6 +218,9 @@ class n19::AstEntityRefThunk final : public AstNode {
 public:
   std::vector<std::string> name_;
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+  
   ~AstEntityRefThunk() override = default;
   AstEntityRefThunk(
     const size_t pos,
@@ -198,8 +231,11 @@ public:
 
 class n19::AstTypeRef final : public AstNode {
 public:
-  TypeDescriptor descriptor_;
+  EntityQualifier descriptor_;
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+  
   ~AstTypeRef() override = default;
   AstTypeRef(
     const size_t pos,
@@ -210,7 +246,10 @@ public:
 
 class n19::AstTypeRefThunk final : public AstNode {
 public:
-  TypeDescriptorThunk descriptor_;
+  EntityQualifierThunk descriptor_;
+
+  auto print(uint32_t depth = 0)
+    const -> void override;
 
   ~AstTypeRefThunk() override = default;
   AstTypeRefThunk(
@@ -226,6 +265,9 @@ public:
   AstNode::Ptr<> then_ = nullptr; // If block.
   AstNode::Ptr<> else_ = nullptr; // Can be null!
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+
   ~AstBranch() override = default;
   AstBranch(
     const size_t pos,
@@ -240,6 +282,9 @@ public:
   AstNode::Ptr<> then_      = nullptr; // Where block.
   AstNode::Ptr<> otherwise_ = nullptr; // Can be null!
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+  
   ~AstConstBranch() override = default;
   AstConstBranch(
     const size_t pos,
@@ -254,6 +299,9 @@ public:
   AstNode::Ptr<> value_ = nullptr;
   AstNode::Children<> children_;
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+  
   ~AstCase() override = default;
   AstCase(
     const size_t pos,
@@ -265,6 +313,9 @@ public:
 class n19::AstDefault final : public AstNode {
 public:
   AstNode::Children<> children_;
+
+  auto print(uint32_t depth = 0)
+    const -> void override;
 
   ~AstDefault() override = default;
   AstDefault(
@@ -280,6 +331,9 @@ public:
   AstNode::Ptr<AstDefault> dflt_ = nullptr;
   AstNode::Children<AstCase> cases_;
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+
   ~AstSwitch() override = default;
   AstSwitch(
     const size_t pos,
@@ -291,6 +345,9 @@ public:
 class n19::AstScopeBlock final : public AstNode {
 public:
   AstNode::Children<> children_;
+
+  auto print(uint32_t depth = 0)
+    const -> void override;
 
   ~AstScopeBlock() override = default;
   AstScopeBlock(
@@ -305,6 +362,9 @@ public:
   AstNode::Ptr<> target_ = nullptr;
   AstNode::Children<> arguments_;
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+
   ~AstCall() override = default;
   AstCall(
     const size_t pos,
@@ -316,6 +376,9 @@ public:
 class n19::AstDefer final : public AstNode {
 public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
+
+  auto print(uint32_t depth = 0)
+    const -> void override;
 
   ~AstDefer() override = default;
   AstDefer(
@@ -330,6 +393,9 @@ public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
   AstNode::Ptr<> condition_ = nullptr;  // The condition on which we call this.
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+
   ~AstDeferIf() override = default;
   AstDeferIf(
     const size_t pos,
@@ -342,6 +408,9 @@ class n19::AstVardecl final : public AstNode {
 public:
   AstNode::Ptr<> name_ = nullptr;  // EntityRef or EntityRefThunk
   AstNode::Ptr<> type_ = nullptr;  // TypeRef or TypeRefThunk
+
+  auto print(uint32_t depth = 0)
+    const -> void override;
 
   ~AstVardecl() override = default;
   AstVardecl(
@@ -357,6 +426,9 @@ public:
   AstNode::Children<> arg_decls_; // The parameter declarations (if any)
   AstNode::Children<> body_;      // The body of the procedure
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+
   ~AstProcDecl() override = default;
   AstProcDecl(
     const size_t pos,
@@ -369,6 +441,9 @@ class n19::AstReturn final : public AstNode {
 public:
   AstNode::Ptr<> value_ = nullptr; // Can be null!
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+
   ~AstReturn() override = default;
   AstReturn(
     const size_t pos,
@@ -379,6 +454,9 @@ public:
 
 class n19::AstBreak final : public AstNode {
 public:
+  auto print(uint32_t depth = 0)
+    const -> void override;
+
   ~AstBreak() override = default;
   AstBreak(
     const size_t pos,
@@ -389,6 +467,9 @@ public:
 
 class n19::AstContinue final : public AstNode {
 public:
+  auto print(uint32_t depth = 0)
+    const -> void override;
+
   ~AstContinue() override = default;
   AstContinue(
     const size_t pos,
@@ -404,6 +485,9 @@ public:
   AstNode::Ptr<> update_  = nullptr; // Can be null!
   AstNode::Ptr<> cond_    = nullptr; // Can be null!
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+
   ~AstFor() override = default;
   AstFor(
     const size_t pos,
@@ -418,6 +502,9 @@ public:
   AstNode::Ptr<> cond_ = nullptr; // The loop condition
   bool is_dowhile      = false;   // If true: the loop is a do-while.
 
+  auto print(uint32_t depth = 0)
+    const -> void override;
+
   ~AstWhile() override = default;
   AstWhile(
     const size_t pos,
@@ -430,6 +517,9 @@ class n19::AstSubscript final : public AstNode {
 public:
   AstNode::Ptr<> operand_ = nullptr; // The thing being subscripted.
   AstNode::Ptr<> value_   = nullptr; // The index value.
+
+  auto print(uint32_t depth = 0)
+    const -> void override;
 
   ~AstSubscript() override = default;
   AstSubscript(

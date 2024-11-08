@@ -19,6 +19,7 @@ public:
   [[nodiscard]] auto get_shared(uintmax_t amnt) const  -> Result<std::shared_ptr<std::vector<char>>>;
   [[nodiscard]] auto get_flat(uintmax_t amnt) const    -> Result<std::vector<char>>;
   [[nodiscard]] auto name() const                      -> std::string;
+  [[nodiscard]] auto absolute() const                  -> std::string;
 
   static auto create(const FileRef &other)          -> Result<FileRef>;
   static auto create(const std::wstring &file_name) -> Result<FileRef>;

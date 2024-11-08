@@ -12,28 +12,23 @@ n19::EntityTable::EntityTable(const std::string& name) {
   root_->name_  = "::";
 
   // Create all builtin types and initialize them.
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::I8);
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::U8);
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::I16);
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::U16);
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::I32);
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::U32);
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::I64);
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::U64);
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::F32);
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::F64);
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::Bool);
-  map_[curr_id_++] = std::make_shared<BuiltinType>(BuiltinType::Ptr);
+  // Ensure that their parent is the root entity.
+  constexpr BuiltinType::Type builtins[] = {
+  #define X(TYPE, UNUSED) BuiltinType::Type{BuiltinType::TYPE},
+    N19_ENTITY_BUILTIN_LIST
+  #undef X
+  };
 
-  // Make each builtin type's parent the root entity,
-  // add each builtin type as a child of the root.
-  for(auto &[ID, ptr] : map_) {
+  for(const auto& type : builtins) {
+    auto ptr = std::make_shared<BuiltinType>(type);
+    auto id  = curr_id_++;
+    ptr->id_ = id;
     ptr->parent_ = root_->id_;
-    ptr->id_ = ID;
-    root_->children_.emplace_back(ID);
+    root_->children_.emplace_back(id);
+    map_[id] = std::move(ptr);
   }
 
-  // Finally, add the root entity to the lookup table.
+  // Add the root entity to the lookup table.
   map_[root_->id_] = root_;
 }
 

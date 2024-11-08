@@ -1,6 +1,5 @@
 #include <ConManip.h>
 #include <print>
-#include <string>
 
 #if defined(N19_WIN32)
 #include <Windows.h>
@@ -30,29 +29,14 @@ auto n19::enable_vsequences() -> void {
 }
 
 auto n19::maybe_enable_vsequences() -> void {
-  if(!are_vsequences_enabled())
+  static bool already_did_this = false;
+  if(already_did_this) {
+    return;
+  } if(!are_vsequences_enabled()) {
     enable_vsequences();
+  }
+
+  already_did_this = true;
 }
 
 #endif // #if defined(N19_WIN32)
-
-auto n19::reset_console() -> void {
-#if defined(N19_WIN32)
-  maybe_enable_vsequences();
-#endif
-  std::print("\x1b[m");
-}
-
-auto n19::set_console(const ConStyle cs) -> void {
-#if defined(N19_WIN32)
-  maybe_enable_vsequences();
-#endif
-  std::print("\x1b[{}m", std::to_string((uint16_t)cs));
-}
-
-auto n19::set_console(const ConFg fg) -> void {
-#if defined(N19_WIN32)
-  maybe_enable_vsequences();
-#endif
-  std::print("\x1b[{}m", std::to_string((uint16_t)fg));
-}
