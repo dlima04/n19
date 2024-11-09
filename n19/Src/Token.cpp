@@ -84,33 +84,3 @@ auto n19::Token::illegal(
     str
   };
 }
-
-auto n19::TokenCategory::operator|=(const TokenCategory &other)
--> void { // Maybe returning void is bad here?
-  value |= other.value;
-}
-
-auto n19::TokenCategory::operator|=(const Value other)
--> void { // Maybe returning void is bad here?
-  value |= other;
-}
-
-auto n19::Token::operator==(const TokenType other) const
--> bool {
-  return type_ == other;
-}
-
-auto n19::Token::operator==(const Token &other) const
--> bool {
-  return other.type_ == this->type_;
-}
-
-auto n19::Token::operator!=(const Token &other) const
--> bool {
-  return other.type_ != type_;
-}
-
-auto n19::Token::operator!=(const TokenType other) const
--> bool {
-  return other != type_;
-}

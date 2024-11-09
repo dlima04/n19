@@ -109,12 +109,12 @@ auto n19::ErrorCollector::display_error(
   std::string whitespace;
   std::string full_line;
   try {
-    for(size_t i = line_start; i < line_end; i++)
+    for(size_t i = line_start; i < line_end; i++) {
       if(const auto& ch = buff.at(i); ch != '\n') {
         filler += '~';
         full_line += ch;
       }
-    if(!filler.empty() && arrow_off < filler.size()) {
+    } if(!filler.empty() && arrow_off < filler.size()) {
       filler.at(arrow_off) = '^';
     } else {
       filler += '^';

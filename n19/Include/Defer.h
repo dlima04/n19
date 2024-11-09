@@ -2,7 +2,7 @@
 #define DEFER_H
 #include <type_traits>
 
-#define DEFER(obj)          ::n19::Defer _(cond);
+#define DEFER(obj)          ::n19::Defer _(obj);
 #define DEFER_IF(cond, obj) ::n19::Defer _([&](){ if((cond))obj(); })
 
 namespace n19 {

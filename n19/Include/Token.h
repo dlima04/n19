@@ -124,6 +124,8 @@ namespace n19 {
   struct TokenCategory;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 struct n19::TokenType {
 #define X(TOKEN_TYPE, STR_UNUSED) TOKEN_TYPE,
   enum Value : uint16_t {
@@ -194,5 +196,38 @@ public:
     cat_(cat),
     value_(value) {}
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Inline functions
+
+inline auto n19::TokenCategory::operator|=(const TokenCategory &other)
+-> void { // Maybe returning void is bad here?
+  value |= other.value;
+}
+
+inline auto n19::TokenCategory::operator|=(const Value other)
+-> void { // Maybe returning void is bad here?
+  value |= other;
+}
+
+inline auto n19::Token::operator==(const TokenType other) const
+-> bool {
+  return type_ == other;
+}
+
+inline auto n19::Token::operator==(const Token &other) const
+-> bool {
+  return other.type_ == this->type_;
+}
+
+inline auto n19::Token::operator!=(const Token &other) const
+-> bool {
+  return other.type_ != type_;
+}
+
+inline auto n19::Token::operator!=(const TokenType other) const
+-> bool {
+  return other != type_;
+}
 
 #endif //TOKEN_H

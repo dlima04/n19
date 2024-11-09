@@ -91,7 +91,8 @@ public:
   // and it's children into a string representation and prints it.
   //
   virtual auto print(
-    uint32_t depth = 0
+    uint32_t depth,
+    const Maybe<std::string> &alias
   ) const -> void = 0;
 
   //
@@ -109,7 +110,7 @@ protected:
     uint32_t depth,
     const std::string& node_name
   ) const -> void;
-
+  
   //
   // Constructor available to
   // derived classes.
@@ -127,8 +128,10 @@ protected:
 
 class n19::AstBinExpr final : public AstNode {
 public:
-  auto print(uint32_t depth = 0)
-    const -> void override; 
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
   
   TokenType op_type_    = TokenType::None;
   TokenCategory op_cat_ = 0;
@@ -150,8 +153,10 @@ public:
   AstNode::Ptr<> operand_ = nullptr;
   bool is_postfix         = false; // only relevant for '--' and '++'
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
   
   ~AstUnaryExpr() override = default;
   AstUnaryExpr(
@@ -173,8 +178,10 @@ public:
     FloatLit,
   } type_ = None;
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
   
   ~AstScalarLiteral() override = default;
   AstScalarLiteral(
@@ -188,8 +195,10 @@ class n19::AstAggregateLiteral final : public AstNode {
 public:
   AstNode::Children<> children_;
   
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
   
   ~AstAggregateLiteral() override = default;
   AstAggregateLiteral(
@@ -203,8 +212,10 @@ class n19::AstEntityRef final : public AstNode {
 public:
   Entity::ID id_= N19_INVALID_ENTITY_ID;
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
   
   ~AstEntityRef() override = default;
   AstEntityRef(
@@ -218,8 +229,10 @@ class n19::AstEntityRefThunk final : public AstNode {
 public:
   std::vector<std::string> name_;
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override;
   
   ~AstEntityRefThunk() override = default;
   AstEntityRefThunk(
@@ -233,8 +246,10 @@ class n19::AstTypeRef final : public AstNode {
 public:
   EntityQualifier descriptor_;
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
   
   ~AstTypeRef() override = default;
   AstTypeRef(
@@ -248,8 +263,10 @@ class n19::AstTypeRefThunk final : public AstNode {
 public:
   EntityQualifierThunk descriptor_;
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstTypeRefThunk() override = default;
   AstTypeRefThunk(
@@ -265,8 +282,10 @@ public:
   AstNode::Ptr<> then_ = nullptr; // If block.
   AstNode::Ptr<> else_ = nullptr; // Can be null!
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstBranch() override = default;
   AstBranch(
@@ -282,8 +301,10 @@ public:
   AstNode::Ptr<> then_      = nullptr; // Where block.
   AstNode::Ptr<> otherwise_ = nullptr; // Can be null!
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
   
   ~AstConstBranch() override = default;
   AstConstBranch(
@@ -297,10 +318,12 @@ class n19::AstCase final : public AstNode {
 public:
   bool is_fallthrough = false;
   AstNode::Ptr<> value_ = nullptr;
-  AstNode::Children<> children_;
+  AstNode::Ptr<> children_;
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
   
   ~AstCase() override = default;
   AstCase(
@@ -314,8 +337,10 @@ class n19::AstDefault final : public AstNode {
 public:
   AstNode::Children<> children_;
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstDefault() override = default;
   AstDefault(
@@ -331,8 +356,10 @@ public:
   AstNode::Ptr<AstDefault> dflt_ = nullptr;
   AstNode::Children<AstCase> cases_;
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstSwitch() override = default;
   AstSwitch(
@@ -346,8 +373,10 @@ class n19::AstScopeBlock final : public AstNode {
 public:
   AstNode::Children<> children_;
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstScopeBlock() override = default;
   AstScopeBlock(
@@ -362,8 +391,10 @@ public:
   AstNode::Ptr<> target_ = nullptr;
   AstNode::Children<> arguments_;
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstCall() override = default;
   AstCall(
@@ -377,8 +408,10 @@ class n19::AstDefer final : public AstNode {
 public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstDefer() override = default;
   AstDefer(
@@ -393,8 +426,10 @@ public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
   AstNode::Ptr<> condition_ = nullptr;  // The condition on which we call this.
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstDeferIf() override = default;
   AstDeferIf(
@@ -409,8 +444,10 @@ public:
   AstNode::Ptr<> name_ = nullptr;  // EntityRef or EntityRefThunk
   AstNode::Ptr<> type_ = nullptr;  // TypeRef or TypeRefThunk
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstVardecl() override = default;
   AstVardecl(
@@ -426,8 +463,10 @@ public:
   AstNode::Children<> arg_decls_; // The parameter declarations (if any)
   AstNode::Children<> body_;      // The body of the procedure
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstProcDecl() override = default;
   AstProcDecl(
@@ -441,8 +480,10 @@ class n19::AstReturn final : public AstNode {
 public:
   AstNode::Ptr<> value_ = nullptr; // Can be null!
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstReturn() override = default;
   AstReturn(
@@ -454,8 +495,10 @@ public:
 
 class n19::AstBreak final : public AstNode {
 public:
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstBreak() override = default;
   AstBreak(
@@ -467,8 +510,10 @@ public:
 
 class n19::AstContinue final : public AstNode {
 public:
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstContinue() override = default;
   AstContinue(
@@ -480,13 +525,15 @@ public:
 
 class n19::AstFor final : public AstNode {
 public:
-  AstNode::Children<> body_;
+  AstNode::Ptr<> body_    = nullptr;
   AstNode::Ptr<> init_    = nullptr; // Can be null!
   AstNode::Ptr<> update_  = nullptr; // Can be null!
   AstNode::Ptr<> cond_    = nullptr; // Can be null!
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstFor() override = default;
   AstFor(
@@ -502,8 +549,10 @@ public:
   AstNode::Ptr<> cond_ = nullptr; // The loop condition
   bool is_dowhile      = false;   // If true: the loop is a do-while.
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstWhile() override = default;
   AstWhile(
@@ -518,8 +567,10 @@ public:
   AstNode::Ptr<> operand_ = nullptr; // The thing being subscripted.
   AstNode::Ptr<> value_   = nullptr; // The index value.
 
-  auto print(uint32_t depth = 0)
-    const -> void override;
+  auto print(
+    uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
 
   ~AstSubscript() override = default;
   AstSubscript(

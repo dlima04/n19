@@ -2,9 +2,9 @@
 #define ENTITYTABLE_H
 #include <Entity.h>
 #include <Fmt.h>
+#include <Panic.h>
 #include <Result.h>
 #include <unordered_map>
-#include <Panic.h>
 
 namespace n19 {
   class EntityTable;
@@ -35,10 +35,10 @@ public:
     const std::string &lname
   ) -> Entity::Ptr<>;
 
-  auto exists(Entity::ID id) const  -> bool;
-  auto entries() const              -> const std::unordered_map<Entity::ID, Entity::Ptr<>>&;
-  auto find(Entity::ID id)          -> Entity::Ptr<>;
-  auto get_root_entity() const      -> Entity::Ptr<RootEntity>;
+  auto exists(Entity::ID id) const -> bool;
+  auto entries()             const -> const std::unordered_map<Entity::ID, Entity::Ptr<>>&;
+  auto find(Entity::ID id)   const -> Entity::Ptr<>;
+  auto get_root_entity()     const -> Entity::Ptr<RootEntity>;
 
   ~EntityTable() = default;
   explicit EntityTable(const std::string& name);

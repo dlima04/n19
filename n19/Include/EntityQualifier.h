@@ -5,10 +5,10 @@
 #include <memory>
 #include <cstdint>
 
-#define JOY_TD_FLAG_LIST    \
-  X(None, 0ULL)             \
-  X(IsConstant, 1ULL)       \
-  X(IsRvalue, 1ULL << 1)    \
+#define N19_EQ_FLAG_LIST   \
+  X(None, 0ULL)            \
+  X(Constant, 1ULL)        \
+  X(Rvalue, 1ULL << 1)     \
 
 namespace n19 {
   class EntityQualifierBase;
@@ -32,7 +32,7 @@ public:
 
   enum Flags : uint8_t {
   #define X(NAME, VALUE) NAME = VALUE,
-    JOY_TD_FLAG_LIST
+    N19_EQ_FLAG_LIST
   #undef X
   };
 
@@ -50,7 +50,20 @@ public:
 class n19::EntityQualifier final
   : public EntityQualifierBase {
 public:
-  auto get(EntityTable &tbl) const -> Entity::Ptr<Type>;
+  auto to_string(
+    const EntityTable& tbl,
+    bool include_qualifiers = true,
+    bool include_postfixes = true
+  ) const -> std::string;
+
+  auto get_entity_ptr(
+    const EntityTable& tbl
+  ) const -> Entity::Ptr<Type>;
+
+  auto format() const -> std::string;
+  static auto get_const_bool() -> EntityQualifier;
+  static auto get_const_f64() -> EntityQualifier;
+  static auto get_const_ptr() -> EntityQualifier;
 
   std::vector<EntityQualifier> generics_;
   Entity::ID id_ = 0;
@@ -66,11 +79,46 @@ public:
 class n19::EntityQualifierThunk final
   : public EntityQualifierBase {
 public:
+  auto to_string() const -> std::string;
+  auto format() const -> std::string;
+
   std::vector<std::string> name_;
   std::vector<EntityQualifierThunk> generics_;
 
   ~EntityQualifierThunk() = default;
   EntityQualifierThunk()  = default;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+inline auto n19::EntityQualifier::get_entity_ptr(const EntityTable &tbl) const
+-> Entity::Ptr<Type> {
+  return std::dynamic_pointer_cast<Type>(tbl.find(id_));
+}
+
+inline auto n19::EntityQualifierBase::is_constant() const
+-> bool {
+  return flags_ & Constant;
+}
+
+inline auto n19::EntityQualifierBase::is_rvalue() const
+-> bool {
+  return flags_ & Rvalue;
+}
+
+inline auto n19::EntityQualifierBase::is_pointer() const
+-> bool {
+  return ptr_depth_ > 0;
+}
+
+inline auto n19::EntityQualifierBase::is_array() const
+-> bool {
+  return !arr_lengths_.empty();
+}
+
+inline auto n19::EntityQualifierBase::is_matrice() const
+-> bool {
+  return arr_lengths_.size() > 1;
+}
 
 #endif //TYPEDESCRIPTOR_H
