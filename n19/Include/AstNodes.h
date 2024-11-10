@@ -22,12 +22,16 @@
   X(BinExpr)                    \
   X(UnaryExpr)                  \
   X(Branch)                     \
+  X(If)                         \
+  X(Else)                       \
   X(Switch)                     \
   X(Case)                       \
   X(Default)                    \
   X(For)                        \
   X(While)                      \
   X(ConstBranch)                \
+  X(Where)                      \
+  X(Otherwise)                  \
   X(ScopeBlock)                 \
   X(NamespaceBlock)             \
   X(Call)                       \
@@ -64,7 +68,7 @@ public:
   // For polymorphism in containers.
   //
   template<typename T = AstNode> requires IsAstNode<T>
-  using Ptr = std::shared_ptr<T>;
+  using Ptr = std::unique_ptr<T>;
 
   //
   // The default container for storing child
@@ -76,16 +80,16 @@ public:
 
   //
   // The public members of AstNode.
-  // we need to store a pointer to the node's parent,
+  // we need to store a non-owning pointer to the node's parent,
   // as well as some necessary info such as the file it
   // belongs to and it's location.
   //
-  std::weak_ptr<AstNode> parent_;
-  size_t pos_;
-  uint32_t line_;
+  AstNode* parent_ = nullptr;
+  size_t pos_      = 0;
+  uint32_t line_   = 1;
   std::string file_;
   Type type_;
-
+  
   //
   // For debugging/viewing the AST. print() formats the node
   // and it's children into a string representation and prints it.
@@ -96,9 +100,16 @@ public:
   ) const -> void = 0;
 
   //
-  // Default virtual destructor so that
-  // we get a Vtable for this...
+  // Factory for producing AST nodes.
   //
+  template<class T> requires IsAstNode<T>
+  static auto create(
+    size_t pos,
+    uint32_t line,
+    AstNode* parent = nullptr,
+    const std::string& file = ""
+  ) -> Ptr<T>;
+
   virtual ~AstNode() = default;
 protected:
   //
@@ -106,7 +117,7 @@ protected:
   // data that is consistent across all
   // AST nodes: file position, line number, etc.
   //
-  auto print_(
+  auto _print(
     uint32_t depth,
     const std::string& node_name
   ) const -> void;
@@ -128,16 +139,15 @@ protected:
 
 class n19::AstBinExpr final : public AstNode {
 public:
-  auto print(
-    uint32_t depth,
-    const Maybe<std::string> &alias
-  ) const -> void override; 
-  
   TokenType op_type_    = TokenType::None;
   TokenCategory op_cat_ = 0;
   AstNode::Ptr<> left_  = nullptr;
   AstNode::Ptr<> right_ = nullptr;
-
+  
+  auto print(uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
+  
   ~AstBinExpr() override = default;
   AstBinExpr(
     const size_t pos,
@@ -153,8 +163,7 @@ public:
   AstNode::Ptr<> operand_ = nullptr;
   bool is_postfix         = false; // only relevant for '--' and '++'
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
   
@@ -178,8 +187,7 @@ public:
     FloatLit,
   } type_ = None;
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
   
@@ -195,8 +203,7 @@ class n19::AstAggregateLiteral final : public AstNode {
 public:
   AstNode::Children<> children_;
   
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
   
@@ -212,8 +219,7 @@ class n19::AstEntityRef final : public AstNode {
 public:
   Entity::ID id_= N19_INVALID_ENTITY_ID;
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
   
@@ -229,10 +235,9 @@ class n19::AstEntityRefThunk final : public AstNode {
 public:
   std::vector<std::string> name_;
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override;
+  ) const -> void override; 
   
   ~AstEntityRefThunk() override = default;
   AstEntityRefThunk(
@@ -246,8 +251,7 @@ class n19::AstTypeRef final : public AstNode {
 public:
   EntityQualifier descriptor_;
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
   
@@ -263,8 +267,7 @@ class n19::AstTypeRefThunk final : public AstNode {
 public:
   EntityQualifierThunk descriptor_;
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -276,14 +279,78 @@ public:
   ) : AstNode(pos, line, file, Type::TypeRefThunk) {}
 };
 
+class n19::AstIf final : public AstNode {
+public:
+  AstNode::Children<> body_;
+  AstNode::Ptr<> condition_ = nullptr;
+
+  auto print(uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
+
+  ~AstIf() override = default;
+  AstIf(
+    const size_t pos,
+    const uint32_t line,
+    const std::string& file
+  ) : AstNode(pos, line, file, Type::If) {}
+};
+
+class n19::AstElse final : public AstNode {
+public:
+  AstNode::Children<> body_;
+
+  auto print(uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
+
+  ~AstElse() override = default;
+  AstElse(
+    const size_t pos,
+    const uint32_t line,
+    const std::string& file
+  ) : AstNode(pos, line, file, Type::Else) {}
+};
+
+class n19::AstWhere final : public AstNode {
+public:
+  AstNode::Children<> body_;
+  AstNode::Ptr<> condition_ = nullptr;
+
+  auto print(uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
+
+  ~AstWhere() override = default;
+  AstWhere(
+    const size_t pos,
+    const uint32_t line,
+    const std::string& file
+  ) : AstNode(pos, line, file, Type::Where) {}
+};
+
+class n19::AstOtherwise final : public AstNode {
+public:
+  AstNode::Children<> body_;
+
+  auto print(uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override; 
+
+  ~AstOtherwise() override = default;
+  AstOtherwise(
+    const size_t pos,
+    const uint32_t line,
+    const std::string& file
+  ) : AstNode(pos, line, file, Type::Otherwise) {}
+};
+
 class n19::AstBranch final : public AstNode {
 public:
-  AstNode::Ptr<> if_   = nullptr; // If condition.
-  AstNode::Ptr<> then_ = nullptr; // If block.
-  AstNode::Ptr<> else_ = nullptr; // Can be null!
+  AstNode::Ptr<AstIf> if_     = nullptr; // If condition + block
+  AstNode::Ptr<AstElse> else_ = nullptr; // Can be null!
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -297,12 +364,10 @@ public:
 
 class n19::AstConstBranch final : public AstNode {
 public:
-  AstNode::Ptr<> where_     = nullptr; // Where condition.
-  AstNode::Ptr<> then_      = nullptr; // Where block.
-  AstNode::Ptr<> otherwise_ = nullptr; // Can be null!
+  AstNode::Ptr<AstWhere> where_ = nullptr;
+  AstNode::Ptr<AstOtherwise> otherwise_ = nullptr; // Can be null!
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
   
@@ -318,10 +383,9 @@ class n19::AstCase final : public AstNode {
 public:
   bool is_fallthrough = false;
   AstNode::Ptr<> value_ = nullptr;
-  AstNode::Ptr<> children_;
+  AstNode::Children<> children_;
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
   
@@ -337,8 +401,7 @@ class n19::AstDefault final : public AstNode {
 public:
   AstNode::Children<> children_;
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -356,8 +419,7 @@ public:
   AstNode::Ptr<AstDefault> dflt_ = nullptr;
   AstNode::Children<AstCase> cases_;
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -373,8 +435,7 @@ class n19::AstScopeBlock final : public AstNode {
 public:
   AstNode::Children<> children_;
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -391,8 +452,7 @@ public:
   AstNode::Ptr<> target_ = nullptr;
   AstNode::Children<> arguments_;
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -408,8 +468,7 @@ class n19::AstDefer final : public AstNode {
 public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -426,8 +485,7 @@ public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
   AstNode::Ptr<> condition_ = nullptr;  // The condition on which we call this.
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -444,8 +502,7 @@ public:
   AstNode::Ptr<> name_ = nullptr;  // EntityRef or EntityRefThunk
   AstNode::Ptr<> type_ = nullptr;  // TypeRef or TypeRefThunk
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -463,8 +520,7 @@ public:
   AstNode::Children<> arg_decls_; // The parameter declarations (if any)
   AstNode::Children<> body_;      // The body of the procedure
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -480,8 +536,7 @@ class n19::AstReturn final : public AstNode {
 public:
   AstNode::Ptr<> value_ = nullptr; // Can be null!
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -495,8 +550,7 @@ public:
 
 class n19::AstBreak final : public AstNode {
 public:
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -510,8 +564,7 @@ public:
 
 class n19::AstContinue final : public AstNode {
 public:
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -530,8 +583,7 @@ public:
   AstNode::Ptr<> update_  = nullptr; // Can be null!
   AstNode::Ptr<> cond_    = nullptr; // Can be null!
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -549,8 +601,7 @@ public:
   AstNode::Ptr<> cond_ = nullptr; // The loop condition
   bool is_dowhile      = false;   // If true: the loop is a do-while.
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -567,8 +618,7 @@ public:
   AstNode::Ptr<> operand_ = nullptr; // The thing being subscripted.
   AstNode::Ptr<> value_   = nullptr; // The index value.
 
-  auto print(
-    uint32_t depth,
+  auto print(uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void override; 
 
@@ -582,5 +632,16 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+template<class T> requires n19::IsAstNode<T>
+auto n19::AstNode::create(
+  const size_t pos,
+  const uint32_t line,
+  AstNode* parent,
+  const std::string& file ) -> Ptr<T>
+{
+  auto ptr = std::make_unique<T>(pos, line, file);
+  if(parent) ptr->parent_ = parent;
+  return ptr;
+}
 
 #endif //ASTNODES_H

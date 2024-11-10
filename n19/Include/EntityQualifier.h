@@ -79,7 +79,10 @@ public:
 class n19::EntityQualifierThunk final
   : public EntityQualifierBase {
 public:
-  auto to_string() const -> std::string;
+  auto to_string(
+    bool include_qualifiers = true,
+    bool include_postfixes = true
+  ) const -> std::string;
   auto format() const -> std::string;
 
   std::vector<std::string> name_;

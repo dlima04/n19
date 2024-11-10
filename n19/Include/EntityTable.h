@@ -5,6 +5,7 @@
 #include <Panic.h>
 #include <Result.h>
 #include <unordered_map>
+#include <print>
 
 namespace n19 {
   class EntityTable;

@@ -43,7 +43,7 @@ namespace n19 {
   using Maybe = std::optional<T>;
 
   template<typename T, typename ...Args>
-  auto make_result(Args... args) -> Result<T>;
+  auto make_result(Args&&... args) -> Result<T>;
 
   template<typename ...Args>
   auto make_error(ErrC code, std::format_string<Args...>, Args... args) -> Error;
@@ -65,8 +65,8 @@ struct n19::None {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T, typename ...Args>
-auto n19::make_result(Args... args) -> Result<T> {
-  return Result<T>{ T(args...) };
+auto n19::make_result(Args&&... args) -> Result<T> {
+  return Result<T>{ T(std::forward<Args>(args)...) };
 }
 
 template<typename... Args>

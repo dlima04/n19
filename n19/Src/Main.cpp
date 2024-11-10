@@ -3,16 +3,35 @@
 #include <Lexer.h>
 #include <Result.h>
 #include <ResultMacros.h>
+#include <AstNodes.h>
 #include <EntityQualifier.h>
 #include <ConManip.h>
+#include <memory>
+#include <StopWatch.h>
+
 #define CURRENT_TEST "C:\\Users\\diago\\Desktop\\compiler_tests\\test1.txt"
 using namespace n19;
 
-int main() {
-  int x = 1;
-  int y = 0;
-  std::cout << (x & y) << std::endl;
+Result<AstNode::Ptr<>> foo() {
+  auto branch = std::make_unique<AstBranch>(
+    30, 3, ""
+  );
 
+  auto _if = std::make_unique<AstIf>(21, 300, "");
+  auto _else = std::make_unique<AstElse>(33,1,"");
+  auto cond =  std::make_unique<AstScalarLiteral>(121,333, "");
+
+  _else->body_.emplace_back(std::make_unique<AstReturn>(1,2,""));
+  _if->body_.emplace_back(std::make_unique<AstBreak>(123,22,""));
+  cond->value_    = "true";
+  _if->condition_ = std::move(cond);
+
+  branch->if_ = std::move(_if);
+  //branch->else_ = std::move(_else);
+  return make_result<AstNode::Ptr<>>(std::move(branch));
+}
+
+int main() {
 
 
   /*try {
