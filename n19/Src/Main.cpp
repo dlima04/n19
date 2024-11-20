@@ -32,9 +32,7 @@ Result<AstNode::Ptr<>> foo() {
 }
 
 int main() {
-
-
-  /*try {
+  try {
     const auto file = MUST(FileRef::create(CURRENT_TEST));
     auto lxr = MUST(Lexer::create(*file));
     do {
@@ -48,7 +46,7 @@ int main() {
   } catch(const std::exception& e) {
     std::cerr << "EXCEPTION: " << e.what() << std::endl;
     return 1;
-  }*/
+  }
 
   std::cout.flush();
   return 0;

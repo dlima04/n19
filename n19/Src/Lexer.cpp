@@ -1058,42 +1058,42 @@ inline auto n19::Lexer::_token_hyphen() -> void {
 
 auto n19::Lexer::_curr_char_is_reserved() const -> bool {
   switch(_current_char()) {
-    case ' ':  // < reserved
-    case '\r': // < reserved
-    case '\b': // < reserved
-    case '\t': // < reserved
-    case '\n': // < reserved
-    case ';':  // < reserved
-    case '(':  // < reserved
-    case ')':  // < reserved
-    case '{':  // < reserved
-    case '}':  // < reserved
-    case ',':  // < reserved
-    case '-':  // < reserved
-    case '+':  // < reserved
-    case '*':  // < reserved
-    case '/':  // < reserved
-    case '%':  // < reserved
-    case '=':  // < reserved
-    case '<':  // < reserved
-    case '>':  // < reserved
-    case '&':  // < reserved
-    case '|':  // < reserved
-    case '!':  // < reserved
-    case '~':  // < reserved
-    case '^':  // < reserved
-    case '\'': // < reserved
-    case '"':  // < reserved
-    case '`':   // < reserved
-    case '[':  // < reserved
-    case ']':  // < reserved
-    case '?':  // < reserved
-    case ':':  // < reserved
-    case '#':  // < reserved
-    case '@':  // < reserved
-    case '.':  // < reserved
-    case '\\': // < reserved
-    case '$':  // < reserved
+    case ' ':  [[fallthrough]];
+    case '\r': [[fallthrough]];
+    case '\b': [[fallthrough]];
+    case '\t': [[fallthrough]];
+    case '\n': [[fallthrough]];
+    case ';':  [[fallthrough]];
+    case '(':  [[fallthrough]];
+    case ')':  [[fallthrough]];
+    case '{':  [[fallthrough]];
+    case '}':  [[fallthrough]];
+    case ',':  [[fallthrough]];
+    case '-':  [[fallthrough]];
+    case '+':  [[fallthrough]];
+    case '*':  [[fallthrough]];
+    case '/':  [[fallthrough]];
+    case '%':  [[fallthrough]];
+    case '=':  [[fallthrough]];
+    case '<':  [[fallthrough]];
+    case '>':  [[fallthrough]];
+    case '&':  [[fallthrough]];
+    case '|':  [[fallthrough]];
+    case '!':  [[fallthrough]];
+    case '~':  [[fallthrough]];
+    case '^':  [[fallthrough]];
+    case '\'': [[fallthrough]];
+    case '"':  [[fallthrough]];
+    case '`':  [[fallthrough]];
+    case '[':  [[fallthrough]];
+    case ']':  [[fallthrough]];
+    case '?':  [[fallthrough]];
+    case ':':  [[fallthrough]];
+    case '#':  [[fallthrough]];
+    case '@':  [[fallthrough]];
+    case '.':  [[fallthrough]];
+    case '\\': [[fallthrough]];
+    case '$':  [[fallthrough]];
     case '\0': return true;
     default:   return false;
   }
