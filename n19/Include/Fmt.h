@@ -1,5 +1,12 @@
-// A runtime format utility.
-// Utilizes std::vformat.
+/*
+* Copyright (c) 2024 Diago Lima
+* All rights reserved.
+*
+* This software is licensed under the BSD 3-Clause "New" or "Revised" License.
+* See the LICENSE file located at this project's root directory for
+* more information.
+*/
+
 #ifndef FMT_H
 #define FMT_H
 #include <string>

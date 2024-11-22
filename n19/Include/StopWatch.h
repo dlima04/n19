@@ -1,5 +1,14 @@
-#ifndef WATCH_H
-#define WATCH_H
+/*
+* Copyright (c) 2024 Diago Lima
+* All rights reserved.
+*
+* This software is licensed under the BSD 3-Clause "New" or "Revised" License.
+* See the LICENSE file located at this project's root directory for
+* more information.
+*/
+
+#ifndef STOPWATCH_H
+#define STOPWATCH_H
 #include <chrono>
 
 namespace n19 {
@@ -41,4 +50,4 @@ auto n19::StopWatch<T, Units, Clock>::elapsed() const -> T {
   return dur.count();
 }
 
-#endif //WATCH_H
+#endif //STOPWATCH_H
