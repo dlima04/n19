@@ -9,7 +9,7 @@
 #include <memory>
 #include <StopWatch.h>
 
-#define CURRENT_TEST "/Users/Diago/Desktop/compiler_tests/test1.txt"
+#define CURRENT_TEST "/Users/Diago/Desktop/compiler_tests/test2.txt"
 using namespace n19;
 
 Result<AstNode::Ptr<>> foo() {
@@ -44,7 +44,6 @@ int main() {
     }
   } catch(const std::exception& e) {
     std::cerr << "EXCEPTION: " << e.what() << std::endl;
-    return 1;
   }
 
   std::cout.flush();

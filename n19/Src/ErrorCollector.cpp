@@ -4,6 +4,8 @@
 #include <ResultMacros.h>
 #include <Panic.h>
 #include <algorithm>
+#include <stdexcept>
+#include <cctype>
 
 auto n19::ErrorCollector::store_error(
   const std::string &msg,
@@ -72,73 +74,54 @@ auto n19::ErrorCollector::display_error(
   const uint32_t line,           // Line number, optional
   const bool is_warn ) -> void   // Red/yellow error text
 {
+  ASSERT(!buff.empty());
+  std::string before;  // The bytes that appear before "pos"
+  std::string after;   // The byte at "pos", and the ones after it.
+  std::string filler;  // The squiggly lines and pointy arrow.
+  std::string spaces;  // The spaces to the left of the message.
+
   if(pos >= buff.size()) {
     pos = buff.size() - 1;
-  } if(buff.at(pos) == '\n') {
-    pos = !pos ? 1 : pos - 1;
-  } if(buff.empty()) {
-    return;
   }
 
-  //
-  // Calculate the length of the line that "pos" is on.
-  // Get the entire line as a string.
-  //
-  size_t line_start = pos;
-  size_t line_end   = pos;
   try {
-    while(line_start != 0 && buff.at(line_start) != '\n') {
-      --line_start;
+    for(size_t i = pos - 1; buff.at(i) != '\n'; i--) {
+      const char ch = buff.at(i);
+      if(!std::isprint(static_cast<uint8_t>(ch)))
+        continue;
+      before += ch;
+      filler += '~';
     }
-    while(line_end < buff.size() - 1 && buff.at(line_end) != '\n') {
-      ++line_end;
-    }
-  } catch(const std::exception& e) {
-    PANIC(fmt("ErrorCollector::display_error: {}", e.what()));
-  }
+  } catch(...) {} // NOLINT(*-empty-catch)
 
-  const size_t arrow_off = pos - line_start;
-  ASSERT(line_end < buff.size());
-  ASSERT(line_start < buff.size());
-  ASSERT(arrow_off < buff.size());
-
-  //
-  // Create text filler below full line with arrow.
-  //
-  std::string filler;
-  std::string whitespace;
-  std::string full_line;
   try {
-    for(size_t i = line_start; i < line_end; i++) {
-      if(const auto& ch = buff.at(i); ch != '\n') {
-        filler += '~';
-        full_line += ch;
-      }
-    } if(!filler.empty() && arrow_off < filler.size()) {
-      filler.at(arrow_off) = '^';
-    } else {
-      filler += '^';
+    for(size_t i = pos; buff.at(i) != '\n'; i++) {
+      const char ch = buff.at(i);
+      if(!std::isprint(static_cast<uint8_t>(ch)))
+        continue;
+      after += ch;
+      filler += i == pos ? '^' : '~';
     }
-  } catch(const std::exception& e) {
-    PANIC(fmt("ErrorCollector::display_error: {}", e.what()));
+  } catch(...) {} // NOLINT(*-empty-catch)
+
+  std::ranges::reverse(before);
+  before += after;
+
+  for(const auto ch : filler) {
+    if(ch == '^') break;
+    spaces += ' ';
   }
 
-  whitespace.resize(arrow_off ? arrow_off : 1);
-  std::fill(whitespace.begin(), whitespace.end(), ' ');
-
-  //
-  // Display the error message.
-  //
   set_console(Con::Bold);
   std::println("In {}{}", file_name, !line
     ? std::string("") : ':' + std::to_string(line));
 
   set_console(Con::Reset);
-  std::println("{}", full_line);
+  std::println("{}", before);
   std::println("{}", filler);
 
   set_console(is_warn ? Con::Yellow : Con::Red);
-  std::println("{}{}\n", whitespace, msg);
+  std::println("{}{}\n", spaces, msg);
   set_console(Con::Reset);
 }
 

@@ -22,10 +22,10 @@ Checks: >
   -readability-named-parameter,
   -readability-magic-numbers,
   -readability-uppercase-literal-suffix,
-  -readability-use-anyofallof,
   -readability-identifier-length,
   -readability-implicit-bool-conversion,
-  -modernize-use-if-init
+  -modernize-use-if-init,
+  -empty-catch
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: none
