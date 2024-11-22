@@ -74,7 +74,7 @@ auto n19::ErrorCollector::display_error(
 {
   if(pos >= buff.size()) {
     pos = buff.size() - 1;
-  } if(buff[pos] == '\n') {
+  } if(buff.at(pos) == '\n') {
     pos = !pos ? 1 : pos - 1;
   } if(buff.empty()) {
     return;
@@ -124,7 +124,7 @@ auto n19::ErrorCollector::display_error(
   }
 
   whitespace.resize(arrow_off ? arrow_off : 1);
-  std::ranges::fill(whitespace, ' ');
+  std::fill(whitespace.begin(), whitespace.end(), ' ');
 
   //
   // Display the error message.

@@ -24,12 +24,13 @@ namespace n19 {
     ((std::is_same_v<T, Us> || ...));
 
   // n19::IsSame
-  // Constrains each type in the pack Ts
-  // to being the same as the types in the pack Us.
-  template <class... Ts, class... Us>
+  // Constrains the type T to being the same as
+  // the type U (removes reference qualifications).
+  template <class T, class U>
   concept IsSame =
-    (sizeof...(Ts) == sizeof...(Us)) &&
-    (std::is_same_v<Ts, Us> && ...);
+    std::is_same_v<
+      std::remove_reference_t<T>,
+      std::remove_reference_t<U>>;
 
   // n19::IsIntOrFloatingPoint
   // The name is self explanatory

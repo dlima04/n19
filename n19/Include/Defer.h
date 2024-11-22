@@ -3,7 +3,7 @@
 #include <type_traits>
 
 #define DEFER(obj)          ::n19::Defer _(obj);
-#define DEFER_IF(cond, obj) ::n19::Defer _([&](){ if((cond))obj(); })
+#define DEFER_IF(cond, obj) ::n19::Defer _([&](){ if((cond)){obj();} })
 
 namespace n19 {
   template<typename T> requires std::is_invocable_v<T>

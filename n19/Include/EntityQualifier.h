@@ -24,11 +24,11 @@ namespace n19 {
 // this class does not represent the type itself.
 class n19::EntityQualifierBase {
 public:
-  auto is_constant() const -> bool;
-  auto is_rvalue()   const -> bool;
-  auto is_pointer()  const -> bool;
-  auto is_array()    const -> bool;
-  auto is_matrice()  const -> bool;
+  [[nodiscard]] auto is_constant() const -> bool;
+  [[nodiscard]] auto is_rvalue()   const -> bool;
+  [[nodiscard]] auto is_pointer()  const -> bool;
+  [[nodiscard]] auto is_array()    const -> bool;
+  [[nodiscard]] auto is_matrice()  const -> bool;
 
   enum Flags : uint8_t {
   #define X(NAME, VALUE) NAME = VALUE,
@@ -50,20 +50,20 @@ public:
 class n19::EntityQualifier final
   : public EntityQualifierBase {
 public:
-  auto to_string(
+  [[nodiscard]] auto to_string(
     const EntityTable& tbl,
     bool include_qualifiers = true,
     bool include_postfixes = true
   ) const -> std::string;
 
-  auto get_entity_ptr(
+  [[nodiscard]] auto get_entity_ptr(
     const EntityTable& tbl
   ) const -> Entity::Ptr<Type>;
 
-  auto format() const -> std::string;
+  [[nodiscard]] auto format() const -> std::string;
   static auto get_const_bool() -> EntityQualifier;
-  static auto get_const_f64() -> EntityQualifier;
-  static auto get_const_ptr() -> EntityQualifier;
+  static auto get_const_f64()  -> EntityQualifier;
+  static auto get_const_ptr()  -> EntityQualifier;
 
   std::vector<EntityQualifier> generics_;
   Entity::ID id_ = 0;
@@ -79,11 +79,11 @@ public:
 class n19::EntityQualifierThunk final
   : public EntityQualifierBase {
 public:
-  auto to_string(
+  [[nodiscard]] auto to_string(
     bool include_qualifiers = true,
     bool include_postfixes = true
   ) const -> std::string;
-  auto format() const -> std::string;
+  [[nodiscard]] auto format() const -> std::string;
 
   std::vector<std::string> name_;
   std::vector<EntityQualifierThunk> generics_;

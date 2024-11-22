@@ -209,7 +209,7 @@ auto n19::AstCall::print(
 
   std::println("");
   for(size_t i = 0; i < arguments_.size(); i++)
-    arguments_[i]->print(depth + 1, fmt("Call.Args.{}", i + 1));
+    arguments_.at(i)->print(depth + 1, fmt("Call.Args.{}", i + 1));
   target_->print(depth + 1, "Call.Target");
 }
 
@@ -275,14 +275,12 @@ auto n19::AstProcDecl::print(
   name_->print(depth + 1, "ProcDecl.Name");
 
   for(size_t i = 0; i < arg_decls_.size(); i++) {
-    arg_decls_[i]->print(depth + 1, fmt("ProcDecl.Arg.{}", i + 1));
+    arg_decls_.at(i)->print(depth + 1, fmt("ProcDecl.Arg.{}", i + 1));
   }
   for(const auto& child : body_) {
     child->print(depth + 1, std::nullopt);
   }
 }
-
-
 
 auto n19::AstCase::print(
   const uint32_t depth,
@@ -345,7 +343,7 @@ auto n19::AstSwitch::print(
   target_->print(depth + 1, "Switch.Target");
   dflt_->print(depth + 1, "Switch.Default");
   for(size_t i = 0; i < cases_.size(); i++) {
-    cases_[i]->print(depth + 1, fmt("Switch.Case.{}", i + 1));
+    cases_.at(i)->print(depth + 1, fmt("Switch.Case.{}", i + 1));
   }
 }
 
