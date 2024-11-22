@@ -24,7 +24,8 @@ Checks: >
   -readability-uppercase-literal-suffix,
   -readability-use-anyofallof,
   -readability-identifier-length,
-  -readability-implicit-bool-conversion
+  -readability-implicit-bool-conversion,
+  -modernize-use-if-init
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: none
