@@ -8,8 +8,8 @@
 
 #ifndef CONMANIP_H
 #define CONMANIP_H
-#include <Fmt.h>
-#include <Concepts.h>
+#include <Core/Fmt.h>
+#include <Core/Concepts.h>
 #include <string>
 #include <cstdint>
 #include <print>
@@ -34,16 +34,16 @@ namespace n19 {
   auto maybe_enable_vsequences() -> void;
   #endif
 
-  template<class ...Args> requires ::n19::AreAll<n19::Con, Args...>
+  template<::n19::AreAll<n19::Con> ...Args>
   auto manip_string(Args... values) -> std::string;
 
-  template<class ...Args> requires ::n19::AreAll<n19::Con, Args...>
+  template<::n19::AreAll<n19::Con> ...Args>
   auto set_console(Args... values) -> void;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class ...Args> requires ::n19::AreAll<n19::Con, Args...>
+template<::n19::AreAll<n19::Con> ...Args>
 auto n19::set_console(Args... values) -> void {
   #if defined(N19_WIN32)
     maybe_enable_vsequences();
@@ -52,12 +52,13 @@ auto n19::set_console(Args... values) -> void {
   const uint16_t to_u16[] = {
     (static_cast<uint16_t>(values))...
   };
+
   for(const auto& val : to_u16) {
     std::print("\x1b[{}m", val);
   }
 }
 
-template<class ...Args> requires ::n19::AreAll<n19::Con, Args...>
+template<::n19::AreAll<n19::Con> ...Args>
 auto n19::manip_string(Args... values) -> std::string {
   #if defined(N19_WIN32)
     maybe_enable_vsequences();
@@ -67,6 +68,7 @@ auto n19::manip_string(Args... values) -> std::string {
   const uint16_t to_u16[] = {
     (static_cast<uint16_t>(values))...
   };
+
   for(const auto& val : to_u16) {
     buff += fmt("\x1b[{}m", val);
   }

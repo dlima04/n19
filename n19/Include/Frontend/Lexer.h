@@ -8,9 +8,9 @@
 
 #ifndef LEXER_H
 #define LEXER_H
-#include <FileRef.h>
-#include <Result.h>
-#include <Token.h>
+#include <Core/FileRef.h>
+#include <Core/Result.h>
+#include <Frontend/Token.h>
 #include <cstdint>
 #include <vector>
 

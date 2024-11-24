@@ -6,9 +6,9 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <AstNodes.h>
-#include <ConManip.h>
-#include <Defer.h>
+#include <Frontend/AstNodes.h>
+#include <Core/ConManip.h>
+#include <Core/Defer.h>
 #include <print>
 
 auto n19::AstNode::_print(

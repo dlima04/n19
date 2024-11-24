@@ -6,12 +6,12 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <Lexer.h>
-#include <Defer.h>
-#include <ConManip.h>
-#include <Panic.h>
-#include <ErrorCollector.h>
-#include <ResultMacros.h>
+#include <Frontend/Lexer.h>
+#include <Frontend/ErrorCollector.h>
+#include <Core/Defer.h>
+#include <Core/ConManip.h>
+#include <Core/Panic.h>
+#include <Core/ResultMacros.h>
 #include <filesystem>
 #include <fstream>
 #include <cctype>

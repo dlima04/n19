@@ -6,11 +6,11 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <ConManip.h>
+#include <Core/ConManip.h>
 #include <print>
 
 #if defined(N19_WIN32)
-#include <Windows.h>
+#include <windows.h>
 
 auto n19::are_vsequences_enabled() -> bool {
   DWORD mode_stdout = 0;

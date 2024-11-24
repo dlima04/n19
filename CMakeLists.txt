@@ -4,41 +4,75 @@ project(n19)
 set(CMAKE_CXX_STANDARD 23)
 set(N19_SOURCE_FILES
   n19/Src/Main.cpp
-  n19/Src/ConManip.cpp
-  n19/Src/FileRef.cpp
-  n19/Src/Token.cpp
-  n19/Src/Lexer.cpp
-  n19/Src/ErrorCollector.cpp
-  n19/Src/EntityTable.cpp
-  n19/Src/Entity.cpp
-  n19/Src/EntityQualifier.cpp
-  n19/Src/DumpAst.cpp
-  n19/Include/ConManip.h
-  n19/Include/Result.h
-  n19/Include/ResultMacros.h
-  n19/Include/GlobalLastError.h
-  n19/Include/Panic.h
-  n19/Include/Fmt.h
-  n19/Include/FileRef.h
-  n19/Include/Defer.h
-  n19/Include/Lexer.h
-  n19/Include/Token.h
-  n19/Include/ErrorCollector.h
-  n19/Include/AstNodes.h
-  n19/Include/EntityQualifier.h
-  n19/Include/EntityTable.h
-  n19/Include/Entity.h
-  n19/Include/Concepts.h
-  n19/Include/StopWatch.h
+  n19/Src/Core/ConManip.cpp
+  n19/Src/Core/FileRef.cpp
+  n19/Src/Frontend/Token.cpp
+  n19/Src/Frontend/Lexer.cpp
+  n19/Src/Frontend/ErrorCollector.cpp
+  n19/Src/Frontend/EntityTable.cpp
+  n19/Src/Frontend/Entity.cpp
+  n19/Src/Frontend/EntityQualifier.cpp
+  n19/Src/Frontend/DumpAst.cpp
+  n19/Src/Core/ArgParse.cpp
+  n19/Src/Native/LastError.cpp
+  n19/Include/Core/ConManip.h
+  n19/Include/Core/Result.h
+  n19/Include/Core/ResultMacros.h
+  n19/Include/Core/GlobalLastError.h
+  n19/Include/Core/Panic.h
+  n19/Include/Core/Fmt.h
+  n19/Include/Core/FileRef.h
+  n19/Include/Core/Defer.h
+  n19/Include/Frontend/Lexer.h
+  n19/Include/Frontend/Token.h
+  n19/Include/Frontend/ErrorCollector.h
+  n19/Include/Frontend/AstNodes.h
+  n19/Include/Frontend/EntityQualifier.h
+  n19/Include/Frontend/EntityTable.h
+  n19/Include/Frontend/Entity.h
+  n19/Include/Core/Concepts.h
+  n19/Include/Core/StopWatch.h
+  n19/Include/Core/ArgParse.h
+  n19/Include/Native/String.h
+  n19/Include/Native/Stream.h
+  n19/Include/Native/LastError.h
 )
 
 add_executable(n19 ${N19_SOURCE_FILES})
 target_include_directories(n19 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/n19/Include)
 
-if(WIN32)
-  target_compile_definitions(n19 PRIVATE N19_WIN32)
+set(N19_BUILD_PLATFORM ${CMAKE_HOST_SYSTEM_NAME})
+set(N19_IS_MACOS FALSE)
+set(N19_IS_LINUX FALSE)
+set(N19_IS_POSIX FALSE)
+set(N19_IS_WINDOWS FALSE)
+
+# Determine build platform...
+# also, is this actually reliable?
+# CMAKE_HOST_SYSTEM_NAME seems to be
+# unofficial or at least volatile in some cases
+# based on what I'm seeing on the internet.
+
+if(WIN32 OR N19_BUILD_PLATFORM STREQUAL "Windows")
+  set(N19_IS_WINDOWS TRUE)
+elseif(N19_BUILD_PLATFORM STREQUAL "Linux")
+  set(N19_IS_LINUX TRUE)
+  set(N19_IS_POSIX TRUE)
+elseif(N19_BUILD_PLATFORM STREQUAL "Darwin")
+  set(N19_IS_MACOS TRUE)
+  set(N19_IS_POSIX TRUE)
 else()
-  target_compile_definitions(n19 PRIVATE N19_POSIX)
+  message(FATAL_ERROR "Unsupported build platform. "
+    "Supported platforms: MacOS (Darwin), Linux, Windows.")
 endif()
 
-
+# Create definitions for the compiler
+if(N19_IS_LINUX)
+  target_compile_definitions(n19 PRIVATE N19_POSIX)
+  target_compile_definitions(n19 PRIVATE N19_LINUX)
+elseif(N19_IS_MACOS)
+  target_compile_definitions(n19 PRIVATE N19_POSIX)
+  target_compile_definitions(n19 PRIVATE N19_MACOS)
+else()
+  target_compile_definitions(n19 PRIVATE N19_WIN32)
+endif()

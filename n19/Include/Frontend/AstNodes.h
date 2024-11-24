@@ -8,9 +8,9 @@
 
 #ifndef ASTNODES_H
 #define ASTNODES_H
-#include <Token.h>
-#include <EntityQualifier.h>
-#include <Concepts.h>
+#include <Frontend/Token.h>
+#include <Frontend/EntityQualifier.h>
+#include <Core/Concepts.h>
 #include <vector>
 #include <memory>
 #include <concepts>

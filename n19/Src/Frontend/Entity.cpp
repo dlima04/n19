@@ -6,10 +6,10 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <Entity.h>
+#include <Frontend/Entity.h>
 
 n19::BuiltinType::BuiltinType(const Type type) : n19::Type(EntityType::BuiltinType) {
-#define X(TYPE, STR, _1) if(type == TYPE){ lname_ = STR; name_ = "::" STR; }
+  #define X(TYPE, STR, _1) if(type == TYPE){ lname_ = STR; name_ = "::" STR; }
   N19_ENTITY_BUILTIN_LIST
-#undef X
+  #undef X
 }

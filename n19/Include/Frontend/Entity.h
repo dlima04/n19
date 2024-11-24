@@ -8,11 +8,12 @@
 
 #ifndef ENTITY_H
 #define ENTITY_H
-#include <Concepts.h>
+#include <Core/Concepts.h>
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <memory>
+
 #ifndef ENTITYTABLE_H
   static_assert("Must include EntityTable.h before Entity.h.");
 #endif

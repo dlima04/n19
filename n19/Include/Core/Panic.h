@@ -8,18 +8,18 @@
 
 #ifndef PANIC_H
 #define PANIC_H
-#include <ConManip.h>
+#include <Core/ConManip.h>
 #include <cstdlib>
 #include <string>
 #include <print>
 
 #define PANIC(MSG) ::n19::panic_impl_(__FILE__, __LINE__, MSG)
-#define FATAL(MSG) ::n19::exit_impl_(MSG)
+#define FATAL(MSG) ::n19::fatal_impl_(MSG)
 #define UNREACHABLE PANIC("Default assertion - unreachable branch.")
 #define ASSERT(COND) if(!(COND)) PANIC("Assertion \"" #COND "\" failed!")
 
 namespace n19 {
-  [[noreturn]] auto exit_impl_(const std::string &msg) -> void;
+  [[noreturn]] auto fatal_impl_(const std::string &msg) -> void;
   [[noreturn]] auto panic_impl_(const std::string &file, int line, const std::string &msg) -> void;
 }
 
@@ -38,7 +38,7 @@ inline auto n19::panic_impl_(
   ::exit(EXIT_FAILURE);
 }
 
-inline auto n19::exit_impl_(const std::string &msg) -> void {
+inline auto n19::fatal_impl_(const std::string &msg) -> void {
   set_console(Con::Red, Con::Bold);
   std::println("FATAL :: {}", msg);
   ::exit(1);

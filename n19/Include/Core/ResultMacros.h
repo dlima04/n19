@@ -8,10 +8,10 @@
 
 #ifndef RESULTMACROS_H
 #define RESULTMACROS_H
-#include <Result.h>
-#include <GlobalLastError.h>
-#include <Panic.h>
-#include <Fmt.h>
+#include <Core/Result.h>
+#include <Core/GlobalLastError.h>
+#include <Core/Panic.h>
+#include <Core/Fmt.h>
 #include <type_traits>
 
 // Provides additional support for n19::Result<T>

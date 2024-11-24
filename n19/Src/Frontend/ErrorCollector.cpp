@@ -6,11 +6,11 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <ErrorCollector.h>
-#include <FileRef.h>
-#include <Result.h>
-#include <ResultMacros.h>
-#include <Panic.h>
+#include <Core/FileRef.h>
+#include <Core/Result.h>
+#include <Core/ResultMacros.h>
+#include <Core/Panic.h>
+#include <Frontend/ErrorCollector.h>
 #include <algorithm>
 #include <stdexcept>
 #include <cctype>

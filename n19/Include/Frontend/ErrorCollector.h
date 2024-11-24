@@ -9,7 +9,7 @@
 #ifndef ERRORCOLLECTOR_H
 #define ERRORCOLLECTOR_H
 #define N19_MAX_ERRORS 40
-#include <FileRef.h>
+#include <Core/FileRef.h>
 #include <string>
 #include <vector>
 #include <cstdint>

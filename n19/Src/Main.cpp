@@ -8,38 +8,92 @@
 
 #include <print>
 #include <iostream>
-#include <Lexer.h>
-#include <Result.h>
-#include <ResultMacros.h>
-#include <AstNodes.h>
-#include <EntityQualifier.h>
-#include <ConManip.h>
-#include <memory>
-#include <StopWatch.h>
+#include <cstdlib>
+#include <csignal>
+#include <cstdint>
+#include <../Include/Frontend/Lexer.h>
+#include <../Include/Core/ConManip.h>
+#include <Native/String.h>
+#include <Native/Stream.h>
+#include <Native/LastError.h>
+#include <../Include/Core/Panic.h>
+#include <Core/ArgParse.h>
+#include <../Include/Core/ResultMacros.h>
 
 #define CURRENT_TEST "/Users/Diago/Desktop/compiler_tests/test2.txt"
 using namespace n19;
 
-Result<AstNode::Ptr<>> foo() {
-  auto branch = std::make_unique<AstBranch>(
-    30, 3, ""
-  );
-
-  auto _if = std::make_unique<AstIf>(21, 300, "");
-  auto _else = std::make_unique<AstElse>(33, 1,"");
-  auto cond =  std::make_unique<AstScalarLiteral>(121,333, "");
-
-  _else->body_.emplace_back(std::make_unique<AstReturn>(1, 2,""));
-  _if->body_.emplace_back(std::make_unique<AstBreak>(123, 22,""));
-  cond->value_    = "true";
-  _if->condition_ = std::move(cond);
-
-  branch->if_ = std::move(_if);
-  //branch->else_ = std::move(_else);
-  return make_result<AstNode::Ptr<>>(std::move(branch));
+static auto handle_kb_interrupt(const int signal) -> void {
+  std::println("\nKeyboard Interrupt! Exiting...");
+  ::std::exit(signal);
 }
 
+#if defined(N19_WIN32)
+#include <windows.h>
+#include <shellapi.h>
+
 int main() {
+  // Windows-specific command line parsing.
+  // We need to get passed arguments as UTF16 encoded
+  // strings. The most reliable way to do this is to use
+  // GetCommandLineW() alongside CommandLineToArgvW().
+  // It's also possible to define main as int wmain() instead,
+  // but from what I can tell this method is more portable.
+
+  std::vector<native::String> args;
+  int argc = 0;
+  wchar_t** argv = nullptr;
+
+  argv = ::CommandLineToArgvW(GetCommandLineW(), &argc);
+  if(argv == nullptr) {
+    native::outs() << native::last_error() << _nchr('\n');
+    PANIC("Failed to retrieve command line arguments.");
+  }
+
+  for(int i = 1; i < argc; i++) {
+    args.emplace_back(argv[i]);
+  }
+
+  LocalFree(argv);
+  argv = nullptr;
+
+#else // IF POSIX
+
+int main(int argc, char** argv) {
+  // For POSIX platforms, this shit is light work.
+  // Simply parse out command line arguments in the
+  // same way you'd normally do it: argc and argv.
+  // These strings should be UTF8 encoded in most cases.
+  std::vector<native::String> args;
+  for(int i = 1; i < argc; i++) {
+    args.emplace_back(argv[i]);
+  }
+
+  native::outs() << native::last_error() << _nchr('\n');
+#endif // #IF defined(N19_WIN32)
+
+  // std::vector<native::String> strs
+  // = { "--output-directory", "--demangle-funcs=true", "-a", "3123", "-z" };
+  //
+  // argp::Parser parser;
+  // parser
+  //   .add_param(argp::Parameter::create("--output-directory", "-f", "The foo argument" ))
+  //   .add_param(argp::Parameter::create("--demangle-funcs", "-b", "The bar argument", false, argp::Value{"thedefault"}))
+  //   .add_param(argp::Parameter::create("--time-actions", "-a", "The asshole argument", true))
+  //   .add_param(argp::Parameter::create("--jobs", "-z", "idk lol", true));
+  //
+  // if(!parser.parse(strs)) {
+  //    return 1;
+  // }
+  //
+  // parser.debug_print();
+  // parser.print();
+  //
+  // const auto val = parser.get_arg("--time-actions");
+  // if(val) {
+  //   std::println("Value: \"{}\"", val->value_);
+  // }
+
   try {
     const auto file = MUST(FileRef::create(CURRENT_TEST));
     auto lxr = MUST(Lexer::create(*file));
@@ -54,6 +108,7 @@ int main() {
     std::cerr << "EXCEPTION: " << e.what() << std::endl;
   }
 
-  std::cout.flush();
   return 0;
 }
+
+

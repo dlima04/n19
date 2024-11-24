@@ -6,8 +6,8 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#ifndef TOKEN_H
-#define TOKEN_H
+#ifndef FRONTEND_TOKEN_H
+#define FRONTEND_TOKEN_H
 #include <string>
 #include <string_view>
 #include <cstdint>
@@ -135,14 +135,16 @@ namespace n19 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct n19::TokenType {
-#define X(TOKEN_TYPE, STR_UNUSED) TOKEN_TYPE,
+  #define X(TOKEN_TYPE, STR_UNUSED) TOKEN_TYPE,
   enum Value : uint16_t {
     N19_TOKEN_TYPE_LIST
   };
-#undef X
+  #undef X
+
   [[nodiscard]] auto to_string() const -> std::string;
   [[nodiscard]] auto maybe_entity_begin() const -> bool;
-  auto operator<=>(const TokenType& other) const = default;
+  auto operator==(const TokenType& other) const -> bool;
+  auto operator!=(const TokenType& other) const -> bool;
 
   Value value  = None;
   TokenType()  = default;
@@ -151,18 +153,20 @@ struct n19::TokenType {
 };
 
 struct n19::TokenCategory {
-#define X(CAT, MASK) CAT = MASK,
+  #define X(CAT, MASK) CAT = MASK,
   enum Value : size_t {
     N19_TOKEN_CATEGORY_LIST
   };
-#undef X
+  #undef X
+
   [[nodiscard]] auto to_string() const -> std::string;
   [[nodiscard]] auto isa(Value val) const -> bool;
   [[nodiscard]] auto is_any_of(const std::vector<Value> &vals) const -> bool;
 
   auto operator|=(const TokenCategory &other) -> void;
   auto operator|=(Value other) -> void;
-  auto operator<=>(const TokenCategory& other) const = default;
+  auto operator==(const TokenCategory& other) const -> bool;
+  auto operator!=(const TokenCategory& other) const -> bool;
 
   size_t value     = NonCategorical;
   TokenCategory()  = default;
@@ -173,10 +177,10 @@ struct n19::TokenCategory {
 
 class n19::Token {
 public:
-  size_t pos_ = 0;
-  uint32_t line_ = 0;
-  TokenType type_ = TokenType::None;
+  TokenType type_    = TokenType::None;
   TokenCategory cat_ = TokenCategory::NonCategorical;
+  size_t pos_        = 0;
+  uint32_t line_     = 0;
   std::string_view value_;
 
   [[nodiscard]] auto format() const -> std::string;
@@ -198,44 +202,74 @@ public:
     const TokenType type,
     const TokenCategory cat,
     const std::string_view &value
-  ) : pos_(position),
-    line_(line),
-    type_(type),
-    cat_(cat),
-    value_(value) {}
+  ) : type_(type),
+     cat_(cat),
+     pos_(position),
+     line_(line),
+     value_(value) {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Inline functions
+// Inline operator functions
 
-inline auto n19::TokenCategory::operator|=(const TokenCategory &other)
--> void { // Maybe returning void is bad here?
+inline auto n19::TokenCategory::operator|=(
+  const TokenCategory &other ) -> void
+{
   value |= other.value;
 }
 
-inline auto n19::TokenCategory::operator|=(const Value other)
--> void { // Maybe returning void is bad here?
+inline auto n19::TokenCategory::operator|=(
+  const Value other ) -> void
+{
   value |= other;
 }
 
-inline auto n19::Token::operator==(const TokenType other) const
--> bool {
+inline auto n19::TokenCategory::operator!=(
+  const TokenCategory& other ) const -> bool
+{
+  return other.value != this->value;
+}
+
+inline auto n19::TokenCategory::operator==(
+  const TokenCategory& other ) const -> bool
+{
+  return other.value == this->value;
+}
+
+inline auto n19::TokenType::operator!=(
+  const TokenType& other ) const -> bool
+{
+  return other.value != this->value;
+}
+
+inline auto n19::TokenType::operator==(
+  const TokenType& other ) const -> bool
+{
+  return other.value == this->value;
+}
+
+inline auto n19::Token::operator==(
+  const TokenType other ) const -> bool
+{
   return type_ == other;
 }
 
-inline auto n19::Token::operator==(const Token &other) const
--> bool {
+inline auto n19::Token::operator==(
+  const Token &other ) const -> bool
+{
   return other.type_ == this->type_;
 }
 
-inline auto n19::Token::operator!=(const Token &other) const
--> bool {
+inline auto n19::Token::operator!=(
+  const Token &other ) const -> bool
+{
   return other.type_ != type_;
 }
 
-inline auto n19::Token::operator!=(const TokenType other) const
--> bool {
+inline auto n19::Token::operator!=(
+  const TokenType other ) const -> bool
+{
   return other != type_;
 }
 
-#endif //TOKEN_H
+#endif //FRONTEND_TOKEN_H

@@ -7,8 +7,8 @@
 */
 
 #include <algorithm>
-#include <Token.h>
-#include <Fmt.h>
+#include <Frontend/Token.h>
+#include <Core/Fmt.h>
 
 auto n19::Token::to_string() const -> std::string {
   #define X(TYPE, STR) case TokenType::TYPE: return STR;

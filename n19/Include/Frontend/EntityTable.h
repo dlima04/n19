@@ -8,10 +8,10 @@
 
 #ifndef ENTITYTABLE_H
 #define ENTITYTABLE_H
-#include <Entity.h>
-#include <Fmt.h>
-#include <Panic.h>
-#include <Result.h>
+#include <Frontend/Entity.h>
+#include <Core/Fmt.h>
+#include <Core/Panic.h>
+#include <Core/Result.h>
 #include <unordered_map>
 #include <print>
 

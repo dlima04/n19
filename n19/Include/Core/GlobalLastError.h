@@ -8,7 +8,7 @@
 
 #ifndef GLOBALLASTERROR_H
 #define GLOBALLASTERROR_H
-#include <Result.h>
+#include <Core/Result.h>
 
 // Global error values.
 // Used by a few n19::Result related macros that need

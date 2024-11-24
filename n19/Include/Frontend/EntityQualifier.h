@@ -8,7 +8,7 @@
 
 #ifndef TYPEDESCRIPTOR_H
 #define TYPEDESCRIPTOR_H
-#include <EntityTable.h>
+#include <Frontend/EntityTable.h>
 #include <vector>
 #include <memory>
 #include <cstdint>

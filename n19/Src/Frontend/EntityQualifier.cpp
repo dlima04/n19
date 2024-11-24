@@ -6,8 +6,8 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <EntityQualifier.h>
-#include <ConManip.h>
+#include <Frontend/EntityQualifier.h>
+#include <Core/ConManip.h>
 
 auto n19::EntityQualifier::format() const -> std::string {
   std::string buff;

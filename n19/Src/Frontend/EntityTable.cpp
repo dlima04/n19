@@ -6,7 +6,7 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <EntityTable.h>
+#include <Frontend/EntityTable.h>
 #include <algorithm>
 
 n19::EntityTable::EntityTable(const std::string& name) {

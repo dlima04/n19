@@ -18,7 +18,7 @@ namespace n19 {
   // A 16-bit error code.
   // Specifies the error's type, and is
   // usually found inside of a bithat::ErrorDescriptor.
-  enum class ErrC : uint16_t {
+  enum class ErrC : uint8_t {
     None,
     InvalidArg,
     FileIO,
@@ -55,6 +55,7 @@ namespace n19 {
 
   template<typename ...Args>
   auto make_error(ErrC code, std::format_string<Args...>, Args... args) -> Error;
+  auto make_error(ErrC code) -> Error;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +93,11 @@ auto n19::make_error(const ErrC code, std::format_string<Args...> fmt, Args... a
 
   desc.code = code;
   desc.msg  = formatted;
+  return Error{ desc };
+}
+
+inline auto n19::make_error(const ErrC code) -> Error {
+  const ErrorDescriptor desc{ .msg = "", .code = code };
   return Error{ desc };
 }
 
