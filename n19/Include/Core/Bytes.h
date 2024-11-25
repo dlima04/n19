@@ -15,13 +15,18 @@
 #include <span>
 #include <array>
 #include <cstring>
+#include <ranges>
 
 namespace n19 {
   using Byte = std::byte;
-  using ByteView = std::span<Byte>;
+  using WritableBytes = std::span<Byte>;
+  using Bytes = std::span<const Byte>;
 
   template<typename T>
-  auto as_bytes(const T& val) -> std::span<Byte>;
+  auto as_writable_bytes(T& val) -> WritableBytes;
+
+  template<typename T>
+  auto as_bytes(const T& val) -> Bytes;
 
   template<typename T>
   auto as_scalar_bytecopy(const T& val) -> std::array<Byte, sizeof(T)>;
@@ -30,9 +35,15 @@ namespace n19 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
-auto n19::as_bytes(const T &val) -> std::span<Byte> {
-  static_assert(std::constructible_from<std::span<T>, T>);
-  return std::as_bytes( std::span<T>(val) );
+auto n19::as_writable_bytes(T& val) -> WritableBytes {
+  static_assert(std::ranges::contiguous_range<T>);
+  return std::as_writable_bytes( std::span(val) );
+}
+
+template<typename T>
+auto n19::as_bytes(const T& val) -> Bytes {
+  static_assert(std::ranges::contiguous_range<T>);
+  return std::as_bytes( std::span(val) );
 }
 
 template<typename T>

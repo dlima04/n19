@@ -10,6 +10,7 @@ Checks: >
   readability-*,
   -bugprone-easily-swappable-parameters,
   -bugprone-macro-parentheses,
+  -bugprone-unused-return-value,
   -misc-include-cleaner,
   -misc-no-recursion,
   -cppcoreguidelines-pro-type-cstyle-cast,

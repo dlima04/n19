@@ -49,10 +49,11 @@ public:
   auto invalidate() -> void override;
   auto is_invalid() -> bool override;
 
-  // public methods for reading to and
-  // writing to the device.
-  auto write(const ByteView& bytes) -> IODevice&;
-  auto read_into(ByteView& bytes) -> IODevice&;
+  // public methods for reading to,
+  // writing to, and flushing the device.
+  auto write(const Bytes& bytes) const -> Result<None>;
+  auto read_into(WritableBytes& bytes) const -> Result<None>;
+  auto flush() const -> Result<None>;
 
   // Some operator overloads to simplify
   // reading/writing to the IODevice.
@@ -76,7 +77,7 @@ private:
 
 template<typename T>
 auto n19::native::IODevice::operator<<(const T& val) -> IODevice& {
-  if constexpr(std::constructible_from<std::span<T>, T>) {
+  if constexpr(std::ranges::contiguous_range<T>) {
     auto bytes = n19::as_bytes(val);
     write(bytes);
   } else if constexpr (std::is_trivially_constructible_v<T>){
@@ -93,9 +94,10 @@ auto n19::native::IODevice::operator<<(const T& val) -> IODevice& {
 
 template<typename T>
 auto n19::native::IODevice::operator>>(T& val) -> IODevice & {
-  static_assert(std::constructible_from<std::span<T>, T>);
-  auto bv = n19::as_bytes(val);
-  return read_into(bv);
+  static_assert(std::ranges::contiguous_range<T>);
+  auto bytes = n19::as_writable_bytes(val);
+  read_into(bytes);
+  return *this;
 }
 
 #if defined(N19_POSIX)
@@ -118,6 +120,7 @@ inline auto n19::native::IODevice::invalidate() -> void {
 }
 
 inline auto n19::native::IODevice::close() -> void {
+  ::CancelIoEx(value_, nullptr);
   ::CloseHandle(value_);
   invalidate();
 }

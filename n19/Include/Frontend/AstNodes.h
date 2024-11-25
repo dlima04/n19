@@ -17,39 +17,39 @@
 #include <type_traits>
 #include <optional>
 
-#define N19_ASTNODE_TYPE_LIST   \
-  X(Node)                       \
-  X(Vardecl)                    \
-  X(ProcDecl)                   \
-  X(EntityRef)                  \
-  X(EntityRefThunk)             \
-  X(TypeRef)                    \
-  X(TypeRefThunk)               \
-  X(ScalarLiteral)              \
-  X(AggregateLiteral)           \
-  X(BinExpr)                    \
-  X(UnaryExpr)                  \
-  X(Branch)                     \
-  X(If)                         \
-  X(Else)                       \
-  X(Switch)                     \
-  X(Case)                       \
-  X(Default)                    \
-  X(For)                        \
-  X(While)                      \
-  X(ConstBranch)                \
-  X(Where)                      \
-  X(Otherwise)                  \
-  X(ScopeBlock)                 \
-  X(NamespaceBlock)             \
-  X(Call)                       \
-  X(Break)                      \
-  X(Continue)                   \
-  X(Return)                     \
-  X(Defer)                      \
-  X(DeferIf)                    \
-  X(Sizeof)                     \
-  X(Subscript)                  \
+#define N19_ASTNODE_TYPE_LIST \
+  X(Node)                     \
+  X(Vardecl)                  \
+  X(ProcDecl)                 \
+  X(EntityRef)                \
+  X(EntityRefThunk)           \
+  X(TypeRef)                  \
+  X(TypeRefThunk)             \
+  X(ScalarLiteral)            \
+  X(AggregateLiteral)         \
+  X(BinExpr)                  \
+  X(UnaryExpr)                \
+  X(Branch)                   \
+  X(If)                       \
+  X(Else)                     \
+  X(Switch)                   \
+  X(Case)                     \
+  X(Default)                  \
+  X(For)                      \
+  X(While)                    \
+  X(ConstBranch)              \
+  X(Where)                    \
+  X(Otherwise)                \
+  X(ScopeBlock)               \
+  X(NamespaceBlock)           \
+  X(Call)                     \
+  X(Break)                    \
+  X(Continue)                 \
+  X(Return)                   \
+  X(Defer)                    \
+  X(DeferIf)                  \
+  X(Sizeof)                   \
+  X(Subscript)                \
 
 namespace n19 {
   // Class forward decls.
@@ -87,7 +87,7 @@ public:
   using Children = std::vector<Ptr<T>>;
 
   //
-  // The public members of AstNode.
+  // The public fields of AstNode.
   // we need to store a non-owning pointer to the node's parent,
   // as well as some necessary info such as the file it
   // belongs to and it's location.
@@ -110,7 +110,7 @@ public:
   //
   // Factory for producing AST nodes.
   //
-  template<class T> requires IsAstNode<T>
+  template<IsAstNode T>
   static auto create(
     size_t pos,
     uint32_t line,
@@ -129,20 +129,6 @@ protected:
     uint32_t depth,
     const std::string& node_name
   ) const -> void;
-  
-  //
-  // Constructor available to
-  // derived classes.
-  //
-  AstNode(
-    const size_t pos,
-    const uint32_t line,
-    const std::string &file,
-    const Type type
-  ) : pos_(pos),
-    line_(line),
-    file_(file),
-    type_(type) {}
 };
 
 class n19::AstBinExpr final : public AstNode {
@@ -151,17 +137,13 @@ public:
   TokenCategory op_cat_ = 0;
   AstNode::Ptr<> left_  = nullptr;
   AstNode::Ptr<> right_ = nullptr;
-  
+
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
-  
+  ) const -> void override;
+
   ~AstBinExpr() override = default;
-  AstBinExpr(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::BinExpr) {}
+  AstBinExpr() = default;
 };
 
 class n19::AstUnaryExpr final : public AstNode {
@@ -173,14 +155,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
-  
+  ) const -> void override;
+
   ~AstUnaryExpr() override = default;
-  AstUnaryExpr(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::UnaryExpr) {}
+  AstUnaryExpr() = default;
 };
 
 class n19::AstScalarLiteral final : public AstNode {
@@ -197,30 +175,22 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
-  
+  ) const -> void override;
+
   ~AstScalarLiteral() override = default;
-  AstScalarLiteral(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::ScalarLiteral) {}
+  AstScalarLiteral() = default;
 };
 
 class n19::AstAggregateLiteral final : public AstNode {
 public:
   AstNode::Children<> children_;
-  
+
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
-  
+  ) const -> void override;
+
   ~AstAggregateLiteral() override = default;
-  AstAggregateLiteral(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::AggregateLiteral) {}
+  AstAggregateLiteral() = default;
 };
 
 class n19::AstEntityRef final : public AstNode {
@@ -229,14 +199,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
-  
+  ) const -> void override;
+
   ~AstEntityRef() override = default;
-  AstEntityRef(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::EntityRef) {}
+  AstEntityRef() = default;
 };
 
 class n19::AstEntityRefThunk final : public AstNode {
@@ -245,14 +211,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
-  
+  ) const -> void override;
+
   ~AstEntityRefThunk() override = default;
-  AstEntityRefThunk(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::EntityRefThunk) {}
+  AstEntityRefThunk() = default;
 };
 
 class n19::AstTypeRef final : public AstNode {
@@ -261,14 +223,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
-  
+  ) const -> void override;
+
   ~AstTypeRef() override = default;
-  AstTypeRef(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::TypeRef) {}
+  AstTypeRef() = default;
 };
 
 class n19::AstTypeRefThunk final : public AstNode {
@@ -277,14 +235,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstTypeRefThunk() override = default;
-  AstTypeRefThunk(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::TypeRefThunk) {}
+  AstTypeRefThunk() = default;
 };
 
 class n19::AstIf final : public AstNode {
@@ -294,14 +248,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstIf() override = default;
-  AstIf(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::If) {}
+  AstIf() = default;
 };
 
 class n19::AstElse final : public AstNode {
@@ -310,14 +260,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstElse() override = default;
-  AstElse(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Else) {}
+  AstElse() = default;
 };
 
 class n19::AstWhere final : public AstNode {
@@ -327,14 +273,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstWhere() override = default;
-  AstWhere(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Where) {}
+  AstWhere() = default;
 };
 
 class n19::AstOtherwise final : public AstNode {
@@ -343,14 +285,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstOtherwise() override = default;
-  AstOtherwise(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Otherwise) {}
+  AstOtherwise() = default;
 };
 
 class n19::AstBranch final : public AstNode {
@@ -360,14 +298,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstBranch() override = default;
-  AstBranch(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Branch) {}
+  AstBranch() = default;
 };
 
 class n19::AstConstBranch final : public AstNode {
@@ -377,14 +311,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
-  
+  ) const -> void override;
+
   ~AstConstBranch() override = default;
-  AstConstBranch(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::ConstBranch) {}
+  AstConstBranch() = default;
 };
 
 class n19::AstCase final : public AstNode {
@@ -395,14 +325,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
-  
+  ) const -> void override;
+
   ~AstCase() override = default;
-  AstCase(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Case) {}
+  AstCase() = default;
 };
 
 class n19::AstDefault final : public AstNode {
@@ -411,14 +337,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstDefault() override = default;
-  AstDefault(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Default) {}
+  AstDefault() = default;
 };
 
 class n19::AstSwitch final : public AstNode {
@@ -429,14 +351,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstSwitch() override = default;
-  AstSwitch(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Switch) {}
+  AstSwitch() = default;
 };
 
 class n19::AstScopeBlock final : public AstNode {
@@ -445,14 +363,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstScopeBlock() override = default;
-  AstScopeBlock(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::ScopeBlock) {}
+  AstScopeBlock() = default;
 };
 
 class n19::AstCall final : public AstNode {
@@ -462,14 +376,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstCall() override = default;
-  AstCall(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Call) {}
+  AstCall() = default;
 };
 
 class n19::AstDefer final : public AstNode {
@@ -478,14 +388,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstDefer() override = default;
-  AstDefer(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Defer) {}
+  AstDefer() = default;
 };
 
 class n19::AstDeferIf final : public AstNode {
@@ -495,14 +401,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstDeferIf() override = default;
-  AstDeferIf(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::DeferIf) {}
+  AstDeferIf() = default;
 };
 
 class n19::AstVardecl final : public AstNode {
@@ -512,14 +414,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstVardecl() override = default;
-  AstVardecl(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Vardecl) {}
+  AstVardecl() = default;
 };
 
 class n19::AstProcDecl final : public AstNode {
@@ -530,14 +428,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstProcDecl() override = default;
-  AstProcDecl(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::ProcDecl) {}
+  AstProcDecl() = default;
 };
 
 class n19::AstReturn final : public AstNode {
@@ -546,42 +440,28 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstReturn() override = default;
-  AstReturn(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Return) {}
+  AstReturn() = default;
 };
 
 class n19::AstBreak final : public AstNode {
 public:
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstBreak() override = default;
-  AstBreak(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Break) {}
+  AstBreak() = default;
 };
 
 class n19::AstContinue final : public AstNode {
 public:
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
-
+  ) const -> void override;
   ~AstContinue() override = default;
-  AstContinue(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Continue) {}
 };
 
 class n19::AstFor final : public AstNode {
@@ -593,14 +473,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstFor() override = default;
-  AstFor(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::For) {}
+  AstFor() = default;
 };
 
 class n19::AstWhile final : public AstNode {
@@ -611,14 +487,10 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstWhile() override = default;
-  AstWhile(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::While) {}
+  AstWhile() = default;
 };
 
 class n19::AstSubscript final : public AstNode {
@@ -628,27 +500,36 @@ public:
 
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
-  ) const -> void override; 
+  ) const -> void override;
 
   ~AstSubscript() override = default;
-  AstSubscript(
-    const size_t pos,
-    const std::string& file,
-    const uint32_t line
-  ) : AstNode(pos, line, file, Type::Subscript) {}
+  AstSubscript() = default;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class T> requires n19::IsAstNode<T>
+template<n19::IsAstNode T>
 auto n19::AstNode::create(
   const size_t pos,
   const uint32_t line,
   AstNode* parent,
   const std::string& file ) -> Ptr<T>
 {
-  auto ptr = std::make_unique<T>(pos, line, file);
-  if(parent) ptr->parent_ = parent;
+  auto ptr     = std::make_unique<T>();
+  ptr->parent_ = parent;
+  ptr->pos_    = pos;
+  ptr->line_   = line;
+  ptr->file_   = file;
+
+  #define X(NAME)                      \
+  if constexpr(IsSame<T, Ast##NAME>) { \
+    ptr->type_ = Type::NAME;           \
+  }
+
+  N19_ASTNODE_TYPE_LIST
+  #undef X
+
+  if(parent != nullptr) ptr->parent_ = parent;
   return ptr;
 }
 

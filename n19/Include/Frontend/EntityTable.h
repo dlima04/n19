@@ -26,22 +26,24 @@ public:
   EntityTable(const EntityTable&&)            = delete;
   EntityTable& operator=(const EntityTable&&) = delete;
 
-  template<typename T> requires IsEntity<T>
+  template<IsEntity T, typename ...Args>
   auto insert(
     Entity::ID parent_id,
     size_t pos,
     uint32_t line,
-    const std::string &file,
-    const std::string &lname
+    const std::string& file,
+    const std::string& lname,
+    Args... args
   ) -> Entity::Ptr<>;
 
-  template<typename T> requires IsEntity<T>
+  template<IsEntity T, typename ...Args>
   auto insert(
     Entity::Ptr<> parent,
     size_t pos,
     uint32_t line,
-    const std::string &file,
-    const std::string &lname
+    const std::string& file,
+    const std::string& lname,
+    Args... args
   ) -> Entity::Ptr<>;
 
   auto exists(Entity::ID id) const -> bool;
@@ -64,20 +66,20 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<typename T> requires n19::IsEntity<T>
+template<n19::IsEntity T, typename ...Args>
 auto n19::EntityTable::insert(
   const Entity::Ptr<> parent,
   const size_t pos,
   const uint32_t line,
   const std::string& file,
-  const std::string& lname ) -> Entity::Ptr<>
+  const std::string& lname,
+  Args... args ) -> Entity::Ptr<>
 {
   ASSERT(parent != nullptr);
-  ASSERT(exists(parent->id_));
   ASSERT(line != 0);
 
-  const auto id { curr_id_ };
-  map_[id]          = std::make_shared<T>();
+  const auto id     = curr_id_;
+  map_[id]          = std::make_shared<T>(args...);
   map_[id]->file_   = file;
   map_[id]->id_     = id;
   map_[id]->parent_ = parent->id_;
@@ -86,17 +88,26 @@ auto n19::EntityTable::insert(
   map_[id]->pos_    = pos;
   map_[id]->line_   = line;
 
+  #define X(NAME)                       \
+  if constexpr(IsSame<T, NAME>) {       \
+    map_[id]->type_ = EntityType::NAME; \
+  }
+
+  N19_ENTITY_TYPE_LIST
+  #undef X
+
   ++curr_id_;
   return map_[id];
 }
 
-template<typename T> requires n19::IsEntity<T>
+template<n19::IsEntity T, typename ...Args>
 auto n19::EntityTable::insert(
   const Entity::ID parent_id,
   const size_t pos,
   const uint32_t line,
   const std::string& file,
-  const std::string& lname ) -> Entity::Ptr<>
+  const std::string& lname,
+  Args... args ) -> Entity::Ptr<>
 {
   ASSERT(exists(parent_id));
   ASSERT(line != 0);
@@ -104,7 +115,7 @@ auto n19::EntityTable::insert(
   const auto id = curr_id_;
   const auto parent = find(parent_id);
 
-  map_[id]          = std::make_shared<T>();
+  map_[id]          = std::make_shared<T>(args...);
   map_[id]->file_   = file;
   map_[id]->id_     = id;
   map_[id]->parent_ = parent->id_;
@@ -113,12 +124,21 @@ auto n19::EntityTable::insert(
   map_[id]->pos_    = pos;
   map_[id]->line_   = line;
 
+  #define X(NAME)                       \
+  if constexpr(IsSame<T, NAME>) {       \
+    map_[id]->type_ = EntityType::NAME; \
+  }
+
+  N19_ENTITY_TYPE_LIST
+  #undef X
+
   ++curr_id_;
   return map_[id];
 }
 
-inline auto n19::EntityTable::entries()
-const -> const std::unordered_map<Entity::ID, Entity::Ptr<>>& {
+inline auto n19::EntityTable::entries() const
+-> const std::unordered_map<Entity::ID, Entity::Ptr<>>&
+{
   return map_;
 }
 

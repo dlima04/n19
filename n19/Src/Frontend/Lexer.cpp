@@ -8,24 +8,24 @@
 
 #include <Frontend/Lexer.h>
 #include <Frontend/ErrorCollector.h>
-#include <Core/Defer.h>
-#include <Core/ConManip.h>
 #include <Core/Panic.h>
 #include <Core/ResultMacros.h>
-#include <filesystem>
 #include <fstream>
 #include <cctype>
 #include <algorithm>
 #include <unordered_map>
-#include <unordered_set>
 
 auto n19::Lexer::create(const FileRef& file) -> Result<Lexer> {
   auto fsize = file.size().OR_RETURN();
-  auto ptr   = file.get_unique(*fsize).OR_RETURN();
+  auto buff  = std::make_unique<std::vector<char>>(*fsize);
+  auto view  = n19::as_writable_bytes(*buff);
+
+  // Read file into the buffer
+  file.read_into(view).OR_RETURN();
 
   Lexer lxr;
   lxr.file_name_ = file.absolute();
-  lxr.src_ = std::move(*ptr);
+  lxr.src_ = std::move(buff);
 
   if(lxr.src_->size() > 3
     && static_cast<uint8_t>(lxr.src_->at(0)) == 0xEF
@@ -40,7 +40,7 @@ auto n19::Lexer::create(const FileRef& file) -> Result<Lexer> {
 }
 
 auto n19::Lexer::create(const std::string& file) -> Result<Lexer> {
-  const auto ref = TRY(FileRef::create(file));
+  const auto ref = TRY(FileRef::open(file));
   return create(*ref);
 }
 
@@ -49,6 +49,7 @@ auto n19::Lexer::advance(const uint32_t amnt) -> Lexer& {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return *this;
   }
+
   for(uint32_t i = 0; i < amnt; i++) {
     do {
       _advance_impl();
@@ -242,7 +243,6 @@ inline auto n19::Lexer::_token_numeric_literal() -> Token {
     if(_current_char() == '\0') {
       break;
     }
-
     if(_current_char() == '.') {
       if(_peek_char() == '.' || !std::isdigit(static_cast<uint8_t>(_peek_char()))) {
         break;
@@ -251,9 +251,7 @@ inline auto n19::Lexer::_token_numeric_literal() -> Token {
       }
 
       seen_dot = true;
-    }
-
-    else if(_current_char() == 'e' || _current_char() == 'E') {
+    } else if(_current_char() == 'e' || _current_char() == 'E') {
       if(seen_exponent) {
         return Token::illegal(start, line_, {&src_->at(start), index_ - start});
       }
@@ -263,9 +261,7 @@ inline auto n19::Lexer::_token_numeric_literal() -> Token {
         _advance_char(1);
         if(!std::isdigit(static_cast<uint8_t>(_peek_char()))) break;
       }
-    }
-
-    else if(!std::isdigit(static_cast<uint8_t>(_current_char()))) {
+    } else if(!std::isdigit(static_cast<uint8_t>(_current_char()))) {
       break;
     }
 

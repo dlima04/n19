@@ -48,7 +48,7 @@
 // - the name
 // - the string representation
 // - The guaranteed ID it has in the table.
-// - ID should always be ROOT + n
+// - ID should always be ROOT_ID + n
 #define N19_ENTITY_BUILTIN_LIST              \
   X(I8,   "i8",  N19_ROOT_ENTITY_ID + 1)     \
   X(U8,   "u8",  N19_ROOT_ENTITY_ID + 2)     \
@@ -67,6 +67,7 @@ namespace n19 {
   enum class EntityType : uint16_t {
   #define X(NAME) NAME,
     N19_ENTITY_TYPE_LIST
+    None,
   #undef X
   };
   #define X(NAME) class NAME;
@@ -84,24 +85,18 @@ public:
   using ID  = uint32_t;
   using Children = std::vector<ID>;
 
-  auto id_     = ID{};
-  auto parent_ = ID{};
-  auto line_   = uint32_t{};
-  auto pos_    = size_t{};
-  auto type_   = EntityType{};
-  auto file_   = std::string{};
-  auto lname_  = std::string{};
-  auto name_   = std::string{};
-  auto chldrn_ = Children{};
+  ID          id_      = 0;
+  ID          parent_  = 0;
+  uint32_t    line_    = 0;
+  size_t      pos_     = 0;
+  EntityType  type_    = EntityType::None;
+  std::string file_;
+  std::string lname_;
+  std::string name_;
+  Children    chldrn_;
 
   virtual ~Entity() = default;
-protected:
-  explicit Entity(const EntityType type):
-    id_(N19_INVALID_ENTITY_ID),
-    parent_(N19_INVALID_ENTITY_ID),
-    line_(0),
-    pos_(0),
-    type_(type) {}
+  Entity() = default;
 };
 
 // The root entity in the entity tree.
@@ -109,7 +104,7 @@ protected:
 // including the builtin types.
 class n19::RootEntity final : public Entity {
 public:
-  RootEntity() : Entity(EntityType::RootEntity) {}
+  RootEntity() = default;
   ~RootEntity() override = default;
 };
 
@@ -117,13 +112,12 @@ public:
 class n19::Type : public Entity {
 public:
   ~Type() override = default;
-protected:
-  explicit Type(const EntityType type) : Entity(type) {}
+  Type() = default;
 };
 
 // Represents a builtin scalar type,
 // including integers, floating point types, and "ptr".
-// Can also be referred to as a "primitive".
+// All BuiltinTypes are children of Root.
 class n19::BuiltinType final : public Type {
 public:
   #define X(TYPE, UNUSED, VALUE) TYPE = VALUE,

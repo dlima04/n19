@@ -11,6 +11,7 @@
 #include <Core/ResultMacros.h>
 #include <Core/Panic.h>
 #include <Frontend/ErrorCollector.h>
+#include <Core/Bytes.h>
 #include <algorithm>
 #include <stdexcept>
 #include <cctype>
@@ -70,8 +71,17 @@ auto n19::ErrorCollector::display_error(
   const bool is_warn ) -> void  // Red/yellow error text
 {
   const auto fsize = MUST(file.size());
-  const auto buff = MUST(file.get_flat(*fsize));
-  display_error(msg, file.name(), buff.value(), pos, line, is_warn);
+  std::vector<char> buff(*fsize);
+  auto view = n19::as_writable_bytes(buff);
+
+  if(file.read_into(view))
+    display_error(
+      msg,
+      file.name(),
+      buff,
+      pos,
+      line,
+      is_warn);
 }
 
 auto n19::ErrorCollector::display_error(
@@ -100,7 +110,7 @@ auto n19::ErrorCollector::display_error(
       before += ch;
       filler += '~';
     }
-  } catch(...) {} // NOLINT(*-empty-catch)
+  } catch(...) {/* ... */} // NOLINT(*-empty-catch)
 
   try {
     for(size_t i = pos; buff.at(i) != '\n'; i++) {
@@ -110,7 +120,7 @@ auto n19::ErrorCollector::display_error(
       after += ch;
       filler += i == pos ? '^' : '~';
     }
-  } catch(...) {} // NOLINT(*-empty-catch)
+  } catch(...) {/* ... */} // NOLINT(*-empty-catch)
 
   std::ranges::reverse(before);
   before += after;
@@ -134,18 +144,20 @@ auto n19::ErrorCollector::display_error(
 }
 
 auto n19::ErrorCollector::emit() const -> Result<None> {
+  std::vector<char> buff;
   for(const auto &[file_name, errs] : errs_) {
-    // Load the file
-    const auto file = TRY(FileRef::create(file_name));
+    const auto file = TRY(FileRef::open(file_name));
     const auto size = TRY(file->size());
-    const auto buff = TRY(file->get_flat(*size));
+
+    buff.resize(*size);
+    file->read_into(n19::as_writable_bytes(buff)).OR_RETURN();
 
     // Print the error using the file buffer
     for(const auto &err : errs)
       display_error(
         err.message,
         file_name,
-        *buff,
+        buff,
         err.file_pos,
         err.line,
         err.is_warning

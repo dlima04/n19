@@ -12,14 +12,14 @@
 #include <csignal>
 #include <cstdint>
 #include <Frontend/Lexer.h>
-#include <Core/ConManip.h>
 #include <Native/String.h>
-#include <Native/Stream.h>
 #include <Native/LastError.h>
 #include <Core/Panic.h>
 #include <Core/ArgParse.h>
 #include <Core/ResultMacros.h>
 #include <Core/Bytes.h>
+#include <Frontend/ErrorCollector.h>
+#include "Frontend/AstNodes.h"
 
 #define CURRENT_TEST "/Users/Diago/Desktop/compiler_tests/test2.txt"
 using namespace n19;
@@ -93,28 +93,22 @@ int main(int argc, char** argv) {
   //   std::println("Value: \"{}\"", val->value_);
   // }
 
-  /*std::vector<int> x = {3381, 44123, 55, 641};
-  auto y = std::span(x);
-  auto z = std::as_bytes(y);
-
-  for(const auto& elem : z) {
-    std::cout << (int)elem << " " << std::endl;
-  }*/
-
   try {
-     const auto file = MUST(FileRef::create(CURRENT_TEST));
-     auto lxr = Lexer::create(*file);
-     if(!lxr) {
-       return 1;
-     }
+    const auto file = MUST(FileRef::open(CURRENT_TEST));
+    auto lxr = Lexer::create(*file);
+    if(!lxr) {
+      return 1;
+    }
 
-     do {
-       lxr->advance(1);
-       std::cout << lxr->current().format() << std::flush;
-     } while(lxr->current() != TokenType::EndOfFile && lxr->current() != TokenType::Illegal);
-       if(lxr->current() == TokenType::Illegal) {
-       lxr->error("Illegal token!");
-     }
+    do {
+      lxr->advance(1);
+      std::cout << lxr->current().format() << std::flush;
+    } while(lxr->current() != TokenType::EndOfFile && lxr->current() != TokenType::Illegal);
+
+    if(lxr->current() == TokenType::Illegal) {
+      lxr->error("Illegal token!");
+    }
+
   } catch(const std::exception& e) {
     std::cerr << "EXCEPTION: " << e.what() << std::endl;
   }

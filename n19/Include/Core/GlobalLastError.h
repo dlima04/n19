@@ -14,7 +14,7 @@
 // Used by a few n19::Result related macros that need
 // to produce error side effects to work correctly.
 
-static thread_local auto n19_last_errc_ = n19::ErrC::None;
-static thread_local auto n19_last_msg_  = std::string();
+inline thread_local auto n19_last_errc_ = n19::ErrC::None;
+inline thread_local auto n19_last_msg_  = std::string();
 
 #endif //GLOBALLASTERROR_H

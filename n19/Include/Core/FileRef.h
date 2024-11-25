@@ -29,9 +29,8 @@ namespace n19 {
 
 class n19::FileRef {
 public:
-  // Checks if two files' paths are lexically equal.
-  auto operator==(const FileRef& other) const -> bool;
-  auto operator!=(const FileRef& other) const -> bool;
+  auto operator->() -> fs::path*;
+  auto operator*()  -> fs::path&;
 
   // Attempts to convert the type T to a
   // n19::ByteView (AKA std::span<std::byte).
@@ -40,18 +39,35 @@ public:
 
   // Used for reading to/writing to the file, called by
   // operator<< and operator>> as well.
-  auto write(const ByteView& bytes) -> FileRef&;
-  auto read_into(ByteView& bytes)   -> FileRef&;
+  auto write(const Bytes& bytes, bool app = false) const -> Result<None>;
+  auto read_into(const WritableBytes& bytes) const -> Result<None>;
 
   [[nodiscard]] auto size() const     -> Result<uintmax_t>;
   [[nodiscard]] auto name() const     -> std::string;
   [[nodiscard]] auto absolute() const -> std::string;
+  [[nodiscard]] auto path()           -> fs::path&;
 
-  static auto create(const FileRef &other)          -> Result<FileRef>;
-  static auto create(const std::wstring &file_name) -> Result<FileRef>;
-  static auto create(const std::string &file_name)  -> Result<FileRef>;
-private:
+  // Creates a new file, ONLY if the specified file did not
+  // exist beforehand. If the file already exists, the
+  // call fails and an error value is returned.
+  static auto create(const std::string& fname)  -> Result<FileRef>;
+  static auto create(const std::wstring& fname) -> Result<FileRef>;
+
+  // Creates or opens the specified file, as long as
+  // the file path is lexically valid. If the file does not exist,
+  // one will be created.
+  static auto create_or_open(const std::wstring& fname) -> Result<FileRef>;
+  static auto create_or_open(const std::string& fname)  -> Result<FileRef>;
+
+  // Opens the specified file, ONLY if the file
+  // already exists. If it does not exist, the call fails
+  // and an error value is returned.
+  static auto open(const std::wstring& fname) -> Result<FileRef>;
+  static auto open(const std::string& fname)  -> Result<FileRef>;
+
+  FileRef() = default;
   explicit FileRef(const fs::path& path) : path_(path) {}
+private:
   fs::path path_;
 };
 
@@ -59,11 +75,11 @@ private:
 
 template<typename T>
 auto n19::FileRef::operator<<(const T& val) -> FileRef& {
-  if constexpr(std::constructible_from<std::span<T>, T>) {
+  if constexpr(std::ranges::contiguous_range<T>) {
     auto bytes = n19::as_bytes(val);
     write(bytes);
   } else if constexpr (std::is_trivially_constructible_v<T>){
-    auto bytes = as_scalar_bytecopy(val);
+    auto bytes = n19::as_scalar_bytecopy(val);
     write(bytes);
   } else {
     static_assert(
@@ -76,21 +92,30 @@ auto n19::FileRef::operator<<(const T& val) -> FileRef& {
 
 template<typename T>
 auto n19::FileRef::operator>>(T& val) -> FileRef& {
-  static_assert(std::constructible_from<std::span<T>, T>);
-  auto bv = n19::as_bytes(val);
-  return read_into(bv);
+  static_assert(std::ranges::contiguous_range<T>);
+  auto bytes = n19::as_writable_bytes(val);
+  read_into(bytes);
+  return *this;
 }
 
-inline auto n19::FileRef::operator!=(
-const FileRef& other ) const -> bool
-{
-  return other.path_ != this->path_;
+inline auto n19::FileRef::operator*() -> fs::path& {
+  return path_;
 }
 
-inline auto n19::FileRef::operator==(
-  const FileRef& other ) const -> bool
-{
-  return other.path_ == this->path_;
+inline auto n19::FileRef::operator->() -> fs::path* {
+  return &path_;
+}
+
+inline auto n19::FileRef::name() const -> std::string {
+  return path_.string();
+}
+
+inline auto n19::FileRef::absolute() const -> std::string {
+  return fs::absolute(path_).string();
+}
+
+inline auto n19::FileRef::path() -> fs::path& {
+  return path_;
 }
 
 #endif //FILEREF_H

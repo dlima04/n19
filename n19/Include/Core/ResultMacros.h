@@ -72,7 +72,7 @@
   const ::n19::ErrorDescriptor& err_) {                     \
     n19_last_errc_ = err_.code;                             \
     n19_last_msg_  = err_.msg;                              \
-    return decltype(err_)(err_);                            \
+    return ::n19::ErrorDescriptor{ err_ };                  \
   });                                                       \
 
 #define OR_RETURN()                                         \
@@ -86,7 +86,7 @@
   N19_TRANSFORM_RESULT_IMPL_                                \
   if(n19_last_errc_ != ::n19::ErrC::None) {                 \
     PANIC(::n19::fmt(                                       \
-      "An n19::Result evaluated to an error "               \
+      "A n19::Result evaluated to an error "                \
       "in a situation where failure is not allowed.\n"      \
       "Error message = {} ",                                \
       n19_last_msg_                                         \

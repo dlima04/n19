@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.28)
 project(n19)
-
 set(CMAKE_CXX_STANDARD 23)
+
+# The source files for the compiler.
+# Header files are included here so that
+# Clion can provide insight on them.
 set(N19_SOURCE_FILES
   n19/Src/Main.cpp
   n19/Src/Core/ConManip.cpp
@@ -15,6 +18,8 @@ set(N19_SOURCE_FILES
   n19/Src/Frontend/DumpAst.cpp
   n19/Src/Core/ArgParse.cpp
   n19/Src/Native/LastError.cpp
+  n19/Src/Core/RingBuffer.cpp
+  n19/Src/Native/IODevice.cpp
   n19/Include/Core/ConManip.h
   n19/Include/Core/Result.h
   n19/Include/Core/ResultMacros.h
@@ -36,12 +41,11 @@ set(N19_SOURCE_FILES
   n19/Include/Native/String.h
   n19/Include/Native/Stream.h
   n19/Include/Native/LastError.h
-        n19/Include/Core/RingBuffer.h
-        n19/Src/Core/RingBuffer.cpp
-        n19/Include/Native/IODevice.h
-        n19/Src/Native/IODevice.cpp
-        n19/Include/Native/Handle.h
-        n19/Include/Core/Bytes.h
+  n19/Include/Core/RingBuffer.h
+  n19/Include/Native/IODevice.h
+  n19/Include/Native/Handle.h
+  n19/Include/Core/Bytes.h
+  n19/Include/Core/Attributes.h
 )
 
 add_executable(n19 ${N19_SOURCE_FILES})

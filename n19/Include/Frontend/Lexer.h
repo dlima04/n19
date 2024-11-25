@@ -112,8 +112,8 @@ private:
   // - integer or floating point
   //
   auto _token_hex_literal()      -> Token;
-  auto _token_octal_literal()    -> Token;
   auto _token_numeric_literal()  -> Token;
+  auto _token_octal_literal()    -> Token;
 
   //
   // For creating single character/unambiguous tokens.

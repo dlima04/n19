@@ -10,16 +10,52 @@
 #include <Native/LastError.h>
 
 #if defined(N19_POSIX)
-auto n19::native::IODevice::read_into(
-  ByteView &bytes ) -> IODevice&
-{
-  return *this; // TODO
-}
+#include <poll.h>
 
 auto n19::native::IODevice::write(
-  const ByteView& bytes ) -> IODevice&
+  const Bytes &bytes ) const -> Result<None>
 {
-  return *this; // TODO
+  ASSERT(!bytes.empty());
+  pollfd fds[1] = { 0 };
+  fds[0].fd     = value_;
+  fds[0].events = POLLOUT;
+
+  if(::poll(fds, 1, -1) == -1 || !(fds[0].revents & POLLOUT)) {
+    return make_error(ErrC::Native, "{}", last_error());
+  }
+
+  if(::write(value_, bytes.data(), bytes.size_bytes()) == -1) {
+    return make_error(ErrC::Native, "{}", last_error());
+  }
+
+  return make_result<None>();
+}
+
+auto n19::native::IODevice::read_into(
+  WritableBytes& bytes ) const -> Result<None>
+{
+  ASSERT(!bytes.empty());
+  pollfd fds[1] = { 0 };
+  fds[0].fd     = value_;
+  fds[0].events = POLLIN;
+
+  if(::poll(fds, 1, -1) == -1 || !(fds[0].revents & POLLIN)) {
+    return make_error(ErrC::Native, "{}", last_error());
+  }
+
+  if(::read(value_, bytes.data(), bytes.size_bytes()) == -1) {
+    return make_error(ErrC::Native, "{}", last_error());
+  }
+
+  return make_result<None>();
+}
+
+auto n19::native::IODevice::flush() const -> Result<None> {
+  if(::fsync(value_) == -1) {
+    return make_error(ErrC::Native, "{}", last_error());
+  }
+
+  return make_result<None>();
 }
 
 auto n19::native::IODevice::create_pipe()
@@ -61,6 +97,90 @@ auto n19::native::IODevice::from_stdin()
   return make_result<IODevice>(device);
 }
 
-#else
+#else // IF WINDOWS
+
+auto n19::native::IODevice::write(
+  const Bytes &bytes ) const -> Result<None>
+{
+  ASSERT(!bytes.empty());
+  if(!WriteFile(
+    value_,
+    (void*)bytes.data(),
+    (DWORD)bytes.size_bytes(),
+    nullptr,
+    nullptr
+  )) {
+    return make_error(
+      ErrC::Native, "{}", last_error());
+  }
+
+  return make_result<None>();
+}
+
+auto n19::native::IODevice::read_into(
+  WritableBytes& bytes ) const -> Result<None>
+{
+  ASSERT(!bytes.empty());
+  if(!ReadFile(
+    value_,
+    (void*)bytes.data(),
+    (DWORD)bytes.size_bytes(),
+    nullptr,
+    nullptr
+  )) {
+    return make_error(
+      ErrC::Native, "{}", last_error());
+  }
+
+  return make_result<None>();
+}
+
+auto n19::native::IODevice::flush() const -> Result<None> {
+  if(!::FlushFileBuffers(value_)) {
+    return make_error(ErrC::Native, "{}", last_error());
+  }
+
+  return make_result<None>();
+}
+
+auto n19::native::IODevice::create_pipe()
+-> Result<std::array<IODevice, 2>>
+{
+  SECURITY_ATTRIBUTES sa  = { 0 };
+  sa.nLength              = sizeof(sa);
+  sa.lpSecurityDescriptor = nullptr;
+  sa.bInheritHandle       = TRUE;
+
+  std::array<IODevice, 2> arr{};
+  if(!CreatePipe(&arr[0].value_, &arr[1].value_, &sa, 0)) {
+    return make_error(ErrC::Native, "{}", last_error());
+  }
+
+  return arr;
+}
+
+auto n19::native::IODevice::from_stderr()
+-> Result<IODevice>
+{
+  IODevice device;
+  device.value_ = ::GetStdHandle(STD_ERROR_HANDLE);
+  return make_result<IODevice>(device);
+}
+
+auto n19::native::IODevice::from_stdout()
+-> Result<IODevice>
+{
+  IODevice device;
+  device.value_ = ::GetStdHandle(STD_OUTPUT_HANDLE);
+  return make_result<IODevice>(device);
+}
+
+auto n19::native::IODevice::from_stdin()
+-> Result<IODevice>
+{
+  IODevice device;
+  device.value_ = ::GetStdHandle(STD_INPUT_HANDLE);
+  return make_result<IODevice>(device);
+}
 
 #endif
