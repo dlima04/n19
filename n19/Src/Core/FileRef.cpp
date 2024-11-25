@@ -55,6 +55,10 @@ auto n19::FileRef::size() const -> Result<uintmax_t> try {
   return make_error(ErrC::FileIO, "{}", e.what());
 }
 
+auto n19::FileRef::read_into(ByteView &bytes) -> FileRef& {
+
+}
+
 auto n19::FileRef::get_shared(const uintmax_t amnt) const
 -> Result<std::shared_ptr<std::vector<char>>>
 {
@@ -70,6 +74,25 @@ auto n19::FileRef::get_shared(const uintmax_t amnt) const
   }
 
   auto buff = std::make_shared<std::vector<char>>(amnt);
+  stream.read(buff->data(), static_cast<std::streamsize>(amnt));
+  return buff;
+}
+
+auto n19::FileRef::get_unique(const uintmax_t amnt) const
+-> Result<std::unique_ptr<std::vector<char>>>
+{
+  std::ifstream stream(path_.string(), std::ios::binary);
+  DEFER_IF(stream.is_open(), [&] {
+    stream.close();
+  });
+
+  if(!stream.is_open()) {
+    return make_error(ErrC::FileIO, "Could not open file {}.", path_.string());
+  } if(const auto _size = size(); !_size || amnt > *_size || !amnt) {
+    return make_error(ErrC::Internal, "Invalid file size.");
+  }
+
+  auto buff = std::make_unique<std::vector<char>>(amnt);
   stream.read(buff->data(), static_cast<std::streamsize>(amnt));
   return buff;
 }

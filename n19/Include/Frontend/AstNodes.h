@@ -159,8 +159,8 @@ public:
   ~AstBinExpr() override = default;
   AstBinExpr(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::BinExpr) {}
 };
 
@@ -178,8 +178,8 @@ public:
   ~AstUnaryExpr() override = default;
   AstUnaryExpr(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::UnaryExpr) {}
 };
 
@@ -202,8 +202,8 @@ public:
   ~AstScalarLiteral() override = default;
   AstScalarLiteral(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::ScalarLiteral) {}
 };
 
@@ -218,8 +218,8 @@ public:
   ~AstAggregateLiteral() override = default;
   AstAggregateLiteral(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::AggregateLiteral) {}
 };
 
@@ -234,8 +234,8 @@ public:
   ~AstEntityRef() override = default;
   AstEntityRef(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::EntityRef) {}
 };
 
@@ -250,8 +250,8 @@ public:
   ~AstEntityRefThunk() override = default;
   AstEntityRefThunk(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::EntityRefThunk) {}
 };
 
@@ -266,8 +266,8 @@ public:
   ~AstTypeRef() override = default;
   AstTypeRef(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::TypeRef) {}
 };
 
@@ -282,8 +282,8 @@ public:
   ~AstTypeRefThunk() override = default;
   AstTypeRefThunk(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::TypeRefThunk) {}
 };
 
@@ -299,8 +299,8 @@ public:
   ~AstIf() override = default;
   AstIf(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::If) {}
 };
 
@@ -315,8 +315,8 @@ public:
   ~AstElse() override = default;
   AstElse(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Else) {}
 };
 
@@ -332,8 +332,8 @@ public:
   ~AstWhere() override = default;
   AstWhere(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Where) {}
 };
 
@@ -348,8 +348,8 @@ public:
   ~AstOtherwise() override = default;
   AstOtherwise(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Otherwise) {}
 };
 
@@ -365,8 +365,8 @@ public:
   ~AstBranch() override = default;
   AstBranch(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Branch) {}
 };
 
@@ -382,8 +382,8 @@ public:
   ~AstConstBranch() override = default;
   AstConstBranch(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::ConstBranch) {}
 };
 
@@ -400,8 +400,8 @@ public:
   ~AstCase() override = default;
   AstCase(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Case) {}
 };
 
@@ -416,8 +416,8 @@ public:
   ~AstDefault() override = default;
   AstDefault(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Default) {}
 };
 
@@ -434,8 +434,8 @@ public:
   ~AstSwitch() override = default;
   AstSwitch(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Switch) {}
 };
 
@@ -450,8 +450,8 @@ public:
   ~AstScopeBlock() override = default;
   AstScopeBlock(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::ScopeBlock) {}
 };
 
@@ -467,8 +467,8 @@ public:
   ~AstCall() override = default;
   AstCall(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Call) {}
 };
 
@@ -483,8 +483,8 @@ public:
   ~AstDefer() override = default;
   AstDefer(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Defer) {}
 };
 
@@ -500,8 +500,8 @@ public:
   ~AstDeferIf() override = default;
   AstDeferIf(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::DeferIf) {}
 };
 
@@ -517,8 +517,8 @@ public:
   ~AstVardecl() override = default;
   AstVardecl(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Vardecl) {}
 };
 
@@ -535,8 +535,8 @@ public:
   ~AstProcDecl() override = default;
   AstProcDecl(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::ProcDecl) {}
 };
 
@@ -551,8 +551,8 @@ public:
   ~AstReturn() override = default;
   AstReturn(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Return) {}
 };
 
@@ -565,8 +565,8 @@ public:
   ~AstBreak() override = default;
   AstBreak(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Break) {}
 };
 
@@ -579,8 +579,8 @@ public:
   ~AstContinue() override = default;
   AstContinue(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Continue) {}
 };
 
@@ -598,8 +598,8 @@ public:
   ~AstFor() override = default;
   AstFor(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::For) {}
 };
 
@@ -616,8 +616,8 @@ public:
   ~AstWhile() override = default;
   AstWhile(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::While) {}
 };
 
@@ -633,8 +633,8 @@ public:
   ~AstSubscript() override = default;
   AstSubscript(
     const size_t pos,
-    const uint32_t line,
-    const std::string& file
+    const std::string& file,
+    const uint32_t line
   ) : AstNode(pos, line, file, Type::Subscript) {}
 };
 

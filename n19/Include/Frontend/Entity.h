@@ -84,15 +84,15 @@ public:
   using ID  = uint32_t;
   using Children = std::vector<ID>;
 
-  ID id_;
-  ID parent_;
-  uint32_t line_;
-  size_t pos_;
-  EntityType type_;
-  std::string file_;
-  std::string lname_;
-  std::string name_;
-  Children children_;
+  auto id_     = ID{};
+  auto parent_ = ID{};
+  auto line_   = uint32_t{};
+  auto pos_    = size_t{};
+  auto type_   = EntityType{};
+  auto file_   = std::string{};
+  auto lname_  = std::string{};
+  auto name_   = std::string{};
+  auto chldrn_ = Children{};
 
   virtual ~Entity() = default;
 protected:
@@ -119,11 +119,6 @@ public:
   ~Type() override = default;
 protected:
   explicit Type(const EntityType type) : Entity(type) {}
-};
-
-class n19::Procedure final : public Entity {
-public:
-
 };
 
 // Represents a builtin scalar type,

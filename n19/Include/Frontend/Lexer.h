@@ -20,13 +20,23 @@ namespace n19 {
 
 class n19::Lexer {
 public:
-  auto current() const                                             -> const Token&;
-  auto advance(uint32_t amnt)                                      -> Lexer&;
-  auto peek(uint32_t amnt)                                         -> Token;
-  auto error(const std::string &msg, size_t pos, uint32_t line)    -> Lexer&;
-  auto warn(const std::string &msg, size_t pos, uint32_t line)     -> Lexer&;
-  auto error(const std::string &msg)                               -> Lexer&;
-  auto warn(const std::string &msg)                                -> Lexer&;
+  auto current() const        -> const Token&;
+  auto advance(uint32_t amnt) -> Lexer&;
+  auto peek(uint32_t amnt)    -> Token;
+
+  //
+  // Error handling. Raise an error or warning at a
+  // specific position in the file buffer owned by the Lexer.
+  //
+  auto error(const std::string &msg, size_t pos, uint32_t line) -> Lexer&;
+  auto warn(const std::string &msg, size_t pos, uint32_t line)  -> Lexer&;
+  auto error(const std::string &msg) -> Lexer&;
+  auto warn(const std::string &msg)  -> Lexer&;
+
+  //
+  // Throws an assertion if the current token is not the
+  // one passed as a parameter here.
+  //
   auto expect(TokenCategory cat, const std::string&, bool = true)  -> Result<None>;
   auto expect(TokenType type, const std::string&, bool = true)     -> Result<None>;
 
@@ -112,12 +122,11 @@ private:
 
   //
   // The private members of a n19::Lexer.
-  // Includes the source buffer, current token,
-  // file name, source buffer offset, and line number.
-  // Note that we don't have a preprocessor so this information
-  // is always accurate.
+  // We use a unique_ptr for the buffer here,
+  // to make it easier to transfer byte buffers
+  // into the Lexer from elswehere.
   //
-  std::shared_ptr<std::vector<char>> src_;
+  std::unique_ptr< std::vector<char> > src_;
   Token curr_tok_;
   std::string file_name_;
   size_t index_  = 0;

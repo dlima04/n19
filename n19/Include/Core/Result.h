@@ -17,7 +17,7 @@
 namespace n19 {
   // A 16-bit error code.
   // Specifies the error's type, and is
-  // usually found inside of a bithat::ErrorDescriptor.
+  // usually found inside of a n19::ErrorDescriptor.
   enum class ErrC : uint8_t {
     None,
     InvalidArg,
@@ -25,7 +25,8 @@ namespace n19 {
     Platform,
     Internal,
     NotFound,
-    BadToken
+    BadToken,
+    Native,
   };
 
   // A struct that represents a runtime error.

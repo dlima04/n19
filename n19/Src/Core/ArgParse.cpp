@@ -126,7 +126,7 @@ auto n19::argp::Parser::_is_valid_argument(
 
 auto n19::argp::Parser::_already_passed(
   const size_t index,
-  const std::vector<native::String>& strings ) -> bool
+  const std::vector<native::StringView>& strings ) -> bool
 {
   ASSERT(index < strings.size());
   for(size_t i = 0; i < index; i++) {
@@ -139,7 +139,7 @@ auto n19::argp::Parser::_already_passed(
 auto n19::argp::Parser::_print_chunk_error(
   const std::string& msg,
   const size_t at,
-  const std::vector<native::String>& strings ) -> void
+  const std::vector<native::StringView>& strings ) -> void
 {
   // Unironically this is the best way to do this,
   // 3 loops is better than excessive allocation here
@@ -161,9 +161,9 @@ auto n19::argp::Parser::_print_chunk_error(
   for(size_t i = 0; i < strings.size(); i++) {
     filler.resize( strings[i].size() );
     if(i != at) {
-      std::fill(filler.begin(), filler.end(), _nchr('~'));
+      std::ranges::fill(filler, _nchr('~'));
     } else {
-      std::fill(filler.begin(), filler.end(), _nchr('^'));
+      std::ranges::fill(filler, _nchr('^'));
     }
 
     native::outs() << filler << _nchr(' ');
@@ -174,7 +174,7 @@ auto n19::argp::Parser::_print_chunk_error(
 
   while(i < strings.size() && i != at) {
     spaces.resize(strings[i].size());
-    std::fill(spaces.begin(), spaces.end(), _nchr(' '));
+    std::ranges::fill(spaces, _nchr(' '));
     native::outs() << spaces << _nchr(' ');
     ++i;
   }
@@ -229,25 +229,26 @@ auto n19::argp::Parser::debug_print() const -> void {
     std::println("\"{}\"", param.desc_);
     set_console(Con::Reset);
 
-    print_value(
-      param.lf_,
-      _nstr("Long Form"));
-    print_value(
-      param.sf_,
-      _nstr("Short Form"));
-    print_value(
-      param.required_,
-      _nstr("Required"));
+    native::StringView the_default;
+    native::StringView the_value;
 
-    print_value(param.default_.has_value()
-      ? param.default_->value_
-      : _nstr("N/A"),
-      _nstr("Default"));
-    print_value(param.val_.has_value()
-      ? param.val_->value_
-      : _nstr("N/A"),
-      _nstr("Value"));
+    if(param.default_ && !param.default_->value_.empty()) {
+      the_default = param.default_->value_;
+    } else {
+      the_default = _nstr("N/A");
+    }
 
+    if(param.val_ && !param.val_->value_.empty()) {
+      the_value = param.val_->value_;
+    } else {
+      the_value = _nstr("N/A");
+    }
+
+    print_value(param.sf_, _nstr("Short Form"));
+    print_value(param.lf_, _nstr("Long Form"));
+    print_value(param.required_, _nstr("Required"));
+    print_value(the_value, _nstr("Value"));
+    print_value(the_default, _nstr("Default"));
     native::outs() << _nchr('\n');
   }
 
@@ -287,7 +288,7 @@ auto n19::argp::Parser::print() const -> void {
 // 8. Check if all required arguments have been passed.
 
 auto n19::argp::Parser::parse(
-  const std::vector<native::String>& chunks ) -> Result<None>
+  const std::vector<native::StringView>& chunks ) -> Result<None>
 {
   for(size_t i = 0; i < chunks.size(); i++) {
     const bool is_invalid =
@@ -335,12 +336,10 @@ auto n19::argp::Parser::parse(
       _print_chunk_error("Expected a value after \"=\"", i, chunks);
       return make_error(ErrC::InvalidArg);
     }
-
     if(!_is_valid_argument(the_flag)) {
       _print_chunk_error("Flag does not exist.", i, chunks);
       return make_error(ErrC::InvalidArg);
     }
-
     if(_already_passed(flag_index, chunks)) {
       _print_chunk_error("Flag was passed more than once.", flag_index, chunks);
       return make_error(ErrC::InvalidArg);

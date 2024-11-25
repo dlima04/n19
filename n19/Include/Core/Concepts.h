@@ -29,7 +29,7 @@ namespace n19 {
   // in the pack Us.
   template<class T, class ...Us>
   concept IsAnyOf =
-    ((std::is_same_v<T, Us> || ...));
+    (std::is_same_v<T, Us> || ...);
 
   // n19::IsSame
   // Constrains the type T to being the same as
@@ -42,9 +42,10 @@ namespace n19 {
 
   // n19::IsIntOrFloatingPoint
   // The name is self explanatory
-  template <class ...Ts>
+  template <class T>
   concept IsIntOrFloatingPoint =
-    (std::is_integral_v<Ts> && ...);
+    std::is_integral_v<T> ||
+    std::is_floating_point_v<T>;
 
   // n19::IsAstNode
   // Constrains any amount of types Ts

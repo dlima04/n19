@@ -20,8 +20,8 @@
 #include <unordered_set>
 
 auto n19::Lexer::create(const FileRef& file) -> Result<Lexer> {
-  auto fsize = TRY(file.size());
-  auto ptr   = TRY(file.get_shared(*fsize));
+  auto fsize = file.size().OR_RETURN();
+  auto ptr   = file.get_unique(*fsize).OR_RETURN();
 
   Lexer lxr;
   lxr.file_name_ = file.absolute();
@@ -36,7 +36,7 @@ auto n19::Lexer::create(const FileRef& file) -> Result<Lexer> {
   }
 
   // Wrap the lexer in a Result
-  return make_result<Lexer>(lxr);
+  return make_result<Lexer>(std::move(lxr));
 }
 
 auto n19::Lexer::create(const std::string& file) -> Result<Lexer> {

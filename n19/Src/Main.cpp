@@ -11,14 +11,15 @@
 #include <cstdlib>
 #include <csignal>
 #include <cstdint>
-#include <../Include/Frontend/Lexer.h>
-#include <../Include/Core/ConManip.h>
+#include <Frontend/Lexer.h>
+#include <Core/ConManip.h>
 #include <Native/String.h>
 #include <Native/Stream.h>
 #include <Native/LastError.h>
-#include <../Include/Core/Panic.h>
+#include <Core/Panic.h>
 #include <Core/ArgParse.h>
-#include <../Include/Core/ResultMacros.h>
+#include <Core/ResultMacros.h>
+#include <Core/Bytes.h>
 
 #define CURRENT_TEST "/Users/Diago/Desktop/compiler_tests/test2.txt"
 using namespace n19;
@@ -58,7 +59,6 @@ int main() {
   argv = nullptr;
 
 #else // IF POSIX
-
 int main(int argc, char** argv) {
   // For POSIX platforms, this shit is light work.
   // Simply parse out command line arguments in the
@@ -69,10 +69,9 @@ int main(int argc, char** argv) {
     args.emplace_back(argv[i]);
   }
 
-  native::outs() << native::last_error() << _nchr('\n');
 #endif // #IF defined(N19_WIN32)
-
-  // std::vector<native::String> strs
+  //
+  // std::vector<native::StringView> strs
   // = { "--output-directory", "--demangle-funcs=true", "-a", "3123", "-z" };
   //
   // argp::Parser parser;
@@ -94,16 +93,28 @@ int main(int argc, char** argv) {
   //   std::println("Value: \"{}\"", val->value_);
   // }
 
+  /*std::vector<int> x = {3381, 44123, 55, 641};
+  auto y = std::span(x);
+  auto z = std::as_bytes(y);
+
+  for(const auto& elem : z) {
+    std::cout << (int)elem << " " << std::endl;
+  }*/
+
   try {
-    const auto file = MUST(FileRef::create(CURRENT_TEST));
-    auto lxr = MUST(Lexer::create(*file));
-    do {
-      lxr->advance(1);
-      std::cout << lxr->current().format() << std::flush;
-    } while(lxr->current() != TokenType::EndOfFile && lxr->current() != TokenType::Illegal);
-      if(lxr->current() == TokenType::Illegal) {
-      lxr->error("Illegal token!");
-    }
+     const auto file = MUST(FileRef::create(CURRENT_TEST));
+     auto lxr = Lexer::create(*file);
+     if(!lxr) {
+       return 1;
+     }
+
+     do {
+       lxr->advance(1);
+       std::cout << lxr->current().format() << std::flush;
+     } while(lxr->current() != TokenType::EndOfFile && lxr->current() != TokenType::Illegal);
+       if(lxr->current() == TokenType::Illegal) {
+       lxr->error("Illegal token!");
+     }
   } catch(const std::exception& e) {
     std::cerr << "EXCEPTION: " << e.what() << std::endl;
   }

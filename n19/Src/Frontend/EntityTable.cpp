@@ -32,7 +32,7 @@ n19::EntityTable::EntityTable(const std::string& name) {
     auto id  = static_cast<Entity::ID>(type);
     ptr->id_ = id;
     ptr->parent_ = root_->id_;
-    root_->children_.emplace_back(id);
+    root_->chldrn_.emplace_back(id);
     map_[id] = std::move(ptr);
   }
 
@@ -43,18 +43,21 @@ n19::EntityTable::EntityTable(const std::string& name) {
 }
 
 auto n19::EntityTable::get_root_entity() const
--> Entity::Ptr<RootEntity> {
+-> Entity::Ptr<RootEntity>
+{
   return root_;
 }
 
-auto n19::EntityTable::exists(const Entity::ID id) const
--> bool {
+auto n19::EntityTable::exists(
+  const Entity::ID id ) const -> bool
+{
   ASSERT(id != N19_INVALID_ENTITY_ID);
   return map_.contains(id);
 }
 
-auto n19::EntityTable::find(const Entity::ID id) const
--> Entity::Ptr<> {
+auto n19::EntityTable::find(
+  const Entity::ID id ) const -> Entity::Ptr<>
+{
   ASSERT(exists(id));
   return map_.at(id);
 }

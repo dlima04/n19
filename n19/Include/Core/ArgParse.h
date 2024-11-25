@@ -76,13 +76,13 @@ private:
 
   static auto _already_passed(
     const size_t index,
-    const std::vector<native::String>& strings
+    const std::vector<native::StringView>& strings
   ) -> bool;
 
   static auto _print_chunk_error(
     const std::string& msg,
     const size_t at,
-    const std::vector<native::String>& strings
+    const std::vector<native::StringView>& strings
   ) -> void;
 
   auto _check_required_params()
@@ -91,11 +91,17 @@ public:
   Parser(const Parser&)             = delete;
   Parser& operator=(const Parser&)  = delete;
 
-  auto get_arg(const native::StringView& str) const     -> Result<Value>;
-  auto add_param(Parameter&& param)                     -> Parser&;
-  auto parse(const std::vector<native::String>& chunks) -> Result<None>;
-  auto print() const                                    -> void;
-  auto debug_print() const                              -> void;
+  auto parse(
+    const std::vector<native::StringView>& chunks
+  ) -> Result<None>;
+
+  auto get_arg(
+    const native::StringView& str
+  ) const -> Result<Value>;
+
+  auto add_param(Parameter&& param) -> Parser&;
+  auto print() const                -> void;
+  auto debug_print() const          -> void;
 
   ~Parser() = default;
   Parser()  = default;

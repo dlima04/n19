@@ -53,9 +53,8 @@ auto n19::set_console(Args... values) -> void {
     (static_cast<uint16_t>(values))...
   };
 
-  for(const auto& val : to_u16) {
+  for(const auto& val : to_u16)
     std::print("\x1b[{}m", val);
-  }
 }
 
 template<::n19::AreAll<n19::Con> ...Args>
@@ -69,9 +68,8 @@ auto n19::manip_string(Args... values) -> std::string {
     (static_cast<uint16_t>(values))...
   };
 
-  for(const auto& val : to_u16) {
+  for(const auto& val : to_u16)
     buff += fmt("\x1b[{}m", val);
-  }
 
   return buff;
 }

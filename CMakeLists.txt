@@ -36,6 +36,12 @@ set(N19_SOURCE_FILES
   n19/Include/Native/String.h
   n19/Include/Native/Stream.h
   n19/Include/Native/LastError.h
+        n19/Include/Core/RingBuffer.h
+        n19/Src/Core/RingBuffer.cpp
+        n19/Include/Native/IODevice.h
+        n19/Src/Native/IODevice.cpp
+        n19/Include/Native/Handle.h
+        n19/Include/Core/Bytes.h
 )
 
 add_executable(n19 ${N19_SOURCE_FILES})
