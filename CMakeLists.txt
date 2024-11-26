@@ -6,50 +6,50 @@ set(CMAKE_CXX_STANDARD 23)
 # Header files are included here so that
 # Clion can provide insight on them.
 set(N19_SOURCE_FILES
-  n19/Src/Main.cpp
-  n19/Src/Core/ConManip.cpp
-  n19/Src/Core/FileRef.cpp
-  n19/Src/Frontend/Token.cpp
-  n19/Src/Frontend/Lexer.cpp
-  n19/Src/Frontend/ErrorCollector.cpp
-  n19/Src/Frontend/EntityTable.cpp
-  n19/Src/Frontend/Entity.cpp
-  n19/Src/Frontend/EntityQualifier.cpp
-  n19/Src/Frontend/DumpAst.cpp
-  n19/Src/Core/ArgParse.cpp
-  n19/Src/Native/LastError.cpp
-  n19/Src/Core/RingBuffer.cpp
-  n19/Src/Native/IODevice.cpp
-  n19/Include/Core/ConManip.h
-  n19/Include/Core/Result.h
-  n19/Include/Core/ResultMacros.h
-  n19/Include/Core/GlobalLastError.h
-  n19/Include/Core/Panic.h
-  n19/Include/Core/Fmt.h
-  n19/Include/Core/FileRef.h
-  n19/Include/Core/Defer.h
-  n19/Include/Frontend/Lexer.h
-  n19/Include/Frontend/Token.h
-  n19/Include/Frontend/ErrorCollector.h
-  n19/Include/Frontend/AstNodes.h
-  n19/Include/Frontend/EntityQualifier.h
-  n19/Include/Frontend/EntityTable.h
-  n19/Include/Frontend/Entity.h
-  n19/Include/Core/Concepts.h
-  n19/Include/Core/StopWatch.h
-  n19/Include/Core/ArgParse.h
-  n19/Include/Native/String.h
-  n19/Include/Native/Stream.h
-  n19/Include/Native/LastError.h
-  n19/Include/Core/RingBuffer.h
-  n19/Include/Native/IODevice.h
-  n19/Include/Native/Handle.h
-  n19/Include/Core/Bytes.h
-  n19/Include/Core/Attributes.h
+  Core/ConManip.cpp
+  Core/FileRef.cpp
+  Frontend/Token.cpp
+        Frontend/ShitLexer.cpp
+  Frontend/ErrorCollector.cpp
+  Frontend/EntityTable.cpp
+  Frontend/Entity.cpp
+  Frontend/EntityQualifier.cpp
+  Frontend/DumpAst.cpp
+  Frontend/Main.cpp
+  Core/ArgParse.cpp
+  Native/LastError.cpp
+  Core/RingBuffer.cpp
+  Native/IODevice.cpp
+  Core/ConManip.hpp
+  Core/Result.hpp
+  Core/ResultMacros.hpp
+  Core/GlobalLastError.hpp
+  Core/Panic.hpp
+  Core/Fmt.hpp
+  Core/FileRef.hpp
+  Core/Defer.hpp
+  Frontend/ShitLexer.hpp
+  Frontend/Token.hpp
+  Frontend/ErrorCollector.hpp
+  Frontend/AstNodes.hpp
+  Frontend/EntityQualifier.hpp
+  Frontend/EntityTable.hpp
+  Frontend/Entity.hpp
+  Core/Concepts.hpp
+  Core/StopWatch.hpp
+  Core/ArgParse.hpp
+  Native/String.hpp
+  Native/Stream.hpp
+  Native/LastError.hpp
+  Core/RingBuffer.hpp
+  Native/IODevice.hpp
+  Native/Handle.hpp
+  Core/Bytes.hpp
+  Core/Attributes.hpp
 )
 
 add_executable(n19 ${N19_SOURCE_FILES})
-target_include_directories(n19 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/n19/Include)
+target_include_directories(n19 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(N19_BUILD_PLATFORM ${CMAKE_HOST_SYSTEM_NAME})
 set(N19_IS_MACOS FALSE)
