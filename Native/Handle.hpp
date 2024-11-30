@@ -9,6 +9,7 @@
 #ifndef NATIVE_HANDLE_HPP
 #define NATIVE_HANDLE_HPP
 #include <Core/Concepts.hpp>
+#include <Core/ClassTraits.hpp>
 
 namespace n19::native {
   template<typename Value>
@@ -17,34 +18,18 @@ namespace n19::native {
 
 template<typename Value>
 class n19::native::Handle {
+N19_MAKE_COMPARABLE_MEMBER(Handle, value_);
 public:
-  auto operator==(const Handle& other) const -> bool;
-  auto operator!=(const Handle& other) const -> bool;
-  explicit operator bool() const;
-
   virtual auto close()      -> void = 0;
   virtual auto invalidate() -> void = 0;
   virtual auto is_invalid() -> bool = 0;
+  explicit operator bool() const;
   virtual ~Handle() = default;
 protected:
   Value value_{};
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-template<typename Value>
-auto n19::native::Handle<Value>::operator!=(
-  const Handle& other ) const -> bool
-{
-  return other.value_ != this->value_;
-}
-
-template<typename Value>
-auto n19::native::Handle<Value>::operator==(
-  const Handle& other ) const -> bool
-{
-  return other.value_ == this->value_;
-}
 
 template<typename Value>
 n19::native::Handle<Value>::operator bool() const {

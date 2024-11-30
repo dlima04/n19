@@ -6,4 +6,8 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <Core/RingBuffer.hpp>
+#ifndef BUFFEREDLEXER_HPP
+#define BUFFEREDLEXER_HPP
+
+
+#endif //BUFFEREDLEXER_HPP

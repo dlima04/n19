@@ -9,7 +9,7 @@ set(N19_SOURCE_FILES
   Core/ConManip.cpp
   Core/FileRef.cpp
   Frontend/Token.cpp
-        Frontend/ShitLexer.cpp
+  Frontend/ShitLexer.cpp
   Frontend/ErrorCollector.cpp
   Frontend/EntityTable.cpp
   Frontend/Entity.cpp
@@ -18,7 +18,6 @@ set(N19_SOURCE_FILES
   Frontend/Main.cpp
   Core/ArgParse.cpp
   Native/LastError.cpp
-  Core/RingBuffer.cpp
   Native/IODevice.cpp
   Core/ConManip.hpp
   Core/Result.hpp
@@ -41,11 +40,20 @@ set(N19_SOURCE_FILES
   Native/String.hpp
   Native/Stream.hpp
   Native/LastError.hpp
-  Core/RingBuffer.hpp
+  Core/RingBase.hpp
   Native/IODevice.hpp
   Native/Handle.hpp
   Core/Bytes.hpp
-  Core/Attributes.hpp
+  Core/Platform.hpp
+  Core/ClassTraits.hpp
+  Core/RingBuffer.hpp
+  Core/RingQueue.hpp
+        Frontend/LexerBase.hpp
+        Frontend/LazyLexer.hpp
+        Frontend/BufferedLexer.hpp
+        Frontend/LexerBase.cpp
+        Core/Panic.cpp
+        Frontend/LazyLexer.cpp
 )
 
 add_executable(n19 ${N19_SOURCE_FILES})

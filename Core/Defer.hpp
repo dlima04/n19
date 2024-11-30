@@ -8,6 +8,7 @@
 
 #ifndef DEFER_HPP
 #define DEFER_HPP
+#include <Core/ClassTraits.hpp>
 #include <type_traits>
 
 #define DEFER(obj)          ::n19::Defer _(obj);
@@ -16,15 +17,13 @@
 namespace n19 {
   template<typename T> requires std::is_invocable_v<T>
   class Defer {
-    T obj_;
+    N19_MAKE_NONMOVABLE(Defer);
+    N19_MAKE_NONCOPYABLE(Defer);
   public:
-    Defer(const Defer&)             = delete;
-    Defer& operator=(const Defer&)  = delete;
-    Defer(const Defer&&)            = delete;
-    Defer& operator=(const Defer&&) = delete;
-
     explicit Defer(T obj) : obj_(obj) {}
     ~Defer() { obj_(); }
+  private:
+    T obj_;
   };
 }
 

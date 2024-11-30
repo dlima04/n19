@@ -49,6 +49,23 @@ auto n19::native::IODevice::read_into(
   return make_result<None>();
 }
 
+auto n19::native::IODevice::create_pipe()
+-> Result<std::array<IODevice, 2>>
+{
+  int pipefds[ 2 ] = { 0 };
+  std::array<IODevice, 2> arr = { };
+  if(::pipe(pipefds) == -1) {
+    return make_error(ErrC::Native, "{}", last_error());
+  }
+
+  arr[ 0 ].value_ = pipefds[ 0 ];
+  arr[ 1 ].value_ = pipefds[ 1 ];
+  arr[ 0 ].perms_ = Read;
+  arr[ 1 ].perms_ = Write;
+
+  return make_result<decltype(arr)>(arr);
+}
+
 auto n19::native::IODevice::flush() const -> Result<None> {
   if(::fsync(value_) == -1) {
     return make_error(ErrC::Native, "{}", last_error());
@@ -57,42 +74,24 @@ auto n19::native::IODevice::flush() const -> Result<None> {
   return make_result<None>();
 }
 
-auto n19::native::IODevice::create_pipe()
--> Result<std::array<IODevice, 2>>
-{
-  int pipefds[ 2 ] = { 0 };
-  std::array<IODevice, 2> arr = { };
-
-  if(::pipe(pipefds) == -1) {
-    return make_error(ErrC::Native, "{}", last_error());
-  }
-
-  arr[ 0 ].value_ = pipefds[ 0 ];
-  arr[ 1 ].value_ = pipefds[ 1 ];
-  return make_result<decltype(arr)>(arr);
-}
-
-auto n19::native::IODevice::from_stderr()
--> Result<IODevice>
-{
+auto n19::native::IODevice::from_stderr() -> Result<IODevice> {
   IODevice device;
   device.value_ = STDERR_FILENO;
+  device.perms_ = Write;
   return make_result<IODevice>(device);
 }
 
-auto n19::native::IODevice::from_stdout()
--> Result<IODevice>
-{
+auto n19::native::IODevice::from_stdout() -> Result<IODevice> {
   IODevice device;
   device.value_ = STDOUT_FILENO;
+  device.perms_ = Write;
   return make_result<IODevice>(device);
 }
 
-auto n19::native::IODevice::from_stdin()
--> Result<IODevice>
-{
+auto n19::native::IODevice::from_stdin() -> Result<IODevice> {
   IODevice device;
   device.value_ = STDIN_FILENO;
+  device.perms_ = Read;
   return make_result<IODevice>(device);
 }
 
@@ -134,14 +133,6 @@ auto n19::native::IODevice::read_into(
   return make_result<None>();
 }
 
-auto n19::native::IODevice::flush() const -> Result<None> {
-  if(!::FlushFileBuffers(value_)) {
-    return make_error(ErrC::Native, "{}", last_error());
-  }
-
-  return make_result<None>();
-}
-
 auto n19::native::IODevice::create_pipe()
 -> Result<std::array<IODevice, 2>>
 {
@@ -155,30 +146,37 @@ auto n19::native::IODevice::create_pipe()
     return make_error(ErrC::Native, "{}", last_error());
   }
 
+  arr[ 0 ].perms_ = Read;
+  arr[ 1 ].perms_ = Write;
   return arr;
 }
 
-auto n19::native::IODevice::from_stderr()
--> Result<IODevice>
-{
+auto n19::native::IODevice::flush() const -> Result<None> {
+  if(!::FlushFileBuffers(value_)) {
+    return make_error(ErrC::Native, "{}", last_error());
+  }
+
+  return make_result<None>();
+}
+
+auto n19::native::IODevice::from_stderr() -> Result<IODevice> {
   IODevice device;
   device.value_ = ::GetStdHandle(STD_ERROR_HANDLE);
+  device.perms_ = Write;
   return make_result<IODevice>(device);
 }
 
-auto n19::native::IODevice::from_stdout()
--> Result<IODevice>
-{
+auto n19::native::IODevice::from_stdout() -> Result<IODevice> {
   IODevice device;
   device.value_ = ::GetStdHandle(STD_OUTPUT_HANDLE);
+  device.perms_ = Write;
   return make_result<IODevice>(device);
 }
 
-auto n19::native::IODevice::from_stdin()
--> Result<IODevice>
-{
+auto n19::native::IODevice::from_stdin() -> Result<IODevice> {
   IODevice device;
   device.value_ = ::GetStdHandle(STD_INPUT_HANDLE);
+  device.perms_ = Read;
   return make_result<IODevice>(device);
 }
 

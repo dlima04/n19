@@ -10,10 +10,9 @@
 #define FILEREF_HPP
 #include <Core/Result.hpp>
 #include <Core/Bytes.hpp>
+#include <Native/String.hpp>
 #include <filesystem>
 #include <cstdint>
-#include <memory>
-#include <vector>
 
 namespace fs = std::filesystem;
 namespace n19 {
@@ -31,6 +30,8 @@ class n19::FileRef {
 public:
   auto operator->() -> fs::path*;
   auto operator*()  -> fs::path&;
+  auto operator->() const -> const fs::path*;
+  auto operator*()  const -> const fs::path&;
 
   // Attempts to convert the type T to a
   // n19::ByteView (AKA std::span<std::byte).
@@ -42,10 +43,10 @@ public:
   auto write(const Bytes& bytes, bool app = false) const -> Result<None>;
   auto read_into(const WritableBytes& bytes) const -> Result<None>;
 
-  [[nodiscard]] auto size() const     -> Result<uintmax_t>;
-  [[nodiscard]] auto name() const     -> std::string;
-  [[nodiscard]] auto absolute() const -> std::string;
-  [[nodiscard]] auto path()           -> fs::path&;
+  [[nodiscard]] auto nstr() const -> native::String;
+  [[nodiscard]] auto size() const -> Result<uintmax_t>;
+  [[nodiscard]] auto path() -> fs::path&;
+  [[nodiscard]] auto path() const -> const fs::path&;
 
   // Creates a new file, ONLY if the specified file did not
   // exist beforehand. If the file already exists, the
@@ -98,6 +99,14 @@ auto n19::FileRef::operator>>(T& val) -> FileRef& {
   return *this;
 }
 
+inline auto n19::FileRef::nstr() const -> native::String {
+#if defined(N19_WIN32)
+  return path_.wstring();
+#else
+  return path_.string();
+#endif
+}
+
 inline auto n19::FileRef::operator*() -> fs::path& {
   return path_;
 }
@@ -106,15 +115,19 @@ inline auto n19::FileRef::operator->() -> fs::path* {
   return &path_;
 }
 
-inline auto n19::FileRef::name() const -> std::string {
-  return path_.string();
+inline auto n19::FileRef::operator*() const -> const fs::path& {
+  return path_;
 }
 
-inline auto n19::FileRef::absolute() const -> std::string {
-  return fs::absolute(path_).string();
+inline auto n19::FileRef::operator->() const -> const fs::path* {
+  return &path_;
 }
 
 inline auto n19::FileRef::path() -> fs::path& {
+  return path_;
+}
+
+inline auto n19::FileRef::path() const -> const fs::path & {
   return path_;
 }
 

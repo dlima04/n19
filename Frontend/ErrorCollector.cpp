@@ -8,23 +8,22 @@
 
 #include <Core/FileRef.hpp>
 #include <Core/Result.hpp>
+#include <Core/Bytes.hpp>
 #include <Core/ResultMacros.hpp>
 #include <Core/Panic.hpp>
+#include <Native/Stream.hpp>
 #include <Frontend/ErrorCollector.hpp>
-#include <Core/Bytes.hpp>
 #include <algorithm>
 #include <stdexcept>
 #include <cctype>
 
 auto n19::ErrorCollector::store_error(
-  const std::string &msg,
-  const std::string &file_name,
+  const std::string& msg,
+  const native::String& file_name,
   const size_t pos,
   const uint32_t line ) -> ErrorCollector&
 {
-  ASSERT(pos);
   ASSERT(line);
-
   max_err_chk();
   ++error_count_;
   errs_[file_name].emplace_back( msg, pos, line, false );
@@ -32,26 +31,22 @@ auto n19::ErrorCollector::store_error(
 }
 
 auto n19::ErrorCollector::store_warning(
-  const std::string &msg,
-  const std::string &file_name,
+  const std::string& msg,
+  const native::String& file_name,
   const size_t pos,
   const uint32_t line ) -> ErrorCollector&
 {
-  ASSERT(pos);
   ASSERT(line);
-
   ++warning_count_;
   errs_[file_name].emplace_back( msg, pos, line, true );
   return *this;
 }
 
 auto n19::ErrorCollector::store_error_or_warning(
-  const std::string &file_name,
-  const ErrorLocation &err ) -> ErrorCollector&
+  const native::String& file_name,
+  const ErrorLocation& err ) -> ErrorCollector&
 {
-  ASSERT(err.file_pos);
   ASSERT(err.line);
-
   if(!err.is_warning) {
     max_err_chk();
     ++error_count_;
@@ -70,14 +65,17 @@ auto n19::ErrorCollector::display_error(
   const uint32_t line,          // Line number, optional.
   const bool is_warn ) -> void  // Red/yellow error text
 {
-  const auto fsize = MUST(file.size());
-  std::vector<char> buff(*fsize);
+  const auto fsize = file.size();
+  if(!fsize) {
+    return;
+  }
+  std::vector<char8_t> buff(*fsize);
   auto view = n19::as_writable_bytes(buff);
 
   if(file.read_into(view))
     display_error(
       msg,
-      file.name(),
+      file.nstr(),
       buff,
       pos,
       line,
@@ -85,12 +83,12 @@ auto n19::ErrorCollector::display_error(
 }
 
 auto n19::ErrorCollector::display_error(
-  const std::string& msg,        // The error/warning message.
-  const std::string& file_name,  // The name given to this file.
-  const std::vector<char>& buff, // File buffer.
-  size_t pos,                    // File buffer offset.
-  const uint32_t line,           // Line number, optional
-  const bool is_warn ) -> void   // Red/yellow error text
+  const std::string& msg,           // The error/warning message.
+  const native::String& fname,      // The name given to this file.
+  const std::vector<char8_t>& buff, // File buffer.
+  size_t pos,                       // File buffer offset.
+  const uint32_t line,              // Line number, optional
+  const bool is_warn ) -> void      // Red/yellow error text
 {
   ASSERT(!buff.empty());
   std::string before;  // The bytes that appear before "pos"
@@ -102,37 +100,36 @@ auto n19::ErrorCollector::display_error(
     pos = buff.size() - 1;
   }
 
-  try {
-    for(size_t i = pos - 1; buff.at(i) != '\n'; i--) {
-      const char ch = buff.at(i);
-      if(!std::isprint(static_cast<uint8_t>(ch)))
-        continue;
-      before += ch;
-      filler += '~';
-    }
-  } catch(...) {/* ... */} // NOLINT(*-empty-catch)
+  try{ for(size_t i = pos - 1; buff.at(i) != '\n'; i--) {
+    const char ch = buff.at(i);
+    if(!std::isprint(static_cast<uint8_t>(ch)))
+      continue;
+    before += ch;
+    filler += '~';
+  }} catch(...) {/* ... */} // NOLINT(*-empty-catch)
 
-  try {
-    for(size_t i = pos; buff.at(i) != '\n'; i++) {
-      const char ch = buff.at(i);
-      if(!std::isprint(static_cast<uint8_t>(ch)))
-        continue;
-      after += ch;
-      filler += i == pos ? '^' : '~';
-    }
-  } catch(...) {/* ... */} // NOLINT(*-empty-catch)
+  try{ for(size_t i = pos; buff.at(i) != '\n'; i++) {
+    const char ch = buff.at(i);
+    if(!std::isprint(static_cast<uint8_t>(ch)))
+      continue;
+    after += ch;
+    filler += i == pos ? '^' : '~';
+  }} catch(...) {/* ... */} // NOLINT(*-empty-catch)
 
   std::ranges::reverse(before);
   before += after;
-
   for(const auto ch : filler) {
     if(ch == '^') break;
     spaces += ' ';
   }
 
   set_console(Con::Bold);
-  std::println("In {}{}", file_name, !line
-    ? std::string("") : ':' + std::to_string(line));
+  native::outs()
+    << _nstr("In ")
+    << fname;
+  if(line != 0) {
+    std::println(":{}", line);
+  }
 
   set_console(Con::Reset);
   std::println("{}", before);
@@ -144,7 +141,7 @@ auto n19::ErrorCollector::display_error(
 }
 
 auto n19::ErrorCollector::emit() const -> Result<None> {
-  std::vector<char> buff;
+  std::vector<char8_t> buff;
   for(const auto &[file_name, errs] : errs_) {
     const auto file = TRY(FileRef::open(file_name));
     const auto size = TRY(file->size());
@@ -168,10 +165,9 @@ auto n19::ErrorCollector::emit() const -> Result<None> {
 }
 
 auto n19::ErrorCollector::max_err_chk() const -> void {
-  if(error_count_ + 1 >= N19_MAX_ERRORS) {
+  if(error_count_ + 1 >= N19_MAX_ERRORS) [[unlikely]] {
     [[maybe_unused]] const auto _ = emit();
-    FATAL("Maximum amount of permitted errors "
-      "reached. Aborting compilation now.");
+    FATAL("Maximum amount of permitted errors reached. Aborting compilation now.");
   }
 }
 

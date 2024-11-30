@@ -68,8 +68,8 @@ public:
   static auto from_stdin()  -> Result<IODevice>;
   static auto create_pipe() -> Result<std::array<IODevice, 2>>;
   ~IODevice() override = default;
-private:
   uint8_t perms_ = NoAccess;
+private:
   IODevice() = default;
 };
 

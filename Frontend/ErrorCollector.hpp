@@ -8,12 +8,16 @@
 
 #ifndef ERRORCOLLECTOR_HPP
 #define ERRORCOLLECTOR_HPP
-#define N19_MAX_ERRORS 40
+#include <Core/ClassTraits.hpp>
 #include <Core/FileRef.hpp>
+#include <Core/Bytes.hpp>
+#include <Native/String.hpp>
 #include <string>
 #include <vector>
 #include <cstdint>
 #include <unordered_map>
+
+#define N19_MAX_ERRORS 40
 
 namespace n19 {
   class ErrorCollector;
@@ -30,40 +34,41 @@ struct n19::ErrorLocation {
 };
 
 class n19::ErrorCollector {
+N19_MAKE_NONCOPYABLE(ErrorCollector);
 public:
   static auto display_error(
     const std::string &msg,
     const FileRef &file,
-    size_t pos,
-    uint32_t line,
+    const size_t pos,
+    const uint32_t line,
     bool is_warn
   ) -> void;
 
   static auto display_error(
-    const std::string &msg,
-    const std::string &file_name,
-    const std::vector<char> &buff,
-    size_t pos,
-    uint32_t line,
+    const std::string& msg,
+    const native::String& fname,
+    const std::vector<char8_t>& buff,
+    const size_t pos,
+    const uint32_t line,
     bool is_warn
   ) -> void;
 
   auto store_warning(
     const std::string &msg,
-    const std::string &file_name,
-    size_t pos,
-    uint32_t line
+    const native::String& file_name,
+    const size_t pos,
+    const uint32_t line
   ) -> ErrorCollector&;
 
   auto store_error(
     const std::string &msg,
-    const std::string &file_name,
-    size_t pos,
-    uint32_t line
+    const native::String& file_name,
+    const size_t pos,
+    const uint32_t line
   ) -> ErrorCollector&;
 
   auto store_error_or_warning(
-    const std::string &file_name,
+    const native::String& file_name,
     const ErrorLocation& err
   ) -> ErrorCollector&;
 
@@ -75,7 +80,7 @@ public:
   ~ErrorCollector() = default;
 private:
   std::unordered_map<
-    std::string,
+    native::String,
     std::vector<ErrorLocation>
   > errs_; // The stored errors.
   uint32_t warning_count_ = 0;

@@ -8,8 +8,9 @@
 
 #ifndef FRONTEND_TOKEN_HPP
 #define FRONTEND_TOKEN_HPP
+#include <Core/ClassTraits.hpp>
+#include <Core/Result.hpp>
 #include <string>
-#include <string_view>
 #include <cstdint>
 #include <vector>
 
@@ -128,31 +129,33 @@
 
 namespace n19 {
   class Token;
-  struct TokenType;
-  struct TokenCategory;
+  class TokenType;
+  class TokenCategory;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct n19::TokenType {
+class n19::TokenType {
+N19_MAKE_COMPARABLE_MEMBER(TokenType, value);
+public:
   #define X(TOKEN_TYPE, STR_UNUSED) TOKEN_TYPE,
   enum Value : uint16_t {
     N19_TOKEN_TYPE_LIST
   };
   #undef X
 
+  [[nodiscard]] auto string_repr() const -> std::string;
   [[nodiscard]] auto to_string() const -> std::string;
   [[nodiscard]] auto maybe_entity_begin() const -> bool;
-  auto operator==(const TokenType& other) const -> bool;
-  auto operator!=(const TokenType& other) const -> bool;
 
   Value value  = None;
-  TokenType()  = default;
-  ~TokenType() = default;
-  TokenType(const Value value) : value(value) {}
+  constexpr TokenType() = default;
+  constexpr TokenType(const Value value) : value(value) {}
 };
 
-struct n19::TokenCategory {
+class n19::TokenCategory {
+N19_MAKE_COMPARABLE_MEMBER(TokenCategory, value);
+public:
   #define X(CAT, MASK) CAT = MASK,
   enum Value : size_t {
     N19_TOKEN_CATEGORY_LIST
@@ -165,41 +168,33 @@ struct n19::TokenCategory {
 
   auto operator|=(const TokenCategory &other) -> void;
   auto operator|=(Value other) -> void;
-  auto operator==(const TokenCategory& other) const -> bool;
-  auto operator!=(const TokenCategory& other) const -> bool;
 
-  size_t value     = NonCategorical;
-  TokenCategory()  = default;
-  ~TokenCategory() = default;
-  TokenCategory(const size_t value)
-    : value(static_cast<Value>(value)) {}
+  size_t value = NonCategorical;
+  constexpr TokenCategory()  = default;
+  constexpr TokenCategory(const size_t value) : value(value) {}
 };
 
 class n19::Token {
+N19_MAKE_COMPARABLE_ON(TokenType, type_);
+N19_MAKE_COMPARABLE_MEMBER(Token, type_);
 public:
-  TokenType type_    = TokenType::None;
-  TokenCategory cat_ = TokenCategory::NonCategorical;
-  size_t pos_        = 0;
-  uint32_t line_     = 0;
-  std::string_view value_;
+  uint32_t pos_  = 0;
+  uint32_t len_  = 0;
+  uint32_t line_ = 0;
+  TokenCategory cat_;
+  TokenType type_;
 
-  [[nodiscard]] auto format() const -> std::string;
-  [[nodiscard]] auto to_string() const -> std::string;
+  [[nodiscard]] auto value(const class LexerBase&) const -> Maybe<std::string>;
+  [[nodiscard]] auto format(const class LexerBase&) const -> std::string;
 
-  auto operator==(const TokenType other) const -> bool;
-  auto operator==(const Token &other)    const -> bool;
-  auto operator!=(const TokenType other) const -> bool;
-  auto operator!=(const Token &other)    const -> bool;
-
-  static auto eof(size_t pos, uint32_t line) -> Token;
-  static auto illegal(size_t pos, uint32_t line, const std::string_view &str) -> Token;
+  static auto eof(uint32_t pos, uint32_t line) -> Token;
+  static auto illegal(uint32_t pos, uint32_t length, uint32_t line) -> Token;
 
   Token()  = default;
   ~Token() = default;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Inline operator functions
 
 inline auto n19::TokenCategory::operator|=(
   const TokenCategory &other ) -> void
@@ -211,54 +206,6 @@ inline auto n19::TokenCategory::operator|=(
   const Value other ) -> void
 {
   value |= other;
-}
-
-inline auto n19::TokenCategory::operator!=(
-  const TokenCategory& other ) const -> bool
-{
-  return other.value != this->value;
-}
-
-inline auto n19::TokenCategory::operator==(
-  const TokenCategory& other ) const -> bool
-{
-  return other.value == this->value;
-}
-
-inline auto n19::TokenType::operator!=(
-  const TokenType& other ) const -> bool
-{
-  return other.value != this->value;
-}
-
-inline auto n19::TokenType::operator==(
-  const TokenType& other ) const -> bool
-{
-  return other.value == this->value;
-}
-
-inline auto n19::Token::operator==(
-  const TokenType other ) const -> bool
-{
-  return type_ == other;
-}
-
-inline auto n19::Token::operator==(
-  const Token &other ) const -> bool
-{
-  return other.type_ == this->type_;
-}
-
-inline auto n19::Token::operator!=(
-  const Token &other ) const -> bool
-{
-  return other.type_ != type_;
-}
-
-inline auto n19::Token::operator!=(
-  const TokenType other ) const -> bool
-{
-  return other != type_;
 }
 
 #endif //FRONTEND_TOKEN_HPP

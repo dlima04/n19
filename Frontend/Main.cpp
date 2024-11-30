@@ -8,75 +8,124 @@
 
 #include <print>
 #include <iostream>
-#include <cstdlib>
-#include <csignal>
 #include <cstdint>
 #include <Frontend/ShitLexer.hpp>
-#include <Native/String.hpp>
 #include <Native/LastError.hpp>
 #include <Core/Panic.hpp>
 #include <Core/ArgParse.hpp>
-#include <Core/ResultMacros.hpp>
-#include <Core/Bytes.hpp>
-#include <Frontend/ErrorCollector.hpp>
-#include "Frontend/AstNodes.hpp"
-
-/* THINGS THAT NEED IMPROVEMENT!
-  1. The lexer. In every aspect.
-  2. Token representation. We shouldn't use string_view.
-  3.
-
-*/
+#include <Core/RingBuffer.hpp>
+#include <Core/RingQueue.hpp>
+#include <thread>
 
 #define CURRENT_TEST "/Users/Diago/Desktop/compiler_tests/test2.txt"
 using namespace n19;
 
-static auto handle_kb_interrupt(const int signal) -> void {
-  std::println("\nKeyboard Interrupt! Exiting...");
-  ::std::exit(signal);
+struct message {
+  char buff[40] = { 0 };
+  uint16_t ival = 0;
+};
+
+static void start_consuming_rb(RingBuffer<message, 8>& buff) {
+  std::this_thread::sleep_for(std::chrono::seconds(20));
+  while(true) {
+    auto msg = buff.read();
+    if(!msg) {
+      continue;
+    }
+
+    msg->buff[39] = '\0';
+    std::cout << "CONSUMER: Got message: " << msg->buff << "\n";
+    std::cout << "CONSUMER: Got ival: " << msg->ival << std::endl;
+
+    if(msg->ival == 6969) {
+      std::cout << "CONSUMER: ival was 6969. Stopping now." << std::endl;
+      break;
+    }
+  }
 }
 
-#if defined(N19_WIN32)
-#include <windows.h>
-#include <shellapi.h>
+static void test_ringbuffer() {
+  RingBuffer<message, 8> buff;
+  std::thread t(start_consuming_rb, std::ref(buff));
 
-int main() {
-  // Windows-specific command line parsing.
-  // We need to get passed arguments as UTF16 encoded
-  // strings. The most reliable way to do this is to use
-  // GetCommandLineW() alongside CommandLineToArgvW().
-  // It's also possible to define main as int wmain() instead,
-  // but from what I can tell this method is more portable.
+  message m;
+  while(true) {
+    std::memset(&m, 0, sizeof(m));
+    std::cout << "input> ";
+    std::cin >> m.buff >> m.ival;
 
-  std::vector<native::String> args;
-  int argc = 0;
-  wchar_t** argv = nullptr;
-
-  argv = ::CommandLineToArgvW(GetCommandLineW(), &argc);
-  if(argv == nullptr) {
-    native::outs() << native::last_error() << _nchr('\n');
-    PANIC("Failed to retrieve command line arguments.");
+    if(!buff.write(m)) {
+      std::cerr << "COULDNT WRITE TO BUFF!!\n";
+    }
+    if(m.ival == 6969) {
+      break;
+    }
   }
 
-  for(int i = 1; i < argc; i++) {
-    args.emplace_back(argv[i]);
+  std::cout << "joining t...\n";
+  t.join();
+  std::cout << "joined." << std::endl;
+}
+
+static void start_consuming_rq(RingQueue<message, 8>& buff) {
+#if 1
+  std::this_thread::sleep_for(std::chrono::seconds(20));
+  while(true) {
+    auto msg = buff.dequeue();
+
+    msg.buff[39] = '\0';
+    std::cout << "CONSUMER: Got message: " << msg.buff << "\n";
+    std::cout << "CONSUMER: Got ival: " << msg.ival << std::endl;
+
+    if(msg.ival == 6969) {
+      std::cout << "CONSUMER: ival was 6969. Stopping now." << std::endl;
+      break;
+    }
+  }
+#else
+  while(true) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(15));
+    auto msg = buff.try_dequeue();
+    if(!msg) {
+      continue;
+    }
+
+    msg->buff[39] = '\0';
+    std::cout << "CONSUMER: Got message: " << msg->buff << "\n";
+    std::cout << "CONSUMER: Got ival: " << msg->ival << std::endl;
+
+    if(msg->ival == 6969) {
+      std::cout << "CONSUMER: ival was 6969. Stopping now." << std::endl;
+      break;
+    }
+  }
+#endif
+}
+
+static void test_ringqueue() {
+  RingQueue<message, 8> buff;
+  std::thread t(start_consuming_rq, std::ref(buff));
+
+  message m;
+  while(true) {
+    std::memset(&m, 0, sizeof(m));
+    std::cout << "input> ";
+    std::cin >> m.buff >> m.ival;
+
+    buff.enqueue(m);
+    if(m.ival == 6969) {
+      break;
+    }
   }
 
-  LocalFree(argv);
-  argv = nullptr;
+  std::cout << "joining t...\n";
+  t.join();
+  std::cout << "joined." << std::endl;
+}
 
-#else // IF POSIX
 int main(int argc, char** argv) {
-  // For POSIX platforms, this shit is light work.
-  // Simply parse out command line arguments in the
-  // same way you'd normally do it: argc and argv.
-  // These strings should be UTF8 encoded in most cases.
-  std::vector<native::String> args;
-  for(int i = 1; i < argc; i++) {
-    args.emplace_back(argv[i]);
-  }
 
-#endif // #IF defined(N19_WIN32)
+
   //
   // std::vector<native::StringView> strs
   // = { "--output-directory", "--demangle-funcs=true", "-a", "3123", "-z" };
@@ -100,25 +149,25 @@ int main(int argc, char** argv) {
   //   std::println("Value: \"{}\"", val->value_);
   // }
 
-  try {
-    const auto file = MUST(FileRef::open(CURRENT_TEST));
-    auto lxr = Lexer::create(*file);
-    if(!lxr) {
-      return 1;
-    }
-
-    do {
-      lxr->advance(1);
-      std::cout << lxr->current().format() << std::flush;
-    } while(lxr->current() != TokenType::EndOfFile && lxr->current() != TokenType::Illegal);
-
-    if(lxr->current() == TokenType::Illegal) {
-      lxr->error("Illegal token!");
-    }
-
-  } catch(const std::exception& e) {
-    std::cerr << "EXCEPTION: " << e.what() << std::endl;
-  }
+  //try {
+  //  const auto file = MUST(FileRef::open(CURRENT_TEST));
+  //  auto lxr = Lexer::create(*file);
+  //  if(!lxr) {
+  //    return 1;
+  //  }
+  //
+  //  do {
+  //    lxr->advance(1);
+  //    std::cout << lxr->current().format() << std::flush;
+  //  } while(lxr->current() != TokenType::EndOfFile && lxr->current() != TokenType::Illegal);
+  //
+  //  if(lxr->current() == TokenType::Illegal) {
+  //    lxr->error("Illegal token!");
+  //  }
+  //
+  //} catch(const std::exception& e) {
+  //  std::cerr << "EXCEPTION: " << e.what() << std::endl;
+  //}
 
   return 0;
 }

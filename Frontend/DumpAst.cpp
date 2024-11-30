@@ -564,6 +564,3 @@ auto n19::AstTypeRefThunk::print(
 
   std::println("{}", descriptor_.format());
 }
-
-
-

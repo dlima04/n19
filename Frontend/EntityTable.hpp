@@ -9,6 +9,7 @@
 #ifndef ENTITYTABLE_HPP
 #define ENTITYTABLE_HPP
 #include <Frontend/Entity.hpp>
+#include <Core/ClassTraits.hpp>
 #include <Core/Fmt.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Result.hpp>
@@ -20,12 +21,9 @@ namespace n19 {
 }
 
 class n19::EntityTable {
+N19_MAKE_NONCOPYABLE(EntityTable);
+N19_MAKE_NONMOVABLE(EntityTable);
 public:
-  EntityTable(const EntityTable&)             = delete;
-  EntityTable& operator=(const EntityTable&)  = delete;
-  EntityTable(const EntityTable&&)            = delete;
-  EntityTable& operator=(const EntityTable&&) = delete;
-
   template<IsEntity T, typename ...Args>
   auto insert(
     Entity::ID parent_id,

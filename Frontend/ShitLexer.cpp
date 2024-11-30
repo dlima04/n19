@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <unordered_map>
 
-auto n19::Lexer::create(const FileRef& file) -> Result<Lexer> {
+auto n19::ShitLexer::create(FileRef& file) -> Result<ShitLexer> {
   auto fsize = file.size().OR_RETURN();
   auto buff  = std::make_unique<std::vector<char>>(*fsize);
   auto view  = n19::as_writable_bytes(*buff);
@@ -23,8 +23,8 @@ auto n19::Lexer::create(const FileRef& file) -> Result<Lexer> {
   // Read file into the buffer
   file.read_into(view).OR_RETURN();
 
-  Lexer lxr;
-  lxr.file_name_ = file.absolute();
+  ShitLexer lxr;
+  lxr.file_name_ = absolute(*file).string();
   lxr.src_ = std::move(buff);
 
   if(lxr.src_->size() > 3
@@ -36,15 +36,10 @@ auto n19::Lexer::create(const FileRef& file) -> Result<Lexer> {
   }
 
   // Wrap the lexer in a Result
-  return make_result<Lexer>(std::move(lxr));
+  return make_result<ShitLexer>(std::move(lxr));
 }
 
-auto n19::Lexer::create(const std::string& file) -> Result<Lexer> {
-  const auto ref = TRY(FileRef::open(file));
-  return create(*ref);
-}
-
-auto n19::Lexer::advance(const uint32_t amnt) -> Lexer& {
+auto n19::ShitLexer::advance(const uint32_t amnt) -> ShitLexer& {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return *this;
@@ -60,7 +55,7 @@ auto n19::Lexer::advance(const uint32_t amnt) -> Lexer& {
   return *this;
 }
 
-auto n19::Lexer::peek(const uint32_t amnt) -> Token {
+auto n19::ShitLexer::peek(const uint32_t amnt) -> Token {
   if(curr_tok_ == TokenType::None) {
     advance(1);
   }
@@ -78,7 +73,7 @@ auto n19::Lexer::peek(const uint32_t amnt) -> Token {
   return peeked;
 }
 
-auto n19::Lexer::expect(
+auto n19::ShitLexer::expect(
   const TokenType type,
   const std::string& msg,
   const bool adv_after ) -> Result<None>
@@ -102,7 +97,7 @@ auto n19::Lexer::expect(
   return make_result<None>();
 }
 
-auto n19::Lexer::expect(
+auto n19::ShitLexer::expect(
   const TokenCategory cat,
   const std::string& msg,
   const bool adv_after ) -> Result<None>
@@ -127,37 +122,37 @@ auto n19::Lexer::expect(
   return make_result<None>();
 }
 
-inline auto n19::Lexer::_at_utf8_begin() const -> bool {
+inline auto n19::ShitLexer::_at_utf8_begin() const -> bool {
   return static_cast<uint8_t>(_current_char()) >= 0x80;
 }
 
-inline auto n19::Lexer::_advance_char(const uint32_t amnt) -> void {
+inline auto n19::ShitLexer::_advance_char(const uint32_t amnt) -> void {
   if(curr_tok_.type_ != TokenType::EndOfFile && index_ < src_->size()) {
     index_ += amnt;
   }
 }
 
-inline auto n19::Lexer::_current_char() const -> char {
+inline auto n19::ShitLexer::_current_char() const -> char {
   return index_ >= src_->size()
     ? '\0'
     : src_->at(index_);
 }
 
-inline auto n19::Lexer::_peek_char(const uint32_t amnt) const -> char {
+inline auto n19::ShitLexer::_peek_char(const uint32_t amnt) const -> char {
   return (index_ + amnt) >= src_->size()
     ? '\0'
     : src_->at(index_ + amnt);
 }
 
-inline auto n19::Lexer::_advance_line() -> void {
+inline auto n19::ShitLexer::_advance_line() -> void {
   if(index_ < src_->size()) ++line_;
 }
 
-auto n19::Lexer::current() const -> const Token& {
+auto n19::ShitLexer::current() const -> const Token& {
   return curr_tok_;
 }
 
-inline auto n19::Lexer::_skip_utf8_sequence() -> void {
+inline auto n19::ShitLexer::_skip_utf8_sequence() -> void {
   ASSERT(_at_utf8_begin());
   const auto c         = static_cast<uint8_t>(_current_char());
   const auto curr_pos  = index_;
@@ -173,7 +168,7 @@ inline auto n19::Lexer::_skip_utf8_sequence() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_hex_literal() -> Token {
+inline auto n19::ShitLexer::_token_hex_literal() -> Token {
   ASSERT(_current_char() == '0');
   ASSERT(_peek_char() == 'x' || _peek_char() == 'X');
 
@@ -197,7 +192,7 @@ inline auto n19::Lexer::_token_hex_literal() -> Token {
   return token;
 }
 
-inline auto n19::Lexer::_token_octal_literal() -> Token {
+inline auto n19::ShitLexer::_token_octal_literal() -> Token {
   ASSERT(_current_char() == '0');
   ASSERT(std::isdigit(static_cast<uint8_t>(_peek_char())));
 
@@ -225,7 +220,7 @@ inline auto n19::Lexer::_token_octal_literal() -> Token {
   return token;
 }
 
-inline auto n19::Lexer::_token_numeric_literal() -> Token {
+inline auto n19::ShitLexer::_token_numeric_literal() -> Token {
   ASSERT(std::isdigit(static_cast<uint8_t>(_current_char())));
 
   const size_t start = index_;
@@ -299,7 +294,7 @@ inline auto n19::Lexer::_token_numeric_literal() -> Token {
   return token;
 }
 
-inline auto n19::Lexer::_token_ambiguous() -> void {
+inline auto n19::ShitLexer::_token_ambiguous() -> void {
   ASSERT(index_ < src_->size());
   ASSERT(!_curr_char_is_reserved());
   using KeywordMap = std::unordered_map<std::string, TokenType>;
@@ -390,7 +385,7 @@ inline auto n19::Lexer::_token_ambiguous() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_skip() -> void {
+inline auto n19::ShitLexer::_token_skip() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
   } else {
@@ -400,7 +395,7 @@ inline auto n19::Lexer::_token_skip() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_newline() -> void {
+inline auto n19::ShitLexer::_token_newline() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -412,11 +407,11 @@ inline auto n19::Lexer::_token_newline() -> void {
   _advance_char(1);
 }
 
-inline auto n19::Lexer::_token_null() -> void {
+inline auto n19::ShitLexer::_token_null() -> void {
   curr_tok_ = Token::eof(src_->size() - 1, line_);
 }
 
-inline auto n19::Lexer::_token_single_char(
+inline auto n19::ShitLexer::_token_single_char(
   const TokenType type,
   const TokenCategory cat ) -> void
 {
@@ -432,7 +427,7 @@ inline auto n19::Lexer::_token_single_char(
   _advance_char(1);
 }
 
-inline auto n19::Lexer::_token_plus() -> void {
+inline auto n19::ShitLexer::_token_plus() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -473,7 +468,7 @@ inline auto n19::Lexer::_token_plus() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_tilde() -> void {
+inline auto n19::ShitLexer::_token_tilde() -> void {
   _token_single_char(
     TokenType::BitwiseNot,
     TokenCategory::UnaryOp
@@ -482,71 +477,71 @@ inline auto n19::Lexer::_token_tilde() -> void {
   );
 }
 
-inline auto n19::Lexer::_token_at() -> void {
+inline auto n19::ShitLexer::_token_at() -> void {
   _token_single_char(TokenType::At,
     TokenCategory::NonCategorical
   );
 }
 
-inline auto n19::Lexer::_token_money() -> void {
+inline auto n19::ShitLexer::_token_money() -> void {
   _token_single_char(TokenType::Money,
     TokenCategory::NonCategorical
   );
 }
 
-inline auto n19::Lexer::_token_lsqbracket() -> void {
+inline auto n19::ShitLexer::_token_lsqbracket() -> void {
   _token_single_char(TokenType::LeftSqBracket,
     TokenCategory::Punctuator | TokenCategory::ValidPostfix
   );
 }
 
-inline auto n19::Lexer::_token_rsqbracket() -> void {
+inline auto n19::ShitLexer::_token_rsqbracket() -> void {
   _token_single_char(TokenType::RightSqBracket,
     TokenCategory::Punctuator
   );
 }
 
-inline auto n19::Lexer::_token_semicolon() -> void {
+inline auto n19::ShitLexer::_token_semicolon() -> void {
   _token_single_char(TokenType::Semicolon,
     TokenCategory::Punctuator | TokenCategory::Terminator);
 }
 
-inline auto n19::Lexer::_token_lparen() -> void {
+inline auto n19::ShitLexer::_token_lparen() -> void {
   _token_single_char(TokenType::LeftParen,
     TokenCategory::Punctuator | TokenCategory::ValidPostfix);
 }
 
-inline auto n19::Lexer::_token_comma() -> void {
+inline auto n19::ShitLexer::_token_comma() -> void {
   _token_single_char(TokenType::Comma,
     TokenCategory::Punctuator | TokenCategory::Terminator
   );
 }
 
-inline auto n19::Lexer::_token_rparen() -> void {
+inline auto n19::ShitLexer::_token_rparen() -> void {
   _token_single_char(TokenType::RightParen,
     TokenCategory::Punctuator
   );
 }
 
-inline auto n19::Lexer::_token_lbrace() -> void {
+inline auto n19::ShitLexer::_token_lbrace() -> void {
   _token_single_char(TokenType::LeftBrace,
     TokenCategory::Punctuator
   );
 }
 
-inline auto n19::Lexer::_token_rbrace() -> void {
+inline auto n19::ShitLexer::_token_rbrace() -> void {
   _token_single_char(TokenType::RightBrace,
     TokenCategory::Punctuator
   );
 }
 
-inline auto n19::Lexer::_token_illegal() -> void {
+inline auto n19::ShitLexer::_token_illegal() -> void {
   _token_single_char(TokenType::Illegal,
     TokenCategory::NonCategorical
   );
 }
 
-inline auto n19::Lexer::_token_asterisk() -> void {
+inline auto n19::ShitLexer::_token_asterisk() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -571,7 +566,7 @@ inline auto n19::Lexer::_token_asterisk() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_colon() -> void {
+inline auto n19::ShitLexer::_token_colon() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -591,7 +586,7 @@ inline auto n19::Lexer::_token_colon() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_bang() -> void {
+inline auto n19::ShitLexer::_token_bang() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
   } else if(_peek_char() == '=') { // '!='
@@ -613,7 +608,7 @@ inline auto n19::Lexer::_token_bang() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_percent() -> void {
+inline auto n19::ShitLexer::_token_percent() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -634,7 +629,7 @@ inline auto n19::Lexer::_token_percent() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_uparrow() -> void {
+inline auto n19::ShitLexer::_token_uparrow() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -655,7 +650,7 @@ inline auto n19::Lexer::_token_uparrow() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_verticalline() -> void {
+inline auto n19::ShitLexer::_token_verticalline() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -686,7 +681,7 @@ inline auto n19::Lexer::_token_verticalline() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_lessthan() -> void {
+inline auto n19::ShitLexer::_token_lessthan() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -718,7 +713,7 @@ inline auto n19::Lexer::_token_lessthan() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_greaterthan() -> void {
+inline auto n19::ShitLexer::_token_greaterthan() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -750,7 +745,7 @@ inline auto n19::Lexer::_token_greaterthan() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_dot() -> void {
+inline auto n19::ShitLexer::_token_dot() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -775,7 +770,7 @@ inline auto n19::Lexer::_token_dot() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_equals() -> void {
+inline auto n19::ShitLexer::_token_equals() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -806,7 +801,7 @@ inline auto n19::Lexer::_token_equals() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_ampersand() -> void {
+inline auto n19::ShitLexer::_token_ampersand() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -840,7 +835,7 @@ inline auto n19::Lexer::_token_ampersand() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_fwdslash() -> void {
+inline auto n19::ShitLexer::_token_fwdslash() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -911,7 +906,7 @@ inline auto n19::Lexer::_token_fwdslash() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_singlequote() -> void {
+inline auto n19::ShitLexer::_token_singlequote() -> void {
   // Singlequotes indicate a character or byte literal.
   // A character literal is defined as being an
   // 8 bit ASCII value, because the type of a char literal
@@ -974,7 +969,7 @@ inline auto n19::Lexer::_token_singlequote() -> void {
   }
 }
 
-inline auto n19::Lexer::_token_quote() -> void {
+inline auto n19::ShitLexer::_token_quote() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -1016,7 +1011,7 @@ inline auto n19::Lexer::_token_quote() -> void {
   //
 }
 
-inline auto n19::Lexer::_token_hyphen() -> void {
+inline auto n19::ShitLexer::_token_hyphen() -> void {
   if(index_ >= src_->size()) {
     curr_tok_ = Token::eof(src_->size() - 1, line_);
     return;
@@ -1061,7 +1056,7 @@ inline auto n19::Lexer::_token_hyphen() -> void {
   }
 }
 
-auto n19::Lexer::_curr_char_is_reserved() const -> bool {
+auto n19::ShitLexer::_curr_char_is_reserved() const -> bool {
   switch(_current_char()) {
     case ' ':  [[fallthrough]];
     case '\r': [[fallthrough]];
@@ -1104,7 +1099,7 @@ auto n19::Lexer::_curr_char_is_reserved() const -> bool {
   }
 }
 
-auto n19::Lexer::_advance_impl() -> void {
+auto n19::ShitLexer::_advance_impl() -> void {
   switch(_current_char()) {
     case ' ':  _token_skip(); return;
     case '\r': _token_skip(); return;
@@ -1147,7 +1142,7 @@ auto n19::Lexer::_advance_impl() -> void {
   }
 }
 
-auto n19::Lexer::warn(const std::string &msg) -> Lexer& {
+auto n19::ShitLexer::warn(const std::string &msg) -> ShitLexer& {
   ErrorCollector::display_error(
     msg,
     file_name_,
@@ -1158,7 +1153,7 @@ auto n19::Lexer::warn(const std::string &msg) -> Lexer& {
   return *this;
 }
 
-auto n19::Lexer::error(const std::string &msg) -> Lexer & {
+auto n19::ShitLexer::error(const std::string &msg) -> ShitLexer & {
   ErrorCollector::display_error(
     msg,
     file_name_,
@@ -1169,10 +1164,10 @@ auto n19::Lexer::error(const std::string &msg) -> Lexer & {
   return *this;
 }
 
-auto n19::Lexer::warn(
+auto n19::ShitLexer::warn(
   const std::string& msg,
   const size_t pos,
-  const uint32_t line ) -> Lexer&
+  const uint32_t line ) -> ShitLexer&
 {
   ErrorCollector::display_error(
     msg,
@@ -1184,10 +1179,10 @@ auto n19::Lexer::warn(
   return *this;
 }
 
-auto n19::Lexer::error(
+auto n19::ShitLexer::error(
   const std::string& msg,
   const size_t pos,
-  const uint32_t line ) -> Lexer&
+  const uint32_t line ) -> ShitLexer&
 {
   ErrorCollector::display_error(
     msg,

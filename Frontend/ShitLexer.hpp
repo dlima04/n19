@@ -12,31 +12,28 @@
 #include <Core/Result.hpp>
 #include <Frontend/Token.hpp>
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 namespace n19 {
-  class Lexer;
+  class ShitLexer;
 }
 
-class n19::Lexer {
+class n19::ShitLexer {
 public:
   auto current() const        -> const Token&;
-  auto advance(uint32_t amnt) -> Lexer&;
+  auto advance(uint32_t amnt) -> ShitLexer&;
   auto peek(uint32_t amnt)    -> Token;
 
   //
   // Error handling. Raise an error or warning at a
   // specific position in the file buffer owned by the Lexer.
   //
-  auto error(const std::string &msg, size_t pos, uint32_t line) -> Lexer&;
-  auto warn(const std::string &msg, size_t pos, uint32_t line)  -> Lexer&;
-  auto error(const std::string &msg) -> Lexer&;
-  auto warn(const std::string &msg)  -> Lexer&;
+  auto error(const std::string &msg, size_t pos, uint32_t line) -> ShitLexer&;
+  auto warn(const std::string &msg, size_t pos, uint32_t line)  -> ShitLexer&;
+  auto error(const std::string &msg) -> ShitLexer&;
+  auto warn(const std::string &msg)  -> ShitLexer&;
 
-  //
-  // Throws an assertion if the current token is not the
-  // one passed as a parameter here.
-  //
   auto expect(TokenCategory cat, const std::string&, bool = true)  -> Result<None>;
   auto expect(TokenType type, const std::string&, bool = true)     -> Result<None>;
 
@@ -44,10 +41,9 @@ public:
   // Used to create the Lexer.
   // No public constructor is available.
   //
-  static auto create(const FileRef& file)      -> Result<Lexer>;
-  static auto create(const std::string& file)  -> Result<Lexer>;
+  static auto create(FileRef& file)-> Result<ShitLexer>;
 private:
-  Lexer() = default;
+  ShitLexer() = default;
 
   //
   // For checking/manipulating characters.
@@ -62,48 +58,48 @@ private:
   // For safely iterating over the character stream.
   // Uses bounds checking to prevent OOB read/write.
   //
-  auto _advance_impl()          -> void;
-  auto _advance_char(uint32_t)  -> void;
-  auto _advance_line()          -> void;
-  auto _skip_utf8_sequence()    -> void;
+  auto _advance_impl()         -> void;
+  auto _advance_char(uint32_t) -> void;
+  auto _advance_line()         -> void;
+  auto _skip_utf8_sequence()   -> void;
 
   //
   // The token generators.
   // Each one of these manipulates the
   // current token.
   //
-  auto _token_skip()            -> void;
-  auto _token_newline()         -> void;
-  auto _token_hyphen()          -> void;
-  auto _token_plus()            -> void;
-  auto _token_asterisk()        -> void;
-  auto _token_fwdslash()        -> void;
-  auto _token_percent()         -> void;
-  auto _token_equals()          -> void;
-  auto _token_lessthan()        -> void;
-  auto _token_greaterthan()     -> void;
-  auto _token_ampersand()       -> void;
-  auto _token_verticalline()    -> void;
-  auto _token_bang()            -> void;
-  auto _token_uparrow()         -> void;
-  auto _token_quote()           -> void;
-  auto _token_singlequote()     -> void;
-  auto _token_colon()           -> void;
-  auto _token_dot()             -> void;
-  auto _token_null()            -> void;
-  auto _token_ambiguous()       -> void;
-  auto _token_tilde()           -> void;
-  auto _token_at()              -> void;
-  auto _token_money()           -> void;
-  auto _token_lsqbracket()      -> void;
-  auto _token_rsqbracket()      -> void;
-  auto _token_semicolon()       -> void;
-  auto _token_lparen()          -> void;
-  auto _token_rparen()          -> void;
-  auto _token_lbrace()          -> void;
-  auto _token_rbrace()          -> void;
-  auto _token_comma()           -> void;
-  auto _token_illegal()         -> void;
+  auto _token_skip()         -> void;
+  auto _token_newline()      -> void;
+  auto _token_hyphen()       -> void;
+  auto _token_plus()         -> void;
+  auto _token_asterisk()     -> void;
+  auto _token_fwdslash()     -> void;
+  auto _token_percent()      -> void;
+  auto _token_equals()       -> void;
+  auto _token_lessthan()     -> void;
+  auto _token_greaterthan()  -> void;
+  auto _token_ampersand()    -> void;
+  auto _token_verticalline() -> void;
+  auto _token_bang()         -> void;
+  auto _token_uparrow()      -> void;
+  auto _token_quote()        -> void;
+  auto _token_singlequote()  -> void;
+  auto _token_colon()        -> void;
+  auto _token_dot()          -> void;
+  auto _token_null()         -> void;
+  auto _token_ambiguous()    -> void;
+  auto _token_tilde()        -> void;
+  auto _token_at()           -> void;
+  auto _token_money()        -> void;
+  auto _token_lsqbracket()   -> void;
+  auto _token_rsqbracket()   -> void;
+  auto _token_semicolon()    -> void;
+  auto _token_lparen()       -> void;
+  auto _token_rparen()       -> void;
+  auto _token_lbrace()       -> void;
+  auto _token_rbrace()       -> void;
+  auto _token_comma()        -> void;
+  auto _token_illegal()      -> void;
 
   //
   // For creating numeric literals:
