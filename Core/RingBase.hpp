@@ -8,10 +8,8 @@
 
 #ifndef RINGBASE_HPP
 #define RINGBASE_HPP
-#include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
 #include <atomic>
-#include <concepts>
 
 namespace n19 {
   template<class T, size_t size_ = 32>

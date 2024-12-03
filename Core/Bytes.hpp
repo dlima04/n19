@@ -22,14 +22,9 @@ namespace n19 {
   using WritableBytes = std::span<Byte>;
   using Bytes = std::span<const Byte>;
 
-  template<typename T>
-  auto as_writable_bytes(T& val) -> WritableBytes;
-
-  template<typename T>
-  auto as_bytes(const T& val) -> Bytes;
-
-  template<typename T>
-  auto as_scalar_bytecopy(const T& val) -> std::array<Byte, sizeof(T)>;
+  template<typename T> auto as_writable_bytes(T& val)        -> WritableBytes;
+  template<typename T> auto as_bytes(const T& val)           -> Bytes;
+  template<typename T> auto as_scalar_bytecopy(const T& val) -> std::array<Byte, sizeof(T)>;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

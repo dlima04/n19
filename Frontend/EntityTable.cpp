@@ -42,16 +42,12 @@ n19::EntityTable::EntityTable(const std::string& name) {
   curr_id_ = BuiltinType::AfterLastID;
 }
 
-auto n19::EntityTable::exists(
-  const Entity::ID id ) const -> bool
-{
+auto n19::EntityTable::exists(const Entity::ID id) const -> bool {
   ASSERT(id != N19_INVALID_ENTITY_ID);
   return map_.contains(id);
 }
 
-auto n19::EntityTable::find(
-  const Entity::ID id ) const -> Entity::Ptr<>
-{
+auto n19::EntityTable::find(const Entity::ID id) const -> Entity::Ptr<> {
   ASSERT(exists(id));
   return map_.at(id);
 }

@@ -1,15 +1,13 @@
 cmake_minimum_required(VERSION 3.28)
 project(n19)
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# The source files for the compiler.
-# Header files are included here so that
-# Clion can provide insight on them.
 set(N19_SOURCE_FILES
   Core/ConManip.cpp
   Core/FileRef.cpp
   Frontend/Token.cpp
-  Frontend/ShitLexer.cpp
   Frontend/ErrorCollector.cpp
   Frontend/EntityTable.cpp
   Frontend/Entity.cpp
@@ -22,12 +20,10 @@ set(N19_SOURCE_FILES
   Core/ConManip.hpp
   Core/Result.hpp
   Core/ResultMacros.hpp
-  Core/GlobalLastError.hpp
   Core/Panic.hpp
   Core/Fmt.hpp
   Core/FileRef.hpp
   Core/Defer.hpp
-  Frontend/ShitLexer.hpp
   Frontend/Token.hpp
   Frontend/ErrorCollector.hpp
   Frontend/AstNodes.hpp
@@ -48,12 +44,10 @@ set(N19_SOURCE_FILES
   Core/ClassTraits.hpp
   Core/RingBuffer.hpp
   Core/RingQueue.hpp
-        Frontend/LexerBase.hpp
-        Frontend/LazyLexer.hpp
-        Frontend/BufferedLexer.hpp
-        Frontend/LexerBase.cpp
-        Core/Panic.cpp
-        Frontend/LazyLexer.cpp
+  Core/Panic.cpp
+  Frontend/Lexer.hpp
+  Frontend/Lexer.cpp
+  Core/Except.hpp
 )
 
 add_executable(n19 ${N19_SOURCE_FILES})

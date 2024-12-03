@@ -1,0 +1,5 @@
+TODO
+- Refactor the lexer, fix _produce_next
+- Add constexpr implementation of Murmurhash so we can get string switches
+- Add a logging library
+- Add a small datetime library (will be useful for logging)

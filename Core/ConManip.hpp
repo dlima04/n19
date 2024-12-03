@@ -48,13 +48,7 @@ auto n19::set_console(Args... values) -> void {
   #if defined(N19_WIN32)
     maybe_enable_vsequences();
   #endif
-
-  const uint16_t to_u16[] = {
-    (static_cast<uint16_t>(values))...
-  };
-
-  for(const auto& val : to_u16)
-    std::print("\x1b[{}m", val);
+  (std::print("\x1b[{}m", (uint16_t)values), ...);
 }
 
 template<::n19::AreAll<n19::Con> ...Args>
@@ -62,15 +56,8 @@ auto n19::manip_string(Args... values) -> std::string {
   #if defined(N19_WIN32)
     maybe_enable_vsequences();
   #endif
-
   std::string buff;
-  const uint16_t to_u16[] = {
-    (static_cast<uint16_t>(values))...
-  };
-
-  for(const auto& val : to_u16)
-    buff += fmt("\x1b[{}m", val);
-
+  ((buff += fmt("\x1b[{}m", (uint16_t)values)), ...);
   return buff;
 }
 

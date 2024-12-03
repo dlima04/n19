@@ -11,6 +11,7 @@
 #include <Core/Bytes.hpp>
 #include <Core/ResultMacros.hpp>
 #include <Core/Panic.hpp>
+#include <Core/Except.hpp>
 #include <Native/Stream.hpp>
 #include <Frontend/ErrorCollector.hpp>
 #include <algorithm>
@@ -100,21 +101,23 @@ auto n19::ErrorCollector::display_error(
     pos = buff.size() - 1;
   }
 
-  try{ for(size_t i = pos - 1; buff.at(i) != '\n'; i--) {
+  IGNORE_EXCEPT(
+  for(size_t i = pos - 1; buff.at(i) != '\n'; i--) {
     const char ch = buff.at(i);
     if(!std::isprint(static_cast<uint8_t>(ch)))
       continue;
     before += ch;
     filler += '~';
-  }} catch(...) {/* ... */} // NOLINT(*-empty-catch)
+  });
 
-  try{ for(size_t i = pos; buff.at(i) != '\n'; i++) {
+  IGNORE_EXCEPT(
+  for(size_t i = pos; buff.at(i) != '\n'; i++) {
     const char ch = buff.at(i);
     if(!std::isprint(static_cast<uint8_t>(ch)))
       continue;
     after += ch;
     filler += i == pos ? '^' : '~';
-  }} catch(...) {/* ... */} // NOLINT(*-empty-catch)
+  });
 
   std::ranges::reverse(before);
   before += after;
@@ -162,17 +165,6 @@ auto n19::ErrorCollector::emit() const -> Result<None> {
   }
 
   return make_result<None>();
-}
-
-auto n19::ErrorCollector::max_err_chk() const -> void {
-  if(error_count_ + 1 >= N19_MAX_ERRORS) [[unlikely]] {
-    [[maybe_unused]] const auto _ = emit();
-    FATAL("Maximum amount of permitted errors reached. Aborting compilation now.");
-  }
-}
-
-auto n19::ErrorCollector::has_errors() const -> bool {
-  return error_count_ > 0;
 }
 
 

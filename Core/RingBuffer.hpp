@@ -47,7 +47,13 @@ public:
   // parameter pack Args.
   template<class ...Args> auto write(Args... args) -> bool;
   template<class ...Args> auto overwrite(Args... args) -> void;
+
+  // For reading values from the ringbuffer.
+  // note that current() and try_current retrieve the value at
+  // tail_ without incrementing it.
   auto read() -> Maybe<ValueType>;
+  auto try_current() -> Maybe<ValueType>;
+  auto current() -> ValueType;
 
   ~RingBuffer() = default;
   RingBuffer()  = default;
@@ -68,7 +74,7 @@ N19_FORCEINLINE auto n19::RingBuffer<T, size_>::write(Args... args) -> bool {
 }
 
 template<class T, size_t size_> template<class ... Args>
-auto n19::RingBuffer<T, size_>::overwrite(Args... args) -> void {
+N19_FORCEINLINE auto n19::RingBuffer<T, size_>::overwrite(Args... args) -> void {
   static_assert(std::constructible_from<T, Args...>);
   if(this->is_full()) {
     tail_.fetch_add(1, std::memory_order::release);
@@ -90,5 +96,30 @@ N19_FORCEINLINE auto n19::RingBuffer<T, size_>::read() -> Maybe<ValueType> {
   tail_.fetch_add(1, std::memory_order::release);
   return val;
 }
+
+template<class T, size_t size_>
+N19_FORCEINLINE auto n19::RingBuffer<T, size_>::try_current() -> Maybe<ValueType> {
+  const size_t lhead = head_.load(std::memory_order::acquire);
+  const size_t ltail = tail_.load(std::memory_order::acquire);
+
+  if((lhead & size_mask_) == (ltail & size_mask_)) {
+    return std::nullopt;
+  }
+
+  return buff_[ ltail & size_mask_ ];
+}
+
+template<class T, size_t size_>
+N19_FORCEINLINE auto n19::RingBuffer<T, size_>::current() -> ValueType {
+  const size_t lhead = head_.load(std::memory_order::acquire);
+  const size_t ltail = tail_.load(std::memory_order::acquire);
+
+  if((lhead & size_mask_) == (ltail & size_mask_)) {
+    head_.wait(lhead, std::memory_order::acquire);
+  }
+
+  return buff_[ ltail & size_mask_ ];
+}
+
 
 #endif //RINGBUFFER_HPP

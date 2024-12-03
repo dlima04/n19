@@ -79,27 +79,21 @@ auto n19::EntityQualifierThunk::format() const -> std::string {
   );
 }
 
-auto n19::EntityQualifier::get_const_bool()
--> EntityQualifier
-{
+auto n19::EntityQualifier::get_const_bool() -> EntityQualifier {
   EntityQualifier const_bool;
   const_bool.id_    = BuiltinType::Bool;
   const_bool.flags_ = Constant;
   return const_bool;
 }
 
-auto n19::EntityQualifier::get_const_f64()
--> EntityQualifier
-{
+auto n19::EntityQualifier::get_const_f64() -> EntityQualifier {
   EntityQualifier const_f64;
   const_f64.id_     = BuiltinType::F64;
   const_f64.flags_  = Constant;
   return const_f64;
 }
 
-auto n19::EntityQualifier::get_const_ptr()
--> EntityQualifier
-{
+auto n19::EntityQualifier::get_const_ptr() -> EntityQualifier {
   EntityQualifier const_ptr;
   const_ptr.id_        = BuiltinType::Ptr;
   const_ptr.ptr_depth_ = 1;
@@ -118,7 +112,7 @@ auto n19::EntityQualifier::to_string(
   if(include_qualifiers) {
     #define X(VAL, UNUSED) \
       if(flags_ & VAL) buff.append(#VAL " ");
-    N19_EQ_FLAG_LIST /*convert to string repr*/
+    N19_EQ_FLAG_LIST /* convert to string repr */
     #undef X
   }
 

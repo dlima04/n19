@@ -8,7 +8,7 @@
 
 #ifndef RINGQUEUE_HPP
 #define RINGQUEUE_HPP
-#include <Core/ClassTraits.hpp>
+#include <Core/Panic.hpp>
 #include <Core/RingBase.hpp>
 #include <Core/Result.hpp>
 
@@ -47,10 +47,19 @@ public:
   template<typename ...Args> auto try_enqueue(Args... args) -> bool;
 
   // Similarly to enqueue() and try_enqueue(), we have blocking
-  // and non-blocking operations here.
-  auto dequeue()     -> ValueType;
+  // and non-blocking operations here. current() gets the current
+  // element at the tail without dequeueing it.
+  auto dequeue() -> ValueType;
+  auto current() -> ValueType;
+  auto try_current() -> Maybe<ValueType>;
   auto try_dequeue() -> Maybe<ValueType>;
-  
+
+  // For peeking operations. i.e. when the consumer wants to peek
+  // ahead a certain amount of elements without consuming anything.
+  auto can_peek(size_t amnt) -> bool;
+  auto try_peek(size_t amnt) -> Maybe<ValueType>;
+  auto peek(size_t amnt) -> ValueType;
+
   // wake any threads waiting on head_ or tail_, if any.
   auto wake_all() -> void;
   
@@ -91,6 +100,44 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_dequeue() -> Maybe<ValueType>
   return val;
 }
 
+template<class T, size_t size_>
+N19_FORCEINLINE auto n19::RingQueue<T, size_>::can_peek(const size_t amnt) -> bool {
+  const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
+  const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
+
+  ASSERT(amnt < (size_ - 1)); // Should never happen.
+  const size_t max_distance = lhead >= ltail
+    ? lhead - ltail
+    : (size_ - ltail) + lhead;
+  return amnt < max_distance;
+}
+
+template<class T, size_t size_>
+N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_peek(const size_t amnt) -> Maybe<ValueType> {
+  const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
+  const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
+
+  ASSERT(amnt < (size_ - 1)); // Should never happen.
+  const size_t max_distance = lhead >= ltail
+    ? lhead - ltail
+    : (size_ - ltail) + lhead;
+  if(amnt >= max_distance) {
+    return std::nullopt;
+  }
+
+  return buff_[ (ltail + amnt) & size_mask_ ];
+}
+
+template<class T, size_t size_>
+N19_FORCEINLINE auto n19::RingQueue<T, size_>::peek(const size_t amnt) -> ValueType {
+  const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
+  while(!can_peek(amnt)) { // spin.
+    head_.wait(head_.load(std::memory_order::acquire));
+  }
+
+  return buff_[ (ltail + amnt) & size_mask_ ];
+}
+
 template<class T, size_t size_> template<typename ... Args>
 N19_FORCEINLINE auto n19::RingQueue<T, size_>::enqueue(Args... args) -> void {
   static_assert(std::constructible_from<T, Args...>);
@@ -126,6 +173,30 @@ template<class T, size_t size_>
 N19_FORCEINLINE auto n19::RingQueue<T, size_>::wake_all() -> void {
   head_.notify_all();
   tail_.notify_all();
+}
+
+template<class T, size_t size_>
+N19_FORCEINLINE auto n19::RingQueue<T, size_>::current() -> ValueType {
+  const size_t lhead = head_.load(std::memory_order::acquire);
+  const size_t ltail = tail_.load(std::memory_order::acquire);
+
+  if((lhead & size_mask_) == (ltail & size_mask_)) {
+    head_.wait(lhead, std::memory_order::acquire);
+  }
+
+  return buff_[ ltail & size_mask_ ];
+}
+
+template<class T, size_t size_>
+N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_current() -> Maybe<ValueType> {
+  const size_t lhead = head_.load(std::memory_order::acquire);
+  const size_t ltail = tail_.load(std::memory_order::acquire);
+
+  if((lhead & size_mask_) == (ltail & size_mask_)) {
+    return std::nullopt;
+  }
+
+  return buff_[ ltail & size_mask_ ];
 }
 
 #endif //RINGQUEUE_HPP

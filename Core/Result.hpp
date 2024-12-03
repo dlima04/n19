@@ -15,9 +15,6 @@
 #include <string>
 
 namespace n19 {
-  // A 16-bit error code.
-  // Specifies the error's type, and is
-  // usually found inside of a n19::ErrorDescriptor.
   enum class ErrC : uint8_t {
     None,
     InvalidArg,
@@ -29,20 +26,9 @@ namespace n19 {
     Native,
   };
 
-  // A struct that represents a runtime error.
-  // Contains an error code (n19::ErrC) as well
-  // as a message (in the form of a std::string) for
-  // some additional context on what went wrong.
   struct ErrorDescriptor;
-
-  // A type that represents "nothing". Used in
-  // situations where a function or method returns either
-  // nothing, or an error (i.e. Result<None>).
   struct None;
 
-  // The result and error types used by the compiler.
-  // So that we can propagate errors as values without using
-  // exceptions.
   template<typename T>
   using Result = std::expected<T, ErrorDescriptor>;
   using Error = std::unexpected<ErrorDescriptor>;

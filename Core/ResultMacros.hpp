@@ -9,9 +9,11 @@
 #ifndef RESULTMACROS_HPP
 #define RESULTMACROS_HPP
 #include <Core/Result.hpp>
-#include <Core/GlobalLastError.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Fmt.hpp>
+
+inline thread_local auto n19_last_errc_ = n19::ErrC::None;
+inline thread_local auto n19_last_msg_  = std::string();
 
 // Provides additional support for n19::Result<T>
 // in the form of a set of macros that allow us to "try"

@@ -32,9 +32,7 @@ auto n19::argp::Parameter::create(
   return param;
 }
 
-auto n19::argp::Value::to_bool() const
--> Result<bool>
-{
+auto n19::argp::Value::to_bool() const -> Result<bool> {
   if(value_ == _nstr("true")) {
     return make_result<bool>(true);
   } if(value_ == _nstr("false")) {
@@ -44,9 +42,7 @@ auto n19::argp::Value::to_bool() const
   return make_error(ErrC::NotFound);
 }
 
-auto n19::argp::Value::to_cdvs() const
--> Result<std::vector<Value>>
-{
+auto n19::argp::Value::to_cdvs() const -> Result<std::vector<Value>> {
   if(value_.empty()) {
     return make_error(ErrC::NotFound);
   }
@@ -61,9 +57,7 @@ auto n19::argp::Value::to_cdvs() const
   return vals;
 }
 
-auto n19::argp::Value::to_f64() const
--> Result<double>
-{
+auto n19::argp::Value::to_f64() const -> Result<double> {
   try {
     const double db = std::stod(value_);
     return db;
@@ -74,9 +68,7 @@ auto n19::argp::Value::to_f64() const
   UNREACHABLE;
 }
 
-auto n19::argp::Value::to_i64() const
--> Result<int64_t>
-{
+auto n19::argp::Value::to_i64() const -> Result<int64_t> {
   try {
     const int64_t the_i64 = std::stoll(value_);
     return the_i64;
@@ -87,9 +79,7 @@ auto n19::argp::Value::to_i64() const
   UNREACHABLE;
 }
 
-auto n19::argp::Parser::add_param(Parameter&& param)
--> Parser&
-{
+auto n19::argp::Parser::add_param(Parameter&& param) -> Parser& {
   ASSERT(param.lf_.starts_with(_nstr("--")));
   ASSERT(param.sf_.starts_with(_nstr("-")));
   params_.emplace_back(param);
@@ -336,10 +326,12 @@ auto n19::argp::Parser::parse(
       _print_chunk_error("Expected a value after \"=\"", i, chunks);
       return make_error(ErrC::InvalidArg);
     }
+
     if(!_is_valid_argument(the_flag)) {
       _print_chunk_error("Flag does not exist.", i, chunks);
       return make_error(ErrC::InvalidArg);
     }
+
     if(_already_passed(flag_index, chunks)) {
       _print_chunk_error("Flag was passed more than once.", flag_index, chunks);
       return make_error(ErrC::InvalidArg);

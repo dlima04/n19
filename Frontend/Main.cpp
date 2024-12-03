@@ -9,7 +9,9 @@
 #include <print>
 #include <iostream>
 #include <cstdint>
-#include <Frontend/ShitLexer.hpp>
+#include <Frontend/Lexer.hpp>
+#include <Core/FileRef.hpp>
+#include <Core/ResultMacros.hpp>
 #include <Native/LastError.hpp>
 #include <Core/Panic.hpp>
 #include <Core/ArgParse.hpp>
@@ -125,7 +127,6 @@ static void test_ringqueue() {
 
 int main(int argc, char** argv) {
 
-
   //
   // std::vector<native::StringView> strs
   // = { "--output-directory", "--demangle-funcs=true", "-a", "3123", "-z" };
@@ -149,25 +150,18 @@ int main(int argc, char** argv) {
   //   std::println("Value: \"{}\"", val->value_);
   // }
 
-  //try {
-  //  const auto file = MUST(FileRef::open(CURRENT_TEST));
-  //  auto lxr = Lexer::create(*file);
-  //  if(!lxr) {
-  //    return 1;
-  //  }
-  //
-  //  do {
-  //    lxr->advance(1);
-  //    std::cout << lxr->current().format() << std::flush;
-  //  } while(lxr->current() != TokenType::EndOfFile && lxr->current() != TokenType::Illegal);
-  //
-  //  if(lxr->current() == TokenType::Illegal) {
-  //    lxr->error("Illegal token!");
-  //  }
-  //
-  //} catch(const std::exception& e) {
-  //  std::cerr << "EXCEPTION: " << e.what() << std::endl;
-  //}
+  try {
+    const auto file = MUST(FileRef::open(CURRENT_TEST));
+    auto lxr = Lexer::create(*file);
+    if(!lxr) {
+      return 1;
+    }
+
+    lxr->get()->testfuck();
+
+  } catch(const std::exception& e) {
+    std::cerr << "EXCEPTION: " << e.what() << std::endl;
+  }
 
   return 0;
 }

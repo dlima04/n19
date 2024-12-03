@@ -50,7 +50,7 @@ auto n19::native::IODevice::read_into(
 }
 
 auto n19::native::IODevice::create_pipe()
--> Result<std::array<IODevice, 2>>
+  -> Result<std::array<IODevice, 2>>
 {
   int pipefds[ 2 ] = { 0 };
   std::array<IODevice, 2> arr = { };

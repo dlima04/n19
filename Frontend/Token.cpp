@@ -7,8 +7,9 @@
 */
 
 #include <algorithm>
-#include <Frontend/LexerBase.hpp>
+#include <Frontend/Lexer.hpp>
 #include <Core/Fmt.hpp>
+#include <Core/Panic.hpp>
 
 auto n19::Token::eof(
   const uint32_t pos,
@@ -37,7 +38,7 @@ auto n19::Token::illegal(
 }
 
 // Converts a given TokenType's underlying
-// value (Type) to a string.
+// Type enumeration to a string.
 auto n19::TokenType::to_string() const -> std::string {
   #define X(TYPE, STR) case TokenType::TYPE: return #TYPE;
   switch(value) {
@@ -63,7 +64,7 @@ auto n19::TokenType::string_repr() const -> std::string {
 }
 
 // Converts a given TokenCategory's underlying
-// value (Type) to a string.
+// Type enumeration to a string.
 auto n19::TokenCategory::to_string() const -> std::string {
   #define X(CAT, UNUSED) if(value & CAT) buff += (std::string(#CAT) + " | ");
    std::string buff;
@@ -72,7 +73,10 @@ auto n19::TokenCategory::to_string() const -> std::string {
 
   if(!buff.empty() && buff[buff.size() - 2] == '|') {
     buff.erase(buff.size() - 3);
+  } else {
+    buff += "NonCategorical";
   }
+
   return buff;
 }
 
@@ -88,7 +92,7 @@ auto n19::TokenCategory::is_any_of(const std::vector<Value>& vals) const -> bool
 // way in which it appears in a source file. For example,
 // an identifier of "foo" would be returned as such,
 // a string of "foo".
-auto n19::Token::value(const LexerBase& lxr) const -> Maybe<std::string> {
+auto n19::Token::value(const Lexer& lxr) const -> Maybe<std::string> {
   if(len_ == 0) return std::nullopt;
   const auto bytes = lxr.get_bytes();
   ASSERT(pos_ < bytes.size());
@@ -98,9 +102,8 @@ auto n19::Token::value(const LexerBase& lxr) const -> Maybe<std::string> {
 
 // Formats a token into a more readable representation.
 // For debugging/testing purposes only.
-auto n19::Token::format(const LexerBase& lxr) const -> std::string {
+auto n19::Token::format(const Lexer& lxr) const -> std::string {
   std::string buffer;
-  buffer.reserve(50);
   buffer += fmt("{:<10}: \"{}\"\n", type_.to_string(), value(lxr).value_or("N/A"));
   buffer += fmt("{:<10}: {}\n", "Line", line_);
   buffer += fmt("{:<10}: {}\n", "Position", pos_);

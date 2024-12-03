@@ -9,6 +9,7 @@
 #ifndef ERRORCOLLECTOR_HPP
 #define ERRORCOLLECTOR_HPP
 #include <Core/ClassTraits.hpp>
+#include <Core/Platform.hpp>
 #include <Core/FileRef.hpp>
 #include <Core/Bytes.hpp>
 #include <Native/String.hpp>
@@ -86,5 +87,19 @@ private:
   uint32_t warning_count_ = 0;
   uint8_t error_count_    = 0;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+N19_FORCEINLINE auto n19::ErrorCollector::max_err_chk() const -> void {
+  if(error_count_ + 1 < N19_MAX_ERRORS) [[likely]]
+    return;
+  [[maybe_unused]] const auto _ = emit();
+  FATAL("Maximum amount of permitted errors reached. Aborting compilation now.");
+}
+
+N19_FORCEINLINE auto n19::ErrorCollector::has_errors() const -> bool {
+  return error_count_ > 0;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif //ERRORCOLLECTOR_HPP

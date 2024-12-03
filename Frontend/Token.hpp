@@ -10,6 +10,7 @@
 #define FRONTEND_TOKEN_HPP
 #include <Core/ClassTraits.hpp>
 #include <Core/Result.hpp>
+#include <Core/Platform.hpp>
 #include <string>
 #include <cstdint>
 #include <vector>
@@ -126,6 +127,7 @@
   X(ValidPrefix, 1ULL << 14)     \
   X(BitwiseAssignOp, 1ULL << 15) \
   X(Terminator, 1ULL << 16)      \
+  X(ControlFlow, 1ULL << 17)     \
 
 namespace n19 {
   class Token;
@@ -166,8 +168,8 @@ public:
   [[nodiscard]] auto isa(Value val) const -> bool;
   [[nodiscard]] auto is_any_of(const std::vector<Value> &vals) const -> bool;
 
-  auto operator|=(const TokenCategory &other) -> void;
-  auto operator|=(Value other) -> void;
+  constexpr auto operator|=(const TokenCategory &other) -> void;
+  constexpr auto operator|=(Value other) -> void;
 
   size_t value = NonCategorical;
   constexpr TokenCategory()  = default;
@@ -180,29 +182,27 @@ N19_MAKE_COMPARABLE_MEMBER(Token, type_);
 public:
   uint32_t pos_  = 0;
   uint32_t len_  = 0;
-  uint32_t line_ = 0;
+  uint32_t line_ = 1;
   TokenCategory cat_;
   TokenType type_;
 
-  [[nodiscard]] auto value(const class LexerBase&) const -> Maybe<std::string>;
-  [[nodiscard]] auto format(const class LexerBase&) const -> std::string;
+  [[nodiscard]] auto value(const class Lexer&) const -> Maybe<std::string>;
+  [[nodiscard]] auto format(const class Lexer&) const -> std::string;
 
   static auto eof(uint32_t pos, uint32_t line) -> Token;
   static auto illegal(uint32_t pos, uint32_t length, uint32_t line) -> Token;
-
-  Token()  = default;
   ~Token() = default;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-inline auto n19::TokenCategory::operator|=(
+constexpr auto n19::TokenCategory::operator|=(
   const TokenCategory &other ) -> void
 {
   value |= other.value;
 }
 
-inline auto n19::TokenCategory::operator|=(
+constexpr auto n19::TokenCategory::operator|=(
   const Value other ) -> void
 {
   value |= other;

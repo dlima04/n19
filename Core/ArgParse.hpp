@@ -9,6 +9,7 @@
 #ifndef ARGPARSE_HPP
 #define ARGPARSE_HPP
 #include <Core/Result.hpp>
+#include <Core/ClassTraits.hpp>
 #include <Native/String.hpp>
 #include <cstdint>
 #include <functional>
@@ -69,6 +70,23 @@ struct n19::argp::Parameter {
 // parse arguments passed from the command line,
 // and subsequently retrieve them as argp::Values.
 class n19::argp::Parser {
+N19_MAKE_NONCOPYABLE(Parser);
+N19_MAKE_NONMOVABLE(Parser);
+public:
+  auto add_param(Parameter&& param) -> Parser&;
+  auto print() const                -> void;
+  auto debug_print() const          -> void;
+
+  auto parse(
+    const std::vector<native::StringView>& chunks
+  ) -> Result<None>;
+
+  auto get_arg(
+    const native::StringView& str
+  ) const -> Result<Value>;
+
+  ~Parser() = default;
+  Parser()  = default;
 private:
   auto _is_valid_argument(
     const native::String& str
@@ -85,27 +103,7 @@ private:
     const std::vector<native::StringView>& strings
   ) -> void;
 
-  auto _check_required_params()
-    const -> bool;
-public:
-  Parser(const Parser&)             = delete;
-  Parser& operator=(const Parser&)  = delete;
-
-  auto parse(
-    const std::vector<native::StringView>& chunks
-  ) -> Result<None>;
-
-  auto get_arg(
-    const native::StringView& str
-  ) const -> Result<Value>;
-
-  auto add_param(Parameter&& param) -> Parser&;
-  auto print() const                -> void;
-  auto debug_print() const          -> void;
-
-  ~Parser() = default;
-  Parser()  = default;
-private:
+  auto _check_required_params() const -> bool;
   std::vector<Parameter> params_;
 };
 
