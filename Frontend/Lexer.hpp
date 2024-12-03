@@ -50,7 +50,7 @@ public:
   auto produce()              -> void;
   auto get_bytes() const      -> Bytes;
   auto peek(uint32_t amnt)    -> Token;
-  auto testfuck() -> void;
+  auto dump()                 -> void;
 
   // Error handling.
   auto error(const std::string &msg, uint32_t line, uint32_t pos) const -> void;

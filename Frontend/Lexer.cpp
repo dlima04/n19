@@ -23,35 +23,35 @@ inline auto n19::Lexer::_token_hyphen() -> Token {
   switch(_peek_char()) {
     case u8'=': // '-='
       curr_tok.type_ = TokenType::SubEq;
-      curr_tok.cat_  = TokenCategory::BinaryOp
-        | TokenCategory::ArithmeticOp
-        | TokenCategory::ArithAssignOp
-        | TokenCategory::PointerArithOp;
+      curr_tok.cat_  = TokenCategory::BinaryOp;
+      curr_tok.cat_ |= TokenCategory::ArithAssignOp;
+      curr_tok.cat_ |= TokenCategory::PointerArithOp;
+      curr_tok.cat_ |= TokenCategory::ArithmeticOp;
       curr_tok.len_  = 2;
       _consume_char(2);
       break;
     case u8'-': // '--'
       curr_tok.type_ = TokenType::Dec;
-      curr_tok.cat_  = TokenCategory::UnaryOp
-        | TokenCategory::PointerArithOp
-        | TokenCategory::ValidPostfix
-        | TokenCategory::ValidPrefix
-        | TokenCategory::ArithAssignOp
-        | TokenCategory::ArithmeticOp;
+      curr_tok.cat_  = TokenCategory::UnaryOp;
+      curr_tok.cat_ |= TokenCategory::PointerArithOp;
+      curr_tok.cat_ |= TokenCategory::ValidPostfix;
+      curr_tok.cat_ |= TokenCategory::ValidPrefix;
+      curr_tok.cat_ |= TokenCategory::ArithAssignOp;
+      curr_tok.cat_ |= TokenCategory::ArithmeticOp;
       curr_tok.len_  = 2;
       _consume_char(2);
       break;
     case u8'>': // '->'
       curr_tok.type_ = TokenType::SkinnyArrow;
-      curr_tok.cat_  = TokenCategory::ValidPostfix
-        | TokenCategory::BinaryOp;
+      curr_tok.cat_  = TokenCategory::ValidPostfix;
+      curr_tok.cat_ |= TokenCategory::BinaryOp;
       curr_tok.len_  = 2;
       _consume_char(2);
     default: // '-'
       curr_tok.type_ = TokenType::Sub;
-      curr_tok.cat_  = TokenCategory::BinaryOp
-        | TokenCategory::ArithmeticOp
-        | TokenCategory::PointerArithOp;
+      curr_tok.cat_  = TokenCategory::BinaryOp;
+      curr_tok.cat_ |= TokenCategory::ArithmeticOp;
+      curr_tok.cat_ |= TokenCategory::PointerArithOp;
       curr_tok.len_  = 1;
       _consume_char(1);
       break;
@@ -69,8 +69,8 @@ inline auto n19::Lexer::_token_ampersand() -> Token {
   switch(_peek_char()) {
     case u8'=': // '&='
       curr_tok.type_ = TokenType::BitwiseAndEq;
-      curr_tok.cat_ |= TokenCategory::BitwiseAssignOp
-        | TokenCategory::BitwiseOp;
+      curr_tok.cat_ |= TokenCategory::BitwiseAssignOp;
+      curr_tok.cat_ |= TokenCategory::BitwiseOp;
       curr_tok.len_  = 2;
       _consume_char(2);
       break;
@@ -82,9 +82,9 @@ inline auto n19::Lexer::_token_ampersand() -> Token {
       break;
     default: // '&'
       curr_tok.type_  = TokenType::BitwiseAnd;
-      curr_tok.cat_  |= TokenCategory::BitwiseOp
-        | TokenCategory::UnaryOp
-        | TokenCategory::ValidPrefix;
+      curr_tok.cat_  |= TokenCategory::BitwiseOp;
+      curr_tok.cat_  |= TokenCategory::UnaryOp;
+      curr_tok.cat_  |= TokenCategory::ValidPrefix;
       curr_tok.len_  = 1;
       _consume_char(1);
       break;
@@ -125,9 +125,9 @@ inline auto n19::Lexer::_token_equals() -> Token {
   switch(_peek_char()) {
     case '=': // '=='
       curr_tok.type_ = TokenType::Eq;
-      curr_tok.cat_  = TokenCategory::BinaryOp
-        | TokenCategory::LogicalOp
-        | TokenCategory::ComparisonOp;
+      curr_tok.cat_  = TokenCategory::BinaryOp;
+      curr_tok.cat_ |= TokenCategory::LogicalOp;
+      curr_tok.cat_ |= TokenCategory::ComparisonOp;
       curr_tok.len_  = 2;
       _consume_char(2);
       break;
@@ -156,31 +156,31 @@ inline auto n19::Lexer::_token_plus() -> Token {
   switch(_peek_char()) {
     case '=': // '+='
       curr_tok.type_ = TokenType::PlusEq;
-      curr_tok.cat_  = TokenCategory::BinaryOp
-        | TokenCategory::ArithAssignOp
-        | TokenCategory::ArithmeticOp
-        | TokenCategory::PointerArithOp;
+      curr_tok.cat_  = TokenCategory::BinaryOp;
+      curr_tok.cat_ |= TokenCategory::ArithAssignOp;
+      curr_tok.cat_ |= TokenCategory::ArithmeticOp;
+      curr_tok.cat_ |= TokenCategory::PointerArithOp;
       curr_tok.len_  = 2;
       _consume_char(2);
       break;
     case '+': // '++'
       curr_tok.type_ = TokenType::Inc;
-      curr_tok.cat_  = TokenCategory::UnaryOp
-        | TokenCategory::ArithAssignOp
-        | TokenCategory::ArithmeticOp
-        | TokenCategory::PointerArithOp
-        | TokenCategory::ValidPostfix
-        | TokenCategory::ValidPrefix;
+      curr_tok.cat_  = TokenCategory::UnaryOp;
+      curr_tok.cat_ |= TokenCategory::ArithAssignOp;
+      curr_tok.cat_ |= TokenCategory::ArithmeticOp;
+      curr_tok.cat_ |= TokenCategory::PointerArithOp;
+      curr_tok.cat_ |= TokenCategory::ValidPostfix;
+      curr_tok.cat_ |= TokenCategory::ValidPrefix;
       curr_tok.len_  = 2;
       _consume_char(2);
       break;
     default: // '+'
       curr_tok.type_ = TokenType::Plus;
-      curr_tok.cat_  = TokenCategory::BinaryOp
-        | TokenCategory::UnaryOp
-        | TokenCategory::ArithmeticOp
-        | TokenCategory::PointerArithOp
-        | TokenCategory::ValidPrefix;
+      curr_tok.cat_  = TokenCategory::BinaryOp;
+      curr_tok.cat_ |= TokenCategory::UnaryOp;
+      curr_tok.cat_ |= TokenCategory::ArithmeticOp;
+      curr_tok.cat_ |= TokenCategory::PointerArithOp;
+      curr_tok.cat_ |= TokenCategory::ValidPrefix;
       curr_tok.len_  = 1;
       _consume_char(1);
       break;
@@ -281,18 +281,18 @@ inline auto n19::Lexer::_token_asterisk() -> Token {
   curr_tok.len_  = 1;
 
   if(_peek_char() == u8'=') { // '*='
-    curr_tok.type_  = TokenType::MulEq;
-    curr_tok.cat_   = TokenCategory::BinaryOp
-      | TokenCategory::ArithAssignOp
-      | TokenCategory::ArithmeticOp;
+    curr_tok.type_ = TokenType::MulEq;
+    curr_tok.cat_  = TokenCategory::BinaryOp;
+    curr_tok.cat_ |= TokenCategory::ArithAssignOp;
+    curr_tok.cat_ |= TokenCategory::ArithmeticOp;
     curr_tok.len_ = 2;
     _consume_char(2);
   } else [[likely]] { // '*'
-    curr_tok.type_  = TokenType::Mul;
-    curr_tok.cat_   = TokenCategory::BinaryOp
-      | TokenCategory::UnaryOp
-      | TokenCategory::ArithmeticOp
-      | TokenCategory::ValidPrefix;
+    curr_tok.type_ = TokenType::Mul;
+    curr_tok.cat_  = TokenCategory::BinaryOp;
+    curr_tok.cat_ |= TokenCategory::UnaryOp;
+    curr_tok.cat_ |= TokenCategory::ArithmeticOp;
+    curr_tok.cat_ |= TokenCategory::ValidPrefix;
     _consume_char(1);
   }
 
@@ -320,23 +320,22 @@ inline auto n19::Lexer::_token_colon() -> Token {
 }
 
 auto n19::Lexer::_token_bang() -> Token {
-  Token curr_tok {
-    .pos_  = index_,
-    .line_ = line_
-  };
+  Token curr_tok;
+  curr_tok.pos_  = index_;
+  curr_tok.line_ = line_;
 
   if(_peek_char() == u8'=') { // '!='
     curr_tok.type_ = TokenType::Neq;
-    curr_tok.cat_  = TokenCategory::BinaryOp
-      | TokenCategory::LogicalOp
-      | TokenCategory::ComparisonOp;
+    curr_tok.cat_  = TokenCategory::BinaryOp;
+    curr_tok.cat_ |= TokenCategory::LogicalOp;
+    curr_tok.cat_ |= TokenCategory::ComparisonOp;
     curr_tok.len_  = 2;
     _consume_char(2);
   } else { // '!'
     curr_tok.type_ = TokenType::LogicalNot;
-    curr_tok.cat_  = TokenCategory::UnaryOp
-      | TokenCategory::LogicalOp
-      | TokenCategory::ValidPrefix;
+    curr_tok.cat_  = TokenCategory::UnaryOp;
+    curr_tok.cat_ |= TokenCategory::ValidPrefix;
+    curr_tok.cat_ |= TokenCategory::LogicalOp;
     curr_tok.len_  = 1;
     _consume_char(1);
   }
@@ -345,11 +344,10 @@ auto n19::Lexer::_token_bang() -> Token {
 }
 
 inline auto n19::Lexer::_token_percent() -> Token {
-  Token curr_tok {
-    .cat_  = TokenCategory::BinaryOp | TokenCategory::ArithmeticOp,
-    .pos_  = index_,
-    .line_ = line_,
-  };
+  Token curr_tok;
+  curr_tok.pos_  = index_;
+  curr_tok.line_ = line_;
+  curr_tok.cat_  = TokenCategory::BinaryOp | TokenCategory::ArithmeticOp;
   
   if(_peek_char() == u8'=') { // '%='
     curr_tok.type_ = TokenType::ModEq;
@@ -366,11 +364,10 @@ inline auto n19::Lexer::_token_percent() -> Token {
 }
 
 inline auto n19::Lexer::_token_uparrow() -> Token {
-  Token curr_tok {
-    .pos_  = index_,
-    .line_ = line_,
-    .cat_  = TokenCategory::BinaryOp | TokenCategory::BitwiseOp
-  };
+  Token curr_tok;
+  curr_tok.cat_  = TokenCategory::BinaryOp | TokenCategory::BitwiseOp;
+  curr_tok.pos_  = index_;
+  curr_tok.line_ = line_;
 
   if(_peek_char() == u8'=') { // '^='
     curr_tok.type_ = TokenType::XorEq;
@@ -637,17 +634,17 @@ inline auto n19::Lexer::_token_fwdslash() -> Token {
 
   if(_peek_char() == u8'=') { // '/='
     curr_tok.type_ = TokenType::DivEq;
-    curr_tok.cat_  = TokenCategory::BinaryOp
-      | TokenCategory::ArithAssignOp
-      | TokenCategory::ArithmeticOp;
+    curr_tok.cat_  = TokenCategory::BinaryOp;
+    curr_tok.cat_ |= TokenCategory::ArithAssignOp;
+    curr_tok.cat_ |= TokenCategory::ArithmeticOp;
     curr_tok.len_  = 2;
     _consume_char(2);
   } else { // '/'
     curr_tok.type_ = TokenType::Div;
-    curr_tok.cat_  = TokenCategory::BinaryOp
-      | TokenCategory::UnaryOp
-      | TokenCategory::ArithmeticOp
-      | TokenCategory::ValidPrefix;
+    curr_tok.cat_  = TokenCategory::BinaryOp;
+    curr_tok.cat_ |= TokenCategory::UnaryOp;
+    curr_tok.cat_ |= TokenCategory::ArithmeticOp;
+    curr_tok.cat_ |= TokenCategory::ValidPrefix;
     curr_tok.len_  = 1;
     _consume_char(1);
   }
@@ -1053,6 +1050,13 @@ auto n19::Lexer::create(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> {
   }
 
   return make_result<std::shared_ptr<Lexer>>(lxr);
+}
+
+auto n19::Lexer::dump() -> void {
+  Token curr_tok;
+  do {
+    curr_tok = _produce_impl();
+  } while(curr_tok != TokenType::EndOfFile && curr_tok != TokenType::Illegal);
 }
 
 auto n19::Lexer::expect(const TokenCategory cat, const bool cons) -> Result<None> {

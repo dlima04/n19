@@ -157,7 +157,7 @@ int main(int argc, char** argv) {
       return 1;
     }
 
-    lxr->get()->testfuck();
+    lxr->get()->dump();
 
   } catch(const std::exception& e) {
     std::cerr << "EXCEPTION: " << e.what() << std::endl;

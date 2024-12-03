@@ -196,13 +196,13 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-constexpr auto n19::TokenCategory::operator|=(
+N19_FORCEINLINE constexpr auto n19::TokenCategory::operator|=(
   const TokenCategory &other ) -> void
 {
   value |= other.value;
 }
 
-constexpr auto n19::TokenCategory::operator|=(
+N19_FORCEINLINE constexpr auto n19::TokenCategory::operator|=(
   const Value other ) -> void
 {
   value |= other;
