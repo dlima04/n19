@@ -52,8 +52,8 @@ public:
   // note that current() and try_current retrieve the value at
   // tail_ without incrementing it.
   auto read() -> Maybe<ValueType>;
-  auto try_current() -> Maybe<ValueType>;
-  auto current() -> ValueType;
+  auto try_current() const -> Maybe<ValueType>;
+  auto current() const -> ValueType;
 
   ~RingBuffer() = default;
   RingBuffer()  = default;
@@ -98,7 +98,7 @@ N19_FORCEINLINE auto n19::RingBuffer<T, size_>::read() -> Maybe<ValueType> {
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingBuffer<T, size_>::try_current() -> Maybe<ValueType> {
+N19_FORCEINLINE auto n19::RingBuffer<T, size_>::try_current() const -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 
@@ -110,7 +110,7 @@ N19_FORCEINLINE auto n19::RingBuffer<T, size_>::try_current() -> Maybe<ValueType
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingBuffer<T, size_>::current() -> ValueType {
+N19_FORCEINLINE auto n19::RingBuffer<T, size_>::current() const -> ValueType {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 

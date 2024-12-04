@@ -16,18 +16,24 @@
 
 namespace n19 {
   enum class ErrC : uint8_t {
-    None,
-    InvalidArg,
-    FileIO,
-    Platform,
-    Internal,
-    NotFound,
-    BadToken,
-    Native,
+    None,       // Default value, no error occured.
+    InvalidArg, // An argument passed is incorrect.
+    FileIO,     // A file I/O operation has failed.
+    Internal,   // Bad internal logic has caused a failure.
+    NotFound,   // The thing you're looking for is not here.
+    BadToken,   // An incorrect token was emmitted by the lexer.
+    Native,     // A native, underlying OS error has occurred.
   };
 
-  struct ErrorDescriptor;
-  struct None;
+  struct ErrorDescriptor {
+    std::string msg;
+    ErrC code = ErrC::None;
+  };
+
+  struct None {
+    unsigned char _ = 0;
+    None() = default;
+  };
 
   template<typename T>
   using Result = std::expected<T, ErrorDescriptor>;
@@ -47,27 +53,13 @@ namespace n19 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct n19::ErrorDescriptor {
-  std::string msg;
-  ErrC code = ErrC::None;
-};
-
-struct n19::None {
-  // Not zero sized to avoid aids cancer.
-  unsigned char _ = 0;
-  None() = default;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 template<typename T, typename ...Args>
 auto n19::make_result(Args&&... args) -> Result<T> {
   return Result<T>{ T(std::forward<Args>(args)...) };
 }
 
 template<typename... Args>
-auto n19::make_error(const ErrC code, std::format_string<Args...> fmt, Args... args)
--> Error {
+auto n19::make_error(const ErrC code, std::format_string<Args...> fmt, Args... args) -> Error {
   std::string formatted;
   ErrorDescriptor desc;
   try {

@@ -48,6 +48,8 @@ set(N19_SOURCE_FILES
   Frontend/Lexer.hpp
   Frontend/Lexer.cpp
   Core/Except.hpp
+        Core/Murmur3.hpp
+        Core/Endian.hpp
 )
 
 add_executable(n19 ${N19_SOURCE_FILES})

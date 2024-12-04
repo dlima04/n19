@@ -50,9 +50,9 @@ public:
   // and non-blocking operations here. current() gets the current
   // element at the tail without dequeueing it.
   auto dequeue() -> ValueType;
-  auto current() -> ValueType;
-  auto try_current() -> Maybe<ValueType>;
   auto try_dequeue() -> Maybe<ValueType>;
+  auto try_current() const -> Maybe<ValueType>;
+  auto current() const -> ValueType;
 
   // For peeking operations. i.e. when the consumer wants to peek
   // ahead a certain amount of elements without consuming anything.
@@ -176,7 +176,7 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::wake_all() -> void {
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::current() -> ValueType {
+N19_FORCEINLINE auto n19::RingQueue<T, size_>::current() const -> ValueType {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 
@@ -188,7 +188,7 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::current() -> ValueType {
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_current() -> Maybe<ValueType> {
+N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_current() const -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 

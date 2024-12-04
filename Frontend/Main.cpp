@@ -125,7 +125,7 @@ static void test_ringqueue() {
   std::cout << "joined." << std::endl;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv){
 
   //
   // std::vector<native::StringView> strs
@@ -150,18 +150,18 @@ int main(int argc, char** argv) {
   //   std::println("Value: \"{}\"", val->value_);
   // }
 
-  try {
-    const auto file = MUST(FileRef::open(CURRENT_TEST));
-    auto lxr = Lexer::create(*file);
-    if(!lxr) {
-      return 1;
-    }
-
-    lxr->get()->dump();
-
-  } catch(const std::exception& e) {
-    std::cerr << "EXCEPTION: " << e.what() << std::endl;
-  }
+  //try {
+  //  const auto file = MUST(FileRef::open(CURRENT_TEST));
+  //  auto lxr = Lexer::create(*file);
+  //  if(!lxr) {
+  //    return 1;
+  //  }
+//
+  //  lxr->get()->dump();
+//
+  //} catch(const std::exception& e) {
+  //  std::cerr << "EXCEPTION: " << e.what() << std::endl;
+  //}
 
   return 0;
 }

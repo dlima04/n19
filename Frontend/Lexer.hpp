@@ -45,16 +45,13 @@ class n19::Lexer final : public std::enable_shared_from_this<Lexer> {
 N19_MAKE_NONCOPYABLE(Lexer);
 N19_MAKE_COMPARABLE_MEMBER(Lexer, file_name_);
 public:
-  auto current()              -> Token;
+  auto current() const -> Token;
   auto consume(uint32_t amnt) -> Token;
   auto produce()              -> void;
   auto get_bytes() const      -> Bytes;
   auto peek(uint32_t amnt)    -> Token;
   auto dump()                 -> void;
 
-  // Error handling.
-  auto error(const std::string &msg, uint32_t line, uint32_t pos) const -> void;
-  auto warn(const std::string &msg, uint32_t line, uint32_t pos)  const -> void;
   auto expect(TokenCategory cat, bool = true) -> Result<None>;
   auto expect(TokenType type, bool = true)    -> Result<None>;
 
@@ -113,7 +110,7 @@ private:
   auto _token_hex_lit()   -> Token;
   auto _token_num_lit()   -> Token;
   auto _token_oct_lit()   -> Token;
-
+public:
   std::vector<char8_t> src_;  // Source file buffer.
   RingQueue<Token, 64> toks_; // Token ringbuffer.
   native::String file_name_;  // For error handling.
@@ -172,7 +169,7 @@ N19_FORCEINLINE auto n19::Lexer::get_bytes() const -> Bytes {
   return n19::as_bytes(src_);
 }
 
-N19_FORCEINLINE auto n19::Lexer::current() -> Token {
+N19_FORCEINLINE auto n19::Lexer::current() const -> Token {
   return toks_.current();
 }
 

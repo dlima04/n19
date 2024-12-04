@@ -1079,14 +1079,6 @@ auto n19::Lexer::expect(const TokenType type, const bool cons) -> Result<None> {
   return make_result<None>();
 }
 
-auto n19::Lexer::warn(const std::string &msg, uint32_t const line, const uint32_t pos) const -> void {
-  ErrorCollector::display_error(msg, file_name_, src_, pos, line, true);
-}
-
-auto n19::Lexer::error(const std::string &msg, const uint32_t line, const uint32_t pos) const -> void {
-  ErrorCollector::display_error(msg, file_name_, src_, pos, line, false);
-}
-
 auto n19::Lexer::consume(const uint32_t amnt) -> Token {
   if(const auto curr = current(); curr == TokenType::EndOfFile) {
     return curr;

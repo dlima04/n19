@@ -12,7 +12,8 @@
 // any code related to the use of C++ exceptions
 // should be kept here. Note that this project does NOT
 // use exceptions as an error handling mechanism, but
-// many common interfaces like the STL do.
+// many common interfaces like the STL do, and thus there
+// will still be times where I will need tools for them.
 
 #define IGNORE_EXCEPT(EXPR) try{ EXPR } catch(...) {/*...*/}
 

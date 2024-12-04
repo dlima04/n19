@@ -209,8 +209,9 @@ auto n19::AstCall::print(
   }
 
   std::println("");
-  for(size_t i = 0; i < arguments_.size(); i++)
+  for(size_t i = 0; i < arguments_.size(); i++) {
     arguments_.at(i)->print(depth + 1, fmt("Call.Args.{}", i + 1));
+  }
   target_->print(depth + 1, "Call.Target");
 }
 

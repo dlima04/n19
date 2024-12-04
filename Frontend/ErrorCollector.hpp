@@ -42,7 +42,7 @@ public:
     const FileRef &file,
     const size_t pos,
     const uint32_t line,
-    bool is_warn
+    bool is_warn = false
   ) -> void;
 
   static auto display_error(
@@ -51,7 +51,20 @@ public:
     const std::vector<char8_t>& buff,
     const size_t pos,
     const uint32_t line,
-    bool is_warn
+    bool is_warn = false
+  ) -> void;
+
+  static auto display_error(
+    const std::string& msg,
+    class Lexer const& lxr,
+    bool is_warn = false
+  ) -> void;
+
+  static auto display_error(
+    const std::string& msg,
+    class Lexer const& lxr,
+    class Token const& tok,
+    bool is_warn = false
   ) -> void;
 
   auto store_warning(
