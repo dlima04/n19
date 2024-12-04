@@ -9,7 +9,7 @@
 #include <Core/ArgParse.hpp>
 #include <Core/Panic.hpp>
 #include <Core/ConManip.hpp>
-#include <Native/Stream.hpp>
+#include <Sys/Stream.hpp>
 #include <ranges>
 #include <algorithm>
 #include <iterator>
@@ -17,8 +17,8 @@
 #include <iomanip>
 
 auto n19::argp::Parameter::create(
-  const native::StringView& lf,
-  const native::StringView& sf,
+  const sys::StringView& lf,
+  const sys::StringView& sf,
   const std::string_view& desc,
   const bool required,
   Maybe<Value>&& deflt ) -> Parameter
@@ -51,7 +51,7 @@ auto n19::argp::Value::to_cdvs() const -> Result<std::vector<Value>> {
   for(const auto& str
     : std::ranges::views::split(value_, _nchr(',')))
   {
-    vals.emplace_back( native::String(str.begin(), str.end()) );
+    vals.emplace_back( sys::String(str.begin(), str.end()) );
   }
 
   return vals;
@@ -87,7 +87,7 @@ auto n19::argp::Parser::add_param(Parameter&& param) -> Parser& {
 }
 
 auto n19::argp::Parser::get_arg(
-  const native::StringView &str ) const -> Result<Value>
+  const sys::StringView &str ) const -> Result<Value>
 {
   const auto the_arg =
   std::ranges::find_if(params_, [&](const Parameter& p) {
@@ -104,7 +104,7 @@ auto n19::argp::Parser::get_arg(
 }
 
 auto n19::argp::Parser::_is_valid_argument(
-  const native::String& str ) const -> bool
+  const sys::String& str ) const -> bool
 {
   for(const auto& param : params_) {
     if(param.lf_ == str || param.sf_ == str)
@@ -116,7 +116,7 @@ auto n19::argp::Parser::_is_valid_argument(
 
 auto n19::argp::Parser::_already_passed(
   const size_t index,
-  const std::vector<native::StringView>& strings ) -> bool
+  const std::vector<sys::StringView>& strings ) -> bool
 {
   ASSERT(index < strings.size());
   for(size_t i = 0; i < index; i++) {
@@ -129,25 +129,25 @@ auto n19::argp::Parser::_already_passed(
 auto n19::argp::Parser::_print_chunk_error(
   const std::string& msg,
   const size_t at,
-  const std::vector<native::StringView>& strings ) -> void
+  const std::vector<sys::StringView>& strings ) -> void
 {
   // Unironically this is the best way to do this,
   // 3 loops is better than excessive allocation here
-  native::String spaces;
-  native::String filler;
+  sys::String spaces;
+  sys::String filler;
 
   for(size_t i = 0; i < strings.size(); i++) {
     if(i != at) {
-      native::outs() << strings[i] << _nchr(' ');
+      sys::outs() << strings[i] << _nchr(' ');
       continue;
     }
 
     set_console(Con::Bold, Con::Red);
-    native::outs() << strings[i] << _nchr(' ');
+    sys::outs() << strings[i] << _nchr(' ');
     set_console(Con::Reset);
   }
 
-  native::outs() << _nchr('\n');
+  sys::outs() << _nchr('\n');
   for(size_t i = 0; i < strings.size(); i++) {
     filler.resize( strings[i].size() );
     if(i != at) {
@@ -156,16 +156,16 @@ auto n19::argp::Parser::_print_chunk_error(
       std::ranges::fill(filler, _nchr('^'));
     }
 
-    native::outs() << filler << _nchr(' ');
+    sys::outs() << filler << _nchr(' ');
   }
 
-  native::outs() << _nchr('\n');
+  sys::outs() << _nchr('\n');
   size_t i = 0;
 
   while(i < strings.size() && i != at) {
     spaces.resize(strings[i].size());
     std::ranges::fill(spaces, _nchr(' '));
-    native::outs() << spaces << _nchr(' ');
+    sys::outs() << spaces << _nchr(' ');
     ++i;
   }
 
@@ -187,7 +187,7 @@ auto n19::argp::Parser::_check_required_params() const -> bool {
 
       std::print("Expected flag: ");
       set_console(Con::Bold);
-      native::outs()
+      sys::outs()
         << param.lf_
         << _nchr(' ')
         << param.sf_
@@ -202,9 +202,9 @@ auto n19::argp::Parser::_check_required_params() const -> bool {
 
 auto n19::argp::Parser::debug_print() const -> void {
   auto print_value = []<typename T>(
-    T&& value, const native::String& title ) -> void
+    T&& value, const sys::String& title ) -> void
   {
-    native::outs()
+    sys::outs()
       << std::setw(12)
       << std::left
       << title
@@ -213,14 +213,14 @@ auto n19::argp::Parser::debug_print() const -> void {
       << _nchr('\n');
   };
 
-  native::outs() << std::boolalpha;
+  sys::outs() << std::boolalpha;
   for(const auto& param : params_) {
     set_console(Con::Green);
     std::println("\"{}\"", param.desc_);
     set_console(Con::Reset);
 
-    native::StringView the_default;
-    native::StringView the_value;
+    sys::StringView the_default;
+    sys::StringView the_value;
 
     if(param.default_ && !param.default_->value_.empty()) {
       the_default = param.default_->value_;
@@ -239,11 +239,11 @@ auto n19::argp::Parser::debug_print() const -> void {
     print_value(param.required_, _nstr("Required"));
     print_value(the_value, _nstr("Value"));
     print_value(the_default, _nstr("Default"));
-    native::outs() << _nchr('\n');
+    sys::outs() << _nchr('\n');
   }
 
-  native::outs() << std::noboolalpha;
-  native::outs() << _nchr('\n');
+  sys::outs() << std::noboolalpha;
+  sys::outs() << _nchr('\n');
 }
 
 auto n19::argp::Parser::print() const -> void {
@@ -253,7 +253,7 @@ auto n19::argp::Parser::print() const -> void {
 
   for(const auto& param : params_) {
     set_console(Con::Magenta);
-    native::outs()
+    sys::outs()
       << std::setw(19)
       << std::left
       << param.lf_
@@ -264,7 +264,7 @@ auto n19::argp::Parser::print() const -> void {
     std::println(":: {}", param.desc_);
   }
 
-  native::outs() << _nchr('\n');
+  sys::outs() << _nchr('\n');
 }
 
 // Flow:
@@ -278,7 +278,7 @@ auto n19::argp::Parser::print() const -> void {
 // 8. Check if all required arguments have been passed.
 
 auto n19::argp::Parser::parse(
-  const std::vector<native::StringView>& chunks ) -> Result<None>
+  const std::vector<sys::StringView>& chunks ) -> Result<None>
 {
   for(size_t i = 0; i < chunks.size(); i++) {
     const bool is_invalid =
@@ -289,8 +289,8 @@ auto n19::argp::Parser::parse(
       return make_error(ErrC::InvalidArg);
     }
 
-    native::String the_value;
-    native::String the_flag;
+    sys::String the_value;
+    sys::String the_flag;
 
     // Determine where the value for this flag is,
     // if it exists. Remember, we can receive flags in 3 ways:
@@ -302,7 +302,7 @@ auto n19::argp::Parser::parse(
     const auto equals = chunks[i].find_first_of(_nchr('='));
     const auto flag_index = i;
 
-    if(equals != native::String::npos) {
+    if(equals != sys::String::npos) {
       the_flag  = chunks[i].substr(0, equals);
       the_value = chunks[i].substr(equals);
     } else if(i + 1 < chunks.size()

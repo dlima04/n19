@@ -60,56 +60,23 @@ namespace n19 {
 
 class n19::AstNode {
 public:
-  //
-  // An enum to avoid unnecessary
-  // dynamic_casts to check if an AstNode*
-  // is actually derived.
-  //
   #define X(NAME) NAME,
   enum class Type : uint16_t {
     N19_ASTNODE_TYPE_LIST
   };
   #undef X
 
-  //
-  // Pointer to an AstNode.
-  // For polymorphism in containers.
-  //
   template<typename T = AstNode> requires IsAstNode<T>
   using Ptr = std::unique_ptr<T>;
 
-  //
-  // The default container for storing child
-  // nodes inside of parent AstNodes.
-  // we can change this later if need be.
-  //
   template<typename T = AstNode> requires IsAstNode<T>
   using Children = std::vector<Ptr<T>>;
 
-  //
-  // The public fields of AstNode.
-  // we need to store a non-owning pointer to the node's parent,
-  // as well as some necessary info such as the file it
-  // belongs to and it's location.
-  //
-  AstNode* parent_ = nullptr;
-  size_t pos_      = 0;
-  uint32_t line_   = 1;
-  std::string file_;
-  Type type_;
-  
-  //
-  // For debugging/viewing the AST. print() formats the node
-  // and it's children into a string representation and prints it.
-  //
   virtual auto print(
     uint32_t depth,
     const Maybe<std::string> &alias
   ) const -> void = 0;
 
-  //
-  // Factory for producing AST nodes.
-  //
   template<IsAstNode T>
   static auto create(
     size_t pos,
@@ -118,13 +85,14 @@ public:
     const std::string& file = ""
   ) -> Ptr<T>;
 
+  AstNode* parent_ = nullptr;
+  size_t pos_      = 0;
+  uint32_t line_   = 1;
+  std::string file_;
+  Type type_;
+
   virtual ~AstNode() = default;
 protected:
-  //
-  // Used internally to print
-  // data that is consistent across all
-  // AST nodes: file position, line number, etc.
-  //
   auto _print(
     uint32_t depth,
     const std::string& node_name

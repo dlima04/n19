@@ -14,7 +14,7 @@
 #include <Core/FileRef.hpp>
 #include <Core/RingQueue.hpp>
 #include <Frontend/Token.hpp>
-#include <Native/String.hpp>
+#include <Sys/String.hpp>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -113,7 +113,7 @@ private:
 public:
   std::vector<char8_t> src_;  // Source file buffer.
   RingQueue<Token, 64> toks_; // Token ringbuffer.
-  native::String file_name_;  // For error handling.
+  sys::String file_name_;  // For error handling.
   uint32_t index_  = 0;       // Current source index.
   uint32_t line_ = 1;         // current line number.
 };

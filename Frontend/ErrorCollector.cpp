@@ -12,7 +12,7 @@
 #include <Core/ResultMacros.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Except.hpp>
-#include <Native/Stream.hpp>
+#include <Sys/Stream.hpp>
 #include <Frontend/ErrorCollector.hpp>
 #include <Frontend/Lexer.hpp>
 #include <algorithm>
@@ -21,7 +21,7 @@
 
 auto n19::ErrorCollector::store_error(
   const std::string& msg,
-  const native::String& file_name,
+  const sys::String& file_name,
   const size_t pos,
   const uint32_t line ) -> ErrorCollector&
 {
@@ -34,7 +34,7 @@ auto n19::ErrorCollector::store_error(
 
 auto n19::ErrorCollector::store_warning(
   const std::string& msg,
-  const native::String& file_name,
+  const sys::String& file_name,
   const size_t pos,
   const uint32_t line ) -> ErrorCollector&
 {
@@ -45,7 +45,7 @@ auto n19::ErrorCollector::store_warning(
 }
 
 auto n19::ErrorCollector::store_error_or_warning(
-  const native::String& file_name,
+  const sys::String& file_name,
   const ErrorLocation& err ) -> ErrorCollector&
 {
   ASSERT(err.line);
@@ -114,7 +114,7 @@ auto n19::ErrorCollector::display_error(
 
 auto n19::ErrorCollector::display_error(
   const std::string& msg,           // The error/warning message.
-  const native::String& fname,      // The name given to this file.
+  const sys::String& fname,      // The name given to this file.
   const std::vector<char8_t>& buff, // File buffer.
   size_t pos,                       // File buffer offset.
   const uint32_t line,              // Line number, optional
@@ -156,7 +156,7 @@ auto n19::ErrorCollector::display_error(
   }
 
   set_console(Con::Bold);
-  native::outs() << _nstr("In ") << fname;
+  sys::outs() << _nstr("In ") << fname;
   if(line != 0) {
     std::println(":{}", line);
   }

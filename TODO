@@ -3,3 +3,18 @@ TODO
 - Add constexpr implementation of Murmurhash so we can get string switches
 - Add a logging library
 - Add a small datetime library (will be useful for logging)
+
+LIST OF STL FEATURES WE'RE DEPENDANT ON:
+- std::function
+- std::vector
+- std::unordered_map but it can be eliminated.
+- std::atomic
+- std::string, string_view, wstring, wstring_view
+- std::span
+- std::unique_ptr
+- std::shared_ptr
+- std::expected
+- std::optional
+- std::forward
+- concepts
+- STL format API

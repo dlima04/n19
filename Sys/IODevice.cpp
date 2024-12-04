@@ -6,13 +6,13 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <Native/IODevice.hpp>
-#include <Native/LastError.hpp>
+#include <Sys/IODevice.hpp>
+#include <Sys/LastError.hpp>
 
 #if defined(N19_POSIX)
 #include <poll.h>
 
-auto n19::native::IODevice::write(
+auto n19::sys::IODevice::write(
   const Bytes &bytes ) const -> Result<None>
 {
   ASSERT(!bytes.empty());
@@ -31,7 +31,7 @@ auto n19::native::IODevice::write(
   return make_result<None>();
 }
 
-auto n19::native::IODevice::read_into(
+auto n19::sys::IODevice::read_into(
   WritableBytes& bytes ) const -> Result<None>
 {
   ASSERT(!bytes.empty());
@@ -49,7 +49,7 @@ auto n19::native::IODevice::read_into(
   return make_result<None>();
 }
 
-auto n19::native::IODevice::create_pipe()
+auto n19::sys::IODevice::create_pipe()
   -> Result<std::array<IODevice, 2>>
 {
   int pipefds[ 2 ] = { 0 };
@@ -66,7 +66,7 @@ auto n19::native::IODevice::create_pipe()
   return make_result<decltype(arr)>(arr);
 }
 
-auto n19::native::IODevice::flush() const -> Result<None> {
+auto n19::sys::IODevice::flush() const -> Result<None> {
   if(::fsync(value_) == -1) {
     return make_error(ErrC::Native, "{}", last_error());
   }
@@ -74,21 +74,21 @@ auto n19::native::IODevice::flush() const -> Result<None> {
   return make_result<None>();
 }
 
-auto n19::native::IODevice::from_stderr() -> Result<IODevice> {
+auto n19::sys::IODevice::from_stderr() -> Result<IODevice> {
   IODevice device;
   device.value_ = STDERR_FILENO;
   device.perms_ = Write;
   return make_result<IODevice>(device);
 }
 
-auto n19::native::IODevice::from_stdout() -> Result<IODevice> {
+auto n19::sys::IODevice::from_stdout() -> Result<IODevice> {
   IODevice device;
   device.value_ = STDOUT_FILENO;
   device.perms_ = Write;
   return make_result<IODevice>(device);
 }
 
-auto n19::native::IODevice::from_stdin() -> Result<IODevice> {
+auto n19::sys::IODevice::from_stdin() -> Result<IODevice> {
   IODevice device;
   device.value_ = STDIN_FILENO;
   device.perms_ = Read;

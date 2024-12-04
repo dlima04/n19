@@ -8,8 +8,8 @@
 
 #ifndef NATIVE_IODEVICE_HPP
 #define NATIVE_IODEVICE_HPP
-#include <Native/Handle.hpp>
-#include <Native/String.hpp>
+#include <Sys/Handle.hpp>
+#include <Sys/String.hpp>
 #include <Core/Bytes.hpp>
 #include <Core/Result.hpp>
 #include <array>
@@ -23,11 +23,11 @@
   #include <unistd.h>
 #endif
 
-namespace n19::native {
+namespace n19::sys {
   class IODevice;
 }
 
-class n19::native::IODevice final
+class n19::sys::IODevice final
   #if defined(N19_WIN32)
   : public Handle<::HANDLE>
   #else
@@ -76,7 +76,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
-auto n19::native::IODevice::operator<<(const T& val) -> IODevice& {
+auto n19::sys::IODevice::operator<<(const T& val) -> IODevice& {
   if constexpr(std::ranges::contiguous_range<T>) {
     auto bytes = n19::as_bytes(val);
     write(bytes);
@@ -86,14 +86,14 @@ auto n19::native::IODevice::operator<<(const T& val) -> IODevice& {
   } else {
     static_assert(
     "IODevice::operator<< must be called with "
-    "a type easily convertible to n19::ByteView.");
+    "a type easily convertible to n19::Bytes.");
   }
 
   return *this;
 }
 
 template<typename T>
-auto n19::native::IODevice::operator>>(T& val) -> IODevice & {
+auto n19::sys::IODevice::operator>>(T& val) -> IODevice & {
   static_assert(std::ranges::contiguous_range<T>);
   auto bytes = n19::as_writable_bytes(val);
   read_into(bytes);
@@ -101,16 +101,16 @@ auto n19::native::IODevice::operator>>(T& val) -> IODevice & {
 }
 
 #if defined(N19_POSIX)
-inline auto n19::native::IODevice::invalidate() -> void {
+inline auto n19::sys::IODevice::invalidate() -> void {
   value_ = -1;
 }
 
-inline auto n19::native::IODevice::close() -> void {
+inline auto n19::sys::IODevice::close() -> void {
   ::close(value_);
   invalidate();
 }
 
-inline auto n19::native::IODevice::is_invalid() -> bool {
+inline auto n19::sys::IODevice::is_invalid() -> bool {
   return value_ == -1;
 }
 

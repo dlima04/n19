@@ -8,9 +8,9 @@
 
 #ifndef NATIVE_LASTERROR_HPP
 #define NATIVE_LASTERROR_HPP
-#include <Native/String.hpp>
+#include <Sys/String.hpp>
 
-namespace n19::native {
+namespace n19::sys {
   [[nodiscard]] auto last_error() -> String;
 }
 

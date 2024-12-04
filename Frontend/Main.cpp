@@ -12,7 +12,7 @@
 #include <Frontend/Lexer.hpp>
 #include <Core/FileRef.hpp>
 #include <Core/ResultMacros.hpp>
-#include <Native/LastError.hpp>
+#include <Sys/LastError.hpp>
 #include <Core/Panic.hpp>
 #include <Core/ArgParse.hpp>
 #include <Core/RingBuffer.hpp>

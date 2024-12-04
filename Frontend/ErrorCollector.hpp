@@ -12,7 +12,7 @@
 #include <Core/Platform.hpp>
 #include <Core/FileRef.hpp>
 #include <Core/Bytes.hpp>
-#include <Native/String.hpp>
+#include <Sys/String.hpp>
 #include <string>
 #include <vector>
 #include <cstdint>
@@ -47,7 +47,7 @@ public:
 
   static auto display_error(
     const std::string& msg,
-    const native::String& fname,
+    const sys::String& fname,
     const std::vector<char8_t>& buff,
     const size_t pos,
     const uint32_t line,
@@ -69,20 +69,20 @@ public:
 
   auto store_warning(
     const std::string &msg,
-    const native::String& file_name,
+    const sys::String& file_name,
     const size_t pos,
     const uint32_t line
   ) -> ErrorCollector&;
 
   auto store_error(
     const std::string &msg,
-    const native::String& file_name,
+    const sys::String& file_name,
     const size_t pos,
     const uint32_t line
   ) -> ErrorCollector&;
 
   auto store_error_or_warning(
-    const native::String& file_name,
+    const sys::String& file_name,
     const ErrorLocation& err
   ) -> ErrorCollector&;
 
@@ -94,7 +94,7 @@ public:
   ~ErrorCollector() = default;
 private:
   std::unordered_map<
-    native::String,
+    sys::String,
     std::vector<ErrorLocation>
   > errs_; // The stored errors.
   uint32_t warning_count_ = 0;

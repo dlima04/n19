@@ -11,13 +11,13 @@
 #include <Core/Concepts.hpp>
 #include <Core/ClassTraits.hpp>
 
-namespace n19::native {
+namespace n19::sys {
   template<typename Value>
   class Handle;
 }
 
 template<typename Value>
-class n19::native::Handle {
+class n19::sys::Handle {
 N19_MAKE_COMPARABLE_MEMBER(Handle, value_);
 public:
   virtual auto close()      -> void = 0;
@@ -32,7 +32,7 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename Value>
-n19::native::Handle<Value>::operator bool() const {
+n19::sys::Handle<Value>::operator bool() const {
   return !is_invalid();
 }
 

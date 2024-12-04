@@ -14,7 +14,7 @@
   static_assert(sizeof(wchar_t) == 2);
 #endif
 
-namespace n19::native {
+namespace n19::sys {
 #if defined(N19_WIN32)
   using OStream = decltype(std::wcout);
   using IStream = decltype(std::wcin);
@@ -27,7 +27,7 @@ namespace n19::native {
   auto ins()  -> IStream&;
 }
 
-inline auto n19::native::outs() -> OStream& {
+inline auto n19::sys::outs() -> OStream& {
 #if defined(N19_WIN32)
   return std::wcout;
 #else
@@ -35,7 +35,7 @@ inline auto n19::native::outs() -> OStream& {
 #endif
 }
 
-inline auto n19::native::errs() -> OStream& {
+inline auto n19::sys::errs() -> OStream& {
 #if defined(N19_WIN32)
   return std::wcerr;
 #else
@@ -43,7 +43,7 @@ inline auto n19::native::errs() -> OStream& {
 #endif
 }
 
-inline auto n19::native::ins() -> IStream& {
+inline auto n19::sys::ins() -> IStream& {
 #if defined(N19_WIN32)
   return std::wcin;
 #else

@@ -6,7 +6,7 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <Native/LastError.hpp>
+#include <Sys/LastError.hpp>
 #if defined(N19_WIN32)
 #include <windows.h>
 
@@ -38,7 +38,7 @@ auto n19::native::last_error() -> String {
 #include <string.h>
 #include <errno.h>
 
-auto n19::native::last_error() -> String {
+auto n19::sys::last_error() -> String {
   Char buffer[256] = { 0 };
   if(strerror_r(errno, buffer, sizeof(buffer)) == 0) {
     return String{ buffer };

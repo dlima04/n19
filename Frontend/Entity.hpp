@@ -14,10 +14,6 @@
 #include <vector>
 #include <memory>
 
-#ifndef ENTITYTABLE_HPP
-  static_assert("Must include EntityTable.hpp before Entity.hpp.");
-#endif
-
 // Some constants:
 // The root entity ID ALWAYS begins at 1.
 // a value of 0 is an invalid ID.

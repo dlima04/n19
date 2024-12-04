@@ -10,9 +10,8 @@
 #define ARGPARSE_HPP
 #include <Core/Result.hpp>
 #include <Core/ClassTraits.hpp>
-#include <Native/String.hpp>
+#include <Sys/String.hpp>
 #include <cstdint>
-#include <functional>
 #include <vector>
 
 namespace n19::argp {
@@ -29,8 +28,8 @@ struct n19::argp::Value {
   auto to_bool() const -> Result<bool>;
   auto to_f64()  const -> Result<double>;
 
-  native::String value_;
-  explicit Value(const native::String& str)
+  sys::String value_;
+  explicit Value(const sys::String& str)
     : value_(str) {}
 };
 
@@ -46,15 +45,15 @@ struct n19::argp::Parameter {
   // The longform (i.e. --param),
   // the shortform (i.e. -p),
   // and the description of what this is.
-  native::StringView lf_;
-  native::StringView sf_;
+  sys::StringView lf_;
+  sys::StringView sf_;
   std::string_view desc_;
 
   // A helpful factory for this type,
   // so we can get default arguments.
   static auto create(
-    const native::StringView& lf,
-    const native::StringView& sf,
+    const sys::StringView& lf,
+    const sys::StringView& sf,
     const std::string_view& desc,
     bool required        = false,
     Maybe<Value>&& deflt = std::nullopt
@@ -78,29 +77,29 @@ public:
   auto debug_print() const          -> void;
 
   auto parse(
-    const std::vector<native::StringView>& chunks
+    const std::vector<sys::StringView>& chunks
   ) -> Result<None>;
 
   auto get_arg(
-    const native::StringView& str
+    const sys::StringView& str
   ) const -> Result<Value>;
 
   ~Parser() = default;
   Parser()  = default;
 private:
   auto _is_valid_argument(
-    const native::String& str
+    const sys::String& str
   ) const -> bool;
 
   static auto _already_passed(
     const size_t index,
-    const std::vector<native::StringView>& strings
+    const std::vector<sys::StringView>& strings
   ) -> bool;
 
   static auto _print_chunk_error(
     const std::string& msg,
     const size_t at,
-    const std::vector<native::StringView>& strings
+    const std::vector<sys::StringView>& strings
   ) -> void;
 
   auto _check_required_params() const -> bool;

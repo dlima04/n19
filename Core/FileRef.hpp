@@ -10,7 +10,7 @@
 #define FILEREF_HPP
 #include <Core/Result.hpp>
 #include <Core/Bytes.hpp>
-#include <Native/String.hpp>
+#include <Sys/String.hpp>
 #include <filesystem>
 #include <cstdint>
 
@@ -43,7 +43,7 @@ public:
   auto write(const Bytes& bytes, bool app = false) const -> Result<None>;
   auto read_into(const WritableBytes& bytes) const -> Result<None>;
 
-  [[nodiscard]] auto nstr() const -> native::String;
+  [[nodiscard]] auto nstr() const -> sys::String;
   [[nodiscard]] auto size() const -> Result<uintmax_t>;
   [[nodiscard]] auto path() -> fs::path&;
   [[nodiscard]] auto path() const -> const fs::path&;
@@ -99,7 +99,7 @@ auto n19::FileRef::operator>>(T& val) -> FileRef& {
   return *this;
 }
 
-inline auto n19::FileRef::nstr() const -> native::String {
+inline auto n19::FileRef::nstr() const -> sys::String {
 #if defined(N19_WIN32)
   return path_.wstring();
 #else

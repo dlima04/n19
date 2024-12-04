@@ -15,8 +15,8 @@ set(N19_SOURCE_FILES
   Frontend/DumpAst.cpp
   Frontend/Main.cpp
   Core/ArgParse.cpp
-  Native/LastError.cpp
-  Native/IODevice.cpp
+  Sys/LastError.cpp
+  Sys/IODevice.cpp
   Core/ConManip.hpp
   Core/Result.hpp
   Core/ResultMacros.hpp
@@ -33,12 +33,12 @@ set(N19_SOURCE_FILES
   Core/Concepts.hpp
   Core/StopWatch.hpp
   Core/ArgParse.hpp
-  Native/String.hpp
-  Native/Stream.hpp
-  Native/LastError.hpp
+  Sys/String.hpp
+  Sys/Stream.hpp
+  Sys/LastError.hpp
   Core/RingBase.hpp
-  Native/IODevice.hpp
-  Native/Handle.hpp
+  Sys/IODevice.hpp
+  Sys/Handle.hpp
   Core/Bytes.hpp
   Core/Platform.hpp
   Core/ClassTraits.hpp
@@ -48,8 +48,8 @@ set(N19_SOURCE_FILES
   Frontend/Lexer.hpp
   Frontend/Lexer.cpp
   Core/Except.hpp
-        Core/Murmur3.hpp
-        Core/Endian.hpp
+  Core/Murmur3.hpp
+  Core/Endian.hpp
 )
 
 add_executable(n19 ${N19_SOURCE_FILES})

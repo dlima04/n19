@@ -15,7 +15,7 @@
   static_assert(sizeof(wchar_t) == 2);
 #endif
 
-namespace n19::native {
+namespace n19::sys {
 #if defined(N19_WIN32)
 #define _nstr( STR ) L##STR
 #define _nchr( CHR ) L##CHR

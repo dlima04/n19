@@ -15,7 +15,6 @@
 #include <span>
 #include <array>
 #include <cstring>
-#include <ranges>
 
 namespace n19 {
   using Byte = std::byte;
