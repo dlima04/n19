@@ -8,10 +8,10 @@
 
 #include <Frontend/AstNodes.hpp>
 #include <Core/ConManip.hpp>
-#include <Core/Defer.hpp>
 #include <print>
+BEGIN_NAMESPACE(n19);
 
-auto n19::AstNode::_print(
+auto AstNode::_print(
   const uint32_t depth,
   const std::string& node_name ) const -> void
 {
@@ -38,7 +38,7 @@ auto n19::AstNode::_print(
   );                            //----------------
 }
 
-auto n19::AstBranch::print(
+auto AstBranch::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -60,7 +60,7 @@ auto n19::AstBranch::print(
   if(else_) else_->print(depth + 1, "Branch.Else");
 }
 
-auto n19::AstConstBranch::print(
+auto AstConstBranch::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -83,7 +83,7 @@ auto n19::AstConstBranch::print(
     otherwise_->print(depth + 1, "ConstBranch.Otherwise");
 }
 
-auto n19::AstIf::print(
+auto AstIf::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -100,7 +100,7 @@ auto n19::AstIf::print(
     child->print(depth + 1, std::nullopt);
 }
 
-auto n19::AstElse::print(
+auto AstElse::print(
   const uint32_t depth,
   const Maybe<std::string> &alias ) const -> void
 {
@@ -116,7 +116,7 @@ auto n19::AstElse::print(
     child->print(depth + 1, std::nullopt);
 }
 
-auto n19::AstWhere::print(
+auto AstWhere::print(
   const uint32_t depth,
   const Maybe<std::string> &alias ) const -> void
 {
@@ -133,7 +133,7 @@ auto n19::AstWhere::print(
     child->print(depth + 1, std::nullopt);
 }
 
-auto n19::AstOtherwise::print(
+auto AstOtherwise::print(
   const uint32_t depth,
   const Maybe<std::string> &alias ) const -> void
 {
@@ -148,7 +148,7 @@ auto n19::AstOtherwise::print(
     child->print(depth + 1, std::nullopt);
 }
 
-auto n19::AstBreak::print(
+auto AstBreak::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -161,7 +161,7 @@ auto n19::AstBreak::print(
   std::println("");
 }
 
-auto n19::AstContinue::print(
+auto AstContinue::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -174,7 +174,7 @@ auto n19::AstContinue::print(
   std::println("");
 }
 
-auto n19::AstReturn::print(
+auto AstReturn::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -197,7 +197,7 @@ auto n19::AstReturn::print(
   }
 }
 
-auto n19::AstCall::print(
+auto AstCall::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -215,7 +215,7 @@ auto n19::AstCall::print(
   target_->print(depth + 1, "Call.Target");
 }
 
-auto n19::AstDefer::print(
+auto AstDefer::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -230,7 +230,7 @@ auto n19::AstDefer::print(
   call_->print(depth + 1, "Defer.Target");
 }
 
-auto n19::AstDeferIf::print(
+auto AstDeferIf::print(
   const uint32_t depth,
   const Maybe<std::string> &alias ) const -> void
 {
@@ -246,7 +246,7 @@ auto n19::AstDeferIf::print(
   call_->print(depth + 1, "DeferIf.Target");
 }
 
-auto n19::AstVardecl::print(
+auto AstVardecl::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -262,7 +262,7 @@ auto n19::AstVardecl::print(
   type_->print(depth + 1, "Vardecl.Type");
 }
 
-auto n19::AstProcDecl::print(
+auto AstProcDecl::print(
   const uint32_t depth,
   const Maybe<std::string> &alias ) const -> void
 {
@@ -284,7 +284,7 @@ auto n19::AstProcDecl::print(
   }
 }
 
-auto n19::AstCase::print(
+auto AstCase::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -308,7 +308,7 @@ auto n19::AstCase::print(
   }
 }
 
-auto n19::AstDefault::print(
+auto AstDefault::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -324,7 +324,7 @@ auto n19::AstDefault::print(
     child->print(depth + 1, std::nullopt);
 }
 
-auto n19::AstSwitch::print(
+auto AstSwitch::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -349,9 +349,10 @@ auto n19::AstSwitch::print(
   }
 }
 
-auto n19::AstScopeBlock::print(
+auto AstScopeBlock::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void {
+  const Maybe<std::string>& alias ) const -> void
+{
   _print(depth, "ScopeBlock");
   if(alias.has_value()) {
     set_console(Con::Green);
@@ -364,7 +365,7 @@ auto n19::AstScopeBlock::print(
     child->print(depth + 1, std::nullopt);
 }
 
-auto n19::AstFor::print(
+auto AstFor::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -387,7 +388,7 @@ auto n19::AstFor::print(
   if(update_) update_->print(depth + 1, "For.Update");
 }
 
-auto n19::AstWhile::print(
+auto AstWhile::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -410,7 +411,7 @@ auto n19::AstWhile::print(
     child->print(depth + 1, std::nullopt);
 }
 
-auto n19::AstSubscript::print(
+auto AstSubscript::print(
   const uint32_t depth,
   const Maybe<std::string> &alias ) const -> void
 {
@@ -426,7 +427,7 @@ auto n19::AstSubscript::print(
   value_->print(depth + 1, "Subscript.Value");
 }
 
-auto n19::AstBinExpr::print(
+auto AstBinExpr::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -445,7 +446,7 @@ auto n19::AstBinExpr::print(
   left_->print(depth + 1, "Binexpr.Left");
 }
 
-auto n19::AstUnaryExpr::print(
+auto AstUnaryExpr::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -469,7 +470,7 @@ auto n19::AstUnaryExpr::print(
   operand_->print(depth + 1, "UnaryExpr.Operand");
 }
 
-auto n19::AstScalarLiteral::print(
+auto AstScalarLiteral::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -485,7 +486,7 @@ auto n19::AstScalarLiteral::print(
   set_console(Con::Reset);
 }
 
-auto n19::AstAggregateLiteral::print(
+auto AstAggregateLiteral::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -502,7 +503,7 @@ auto n19::AstAggregateLiteral::print(
     child->print(depth + 1, std::nullopt);
 }
 
-auto n19::AstEntityRef::print(
+auto AstEntityRef::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -518,7 +519,7 @@ auto n19::AstEntityRef::print(
   set_console(Con::Reset);
 }
 
-auto n19::AstEntityRefThunk::print(
+auto AstEntityRefThunk::print(
   const uint32_t depth,
   const Maybe<std::string> &alias ) const -> void
 {
@@ -538,7 +539,7 @@ auto n19::AstEntityRefThunk::print(
   std::println("");
 }
 
-auto n19::AstTypeRef::print(
+auto AstTypeRef::print(
   const uint32_t depth,
   const Maybe<std::string> &alias ) const -> void
 {
@@ -552,7 +553,7 @@ auto n19::AstTypeRef::print(
   std::println("{}", descriptor_.format());
 }
 
-auto n19::AstTypeRefThunk::print(
+auto AstTypeRefThunk::print(
   const uint32_t depth,
   const Maybe<std::string>& alias ) const -> void
 {
@@ -565,3 +566,21 @@ auto n19::AstTypeRefThunk::print(
 
   std::println("{}", descriptor_.format());
 }
+
+auto AstNamespace::print(
+  const uint32_t depth,
+  const Maybe<std::string> &alias ) const -> void
+{
+  _print(depth, "NamespaceBlock");
+  if(alias.has_value()) {
+    set_console(Con::Green);
+    std::print("\"{}\" ", *alias);
+    set_console(Con::Reset);
+  }
+
+  std::println("");
+  for(const auto& child : body_)
+    child->print(depth + 1, std::nullopt);
+}
+
+END_NAMESPACE(n19);

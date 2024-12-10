@@ -10,11 +10,8 @@
 #define RINGBUFFER_HPP
 #include <Core/RingBase.hpp>
 #include <Core/Result.hpp>
-
-namespace n19 {
-  template<class T, size_t size_ = 32>
-  class RingBuffer;
-}
+#include <Core/Forward.hpp>
+BEGIN_NAMESPACE(n19);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // n19::RingBuffer is a circular buffer with atomic read/writes.
@@ -30,7 +27,7 @@ namespace n19 {
 // which may be sequentially inconsistent otherwise.
 
 template<class T, size_t size_>
-class n19::RingBuffer : public RingBase<T, size_>{
+class RingBuffer : public RingBase<T, size_>{
 public:
   using ValueType     = T;
   using ReferenceType = T&;
@@ -45,8 +42,8 @@ public:
   // write() will attempt to construct
   // an object of type T directly at the head indice using the
   // parameter pack Args.
-  template<class ...Args> auto write(Args... args) -> bool;
-  template<class ...Args> auto overwrite(Args... args) -> void;
+  template<class ...Args> auto write(Args&&... args) -> bool;
+  template<class ...Args> auto overwrite(Args&&... args) -> void;
 
   // For reading values from the ringbuffer.
   // note that current() and try_current retrieve the value at
@@ -62,30 +59,30 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T, size_t size_> template<class ... Args>
-N19_FORCEINLINE auto n19::RingBuffer<T, size_>::write(Args... args) -> bool {
+N19_FORCEINLINE auto RingBuffer<T, size_>::write(Args&&... args) -> bool {
   static_assert(std::constructible_from<T, Args...>);
   if(this->is_full()) {
     return false;
   }
 
-  buff_[ head_.load() & size_mask_ ] = T{args...};
+  buff_[ head_.load() & size_mask_ ] = T{forward<Args>(args)...};
   head_.fetch_add(1, std::memory_order::release);
   return true;
 }
 
 template<class T, size_t size_> template<class ... Args>
-N19_FORCEINLINE auto n19::RingBuffer<T, size_>::overwrite(Args... args) -> void {
+N19_FORCEINLINE auto RingBuffer<T, size_>::overwrite(Args&&... args) -> void {
   static_assert(std::constructible_from<T, Args...>);
   if(this->is_full()) {
     tail_.fetch_add(1, std::memory_order::release);
   }
 
-  buff_[ head_.load() & size_mask_ ] = T{args...};
+  buff_[ head_.load() & size_mask_ ] = T{forward<Args>(args)...};
   head_.fetch_add(1, std::memory_order::release);
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingBuffer<T, size_>::read() -> Maybe<ValueType> {
+N19_FORCEINLINE auto RingBuffer<T, size_>::read() -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
   if(lhead == ltail) {    // buffer is empty.
@@ -98,7 +95,7 @@ N19_FORCEINLINE auto n19::RingBuffer<T, size_>::read() -> Maybe<ValueType> {
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingBuffer<T, size_>::try_current() const -> Maybe<ValueType> {
+N19_FORCEINLINE auto RingBuffer<T, size_>::try_current() const -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 
@@ -110,7 +107,7 @@ N19_FORCEINLINE auto n19::RingBuffer<T, size_>::try_current() const -> Maybe<Val
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingBuffer<T, size_>::current() const -> ValueType {
+N19_FORCEINLINE auto RingBuffer<T, size_>::current() const -> ValueType {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 
@@ -121,5 +118,5 @@ N19_FORCEINLINE auto n19::RingBuffer<T, size_>::current() const -> ValueType {
   return buff_[ ltail & size_mask_ ];
 }
 
-
+END_NAMESPACE(n19);
 #endif //RINGBUFFER_HPP

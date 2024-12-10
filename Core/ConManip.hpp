@@ -9,6 +9,7 @@
 #ifndef CONMANIP_HPP
 #define CONMANIP_HPP
 #include <Core/Fmt.hpp>
+#include <Core/Platform.hpp>
 #include <Core/Concepts.hpp>
 #include <string>
 #include <cstdint>
@@ -44,7 +45,7 @@ namespace n19 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<::n19::AreAll<n19::Con> ...Args>
-auto n19::set_console(Args... values) -> void {
+N19_FORCEINLINE auto n19::set_console(Args... values) -> void {
   #if defined(N19_WIN32)
     maybe_enable_vsequences();
   #endif
@@ -52,7 +53,7 @@ auto n19::set_console(Args... values) -> void {
 }
 
 template<::n19::AreAll<n19::Con> ...Args>
-auto n19::manip_string(Args... values) -> std::string {
+N19_FORCEINLINE auto n19::manip_string(Args... values) -> std::string {
   #if defined(N19_WIN32)
     maybe_enable_vsequences();
   #endif

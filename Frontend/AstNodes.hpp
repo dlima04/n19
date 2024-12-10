@@ -13,52 +13,43 @@
 #include <Core/Concepts.hpp>
 #include <vector>
 #include <memory>
-#include <concepts>
-#include <type_traits>
-#include <optional>
 
 #define N19_ASTNODE_TYPE_LIST \
-  X(Node)                     \
-  X(Vardecl)                  \
-  X(ProcDecl)                 \
-  X(EntityRef)                \
-  X(EntityRefThunk)           \
-  X(TypeRef)                  \
-  X(TypeRefThunk)             \
-  X(ScalarLiteral)            \
-  X(AggregateLiteral)         \
-  X(BinExpr)                  \
-  X(UnaryExpr)                \
-  X(Branch)                   \
-  X(If)                       \
-  X(Else)                     \
-  X(Switch)                   \
-  X(Case)                     \
-  X(Default)                  \
-  X(For)                      \
-  X(While)                    \
-  X(ConstBranch)              \
-  X(Where)                    \
-  X(Otherwise)                \
-  X(ScopeBlock)               \
-  X(NamespaceBlock)           \
-  X(Call)                     \
-  X(Break)                    \
-  X(Continue)                 \
-  X(Return)                   \
-  X(Defer)                    \
-  X(DeferIf)                  \
-  X(Sizeof)                   \
-  X(Subscript)                \
+  X(Node)             \
+  X(Vardecl)          \
+  X(ProcDecl)         \
+  X(EntityRef)        \
+  X(EntityRefThunk)   \
+  X(TypeRef)          \
+  X(TypeRefThunk)     \
+  X(ScalarLiteral)    \
+  X(AggregateLiteral) \
+  X(BinExpr)          \
+  X(UnaryExpr)        \
+  X(Branch)           \
+  X(If)               \
+  X(Else)             \
+  X(Switch)           \
+  X(Case)             \
+  X(Default)          \
+  X(For)              \
+  X(While)            \
+  X(ConstBranch)      \
+  X(Where)            \
+  X(Otherwise)        \
+  X(ScopeBlock)       \
+  X(Namespace)        \
+  X(Call)             \
+  X(Break)            \
+  X(Continue)         \
+  X(Return)           \
+  X(Defer)            \
+  X(DeferIf)          \
+  X(Subscript)        \
 
-namespace n19 {
-  // Class forward decls.
-  #define X(NAME) class Ast##NAME;
-  N19_ASTNODE_TYPE_LIST
-  #undef X
-}
+BEGIN_NAMESPACE(n19);
 
-class n19::AstNode {
+class AstNode {
 public:
   #define X(NAME) NAME,
   enum class Type : uint16_t {
@@ -66,10 +57,10 @@ public:
   };
   #undef X
 
-  template<typename T = AstNode> requires IsAstNode<T>
+  template<typename T = AstNode>
   using Ptr = std::unique_ptr<T>;
 
-  template<typename T = AstNode> requires IsAstNode<T>
+  template<typename T = AstNode>
   using Children = std::vector<Ptr<T>>;
 
   virtual auto print(
@@ -77,7 +68,7 @@ public:
     const Maybe<std::string> &alias
   ) const -> void = 0;
 
-  template<IsAstNode T>
+  template<typename T>
   static auto create(
     size_t pos,
     uint32_t line,
@@ -99,7 +90,7 @@ protected:
   ) const -> void;
 };
 
-class n19::AstBinExpr final : public AstNode {
+class AstBinExpr final : public AstNode {
 public:
   TokenType op_type_    = TokenType::None;
   TokenCategory op_cat_ = 0;
@@ -114,7 +105,7 @@ public:
   AstBinExpr() = default;
 };
 
-class n19::AstUnaryExpr final : public AstNode {
+class AstUnaryExpr final : public AstNode {
 public:
   TokenType op_type_      = TokenType::None;
   TokenCategory op_cat_   = 0;
@@ -129,7 +120,7 @@ public:
   AstUnaryExpr() = default;
 };
 
-class n19::AstScalarLiteral final : public AstNode {
+class AstScalarLiteral final : public AstNode {
 public:
   std::string value_;
   enum : uint8_t {
@@ -149,7 +140,7 @@ public:
   AstScalarLiteral() = default;
 };
 
-class n19::AstAggregateLiteral final : public AstNode {
+class AstAggregateLiteral final : public AstNode {
 public:
   AstNode::Children<> children_;
 
@@ -161,7 +152,7 @@ public:
   AstAggregateLiteral() = default;
 };
 
-class n19::AstEntityRef final : public AstNode {
+class AstEntityRef final : public AstNode {
 public:
   Entity::ID id_= N19_INVALID_ENTITY_ID;
 
@@ -173,7 +164,7 @@ public:
   AstEntityRef() = default;
 };
 
-class n19::AstEntityRefThunk final : public AstNode {
+class AstEntityRefThunk final : public AstNode {
 public:
   std::vector<std::string> name_;
 
@@ -185,7 +176,7 @@ public:
   AstEntityRefThunk() = default;
 };
 
-class n19::AstTypeRef final : public AstNode {
+class AstTypeRef final : public AstNode {
 public:
   EntityQualifier descriptor_;
 
@@ -197,7 +188,7 @@ public:
   AstTypeRef() = default;
 };
 
-class n19::AstTypeRefThunk final : public AstNode {
+class AstTypeRefThunk final : public AstNode {
 public:
   EntityQualifierThunk descriptor_;
 
@@ -209,7 +200,7 @@ public:
   AstTypeRefThunk() = default;
 };
 
-class n19::AstIf final : public AstNode {
+class AstIf final : public AstNode {
 public:
   AstNode::Children<> body_;
   AstNode::Ptr<> condition_ = nullptr;
@@ -222,7 +213,7 @@ public:
   AstIf() = default;
 };
 
-class n19::AstElse final : public AstNode {
+class AstElse final : public AstNode {
 public:
   AstNode::Children<> body_;
 
@@ -234,7 +225,18 @@ public:
   AstElse() = default;
 };
 
-class n19::AstWhere final : public AstNode {
+class AstNamespace final : public AstNode {
+  AstNode::Children<> body_;
+
+  auto print(uint32_t depth,
+    const Maybe<std::string> &alias
+  ) const -> void override;
+
+  ~AstNamespace() override = default;
+  AstNamespace() = default;
+};
+
+class AstWhere final : public AstNode {
 public:
   AstNode::Children<> body_;
   AstNode::Ptr<> condition_ = nullptr;
@@ -247,7 +249,7 @@ public:
   AstWhere() = default;
 };
 
-class n19::AstOtherwise final : public AstNode {
+class AstOtherwise final : public AstNode {
 public:
   AstNode::Children<> body_;
 
@@ -259,7 +261,7 @@ public:
   AstOtherwise() = default;
 };
 
-class n19::AstBranch final : public AstNode {
+class AstBranch final : public AstNode {
 public:
   AstNode::Ptr<AstIf> if_     = nullptr; // If condition + block
   AstNode::Ptr<AstElse> else_ = nullptr; // Can be null!
@@ -272,7 +274,7 @@ public:
   AstBranch() = default;
 };
 
-class n19::AstConstBranch final : public AstNode {
+class AstConstBranch final : public AstNode {
 public:
   AstNode::Ptr<AstWhere> where_ = nullptr;
   AstNode::Ptr<AstOtherwise> otherwise_ = nullptr; // Can be null!
@@ -285,7 +287,7 @@ public:
   AstConstBranch() = default;
 };
 
-class n19::AstCase final : public AstNode {
+class AstCase final : public AstNode {
 public:
   bool is_fallthrough = false;
   AstNode::Ptr<> value_ = nullptr;
@@ -299,7 +301,7 @@ public:
   AstCase() = default;
 };
 
-class n19::AstDefault final : public AstNode {
+class AstDefault final : public AstNode {
 public:
   AstNode::Children<> children_;
 
@@ -311,7 +313,7 @@ public:
   AstDefault() = default;
 };
 
-class n19::AstSwitch final : public AstNode {
+class AstSwitch final : public AstNode {
 public:
   AstNode::Ptr<> target_         = nullptr;
   AstNode::Ptr<AstDefault> dflt_ = nullptr;
@@ -325,7 +327,7 @@ public:
   AstSwitch() = default;
 };
 
-class n19::AstScopeBlock final : public AstNode {
+class AstScopeBlock final : public AstNode {
 public:
   AstNode::Children<> children_;
 
@@ -337,7 +339,7 @@ public:
   AstScopeBlock() = default;
 };
 
-class n19::AstCall final : public AstNode {
+class AstCall final : public AstNode {
 public:
   AstNode::Ptr<> target_ = nullptr;
   AstNode::Children<> arguments_;
@@ -350,7 +352,7 @@ public:
   AstCall() = default;
 };
 
-class n19::AstDefer final : public AstNode {
+class AstDefer final : public AstNode {
 public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
 
@@ -362,7 +364,7 @@ public:
   AstDefer() = default;
 };
 
-class n19::AstDeferIf final : public AstNode {
+class AstDeferIf final : public AstNode {
 public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
   AstNode::Ptr<> condition_ = nullptr;  // The condition on which we call this.
@@ -375,7 +377,7 @@ public:
   AstDeferIf() = default;
 };
 
-class n19::AstVardecl final : public AstNode {
+class AstVardecl final : public AstNode {
 public:
   AstNode::Ptr<> name_ = nullptr;  // EntityRef or EntityRefThunk
   AstNode::Ptr<> type_ = nullptr;  // TypeRef or TypeRefThunk
@@ -388,7 +390,7 @@ public:
   AstVardecl() = default;
 };
 
-class n19::AstProcDecl final : public AstNode {
+class AstProcDecl final : public AstNode {
 public:
   AstNode::Ptr<> name_ = nullptr; // EntityRef or EntityRefThunk
   AstNode::Children<> arg_decls_; // The parameter declarations (if any)
@@ -402,7 +404,7 @@ public:
   AstProcDecl() = default;
 };
 
-class n19::AstReturn final : public AstNode {
+class AstReturn final : public AstNode {
 public:
   AstNode::Ptr<> value_ = nullptr; // Can be null!
 
@@ -414,7 +416,7 @@ public:
   AstReturn() = default;
 };
 
-class n19::AstBreak final : public AstNode {
+class AstBreak final : public AstNode {
 public:
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
@@ -424,7 +426,7 @@ public:
   AstBreak() = default;
 };
 
-class n19::AstContinue final : public AstNode {
+class AstContinue final : public AstNode {
 public:
   auto print(uint32_t depth,
     const Maybe<std::string> &alias
@@ -432,7 +434,7 @@ public:
   ~AstContinue() override = default;
 };
 
-class n19::AstFor final : public AstNode {
+class AstFor final : public AstNode {
 public:
   AstNode::Ptr<> body_    = nullptr;
   AstNode::Ptr<> init_    = nullptr; // Can be null!
@@ -447,7 +449,7 @@ public:
   AstFor() = default;
 };
 
-class n19::AstWhile final : public AstNode {
+class AstWhile final : public AstNode {
 public:
   AstNode::Children<> body_;
   AstNode::Ptr<> cond_ = nullptr; // The loop condition
@@ -461,7 +463,7 @@ public:
   AstWhile() = default;
 };
 
-class n19::AstSubscript final : public AstNode {
+class AstSubscript final : public AstNode {
 public:
   AstNode::Ptr<> operand_ = nullptr; // The thing being subscripted.
   AstNode::Ptr<> value_   = nullptr; // The index value.
@@ -476,8 +478,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<n19::IsAstNode T>
-auto n19::AstNode::create(
+template<typename T>
+auto AstNode::create(
   const size_t pos,
   const uint32_t line,
   AstNode* parent,
@@ -501,4 +503,5 @@ auto n19::AstNode::create(
   return ptr;
 }
 
+END_NAMESPACE(n19);
 #endif //ASTNODES_HPP

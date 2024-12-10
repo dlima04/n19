@@ -11,7 +11,7 @@
 #include <Core/Bytes.hpp>
 #include <Core/ResultMacros.hpp>
 #include <Core/Panic.hpp>
-#include <Core/Except.hpp>
+#include <Core/ConManip.hpp>
 #include <Sys/Stream.hpp>
 #include <Frontend/ErrorCollector.hpp>
 #include <Frontend/Lexer.hpp>
@@ -114,7 +114,7 @@ auto n19::ErrorCollector::display_error(
 
 auto n19::ErrorCollector::display_error(
   const std::string& msg,           // The error/warning message.
-  const sys::String& fname,      // The name given to this file.
+  const sys::String& fname,         // The name given to this file.
   const std::vector<char8_t>& buff, // File buffer.
   size_t pos,                       // File buffer offset.
   const uint32_t line,              // Line number, optional

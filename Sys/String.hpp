@@ -6,8 +6,8 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#ifndef NATIVE_STRING_HPP
-#define NATIVE_STRING_HPP
+#ifndef SYS_STRING_HPP
+#define SYS_STRING_HPP
 #include <string>
 #include <string_view>
 
@@ -31,4 +31,4 @@ namespace n19::sys {
 #endif
 }
 
-#endif //NATIVE_STRING_HPP
+#endif //SYS_STRING_HPP

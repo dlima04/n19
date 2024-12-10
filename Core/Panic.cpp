@@ -7,10 +7,20 @@
 */
 
 #include <Core/Panic.hpp>
+#include <Core/ConManip.hpp>
 #include <cstdlib>
 #include <string>
+BEGIN_NAMESPACE(n19);
 
-auto n19::panic_impl_(
+union test {
+  uint32_t z;
+  double x;
+
+  test(double d) : x(d) {}
+  ~test() = default;
+};
+
+auto panic_impl_(
   const std::string &file,
   const int line,
   const std::string &msg ) -> void
@@ -24,8 +34,10 @@ auto n19::panic_impl_(
   ::exit(1);
 }
 
-auto n19::fatal_impl_(const std::string &msg) -> void {
+auto fatal_impl_(const std::string &msg) -> void {
   set_console(Con::Red, Con::Bold);
   std::println("FATAL :: {}", msg);
   ::exit(1);
 }
+
+END_NAMESPACE(n19);

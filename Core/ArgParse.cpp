@@ -16,7 +16,9 @@
 #include <iostream>
 #include <iomanip>
 
-auto n19::argp::Parameter::create(
+BEGIN_NAMESPACE(n19::argp);
+
+auto Parameter::create(
   const sys::StringView& lf,
   const sys::StringView& sf,
   const std::string_view& desc,
@@ -32,7 +34,7 @@ auto n19::argp::Parameter::create(
   return param;
 }
 
-auto n19::argp::Value::to_bool() const -> Result<bool> {
+auto Value::to_bool() const -> Result<bool> {
   if(value_ == _nstr("true")) {
     return make_result<bool>(true);
   } if(value_ == _nstr("false")) {
@@ -42,22 +44,20 @@ auto n19::argp::Value::to_bool() const -> Result<bool> {
   return make_error(ErrC::NotFound);
 }
 
-auto n19::argp::Value::to_cdvs() const -> Result<std::vector<Value>> {
+auto Value::to_cdvs() const -> Result<std::vector<Value>> {
   if(value_.empty()) {
     return make_error(ErrC::NotFound);
   }
 
   std::vector<Value> vals;
-  for(const auto& str
-    : std::ranges::views::split(value_, _nchr(',')))
-  {
+  for(const auto& str : std::ranges::views::split(value_, _nchr(','))) {
     vals.emplace_back( sys::String(str.begin(), str.end()) );
   }
 
   return vals;
 }
 
-auto n19::argp::Value::to_f64() const -> Result<double> {
+auto Value::to_f64() const -> Result<double> {
   try {
     const double db = std::stod(value_);
     return db;
@@ -68,7 +68,7 @@ auto n19::argp::Value::to_f64() const -> Result<double> {
   UNREACHABLE;
 }
 
-auto n19::argp::Value::to_i64() const -> Result<int64_t> {
+auto Value::to_i64() const -> Result<int64_t> {
   try {
     const int64_t the_i64 = std::stoll(value_);
     return the_i64;
@@ -79,16 +79,14 @@ auto n19::argp::Value::to_i64() const -> Result<int64_t> {
   UNREACHABLE;
 }
 
-auto n19::argp::Parser::add_param(Parameter&& param) -> Parser& {
+auto Parser::add_param(Parameter&& param) -> Parser& {
   ASSERT(param.lf_.starts_with(_nstr("--")));
   ASSERT(param.sf_.starts_with(_nstr("-")));
   params_.emplace_back(param);
   return *this;
 }
 
-auto n19::argp::Parser::get_arg(
-  const sys::StringView &str ) const -> Result<Value>
-{
+auto Parser::get_arg(const sys::StringView &str) const -> Result<Value> {
   const auto the_arg =
   std::ranges::find_if(params_, [&](const Parameter& p) {
     return p.lf_ == str || p.sf_ == str;
@@ -103,9 +101,7 @@ auto n19::argp::Parser::get_arg(
   return make_error(ErrC::NotFound);
 }
 
-auto n19::argp::Parser::_is_valid_argument(
-  const sys::String& str ) const -> bool
-{
+auto Parser::_is_valid_argument(const sys::String& str) const -> bool {
   for(const auto& param : params_) {
     if(param.lf_ == str || param.sf_ == str)
       return true;
@@ -114,7 +110,7 @@ auto n19::argp::Parser::_is_valid_argument(
   return false;
 }
 
-auto n19::argp::Parser::_already_passed(
+auto Parser::_already_passed(
   const size_t index,
   const std::vector<sys::StringView>& strings ) -> bool
 {
@@ -126,7 +122,7 @@ auto n19::argp::Parser::_already_passed(
   return false;
 }
 
-auto n19::argp::Parser::_print_chunk_error(
+auto Parser::_print_chunk_error(
   const std::string& msg,
   const size_t at,
   const std::vector<sys::StringView>& strings ) -> void
@@ -177,7 +173,7 @@ auto n19::argp::Parser::_print_chunk_error(
   std::println("{}", msg);
 }
 
-auto n19::argp::Parser::_check_required_params() const -> bool {
+auto Parser::_check_required_params() const -> bool {
   bool success { true };
   for(const auto& param : params_) {
     if(param.required_ && !param.val_ && !param.default_) {
@@ -200,7 +196,7 @@ auto n19::argp::Parser::_check_required_params() const -> bool {
   return success;
 }
 
-auto n19::argp::Parser::debug_print() const -> void {
+auto Parser::debug_print() const -> void {
   auto print_value = []<typename T>(
     T&& value, const sys::String& title ) -> void
   {
@@ -246,7 +242,7 @@ auto n19::argp::Parser::debug_print() const -> void {
   sys::outs() << _nchr('\n');
 }
 
-auto n19::argp::Parser::print() const -> void {
+auto Parser::print() const -> void {
   set_console(Con::White, Con::Bold);
   std::println("-- Flags:");
   set_console(Con::Reset);
@@ -277,7 +273,7 @@ auto n19::argp::Parser::print() const -> void {
 // 7. Repeat steps 1 through 5 on each string.
 // 8. Check if all required arguments have been passed.
 
-auto n19::argp::Parser::parse(
+auto Parser::parse(
   const std::vector<sys::StringView>& chunks ) -> Result<None>
 {
   for(size_t i = 0; i < chunks.size(); i++) {
@@ -356,3 +352,5 @@ auto n19::argp::Parser::parse(
 
   return make_result<None>();
 }
+
+END_NAMESPACE(n19::argp);

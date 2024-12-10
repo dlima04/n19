@@ -8,13 +8,12 @@
 
 #ifndef MURMUR3_HPP
 #define MURMUR3_HPP
-#include <Core/Endian.hpp>
 #include <cstdint>
 #include <string_view>
 
 #define U32_CONSTANT(X) X##LU
 #define U64_CONSTANT(X) X##LLU
-namespace n19 {
+BEGIN_NAMESPACE(n19);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -190,12 +189,12 @@ constexpr auto murmur3_x64_128(
 }
 
 constexpr auto operator "" _mm32(const char8_t* str, size_t len) -> uint32_t {
-  return murmur3_x86_32({str, len}, 7);
+  return murmur3_x86_32({str, len}, 0xbeef);
 }
 
 constexpr auto operator "" _mm128(const char8_t* str, size_t len) -> Murmur3_128 {
   return murmur3_x64_128({str, len}, 0xbeef);
 }
 
-}      // namespace n19
+END_NAMESPACE(n19);
 #endif // MURMUR3_HPP

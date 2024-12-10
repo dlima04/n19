@@ -33,7 +33,7 @@ inline thread_local auto n19_last_msg_  = std::string();
   if(n19_last_errc_ != ::n19::ErrC::None) {                 \
     auto _tmp = n19_last_errc_;                             \
     n19_last_errc_ = ::n19::ErrC::None;                     \
-    return ::n19::make_error(_tmp, "{}", n19_last_msg_);    \
+    return ::n19::make_error(_tmp, n19_last_msg_);          \
   }                                                         \
 
 #define MUST(EXPR)                                          \
@@ -53,7 +53,7 @@ inline thread_local auto n19_last_msg_  = std::string();
   if(n19_last_errc_ != ::n19::ErrC::None) {                 \
     auto _tmp = n19_last_errc_;                             \
     n19_last_errc_ = ::n19::ErrC::None;                     \
-    return ::n19::make_error(_tmp, "{}", n19_last_msg_);    \
+    return ::n19::make_error(_tmp, n19_last_msg_);          \
   }                                                         \
 
 #define OR_PANIC()                                          \

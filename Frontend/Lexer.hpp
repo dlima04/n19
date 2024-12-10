@@ -20,20 +20,15 @@
 #include <vector>
 #include <functional>
 #include <string_view>
-#include <unordered_map>
 #include <cctype>
 #include <cstdint>
 
+BEGIN_NAMESPACE(n19);
 #define UTF8_LEADING(CH) (((uint8_t)CH) >= 0x80)
 #define CH_IS_XDIGIT(CH) (std::isxdigit((uint8_t)CH))
 #define CH_IS_CTRL(CH)   (std::iscntrl((uint8_t)CH))
 #define CH_IS_SPACE(CH)  (std::isspace((uint8_t)CH))
 #define CH_IS_DIGIT(CH)  (std::isdigit((uint8_t)CH))
-
-namespace n19 {
-  class Lexer;
-  struct Keyword;
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // n19::Lexer uses a Single-Producer Single-Consumer relationship
@@ -41,11 +36,11 @@ namespace n19 {
 // the parser. It holds the source buffer itself, a ringbuffer for the tokens,
 // and a producer thread which runs in the background.
 
-class n19::Lexer final : public std::enable_shared_from_this<Lexer> {
+class Lexer final : public std::enable_shared_from_this<Lexer> {
 N19_MAKE_NONCOPYABLE(Lexer);
 N19_MAKE_COMPARABLE_MEMBER(Lexer, file_name_);
 public:
-  auto current() const -> Token;
+  auto current() const        -> Token;
   auto consume(uint32_t amnt) -> Token;
   auto produce()              -> void;
   auto get_bytes() const      -> Bytes;
@@ -56,7 +51,7 @@ public:
   auto expect(TokenType type, bool = true)    -> Result<None>;
 
   static auto create(const FileRef& ref)  -> Result<std::shared_ptr<Lexer>>;
-  static auto keywords()                  -> const std::unordered_map<std::u8string_view, Keyword>&;
+  static auto get_keyword(const std::u8string_view& str) -> Maybe<struct Keyword>;
   static auto is_reserved_byte(char8_t c) -> bool;
 
   Lexer() = default;
@@ -113,70 +108,70 @@ private:
 public:
   std::vector<char8_t> src_;  // Source file buffer.
   RingQueue<Token, 64> toks_; // Token ringbuffer.
-  sys::String file_name_;  // For error handling.
+  sys::String file_name_;     // For error handling.
   uint32_t index_  = 0;       // Current source index.
-  uint32_t line_ = 1;         // current line number.
+  uint32_t line_   = 1;       // current line number.
 };
 
-struct n19::Keyword {
+struct Keyword {
   TokenType type;
   TokenCategory cat;
-  constexpr Keyword() = default;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // very short functions, inlined here for perf.
 
-N19_FORCEINLINE auto n19::Lexer::peek(const uint32_t amnt) -> Token {
+N19_FORCEINLINE auto Lexer::peek(const uint32_t amnt) -> Token {
   if(const auto curr = current(); curr == TokenType::EndOfFile) {
     return curr;
   }
   return toks_.peek(amnt);
 }
 
-N19_FORCEINLINE auto n19::Lexer::_skip_comment() -> void {
+N19_FORCEINLINE auto Lexer::_skip_comment() -> void {
   _skip_chars_until([](const char8_t ch) {
     return ch == '\n';
   });
 }
 
-N19_FORCEINLINE auto n19::Lexer::_current_char() const -> char8_t {
+N19_FORCEINLINE auto Lexer::_current_char() const -> char8_t {
   return index_ >= src_.size()
     ? u8'\0'
     : src_[index_];
 }
 
-N19_FORCEINLINE auto n19::Lexer::_peek_char(const uint32_t amnt) const -> char8_t {
+N19_FORCEINLINE auto Lexer::_peek_char(const uint32_t amnt) const -> char8_t {
   return (index_ + amnt) >= src_.size()
     ? u8'\0'
     : src_[index_ + amnt];
 }
 
-N19_FORCEINLINE auto n19::Lexer::_consume_char(const uint32_t amnt) -> void {
-  if(index_ < src_.size()) [[likely]] index_ += amnt;
+N19_FORCEINLINE auto Lexer::_consume_char(const uint32_t amnt) -> void {
+  if(index_ < src_.size()) index_ += amnt;
 }
 
-N19_FORCEINLINE auto n19::Lexer::_advance_line() -> void {
+N19_FORCEINLINE auto Lexer::_advance_line() -> void {
   if(index_ < src_.size()) ++line_;
 }
 
-N19_FORCEINLINE auto n19::Lexer::_advance_consume_line() -> void {
+N19_FORCEINLINE auto Lexer::_advance_consume_line() -> void {
   if(index_ < src_.size()) ++line_;
   _consume_char(1);
 }
 
-N19_FORCEINLINE auto n19::Lexer::get_bytes() const -> Bytes {
+N19_FORCEINLINE auto Lexer::get_bytes() const -> Bytes {
   return n19::as_bytes(src_);
 }
 
-N19_FORCEINLINE auto n19::Lexer::current() const -> Token {
+N19_FORCEINLINE auto Lexer::current() const -> Token {
   return toks_.current();
 }
 
-N19_FORCEINLINE auto n19::Lexer::produce() -> void {
+N19_FORCEINLINE auto Lexer::produce() -> void {
   toks_.enqueue(_produce_impl());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+END_NAMESPACE(n19);
 #endif //LEXER_HPP

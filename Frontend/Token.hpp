@@ -147,6 +147,8 @@ public:
   #undef X
 
   [[nodiscard]] auto string_repr() const -> std::string;
+  [[nodiscard]] auto to_string() const -> std::string;
+  [[nodiscard]] auto maybe_entity_begin() const -> bool;
 
   Value value  = None;
   constexpr TokenType() = default;

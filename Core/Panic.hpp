@@ -8,7 +8,6 @@
 
 #ifndef PANIC_HPP
 #define PANIC_HPP
-#include <Core/ConManip.hpp>
 #include <print>
 
 #define PANIC(MSG) ::n19::panic_impl_(__FILE__, __LINE__, MSG)
@@ -16,9 +15,9 @@
 #define UNREACHABLE PANIC("Default assertion - unreachable branch.")
 #define ASSERT(COND) if(!(COND)) PANIC("Assertion \"" #COND "\" failed!")
 
-namespace n19 {
-  [[noreturn]] auto fatal_impl_(const std::string &msg) -> void;
-  [[noreturn]] auto panic_impl_(const std::string &file, int line, const std::string &msg) -> void;
-}
+BEGIN_NAMESPACE(n19);
+[[noreturn]] auto fatal_impl_(const std::string &msg) -> void;
+[[noreturn]] auto panic_impl_(const std::string &file, int line, const std::string &msg) -> void;
+END_NAMESPACE(n19);
 
 #endif //PANIC_HPP

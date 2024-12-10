@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 3.28)
 project(n19)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(N19_SOURCE_FILES
+  Misc/CompilerMain.cpp
+  Misc/Global.hpp
   Core/ConManip.cpp
   Core/FileRef.cpp
   Frontend/Token.cpp
@@ -13,7 +14,6 @@ set(N19_SOURCE_FILES
   Frontend/Entity.cpp
   Frontend/EntityQualifier.cpp
   Frontend/DumpAst.cpp
-  Frontend/Main.cpp
   Core/ArgParse.cpp
   Sys/LastError.cpp
   Sys/IODevice.cpp
@@ -23,7 +23,6 @@ set(N19_SOURCE_FILES
   Core/Panic.hpp
   Core/Fmt.hpp
   Core/FileRef.hpp
-  Core/Defer.hpp
   Frontend/Token.hpp
   Frontend/ErrorCollector.hpp
   Frontend/AstNodes.hpp
@@ -47,9 +46,16 @@ set(N19_SOURCE_FILES
   Core/Panic.cpp
   Frontend/Lexer.hpp
   Frontend/Lexer.cpp
-  Core/Except.hpp
   Core/Murmur3.hpp
-  Core/Endian.hpp
+  Core/TypeTraits.hpp
+  Core/Callback.hpp
+  Core/Forward.hpp
+  Core/NewResult.hpp
+  Core/Memory.hpp
+  Core/Maybe.hpp
+        Core/ConIO.hpp
+        Core/Nothing.hpp
+        Core/Try.hpp
 )
 
 add_executable(n19 ${N19_SOURCE_FILES})
@@ -90,3 +96,6 @@ elseif(N19_IS_MACOS)
 else()
   target_compile_definitions(n19 PRIVATE N19_WIN32)
 endif()
+
+# Global includes
+target_compile_options(n19 PUBLIC -include Misc/Global.hpp)

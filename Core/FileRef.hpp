@@ -10,14 +10,14 @@
 #define FILEREF_HPP
 #include <Core/Result.hpp>
 #include <Core/Bytes.hpp>
+#include <Core/Forward.hpp>
 #include <Sys/String.hpp>
 #include <filesystem>
 #include <cstdint>
+#include <utility>
 
 namespace fs = std::filesystem;
-namespace n19 {
-  class FileRef;
-}
+BEGIN_NAMESPACE(n19);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -26,13 +26,8 @@ namespace n19 {
 // STL features to accomplish its tasks rather than native
 // API functions.
 
-class n19::FileRef {
+class FileRef {
 public:
-  auto operator->() -> fs::path*;
-  auto operator*()  -> fs::path&;
-  auto operator->() const -> const fs::path*;
-  auto operator*()  const -> const fs::path&;
-
   // Attempts to convert the type T to a
   // n19::ByteView (AKA std::span<std::byte).
   template<typename T> auto operator<<(const T& val) -> FileRef&;
@@ -45,8 +40,10 @@ public:
 
   [[nodiscard]] auto nstr() const -> sys::String;
   [[nodiscard]] auto size() const -> Result<uintmax_t>;
-  [[nodiscard]] auto path() -> fs::path&;
-  [[nodiscard]] auto path() const -> const fs::path&;
+
+  auto operator->(this auto&& self) -> auto*;
+  auto path(this auto&& self)       -> auto&;
+  auto operator*(this auto&& self)  -> auto&;
 
   // Creates a new file, ONLY if the specified file did not
   // exist beforehand. If the file already exists, the
@@ -75,31 +72,31 @@ private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
-auto n19::FileRef::operator<<(const T& val) -> FileRef& {
+auto FileRef::operator<<(const T& val) -> FileRef& {
   if constexpr(std::ranges::contiguous_range<T>) {
     auto bytes = n19::as_bytes(val);
     write(bytes);
   } else if constexpr (std::is_trivially_constructible_v<T>){
-    auto bytes = n19::as_scalar_bytecopy(val);
-    write(bytes);
+    auto copy = n19::as_bytecopy(val);
+    write(copy.bytes());
   } else {
     static_assert(
     "FileRef::operator<< must be called with "
-    "a type easily convertible to n19::ByteView.");
+    "a type easily convertible to n19::Bytes.");
   }
 
   return *this;
 }
 
 template<typename T>
-auto n19::FileRef::operator>>(T& val) -> FileRef& {
+auto FileRef::operator>>(T& val) -> FileRef& {
   static_assert(std::ranges::contiguous_range<T>);
   auto bytes = n19::as_writable_bytes(val);
   read_into(bytes);
   return *this;
 }
 
-inline auto n19::FileRef::nstr() const -> sys::String {
+inline auto FileRef::nstr() const -> sys::String {
 #if defined(N19_WIN32)
   return path_.wstring();
 #else
@@ -107,28 +104,17 @@ inline auto n19::FileRef::nstr() const -> sys::String {
 #endif
 }
 
-inline auto n19::FileRef::operator*() -> fs::path& {
-  return path_;
+N19_FORCEINLINE auto FileRef::operator*(this auto &&self) -> auto& {
+  return forward<decltype(self)>(self).path_;
 }
 
-inline auto n19::FileRef::operator->() -> fs::path* {
-  return &path_;
+N19_FORCEINLINE auto FileRef::operator->(this auto &&self) -> auto* {
+  return &(forward<decltype(self)>(self).path_);
 }
 
-inline auto n19::FileRef::operator*() const -> const fs::path& {
-  return path_;
+N19_FORCEINLINE auto FileRef::path(this auto &&self) -> auto& {
+  return forward<decltype(self)>(self).path_;
 }
 
-inline auto n19::FileRef::operator->() const -> const fs::path* {
-  return &path_;
-}
-
-inline auto n19::FileRef::path() -> fs::path& {
-  return path_;
-}
-
-inline auto n19::FileRef::path() const -> const fs::path & {
-  return path_;
-}
-
+END_NAMESPACE(n19);
 #endif //FILEREF_HPP

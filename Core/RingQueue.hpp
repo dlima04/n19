@@ -11,11 +11,8 @@
 #include <Core/Panic.hpp>
 #include <Core/RingBase.hpp>
 #include <Core/Result.hpp>
-
-namespace n19 {
-  template<class T, size_t size_>
-  class RingQueue;
-}
+#include <Core/Forward.hpp>
+BEGIN_NAMESPACE(n19);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // n19::RingQueue is a circular atomic queue with blocking
@@ -27,7 +24,7 @@ namespace n19 {
 // It is unsafe to use the class otherwise.
 
 template<class T, size_t size_>
-class n19::RingQueue : public RingBase<T, size_> {
+class RingQueue : public RingBase<T, size_> {
 public:
   using ValueType     = T;
   using ReferenceType = T&;
@@ -43,22 +40,22 @@ public:
   // queue is full, the call will block until
   // another thread dequeues an object. try_enqueue()
   // is non-blocking, if an object cannot be queued the call will fail.
-  template<typename ...Args> auto enqueue(Args... args) -> void;
-  template<typename ...Args> auto try_enqueue(Args... args) -> bool;
+  template<typename ...Args> auto enqueue(Args&&... args) -> void;
+  template<typename ...Args> auto try_enqueue(Args&&... args) -> bool;
 
   // Similarly to enqueue() and try_enqueue(), we have blocking
   // and non-blocking operations here. current() gets the current
   // element at the tail without dequeueing it.
-  auto dequeue() -> ValueType;
-  auto try_dequeue() -> Maybe<ValueType>;
+  auto dequeue()           -> ValueType;
+  auto try_dequeue()       -> Maybe<ValueType>;
   auto try_current() const -> Maybe<ValueType>;
-  auto current() const -> ValueType;
+  auto current() const     -> ValueType;
 
   // For peeking operations. i.e. when the consumer wants to peek
   // ahead a certain amount of elements without consuming anything.
   auto can_peek(size_t amnt) -> bool;
   auto try_peek(size_t amnt) -> Maybe<ValueType>;
-  auto peek(size_t amnt) -> ValueType;
+  auto peek(size_t amnt)     -> ValueType;
 
   // wake any threads waiting on head_ or tail_, if any.
   auto wake_all() -> void;
@@ -70,7 +67,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::dequeue() -> ValueType {
+N19_FORCEINLINE auto RingQueue<T, size_>::dequeue() -> ValueType {
   constexpr auto read_order  = std::memory_order::acquire;
   constexpr auto write_order = std::memory_order::release;
   const size_t lhead = head_.load(read_order);
@@ -87,13 +84,12 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::dequeue() -> ValueType {
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_dequeue() -> Maybe<ValueType> {
+N19_FORCEINLINE auto RingQueue<T, size_>::try_dequeue() -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
   if(lhead == ltail) {   // the buffer is empty.
     return std::nullopt; // we can't read anything.
   }
-
   const ValueType val = buff_[ ltail ];
   tail_.fetch_add(1, std::memory_order::release);
   tail_.notify_all();
@@ -101,7 +97,7 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_dequeue() -> Maybe<ValueType>
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::can_peek(const size_t amnt) -> bool {
+N19_FORCEINLINE auto RingQueue<T, size_>::can_peek(const size_t amnt) -> bool {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
 
@@ -113,7 +109,7 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::can_peek(const size_t amnt) -> bo
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_peek(const size_t amnt) -> Maybe<ValueType> {
+N19_FORCEINLINE auto RingQueue<T, size_>::try_peek(const size_t amnt) -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
 
@@ -129,7 +125,7 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_peek(const size_t amnt) -> Ma
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::peek(const size_t amnt) -> ValueType {
+N19_FORCEINLINE auto RingQueue<T, size_>::peek(const size_t amnt) -> ValueType {
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
   while(!can_peek(amnt)) { // spin.
     head_.wait(head_.load(std::memory_order::acquire));
@@ -139,7 +135,7 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::peek(const size_t amnt) -> ValueT
 }
 
 template<class T, size_t size_> template<typename ... Args>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::enqueue(Args... args) -> void {
+N19_FORCEINLINE auto RingQueue<T, size_>::enqueue(Args&&... args) -> void {
   static_assert(std::constructible_from<T, Args...>);
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
@@ -148,13 +144,13 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::enqueue(Args... args) -> void {
     tail_.wait(ltail, std::memory_order::acquire);
   }
 
-  buff_[ lhead & size_mask_ ] = T{args...};
+  buff_[ lhead & size_mask_ ] = T{forward<Args>(args)...};
   head_.fetch_add(1, std::memory_order::release);
   head_.notify_all();
 }
 
 template<class T, size_t size_> template<typename ... Args>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_enqueue(Args... args) -> bool {
+N19_FORCEINLINE auto RingQueue<T, size_>::try_enqueue(Args&&... args) -> bool {
   static_assert(std::constructible_from<T, Args...>);
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
@@ -163,20 +159,20 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_enqueue(Args... args) -> bool
     return false;
   }
 
-  buff_[ lhead & size_mask_ ] = T{args...};
+  buff_[ lhead & size_mask_ ] = T{forward<Args>(args)...};
   head_.fetch_add(1, std::memory_order::release);
   head_.notify_all();
   return true;
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::wake_all() -> void {
+N19_FORCEINLINE auto RingQueue<T, size_>::wake_all() -> void {
   head_.notify_all();
   tail_.notify_all();
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::current() const -> ValueType {
+N19_FORCEINLINE auto RingQueue<T, size_>::current() const -> ValueType {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 
@@ -188,7 +184,7 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::current() const -> ValueType {
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_current() const -> Maybe<ValueType> {
+N19_FORCEINLINE auto RingQueue<T, size_>::try_current() const -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 
@@ -199,4 +195,5 @@ N19_FORCEINLINE auto n19::RingQueue<T, size_>::try_current() const -> Maybe<Valu
   return buff_[ ltail & size_mask_ ];
 }
 
+END_NAMESPACE(n19);
 #endif //RINGQUEUE_HPP

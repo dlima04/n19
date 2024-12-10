@@ -10,11 +10,8 @@
 #define RINGBASE_HPP
 #include <Core/Platform.hpp>
 #include <atomic>
-
-namespace n19 {
-  template<class T, size_t size_ = 32>
-  class RingBase;
-}
+#include <type_traits>
+BEGIN_NAMESPACE(n19);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Base class for n19::RingBuffer and n19::RingQueue.
@@ -22,7 +19,7 @@ namespace n19 {
 // checking if the buffer is full/empty, etc.
 
 template<class T, size_t size_>
-class n19::RingBase {
+class RingBase {
 public:
   // The size of the buffer should be a power of 2, always.
   // This allows us to eliminate modulo, which not only makes code
@@ -31,6 +28,7 @@ public:
   constexpr static bool can_mod_opt_ = (size_ & (size_ - 1)) == 0;
   constexpr static size_t size_mask_ = size_ - 1;
 
+  static_assert( std::is_trivially_destructible_v<T> );
   static_assert( can_mod_opt_, "size must be a power of 2!" );
   static_assert( size_ > 1, "Size must be greater than 1!" );
 
@@ -52,7 +50,7 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingBase<T, size_>::is_full() const -> bool {
+N19_FORCEINLINE auto RingBase<T, size_>::is_full() const -> bool {
   constexpr auto order  = std::memory_order::acquire;
   const size_t lhead    = (head_.load(order) + 1) & size_mask_;
   const size_t ltail    = tail_.load(order) & size_mask_;
@@ -60,7 +58,7 @@ N19_FORCEINLINE auto n19::RingBase<T, size_>::is_full() const -> bool {
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingBase<T, size_>::is_empty() const -> bool {
+N19_FORCEINLINE auto RingBase<T, size_>::is_empty() const -> bool {
   constexpr auto order  = std::memory_order::acquire;
   const size_t lhead    = head_.load(order) & size_mask_;
   const size_t ltail    = tail_.load(order) & size_mask_;
@@ -68,8 +66,9 @@ N19_FORCEINLINE auto n19::RingBase<T, size_>::is_empty() const -> bool {
 }
 
 template<class T, size_t size_>
-N19_FORCEINLINE auto n19::RingBase<T, size_>::data() const -> T* {
+N19_FORCEINLINE auto RingBase<T, size_>::data() const -> T* {
   return buff_;
 }
 
+END_NAMESPACE(n19);
 #endif //RINGBASE_HPP

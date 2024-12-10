@@ -46,8 +46,8 @@ namespace n19 {
   template<typename T, typename ...Args>
   auto make_result(Args&&... args) -> Result<T>;
 
-  template<typename ...Args>
-  auto make_error(ErrC code, std::format_string<Args...>, Args... args) -> Error;
+  auto make_error(ErrC code, const std::string&) -> Error;
+  auto make_error(ErrC code, std::string&&) -> Error;
   auto make_error(ErrC code) -> Error;
 }
 
@@ -58,20 +58,13 @@ auto n19::make_result(Args&&... args) -> Result<T> {
   return Result<T>{ T(std::forward<Args>(args)...) };
 }
 
-template<typename... Args>
-auto n19::make_error(const ErrC code, std::format_string<Args...> fmt, Args... args) -> Error {
-  std::string formatted;
-  ErrorDescriptor desc;
-  try {
-    formatted = std::vformat(fmt.get(), std::make_format_args(args...));
-  } catch(const std::format_error& e) {
-    formatted = std::string("!! std::vformat: ") + e.what();
-  } catch(...) {
-    formatted = "!! format error";
-  }
+inline auto n19::make_error(const ErrC code, const std::string& msg) -> Error {
+  const ErrorDescriptor desc{ .msg = msg, .code = code };
+  return Error{ desc };
+}
 
-  desc.code = code;
-  desc.msg  = formatted;
+inline auto n19::make_error(const ErrC code, std::string&& msg) -> Error {
+  const ErrorDescriptor desc{ .msg = msg, .code = code };
   return Error{ desc };
 }
 

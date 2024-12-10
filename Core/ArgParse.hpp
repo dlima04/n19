@@ -14,15 +14,11 @@
 #include <cstdint>
 #include <vector>
 
-namespace n19::argp {
-  class Parser;
-  struct Value;
-  struct Parameter;
-}
+BEGIN_NAMESPACE(n19::argp);
 
 // A value that is extracted from
 // the input stream, in raw text form.
-struct n19::argp::Value {
+struct Value {
   auto to_i64()  const -> Result<int64_t>;
   auto to_cdvs() const -> Result<std::vector<Value>>;
   auto to_bool() const -> Result<bool>;
@@ -37,7 +33,7 @@ struct n19::argp::Value {
 // that we expect to receive from the
 // command line. Stores the long form,
 // short form, and the value itself.
-struct n19::argp::Parameter {
+struct Parameter {
   bool required_         = false;
   Maybe<Value> default_  = std::nullopt;
   Maybe<Value> val_      = std::nullopt;
@@ -58,17 +54,13 @@ struct n19::argp::Parameter {
     bool required        = false,
     Maybe<Value>&& deflt = std::nullopt
   ) -> Parameter;
-
-  // Leave this constructor open
-  // for convenience purposes. Parameter::create()
-  // should be called most of the time though.
   Parameter() = default;
 };
 
 // The argp::Parser class is used to
 // parse arguments passed from the command line,
 // and subsequently retrieve them as argp::Values.
-class n19::argp::Parser {
+class Parser {
 N19_MAKE_NONCOPYABLE(Parser);
 N19_MAKE_NONMOVABLE(Parser);
 public:
@@ -76,20 +68,14 @@ public:
   auto print() const                -> void;
   auto debug_print() const          -> void;
 
-  auto parse(
-    const std::vector<sys::StringView>& chunks
-  ) -> Result<None>;
-
-  auto get_arg(
-    const sys::StringView& str
-  ) const -> Result<Value>;
+  auto parse(const std::vector<sys::StringView>& chunks) -> Result<None>;
+  auto get_arg(const sys::StringView& str ) const        -> Result<Value>;
 
   ~Parser() = default;
   Parser()  = default;
 private:
-  auto _is_valid_argument(
-    const sys::String& str
-  ) const -> bool;
+  auto _is_valid_argument(const sys::String& str) const -> bool;
+  auto _check_required_params() const -> bool;
 
   static auto _already_passed(
     const size_t index,
@@ -102,8 +88,8 @@ private:
     const std::vector<sys::StringView>& strings
   ) -> void;
 
-  auto _check_required_params() const -> bool;
   std::vector<Parameter> params_;
 };
 
+END_NAMESPACE(n19::argp);
 #endif //ARGPARSE_HPP

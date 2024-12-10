@@ -76,7 +76,7 @@ namespace n19 {
 // The base class for all compilation entities.
 class n19::Entity {
 public:
-  template<typename T = Entity> requires IsEntity<T>
+  template<typename T = Entity>
   using Ptr = std::shared_ptr<T>;
   using ID  = uint32_t;
   using Children = std::vector<ID>;

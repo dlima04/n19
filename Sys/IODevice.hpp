@@ -9,25 +9,23 @@
 #ifndef NATIVE_IODEVICE_HPP
 #define NATIVE_IODEVICE_HPP
 #include <Sys/Handle.hpp>
-#include <Sys/String.hpp>
 #include <Core/Bytes.hpp>
 #include <Core/Result.hpp>
 #include <array>
 #include <cstdint>
 #include <span>
-#include <cstddef>
 
 #if defined(N19_WIN32)
-  #include <windows.h>
+#  define WIN32_LEAN_AND_MEAN
+#  include <windows.h>
 #else // POSIX
-  #include <unistd.h>
+#  include <unistd.h>
+#  include <poll.h>
 #endif
 
-namespace n19::sys {
-  class IODevice;
-}
+BEGIN_NAMESPACE(n19::sys);
 
-class n19::sys::IODevice final
+class IODevice
   #if defined(N19_WIN32)
   : public Handle<::HANDLE>
   #else
@@ -53,7 +51,7 @@ public:
   // writing to, and flushing the device.
   auto write(const Bytes& bytes) const -> Result<None>;
   auto read_into(WritableBytes& bytes) const -> Result<None>;
-  auto flush() const -> Result<None>;
+  auto flush_handle() const -> Result<None>;
 
   // Some operator overloads to simplify
   // reading/writing to the IODevice.
@@ -67,22 +65,23 @@ public:
   static auto from_stderr() -> Result<IODevice>;
   static auto from_stdin()  -> Result<IODevice>;
   static auto create_pipe() -> Result<std::array<IODevice, 2>>;
-  ~IODevice() override = default;
-  uint8_t perms_ = NoAccess;
-private:
+
   IODevice() = default;
+ ~IODevice() override = default;
+
+  uint8_t perms_ = NoAccess;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
-auto n19::sys::IODevice::operator<<(const T& val) -> IODevice& {
+auto IODevice::operator<<(const T& val) -> IODevice& {
   if constexpr(std::ranges::contiguous_range<T>) {
     auto bytes = n19::as_bytes(val);
     write(bytes);
   } else if constexpr (std::is_trivially_constructible_v<T>){
-    auto bytes = as_scalar_bytecopy(val);
-    write(bytes);
+    auto copy = as_bytecopy(val);
+    write(copy.bytes());
   } else {
     static_assert(
     "IODevice::operator<< must be called with "
@@ -93,7 +92,7 @@ auto n19::sys::IODevice::operator<<(const T& val) -> IODevice& {
 }
 
 template<typename T>
-auto n19::sys::IODevice::operator>>(T& val) -> IODevice & {
+auto IODevice::operator>>(T& val) -> IODevice & {
   static_assert(std::ranges::contiguous_range<T>);
   auto bytes = n19::as_writable_bytes(val);
   read_into(bytes);
@@ -101,33 +100,34 @@ auto n19::sys::IODevice::operator>>(T& val) -> IODevice & {
 }
 
 #if defined(N19_POSIX)
-inline auto n19::sys::IODevice::invalidate() -> void {
+inline auto IODevice::invalidate() -> void {
   value_ = -1;
 }
 
-inline auto n19::sys::IODevice::close() -> void {
+inline auto IODevice::close() -> void {
   ::close(value_);
   invalidate();
 }
 
-inline auto n19::sys::IODevice::is_invalid() -> bool {
+inline auto IODevice::is_invalid() -> bool {
   return value_ == -1;
 }
 
 #else // IF WINDOWS
-inline auto n19::native::IODevice::invalidate() -> void {
+inline auto IODevice::invalidate() -> void {
   value_ = (::HANDLE)nullptr;
 }
 
-inline auto n19::native::IODevice::close() -> void {
+inline auto IODevice::close() -> void {
   ::CancelIoEx(value_, nullptr);
   ::CloseHandle(value_);
   invalidate();
 }
 
-inline auto n19::native::IODevice::is_invalid() -> bool {
+inline auto IODevice::is_invalid() -> bool {
   return value_ == (::HANDLE)nullptr;
 }
 
 #endif //IF defined(N19_POSIX)
+END_NAMESPACE(n19::sys);
 #endif //NATIVE_IODEVICE_HPP

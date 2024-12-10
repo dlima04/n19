@@ -24,7 +24,7 @@ class n19::EntityTable {
 N19_MAKE_NONCOPYABLE(EntityTable);
 N19_MAKE_NONMOVABLE(EntityTable);
 public:
-  template<IsEntity T, typename ...Args>
+  template<typename T, typename ...Args>
   auto insert(
     Entity::ID parent_id,
     size_t pos,
@@ -34,7 +34,7 @@ public:
     Args... args
   ) -> Entity::Ptr<>;
 
-  template<IsEntity T, typename ...Args>
+  template<typename T, typename ...Args>
   auto insert(
     Entity::Ptr<> parent,
     size_t pos,
@@ -58,7 +58,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<n19::IsEntity T, typename ...Args>
+template<typename T, typename ...Args>
 auto n19::EntityTable::insert(
   const Entity::Ptr<> parent,
   const size_t pos,
@@ -92,7 +92,7 @@ auto n19::EntityTable::insert(
   return map_[id];
 }
 
-template<n19::IsEntity T, typename ...Args>
+template<typename T, typename ...Args>
 auto n19::EntityTable::insert(
   const Entity::ID parent_id,
   const size_t pos,
