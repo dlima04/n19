@@ -92,14 +92,14 @@ public:
 
   N19_FORCEINLINE auto value_or(this auto&& self, T&& val) -> T {
     if(self.has_value()) {
-      return self.value();
-    } return val; // else, return provided value type.
+      return self.value();  // return the error if it exists.
+    } return val;           // else, return provided value type.
   }
 
   N19_FORCEINLINE auto error_or(this auto&& self, E&& val) -> E {
     if(!self.has_value()) {
-      return self.error();
-    } return val; // else, return provided error type.
+      return self.error();  // return the error if it exists.
+    } return val;           // else, return provided error type.
   }
 
   template<class C> /* C = Callable type */

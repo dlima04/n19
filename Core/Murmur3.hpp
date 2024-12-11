@@ -13,8 +13,8 @@
 
 #define U32_CONSTANT(X) X##LU
 #define U64_CONSTANT(X) X##LLU
-BEGIN_NAMESPACE(n19);
 
+BEGIN_NAMESPACE(n19);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct Murmur3_128 {
@@ -112,23 +112,27 @@ constexpr auto murmur3_x64_128(
     const auto* pchnk1 = &block_ptr[i * 16];
     const auto* pchnk2 = &block_ptr[(i * 16) + 8];
 
-    chnk1  = (uint64_t)pchnk1[0] << 0;
-    chnk1 |= (uint64_t)pchnk1[1] << 8;
-    chnk1 |= (uint64_t)pchnk1[2] << 16;
-    chnk1 |= (uint64_t)pchnk1[3] << 24;
-    chnk1 |= (uint64_t)pchnk1[4] << 32;
-    chnk1 |= (uint64_t)pchnk1[5] << 40;
-    chnk1 |= (uint64_t)pchnk1[6] << 48;
-    chnk1 |= (uint64_t)pchnk1[7] << 56;
+    // Copy lower 64 bits:
+    chnk1  = static_cast<uint64_t>(pchnk1[0]) << 0;
+    chnk1 |= static_cast<uint64_t>(pchnk1[1]) << 8;
+    chnk1 |= static_cast<uint64_t>(pchnk1[2]) << 16;
+    chnk1 |= static_cast<uint64_t>(pchnk1[3]) << 24;
 
-    chnk2  = (uint64_t)pchnk2[0] << 0;
-    chnk2 |= (uint64_t)pchnk2[1] << 8;
-    chnk2 |= (uint64_t)pchnk2[2] << 16;
-    chnk2 |= (uint64_t)pchnk2[3] << 24;
-    chnk2 |= (uint64_t)pchnk2[4] << 32;
-    chnk2 |= (uint64_t)pchnk2[5] << 40;
-    chnk2 |= (uint64_t)pchnk2[6] << 48;
-    chnk2 |= (uint64_t)pchnk2[7] << 56;
+    chnk1 |= static_cast<uint64_t>(pchnk1[4]) << 32;
+    chnk1 |= static_cast<uint64_t>(pchnk1[5]) << 40;
+    chnk1 |= static_cast<uint64_t>(pchnk1[6]) << 48;
+    chnk1 |= static_cast<uint64_t>(pchnk1[7]) << 56;
+
+    // Copy upper 64 bits:
+    chnk2  = static_cast<uint64_t>(pchnk2[0]) << 0;
+    chnk2 |= static_cast<uint64_t>(pchnk2[1]) << 8;
+    chnk2 |= static_cast<uint64_t>(pchnk2[2]) << 16;
+    chnk2 |= static_cast<uint64_t>(pchnk2[3]) << 24;
+
+    chnk2 |= static_cast<uint64_t>(pchnk2[4]) << 32;
+    chnk2 |= static_cast<uint64_t>(pchnk2[5]) << 40;
+    chnk2 |= static_cast<uint64_t>(pchnk2[6]) << 48;
+    chnk2 |= static_cast<uint64_t>(pchnk2[7]) << 56;
 
     chnk1 *= c1;
     chnk1  = std::rotl(chnk1, 31);
@@ -147,39 +151,41 @@ constexpr auto murmur3_x64_128(
     hash2  = hash2*5+0x38495ab5;
   }
 
+  // Begin tail portion.
   const auto* tail = (block_ptr + num_blocks*16);
   chnk1 = 0;
   chnk2 = 0;
 
   switch(len_bytes & 15) {
-    case 15: chnk2 ^= (uint64_t)(tail[14]) << 48;
-    case 14: chnk2 ^= (uint64_t)(tail[13]) << 40;
-    case 13: chnk2 ^= (uint64_t)(tail[12]) << 32;
-    case 12: chnk2 ^= (uint64_t)(tail[11]) << 24;
-    case 11: chnk2 ^= (uint64_t)(tail[10]) << 16;
-    case 10: chnk2 ^= (uint64_t)(tail[ 9]) << 8;
-    case  9: chnk2 ^= (uint64_t)(tail[ 8]) << 0;
+    case 15: chnk2 ^= static_cast<uint64_t>(tail[14]) << 48;
+    case 14: chnk2 ^= static_cast<uint64_t>(tail[13]) << 40;
+    case 13: chnk2 ^= static_cast<uint64_t>(tail[12]) << 32;
+    case 12: chnk2 ^= static_cast<uint64_t>(tail[11]) << 24;
+    case 11: chnk2 ^= static_cast<uint64_t>(tail[10]) << 16;
+    case 10: chnk2 ^= static_cast<uint64_t>(tail[ 9]) << 8;
+    case  9: chnk2 ^= static_cast<uint64_t>(tail[ 8]) << 0;
     chnk2 *= c2; chnk2 = std::rotl(chnk2, 33);
     chnk2 *= c1; hash2 ^= chnk2;
 
-    case  8: chnk1 ^= (uint64_t)(tail[ 7]) << 56;
-    case  7: chnk1 ^= (uint64_t)(tail[ 6]) << 48;
-    case  6: chnk1 ^= (uint64_t)(tail[ 5]) << 40;
-    case  5: chnk1 ^= (uint64_t)(tail[ 4]) << 32;
-    case  4: chnk1 ^= (uint64_t)(tail[ 3]) << 24;
-    case  3: chnk1 ^= (uint64_t)(tail[ 2]) << 16;
-    case  2: chnk1 ^= (uint64_t)(tail[ 1]) << 8;
-    case  1: chnk1 ^= (uint64_t)(tail[ 0]) << 0;
+    case  8: chnk1 ^= static_cast<uint64_t>(tail[ 7]) << 56;
+    case  7: chnk1 ^= static_cast<uint64_t>(tail[ 6]) << 48;
+    case  6: chnk1 ^= static_cast<uint64_t>(tail[ 5]) << 40;
+    case  5: chnk1 ^= static_cast<uint64_t>(tail[ 4]) << 32;
+    case  4: chnk1 ^= static_cast<uint64_t>(tail[ 3]) << 24;
+    case  3: chnk1 ^= static_cast<uint64_t>(tail[ 2]) << 16;
+    case  2: chnk1 ^= static_cast<uint64_t>(tail[ 1]) << 8;
+    case  1: chnk1 ^= static_cast<uint64_t>(tail[ 0]) << 0;
     chnk1 *= c1; chnk1 = std::rotl(chnk1, 31);
     chnk1 *= c2; hash1 ^= chnk1;
   }
 
+  // begin finalization.
   hash1 ^= len_bytes;
   hash2 ^= len_bytes;
-
   hash1 += hash2;
   hash2 += hash1;
 
+  // Avalanche.
   hash1 = murmur3_fmix64(hash1);
   hash2 = murmur3_fmix64(hash2);
 

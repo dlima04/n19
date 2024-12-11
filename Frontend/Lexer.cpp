@@ -582,48 +582,48 @@ auto Lexer::_produce_impl() -> Token {
     return Token::eof(src_.size() - 1, line_);
   }
 
-  while(true)
+  SWITCH_BEGIN:
   switch(_current_char()) {
-    case u8'\\': [[fallthrough]]; // illegal character! fallthrough.
-    case u8'?':  return Token::illegal(index_, 1, line_);
-    case u8'#':  _skip_comment();         continue;
-    case u8'\n': _advance_consume_line(); continue;
-    case u8' ':  [[fallthrough]]; // skip character.
-    case u8'\r': [[fallthrough]]; // skip character.
-    case u8'\b': [[fallthrough]]; // skip character.
-    case u8'\a': [[fallthrough]]; // skip character.
-    case u8'\v': [[fallthrough]]; // skip character.
-    case u8'\t': _consume_char(1);        continue;
-    case u8'/':  return _token_fwdslash();
-    case u8'\0': return _token_null();
-    case u8'~':  return _token_tilde();
-    case u8'@':  return _token_at();
-    case u8'$':  return _token_money();
-    case u8'[':  return _token_lsqbrckt();
-    case u8']':  return _token_rsqbrckt();
-    case u8';':  return _token_semicolon();
-    case u8'(':  return _token_lparen();
-    case u8')':  return _token_rparen();
-    case u8'{':  return _token_lbrace();
-    case u8'}':  return _token_rbrace();
-    case u8',':  return _token_comma();
-    case u8'-':  return _token_hyphen();
-    case u8'&':  return _token_ampersand();
-    case u8'.':  return _token_dot();
-    case u8'!':  return _token_bang();
-    case u8'<':  return _token_lthan();
-    case u8'>':  return _token_gthan();
-    case u8'+':  return _token_plus();
-    case u8'*':  return _token_asterisk();
-    case u8'%':  return _token_percent();
-    case u8'=':  return _token_equals();
-    case u8'|':  return _token_pipe();
-    case u8'^':  return _token_uparrow();
-    case u8'\'': return _token_squote();
-    case u8'"':  return _token_quote();
-    case u8'`':  return _token_quote();
-    case u8':':  return _token_colon();
-    default:     return _token_ambiguous();
+    case u8'\\' : [[fallthrough]]; // illegal character! fallthrough.
+    case u8'?'  : return Token::illegal(index_, 1, line_);
+    case u8'#'  : _skip_comment();         goto SWITCH_BEGIN;
+    case u8'\n' : _advance_consume_line(); goto SWITCH_BEGIN;
+    case u8' '  : [[fallthrough]]; // skip character.
+    case u8'\r' : [[fallthrough]]; // skip character.
+    case u8'\b' : [[fallthrough]]; // skip character.
+    case u8'\a' : [[fallthrough]]; // skip character.
+    case u8'\v' : [[fallthrough]]; // skip character.
+    case u8'\t' : _consume_char(1);        goto SWITCH_BEGIN;
+    case u8'/'  : return _token_fwdslash();
+    case u8'\0' : return _token_null();
+    case u8'~'  : return _token_tilde();
+    case u8'@'  : return _token_at();
+    case u8'$'  : return _token_money();
+    case u8'['  : return _token_lsqbrckt();
+    case u8']'  : return _token_rsqbrckt();
+    case u8';'  : return _token_semicolon();
+    case u8'('  : return _token_lparen();
+    case u8')'  : return _token_rparen();
+    case u8'{'  : return _token_lbrace();
+    case u8'}'  : return _token_rbrace();
+    case u8','  : return _token_comma();
+    case u8'-'  : return _token_hyphen();
+    case u8'&'  : return _token_ampersand();
+    case u8'.'  : return _token_dot();
+    case u8'!'  : return _token_bang();
+    case u8'<'  : return _token_lthan();
+    case u8'>'  : return _token_gthan();
+    case u8'+'  : return _token_plus();
+    case u8'*'  : return _token_asterisk();
+    case u8'%'  : return _token_percent();
+    case u8'='  : return _token_equals();
+    case u8'|'  : return _token_pipe();
+    case u8'^'  : return _token_uparrow();
+    case u8'\'' : return _token_squote();
+    case u8'"'  : return _token_quote();
+    case u8'`'  : return _token_quote();
+    case u8':'  : return _token_colon();
+    default     : return _token_ambiguous();
   }
 
   UNREACHABLE; // assertion
@@ -820,9 +820,9 @@ inline auto Lexer::_token_ambiguous() -> Token {
 
   if(curr == u8'0' && (next == u8'x' || next == u8'X')) {
     return _token_hex_lit();
-  }if(curr == u8'0' && CH_IS_DIGIT( next )) {
+  } if(curr == u8'0' && CH_IS_DIGIT( next )) {
     return _token_oct_lit();
-  }if(CH_IS_DIGIT( curr )) {
+  } if(CH_IS_DIGIT( curr )) {
     return _token_num_lit();
   }
 
