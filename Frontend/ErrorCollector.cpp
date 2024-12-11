@@ -9,14 +9,13 @@
 #include <Core/FileRef.hpp>
 #include <Core/Result.hpp>
 #include <Core/Bytes.hpp>
-#include <Core/ResultMacros.hpp>
+#include <Core/Try.hpp>
 #include <Core/Panic.hpp>
-#include <Core/ConManip.hpp>
+#include <Core/ConIO.hpp>
 #include <Sys/Stream.hpp>
 #include <Frontend/ErrorCollector.hpp>
 #include <Frontend/Lexer.hpp>
 #include <algorithm>
-#include <stdexcept>
 #include <cctype>
 
 auto n19::ErrorCollector::store_error(
@@ -101,7 +100,7 @@ auto n19::ErrorCollector::display_error(
   if(!fsize) return;
 
   std::vector<char8_t> buff(*fsize);
-  auto view = n19::as_writable_bytes(buff);
+  auto view = as_writable_bytes(buff);
 
   if(file.read_into(view))
     display_error(
@@ -165,24 +164,30 @@ auto n19::ErrorCollector::display_error(
   std::println("{}", before);
   std::println("{}", filler);
 
-  set_console(is_warn ? Con::Yellow : Con::Red);
+  set_console(is_warn ? Con::YellowFG : Con::RedFG);
   std::println("{}{}\n", spaces, msg);
   set_console(Con::Reset);
 }
 
-auto n19::ErrorCollector::emit() const -> Result<None> {
+auto n19::ErrorCollector::emit() const -> Result<void> {
   std::vector<char8_t> buff;
   for(const auto &[file_name, errs] : errs_) {
     const auto file = TRY(FileRef::open(file_name));
     const auto size = TRY(file->size());
 
     buff.resize(*size);
-    file->read_into(n19::as_writable_bytes(buff)).OR_RETURN();
+    file->read_into(as_writable_bytes(buff)).OR_RETURN();
 
     // Print the error using the file buffer
-    for(const auto &[msg, pos, line, warn] : errs)
-      display_error(msg, file_name, buff, pos, line, warn);
+    for(const auto& err : errs)
+      display_error(
+        err.message,
+        file_name,
+        buff,
+        err.file_pos,
+        err.line,
+        err.is_warning);
   }
 
-  return make_result<None>();
+  return make_result<void>();
 }

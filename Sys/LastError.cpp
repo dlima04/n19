@@ -7,10 +7,10 @@
 */
 
 #include <Sys/LastError.hpp>
-#if defined(N19_WIN32)
-#include <windows.h>
+BEGIN_NAMESPACE(n19::sys);
 
-auto n19::native::last_error() -> String {
+#if defined(N19_WIN32)
+auto last_error() -> String {
   DWORD err_code = GetLastError();
   DWORD result   = 0;
   LPWSTR outbuf  = nullptr;
@@ -35,10 +35,7 @@ auto n19::native::last_error() -> String {
 }
 
 #else // POSIX
-#include <string.h>
-#include <errno.h>
-
-auto n19::sys::last_error() -> String {
+auto last_error() -> String {
   Char buffer[256] = { 0 };
   if(strerror_r(errno, buffer, sizeof(buffer)) == 0) {
     return String{ buffer };
@@ -48,3 +45,4 @@ auto n19::sys::last_error() -> String {
 }
 
 #endif
+END_NAMESPACE(n19::sys);

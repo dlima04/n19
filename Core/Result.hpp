@@ -8,69 +8,179 @@
 
 #ifndef RESULT_HPP
 #define RESULT_HPP
-#include <expected>
-#include <optional>
-#include <cstdint>
-#include <format>
+#include <Core/Platform.hpp>
+#include <Core/Panic.hpp>
+#include <Core/ClassTraits.hpp>
+#include <Core/Nothing.hpp>
+#include <Core/Forward.hpp>
 #include <string>
+#include <utility>
+#include <variant>
+#include <type_traits>
+BEGIN_NAMESPACE(n19);
 
-namespace n19 {
-  enum class ErrC : uint8_t {
-    None,       // Default value, no error occured.
-    InvalidArg, // An argument passed is incorrect.
-    FileIO,     // A file I/O operation has failed.
-    Internal,   // Bad internal logic has caused a failure.
-    NotFound,   // The thing you're looking for is not here.
-    BadToken,   // An incorrect token was emmitted by the lexer.
-    Native,     // A native, underlying OS error has occurred.
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define N19_ERRC_LIST \
+  X(None)       \
+  X(InvalidArg) \
+  X(FileIO)     \
+  X(Internal)   \
+  X(NotFound)   \
+  X(BadToken)   \
+  X(Native)     \
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+struct __ErrC final {
+N19_MAKE_COMPARABLE_MEMBER(__ErrC, value);
+#define X(NAME) NAME,
+  enum Value : uint16_t {
+    N19_ERRC_LIST
   };
+#undef X
+  Value value = None;     // Underlying error value
+  [[nodiscard]] auto to_string()   -> std::string;
+  [[nodiscard]] auto is_critical() -> bool;
 
-  struct ErrorDescriptor {
-    std::string msg;
-    ErrC code = ErrC::None;
-  };
+  constexpr __ErrC(const Value v) : value(v) {}
+  constexpr __ErrC() = default;
+};
 
-  struct None {
-    unsigned char _ = 0;
-    None() = default;
-  };
+struct __ErrorType {      // The default error type used by n19.
+  std::string msg;        // The optional message. Can be empty.
+  __ErrC code = __ErrC::None;
+};
 
-  template<typename T>
-  using Result = std::expected<T, ErrorDescriptor>;
-  using Error = std::unexpected<ErrorDescriptor>;
+template<class T, class E = __ErrorType>
+class [[nodiscard]] __Result {
+public:
+  using ValueType   = T;
+  using PointerType = T*;
+  using __Variant   = std::variant<T, E> ;
 
-  // For consistency.
-  template<typename T>
-  using Maybe = std::optional<T>;
+  N19_FORCEINLINE __Result(__Result&& other)      = default;
+  N19_FORCEINLINE __Result(const __Result& other) = default;
 
-  template<typename T, typename ...Args>
-  auto make_result(Args&&... args) -> Result<T>;
+  N19_FORCEINLINE auto has_value() const -> bool {
+    return std::holds_alternative<T>( value_ );
+  }
 
-  auto make_error(ErrC code, const std::string&) -> Error;
-  auto make_error(ErrC code, std::string&&) -> Error;
-  auto make_error(ErrC code) -> Error;
-}
+  N19_FORCEINLINE explicit operator bool() const {
+    return std::holds_alternative<T>( value_ );
+  }
+
+  [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
+    ASSERT( has_value() == true && "Result contains an error!" );
+    return std::get<T>( value_ );
+  }
+
+  [[nodiscard]] N19_FORCEINLINE auto value() -> T& {
+    ASSERT( has_value() == true && "Result contains an error!" );
+    return std::get<T>( value_ );
+  }
+
+  [[nodiscard]] N19_FORCEINLINE auto error() const -> const E& {
+    ASSERT( has_value() == false && "Result contains a value!" );
+    return std::get<E>( value_ );
+  }
+
+  [[nodiscard]] N19_FORCEINLINE auto error() -> E& {
+    ASSERT( has_value() == false && "Result contains a value!" );
+    return std::get<E>( value_ );
+  }
+
+  N19_FORCEINLINE auto value_or(this auto&& self, T&& val) -> T {
+    if(self.has_value()) {
+      return self.value();
+    } return val; // else, return provided value type.
+  }
+
+  N19_FORCEINLINE auto error_or(this auto&& self, E&& val) -> E {
+    if(!self.has_value()) {
+      return self.error();
+    } return val; // else, return provided error type.
+  }
+
+  template<class C> /* C = Callable type */
+  N19_FORCEINLINE auto call_if_error(this auto&& self, C&& cb) -> decltype(self) {
+    if(!self.has_value()) cb( forward<decltype(self)>(self) );
+    return self;
+  }
+
+  template<class C> /* C = Callable type */
+  N19_FORCEINLINE auto call_if_value(this auto&& self, C&& cb) -> decltype(self) {
+    if(self.has_value()) cb( forward<decltype(self)>(self) );
+    return self;
+  }
+
+  template<class O>
+  N19_FORCEINLINE auto operator==(const __Result<O>& other) -> bool {
+    if(has_value() != other.has_value()) {
+      return false;
+    } return !has_value() || value() == other.value();
+  }
+
+  template<class O>
+  N19_FORCEINLINE auto operator==(const O& other) -> bool {
+    return has_value() && other == value();
+  }
+
+  N19_FORCEINLINE auto operator->(this auto&& self) -> decltype(auto) {
+    ASSERT( self.has_value() == true && "Result contains an error!" );
+    return &( forward<decltype(self)>(self).value() );
+  }
+
+  N19_FORCEINLINE auto operator*(this auto&& self) -> decltype(auto) {
+    ASSERT( self.has_value() == true && "Result contains an error!" );
+    return forward<decltype(self)>(self).value();
+  }
+
+  N19_FORCEINLINE __Result(T&& value)       : value_(value) {}
+  N19_FORCEINLINE __Result(const T& value)  : value_(value) {}
+  N19_FORCEINLINE __Result(E&& error)       : value_(error) {}
+  N19_FORCEINLINE __Result(const E& error)  : value_(error) {}
+  N19_FORCEINLINE __Result(/*.....*/)       : value_(E{}  ) {}
+protected:
+  __Variant value_;
+};
+
+template<class T>
+struct __Result_Dispatch {
+  using Type = __Result<T>;
+};
+
+template<>
+struct __Result_Dispatch<void> {
+  using Type = __Result<__Nothing>;
+};
+
+template<class T>
+using Result = typename __Result_Dispatch<T>::Type;
+using ErrC   = __ErrC;
+using ErrorT = __ErrorType;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T, typename ...Args>
-auto n19::make_result(Args&&... args) -> Result<T> {
-  return Result<T>{ T(std::forward<Args>(args)...) };
+auto make_result(Args&&... args) -> Result<T> {
+  if constexpr(std::is_void_v<T>)
+    return Result<__Nothing>{};
+   else
+    return T{ std::forward<Args>(args)... };
 }
 
-inline auto n19::make_error(const ErrC code, const std::string& msg) -> Error {
-  const ErrorDescriptor desc{ .msg = msg, .code = code };
-  return Error{ desc };
+inline auto make_error(const ErrC code) -> ErrorT {
+  return ErrorT{ .msg = "", .code = code, };
 }
 
-inline auto n19::make_error(const ErrC code, std::string&& msg) -> Error {
-  const ErrorDescriptor desc{ .msg = msg, .code = code };
-  return Error{ desc };
+inline auto make_error(const ErrC code, const std::string& msg) -> ErrorT {
+  return ErrorT{ .msg = msg, .code = code };
 }
 
-inline auto n19::make_error(const ErrC code) -> Error {
-  const ErrorDescriptor desc{ .msg = "", .code = code };
-  return Error{ desc };
+inline auto make_error(const ErrC code, std::string&& msg) -> ErrorT {
+  return ErrorT{ .msg = msg, .code = code };
 }
 
+END_NAMESPACE(n19);
 #endif //RESULT_HPP

@@ -12,8 +12,12 @@
 
 #define PANIC(MSG) ::n19::panic_impl_(__FILE__, __LINE__, MSG)
 #define FATAL(MSG) ::n19::fatal_impl_(MSG)
-#define UNREACHABLE PANIC("Default assertion - unreachable branch.")
-#define ASSERT(COND) if(!(COND)) PANIC("Assertion \"" #COND "\" failed!")
+
+#define UNREACHABLE       \
+  PANIC("Default assertion - unreachable branch.")
+
+#define ASSERT(COND, ...) \
+  if( !(COND)) PANIC("Assertion \"" #COND "\" failed! " __VA_ARGS__ )
 
 BEGIN_NAMESPACE(n19);
 [[noreturn]] auto fatal_impl_(const std::string &msg) -> void;

@@ -7,7 +7,7 @@
 */
 
 #include <Frontend/EntityQualifier.hpp>
-#include <Core/ConManip.hpp>
+#include <Core/ConIO.hpp>
 
 auto n19::EntityQualifier::format() const -> std::string {
   std::string buff;
@@ -33,10 +33,10 @@ auto n19::EntityQualifier::format() const -> std::string {
 
   return fmt(
     "{}ID: {} {}{}{}{}",         // Fmt string
-    manip_string(Con::Blue),     // ID color = blue
+    manip_string(Con::BlueFG),     // ID color = blue
     static_cast<uint32_t>(id_),  // The ID
     manip_string(Con::Reset),    // Reset console
-    manip_string(Con::White),    // buff = white
+    manip_string(Con::WhiteFG),    // buff = white
     buff,                        // The buff
     manip_string(Con::Reset)     // Reset console
   );
@@ -70,10 +70,10 @@ auto n19::EntityQualifierThunk::format() const -> std::string {
 
   return fmt(
     "{}{} {}{}{}{}",             // Fmt string
-    manip_string(Con::Blue),     // ID color = blue
+    manip_string(Con::BlueFG),     // ID color = blue
     full_name,                   // The ID
     manip_string(Con::Reset),    // Reset console
-    manip_string(Con::White),    // buff = white
+    manip_string(Con::WhiteFG),    // buff = white
     buff,                        // The buff
     manip_string(Con::Reset)     // Reset console
   );

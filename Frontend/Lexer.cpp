@@ -6,7 +6,7 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <Core/ResultMacros.hpp>
+#include <Core/Try.hpp>
 #include <Core/Murmur3.hpp>
 #include <Frontend/Lexer.hpp>
 #include <Frontend/ErrorCollector.hpp>
@@ -852,7 +852,7 @@ inline auto Lexer::_token_ambiguous() -> Token {
 
 auto Lexer::get_keyword(const std::u8string_view& str) -> Maybe<Keyword> {
   if(str.size() > 12) {
-    return std::nullopt;
+    return Nothing;
   }
 
   Keyword kw;                                // The keyword.
@@ -995,7 +995,7 @@ auto Lexer::get_keyword(const std::u8string_view& str) -> Maybe<Keyword> {
     kw.cat  = TokenCategory::Literal;        // Literal
     kw.type = TokenType::NullLiteral;
     break;
-  default: return std::nullopt;
+  default: return Nothing;
   }
 
   return kw;
@@ -1053,7 +1053,7 @@ auto Lexer::create(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> {
 
   /// Check for an empty file.
   /// TODO: should we really error on this? I don't know if
-  ///       this even makes sense.
+  /// this even makes sense.
   if(*fsize == 0) {
     return make_error(ErrC::InvalidArg, "File is empty.");
   }
@@ -1062,11 +1062,11 @@ auto Lexer::create(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> {
   lxr->file_name_ = fs::absolute(*ref).string();
   lxr->src_.resize(*fsize);
 
-  TRY(ref.read_into(n19::as_writable_bytes(lxr->src_)));
+  TRY(ref.read_into(as_writable_bytes(lxr->src_)));
   return make_result<std::shared_ptr<Lexer>>(lxr);
 }
 
-auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<None> {
+auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<void> {
   if(current().cat_ != cat) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token of kind \"{}\".", cat.to_string());
@@ -1074,10 +1074,10 @@ auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<None> {
   }
 
   if(cons) consume(1);
-  return make_result<None>();
+  return make_result<void>();
 }
 
-auto Lexer::expect(const TokenType type, const bool cons) -> Result<None> {
+auto Lexer::expect(const TokenType type, const bool cons) -> Result<void> {
   if(current().type_ != type) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token \"{}\".", type.to_string());
@@ -1085,7 +1085,7 @@ auto Lexer::expect(const TokenType type, const bool cons) -> Result<None> {
   }
 
   if(cons) consume(1);
-  return make_result<None>();
+  return make_result<void>();
 }
 
 auto Lexer::consume(const uint32_t amnt) -> Token {
@@ -1109,6 +1109,10 @@ auto Lexer::dump() -> void {
     curr_tok = _produce_impl();
     std::println("{}", curr_tok.format(*this));
   } while(curr_tok != TokenType::EndOfFile && curr_tok != TokenType::Illegal);
+
+  if(curr_tok == TokenType::Illegal) {
+    ErrorCollector::display_error("Illegal token!", *this, curr_tok);
+  }
 }
 
 END_NAMESPACE(n19);

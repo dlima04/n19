@@ -6,8 +6,8 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#ifndef NATIVE_STREAM_HPP
-#define NATIVE_STREAM_HPP
+#ifndef SYS_STREAM_HPP
+#define SYS_STREAM_HPP
 #include <iostream>
 
 #if defined(N19_WIN32)
@@ -51,4 +51,4 @@ inline auto n19::sys::ins() -> IStream& {
 #endif
 }
 
-#endif //NATIVE_STREAM_HPP
+#endif //SYS_STREAM_HPP

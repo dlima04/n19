@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(N19_SOURCE_FILES
   Misc/CompilerMain.cpp
   Misc/Global.hpp
-  Core/ConManip.cpp
+  Core/ConIO.cpp
   Core/FileRef.cpp
   Frontend/Token.cpp
   Frontend/ErrorCollector.cpp
@@ -14,12 +14,8 @@ set(N19_SOURCE_FILES
   Frontend/Entity.cpp
   Frontend/EntityQualifier.cpp
   Frontend/DumpAst.cpp
-  Core/ArgParse.cpp
   Sys/LastError.cpp
   Sys/IODevice.cpp
-  Core/ConManip.hpp
-  Core/Result.hpp
-  Core/ResultMacros.hpp
   Core/Panic.hpp
   Core/Fmt.hpp
   Core/FileRef.hpp
@@ -31,9 +27,7 @@ set(N19_SOURCE_FILES
   Frontend/Entity.hpp
   Core/Concepts.hpp
   Core/StopWatch.hpp
-  Core/ArgParse.hpp
   Sys/String.hpp
-  Sys/Stream.hpp
   Sys/LastError.hpp
   Core/RingBase.hpp
   Sys/IODevice.hpp
@@ -50,12 +44,13 @@ set(N19_SOURCE_FILES
   Core/TypeTraits.hpp
   Core/Callback.hpp
   Core/Forward.hpp
-  Core/NewResult.hpp
+  Core/Result.hpp
   Core/Memory.hpp
   Core/Maybe.hpp
-        Core/ConIO.hpp
-        Core/Nothing.hpp
-        Core/Try.hpp
+  Core/ConIO.hpp
+  Core/Nothing.hpp
+  Core/Try.hpp
+  Sys/Stream.hpp
 )
 
 add_executable(n19 ${N19_SOURCE_FILES})
@@ -69,9 +64,7 @@ set(N19_IS_WINDOWS FALSE)
 
 # Determine build platform...
 # also, is this actually reliable?
-# CMAKE_HOST_SYSTEM_NAME seems to be
-# unofficial or at least volatile in some cases
-# based on what I'm seeing on the internet.
+# Need to look into this more...
 
 if(WIN32 OR N19_BUILD_PLATFORM STREQUAL "Windows")
   set(N19_IS_WINDOWS TRUE)

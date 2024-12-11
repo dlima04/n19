@@ -9,6 +9,7 @@
 #ifndef FILEREF_HPP
 #define FILEREF_HPP
 #include <Core/Result.hpp>
+#include <Core/Maybe.hpp>
 #include <Core/Bytes.hpp>
 #include <Core/Forward.hpp>
 #include <Sys/String.hpp>
@@ -35,8 +36,8 @@ public:
 
   // Used for reading to/writing to the file, called by
   // operator<< and operator>> as well.
-  auto write(const Bytes& bytes, bool app = false) const -> Result<None>;
-  auto read_into(const WritableBytes& bytes) const -> Result<None>;
+  auto write(const Bytes& bytes, bool app = false) const -> Result<void>;
+  auto read_into(const WritableBytes& bytes) const -> Result<void>;
 
   [[nodiscard]] auto nstr() const -> sys::String;
   [[nodiscard]] auto size() const -> Result<uintmax_t>;
@@ -74,10 +75,10 @@ private:
 template<typename T>
 auto FileRef::operator<<(const T& val) -> FileRef& {
   if constexpr(std::ranges::contiguous_range<T>) {
-    auto bytes = n19::as_bytes(val);
+    auto bytes = as_bytes(val);
     write(bytes);
   } else if constexpr (std::is_trivially_constructible_v<T>){
-    auto copy = n19::as_bytecopy(val);
+    auto copy = as_bytecopy(val);
     write(copy.bytes());
   } else {
     static_assert(
@@ -91,7 +92,7 @@ auto FileRef::operator<<(const T& val) -> FileRef& {
 template<typename T>
 auto FileRef::operator>>(T& val) -> FileRef& {
   static_assert(std::ranges::contiguous_range<T>);
-  auto bytes = n19::as_writable_bytes(val);
+  auto bytes = as_writable_bytes(val);
   read_into(bytes);
   return *this;
 }

@@ -86,7 +86,7 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::read() -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
   if(lhead == ltail) {    // buffer is empty.
-    return std::nullopt;  // we can't read anything.
+    return Nothing;  // we can't read anything.
   }
 
   const ValueType val = buff_[ ltail ];
@@ -100,7 +100,7 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::try_current() const -> Maybe<ValueTyp
   const size_t ltail = tail_.load(std::memory_order::acquire);
 
   if((lhead & size_mask_) == (ltail & size_mask_)) {
-    return std::nullopt;
+    return Nothing;
   }
 
   return buff_[ ltail & size_mask_ ];

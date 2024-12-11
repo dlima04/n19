@@ -12,23 +12,23 @@
 #include <Core/Platform.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/FileRef.hpp>
+#include <Core/Result.hpp>
 #include <Core/RingQueue.hpp>
 #include <Frontend/Token.hpp>
 #include <Sys/String.hpp>
 #include <memory>
-#include <thread>
 #include <vector>
 #include <functional>
 #include <string_view>
 #include <cctype>
 #include <cstdint>
 
-BEGIN_NAMESPACE(n19);
 #define UTF8_LEADING(CH) (((uint8_t)CH) >= 0x80)
 #define CH_IS_XDIGIT(CH) (std::isxdigit((uint8_t)CH))
 #define CH_IS_CTRL(CH)   (std::iscntrl((uint8_t)CH))
 #define CH_IS_SPACE(CH)  (std::isspace((uint8_t)CH))
 #define CH_IS_DIGIT(CH)  (std::isdigit((uint8_t)CH))
+BEGIN_NAMESPACE(n19);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // n19::Lexer uses a Single-Producer Single-Consumer relationship
@@ -47,8 +47,8 @@ public:
   auto peek(uint32_t amnt)    -> Token;
   auto dump()                 -> void;
 
-  auto expect(TokenCategory cat, bool = true) -> Result<None>;
-  auto expect(TokenType type, bool = true)    -> Result<None>;
+  auto expect(TokenCategory cat, bool = true) -> Result<void>;
+  auto expect(TokenType type, bool = true)    -> Result<void>;
 
   static auto create(const FileRef& ref)  -> Result<std::shared_ptr<Lexer>>;
   static auto get_keyword(const std::u8string_view& str) -> Maybe<struct Keyword>;
@@ -160,7 +160,7 @@ N19_FORCEINLINE auto Lexer::_advance_consume_line() -> void {
 }
 
 N19_FORCEINLINE auto Lexer::get_bytes() const -> Bytes {
-  return n19::as_bytes(src_);
+  return as_bytes(src_);
 }
 
 N19_FORCEINLINE auto Lexer::current() const -> Token {

@@ -8,7 +8,7 @@
 
 #ifndef TRY_HPP
 #define TRY_HPP
-#include <Core/NewResult.hpp>
+#include <Core/Result.hpp>
 #include <Core/Fmt.hpp>
 #include <Core/Panic.hpp>
 #include <string>

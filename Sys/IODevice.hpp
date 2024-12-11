@@ -24,8 +24,9 @@
 #endif
 
 BEGIN_NAMESPACE(n19::sys);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class IODevice
+class IODevice final
   #if defined(N19_WIN32)
   : public Handle<::HANDLE>
   #else
@@ -49,9 +50,9 @@ public:
 
   // public methods for reading to,
   // writing to, and flushing the device.
-  auto write(const Bytes& bytes) const -> Result<None>;
-  auto read_into(WritableBytes& bytes) const -> Result<None>;
-  auto flush_handle() const -> Result<None>;
+  auto write(const Bytes& bytes) const -> Result<void>;
+  auto read_into(WritableBytes& bytes) const -> Result<void>;
+  auto flush_handle() const -> Result<void>;
 
   // Some operator overloads to simplify
   // reading/writing to the IODevice.
@@ -77,7 +78,7 @@ public:
 template<typename T>
 auto IODevice::operator<<(const T& val) -> IODevice& {
   if constexpr(std::ranges::contiguous_range<T>) {
-    auto bytes = n19::as_bytes(val);
+    auto bytes = as_bytes(val);
     write(bytes);
   } else if constexpr (std::is_trivially_constructible_v<T>){
     auto copy = as_bytecopy(val);
@@ -94,7 +95,7 @@ auto IODevice::operator<<(const T& val) -> IODevice& {
 template<typename T>
 auto IODevice::operator>>(T& val) -> IODevice & {
   static_assert(std::ranges::contiguous_range<T>);
-  auto bytes = n19::as_writable_bytes(val);
+  auto bytes = as_writable_bytes(val);
   read_into(bytes);
   return *this;
 }

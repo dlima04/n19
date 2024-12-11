@@ -26,104 +26,96 @@ public:
   using ReferenceType = T&;
   using __Variant     = std::variant<T, __Nothing>;
 
+  N19_FORCEINLINE Maybe(Maybe&& other)      = default;
+  N19_FORCEINLINE Maybe(const Maybe& other) = default;
+
+  auto has_value() const -> bool { return has_value_; }
+  explicit operator bool() const { return has_value_; }
+
   // Reassignment ops, these can simply be defaulted as
   // variant will handle the semantics for us.
   auto operator=(Maybe&& other)      -> Maybe& = default;
   auto operator=(const Maybe& other) -> Maybe& = default;
 
-  // Comparison. Can be between another Maybe type, or
-  // the type O as long as it's compatible with T.
-  template<class O> auto operator==(const Maybe<O>&) -> bool;
-  template<class O> auto operator==(const O&)        -> bool;
+  // I need to define these const/non const overloads
+  // explicitly. Trying to use "deducing this" results in
+  // ambiguous calls apparently... fuck this language
+  [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
+    ASSERT(has_value_ == true, "Bad Maybe access!");
+    return std::get<T>( value_ );
+  }
 
-  // Accessor operators for cleaner syntax mostly.
-  auto operator->(this auto&& self)  -> decltype(auto);
-  auto operator*(this auto&& self)   -> decltype(auto);
+  [[nodiscard]] N19_FORCEINLINE auto value() -> T& {
+    ASSERT(has_value_ == true, "Bad maybe access!");
+    return std::get<T>( value_ );
+  }
 
-  [[nodiscard]] auto has_value() const       -> bool;
-  [[nodiscard]] auto value(this auto&& self) -> decltype(auto);
+  [[nodiscard]] N19_FORCEINLINE auto value_or(T &&val) const -> T {
+    if(has_value_) {
+      return std::get<T>( value_ );
+    } return val; // else, return provided value type.
+  }
 
-  // In-place construction of the value type T.
-  template<class ... Args> auto emplace(Args&&... args) -> void;
-  template<class ... Args> Maybe(Args&&... args);
+  [[nodiscard]] N19_FORCEINLINE auto release() -> T {
+    T released = std::move( value() );
+    has_value_ = false;
+    value_     = Nothing;
+    return released;
+  }
 
-  auto clear()   -> void;
-  auto release() -> T;
+  template<class O>
+  N19_FORCEINLINE auto operator==(const Maybe<O>& other) -> bool {
+    return has_value_ == other.has_value_
+      && (!has_value_ || value() == other.value());
+  }
 
-  N19_FORCEINLINE Maybe(Maybe&& other)      = default;
-  N19_FORCEINLINE Maybe(const Maybe& other) = default;
+  template<class O>
+  N19_FORCEINLINE auto operator==(const O& other) -> bool {
+    return has_value_ && other == value();
+  }
 
-  N19_FORCEINLINE Maybe(T&& val)     : value_(forward<T>(val)) {}
-  N19_FORCEINLINE Maybe(__Nothing&&) : value_(__Nothing{}) {}
-  N19_FORCEINLINE Maybe(/*......*/)  : value_(__Nothing{}) {}
+  N19_FORCEINLINE auto operator->(this auto&& self) -> decltype(auto) {
+    ASSERT( self.has_value_ == true, "Bad Maybe access!");
+    return &self.value();
+  }
+
+  N19_FORCEINLINE auto operator*(this auto&& self) -> decltype(auto) {
+    ASSERT(self.has_value_ == true, "Bad Maybe access!");
+    return self.value();
+  }
+
+  template<class ... Args>
+  N19_FORCEINLINE explicit Maybe(Args&& ...args){
+    value_.template emplace<T>( forward<Args>(args)... );
+    has_value_ = true;
+  }
+
+  template<class U> requires std::constructible_from<T, U>
+  N19_FORCEINLINE Maybe(U&& value) {
+    value_.template emplace<T>( forward<U>(value) );
+    has_value_ = true;
+  }
+
+  template<class ... Args>
+  N19_FORCEINLINE auto emplace(Args &&...args) -> void {
+    value_.template emplace<T>( forward<Args>(args)... );
+    has_value_ = true;
+  }
+
+  N19_FORCEINLINE auto clear() -> void {
+    if(!has_value_) return;
+    value_ = Nothing;
+    has_value_ = false;
+  }
+
+  N19_FORCEINLINE Maybe(const T& val)     : has_value_(true), value_(val) {}
+  N19_FORCEINLINE Maybe(T&& val)          : has_value_(true), value_(val) {}
+  N19_FORCEINLINE Maybe(const __Nothing&) : value_(__Nothing{}) {}
+  N19_FORCEINLINE Maybe(/*......*/)       : value_(__Nothing{}) {}
 protected:
   bool has_value_ { false };
   __Variant value_;
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-template<class T>
-N19_FORCEINLINE auto Maybe<T>::value(this auto&& self) -> decltype(auto) {
-  ASSERT(self.has_value_ == true);
-  return std::get<T>( forward<decltype(self)>(self).value_ );
-}
-
-template<class T>
-N19_FORCEINLINE auto Maybe<T>::release() -> T {
-  ASSERT(has_value_);
-  T released = std::move( value() );
-  has_value_ = false;
-  value_     = Nothing;
-  return released;
-}
-
-template<class T> template<class O>
-N19_FORCEINLINE auto Maybe<T>::operator==(const Maybe<O>& other) -> bool {
-  return has_value_ == other.has_value_ && (!has_value_ || value() == other.value());
-}
-
-template<class T> template<class O>
-N19_FORCEINLINE auto Maybe<T>::operator==(const O& other) -> bool {
-  return has_value_ && other == value();
-}
-
-template<class T>
-N19_FORCEINLINE auto Maybe<T>::operator->(this auto&& self) -> decltype(auto) {
-  ASSERT(self.has_value_ == true);
-  return &( forward<decltype(self)>(self).value() );
-}
-
-template<class T>
-N19_FORCEINLINE auto Maybe<T>::operator*(this auto &&self) -> decltype(auto) {
-  ASSERT(self.has_value_ == true);
-  return forward<decltype(self)>(self).value();
-}
-
-template<class T>
-N19_FORCEINLINE auto Maybe<T>::has_value() const -> bool {
-  return has_value_;
-}
-
-template<class T> template<class ... Args>
-N19_FORCEINLINE Maybe<T>::Maybe(Args&& ...args){
-  value_.template emplace<T>( forward<Args>(args)... );
-  has_value_ = true;
-}
-
-template<class T> template<class ... Args>
-auto Maybe<T>::emplace(Args &&...args) -> void {
-  value_.template emplace<T>( forward<Args>(args)... );
-  has_value_ = true;
-}
-
-template<class T>
-N19_FORCEINLINE auto Maybe<T>::clear() -> void {
-  if(has_value_) {
-    value_ = Nothing;
-    has_value_ = false;
-  }
-}
 
 END_NAMESPACE(n19);
 #endif //MAYBE_HPP

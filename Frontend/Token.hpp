@@ -9,11 +9,12 @@
 #ifndef FRONTEND_TOKEN_HPP
 #define FRONTEND_TOKEN_HPP
 #include <Core/ClassTraits.hpp>
-#include <Core/Result.hpp>
+#include <Core/Maybe.hpp>
 #include <Core/Platform.hpp>
 #include <string>
 #include <cstdint>
 #include <vector>
+BEGIN_NAMESPACE(n19);
 
 #define N19_TOKEN_TYPE_LIST      \
   X(None, "")                    \
@@ -137,7 +138,7 @@ namespace n19 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class n19::TokenType {
+class TokenType {
 N19_MAKE_COMPARABLE_MEMBER(TokenType, value);
 public:
   #define X(TOKEN_TYPE, STR_UNUSED) TOKEN_TYPE,
@@ -155,7 +156,7 @@ public:
   constexpr TokenType(const Value value) : value(value) {}
 };
 
-class n19::TokenCategory {
+class TokenCategory {
 N19_MAKE_COMPARABLE_MEMBER(TokenCategory, value);
 public:
   #define X(CAT, MASK) CAT = MASK,
@@ -166,7 +167,6 @@ public:
 
   [[nodiscard]] auto to_string() const -> std::string;
   [[nodiscard]] auto isa(Value val) const -> bool;
-  [[nodiscard]] auto is_any_of(const std::vector<Value> &vals) const -> bool;
 
   constexpr auto operator|=(const TokenCategory &other) -> void;
   constexpr auto operator|=(Value other) -> void;
@@ -176,7 +176,7 @@ public:
   constexpr TokenCategory(const size_t value) : value(value) {}
 };
 
-class n19::Token {
+class Token {
 N19_MAKE_COMPARABLE_ON(TokenType, type_);
 N19_MAKE_COMPARABLE_MEMBER(Token, type_);
 public:
@@ -196,16 +196,25 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-N19_FORCEINLINE constexpr auto n19::TokenCategory::operator|=(
+N19_FORCEINLINE constexpr auto TokenCategory::operator|=(
   const TokenCategory &other ) -> void
 {
   value |= other.value;
 }
 
-N19_FORCEINLINE constexpr auto n19::TokenCategory::operator|=(
+N19_FORCEINLINE constexpr auto TokenCategory::operator|=(
   const Value other ) -> void
 {
   value |= other;
 }
 
+N19_FORCEINLINE auto TokenType::maybe_entity_begin() const -> bool {
+  return value == NamespaceOperator || value == Identifier;
+}
+
+N19_FORCEINLINE auto TokenCategory::isa(const Value val) const -> bool {
+  return this->value & val;
+}
+
+END_NAMESPACE(n19);
 #endif //FRONTEND_TOKEN_HPP

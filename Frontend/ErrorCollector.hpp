@@ -86,7 +86,7 @@ public:
     const ErrorLocation& err
   ) -> ErrorCollector&;
 
-  auto emit()        const -> Result<None>;
+  auto emit()        const -> Result<void>;
   auto max_err_chk() const -> void;
   auto has_errors()  const -> bool;
 

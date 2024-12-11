@@ -7,7 +7,7 @@
 */
 
 #include <Frontend/AstNodes.hpp>
-#include <Core/ConManip.hpp>
+#include <Core/ConIO.hpp>
 #include <print>
 BEGIN_NAMESPACE(n19);
 
@@ -21,21 +21,21 @@ auto AstNode::_print(
     std::print("_ ");
   }
 
-  std::print(                   //----------------
-    "{}{}{}{} ",                // The "title"
-    manip_string(Con::Bold),    // Set bold
-    manip_string(Con::Magenta), // Set fg: magenta
-    node_name,                  // The AST node's name.
-    manip_string(Con::Reset));  // Reset color
-  std::print(                   //----------------
-    "<{}{}{},{}{}{}> :: ",      // Line, position info.
-    manip_string(Con::Yellow),  // Line number: Yellow.
-    this->line_,                // Print line number.
-    manip_string(Con::Reset),   // Reset color for ','.
-    manip_string(Con::Yellow),  // File Position: Yellow.
-    this->pos_,                 // Print file position.
-    manip_string(Con::Reset)    // Reset color.
-  );                            //----------------
+  std::print(                    //----------------
+    "{}{}{}{} ",                 // The "title"
+    manip_string(Con::Bold),     // Set bold
+    manip_string(Con::MagentaFG), // Set fg: magenta
+    node_name,                   // The AST node's name.
+    manip_string(Con::Reset));   // Reset color
+  std::print(                    //----------------
+    "<{}{}{},{}{}{}> :: ",       // Line, position info.
+    manip_string(Con::YellowFG), // Line number: Yellow.
+    this->line_,                 // Print line number.
+    manip_string(Con::Reset),    // Reset color for ','.
+    manip_string(Con::YellowFG), // File Position: Yellow.
+    this->pos_,                  // Print file position.
+    manip_string(Con::Reset)     // Reset color.
+  );                             //----------------
 }
 
 auto AstBranch::print(
@@ -44,14 +44,14 @@ auto AstBranch::print(
 {
   _print(depth, "Branch");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   std::println(
     "{}has_else = {}{}",
-    manip_string(Con::White),
+    manip_string(Con::WhiteFG),
     else_ ? "true" : "false",
     manip_string(Con::Reset)
   );
@@ -66,14 +66,14 @@ auto AstConstBranch::print(
 {
   _print(depth, "ConstBranch");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   std::println(
     "{}has_otherwise = {}{}",
-    manip_string(Con::White),
+    manip_string(Con::WhiteFG),
     otherwise_ ? "true" : "false",
     manip_string(Con::Reset)
   );
@@ -89,7 +89,7 @@ auto AstIf::print(
 {
   _print(depth, "If");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -97,7 +97,7 @@ auto AstIf::print(
   std::println("");
   condition_->print(depth + 1, "If.Condition");
   for(const auto& child : body_)
-    child->print(depth + 1, std::nullopt);
+    child->print(depth + 1, Nothing);
 }
 
 auto AstElse::print(
@@ -106,14 +106,14 @@ auto AstElse::print(
 {
   _print(depth, "Else");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   std::println("");
   for(const auto& child : body_)
-    child->print(depth + 1, std::nullopt);
+    child->print(depth + 1, Nothing);
 }
 
 auto AstWhere::print(
@@ -122,7 +122,7 @@ auto AstWhere::print(
 {
   _print(depth, "Where");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -130,7 +130,7 @@ auto AstWhere::print(
   std::println("");
   condition_->print(depth + 1, "Where.Condition");
   for(const auto& child : body_)
-    child->print(depth + 1, std::nullopt);
+    child->print(depth + 1, Nothing);
 }
 
 auto AstOtherwise::print(
@@ -139,13 +139,13 @@ auto AstOtherwise::print(
 {
   _print(depth, "Otherwise");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   for(const auto& child : body_)
-    child->print(depth + 1, std::nullopt);
+    child->print(depth + 1, Nothing);
 }
 
 auto AstBreak::print(
@@ -154,7 +154,7 @@ auto AstBreak::print(
 {
   _print(depth, "BreakStmt");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -167,7 +167,7 @@ auto AstContinue::print(
 {
   _print(depth, "ContinueStmt");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -180,14 +180,14 @@ auto AstReturn::print(
 {
   _print(depth, "ReturnStmt");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   std::println(
     "{}has_value = {}{}",
-    manip_string(Con::White),
+    manip_string(Con::WhiteFG),
     value_ ? "true" : "false",
     manip_string(Con::Reset)
   );
@@ -203,7 +203,7 @@ auto AstCall::print(
 {
   _print(depth, "Call");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -221,7 +221,7 @@ auto AstDefer::print(
 {
   _print(depth, "Defer");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -236,7 +236,7 @@ auto AstDeferIf::print(
 {
   _print(depth, "DeferIf");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -252,7 +252,7 @@ auto AstVardecl::print(
 {
   _print(depth, "VarDecl");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -268,7 +268,7 @@ auto AstProcDecl::print(
 {
   _print(depth, "VarDecl");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -280,7 +280,7 @@ auto AstProcDecl::print(
     arg_decls_.at(i)->print(depth + 1, fmt("ProcDecl.Arg.{}", i + 1));
   }
   for(const auto& child : body_) {
-    child->print(depth + 1, std::nullopt);
+    child->print(depth + 1, Nothing);
   }
 }
 
@@ -290,21 +290,21 @@ auto AstCase::print(
 {
   _print(depth, "Case");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   std::print(
     "{}is_fallthrough = {}{}\n",         // Title
-    manip_string(Con::White),            // Clad in white.
+    manip_string(Con::WhiteFG),            // Clad in white.
     is_fallthrough ? "True" : "False",   // Fallthrough = C style case
     manip_string(Con::Reset)             // Reset color
   );
 
   value_->print(depth + 1, "Case.Value");
   for(const auto& child : children_) {
-    child->print(depth + 1, std::nullopt);
+    child->print(depth + 1, Nothing);
   }
 }
 
@@ -314,14 +314,14 @@ auto AstDefault::print(
 {
   _print(depth, "Default");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   std::println("");
   for(const auto& child : children_)
-    child->print(depth + 1, std::nullopt);
+    child->print(depth + 1, Nothing);
 }
 
 auto AstSwitch::print(
@@ -330,14 +330,14 @@ auto AstSwitch::print(
 {
   _print(depth, "Switch");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   std::println(
     "num_cases = {}{}{}",
-    manip_string(Con::Blue),
+    manip_string(Con::BlueFG),
     cases_.size(),
     manip_string(Con::Reset)
   );
@@ -355,14 +355,14 @@ auto AstScopeBlock::print(
 {
   _print(depth, "ScopeBlock");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   std::println("");
   for(const auto& child : children_)
-    child->print(depth + 1, std::nullopt);
+    child->print(depth + 1, Nothing);
 }
 
 auto AstFor::print(
@@ -371,12 +371,12 @@ auto AstFor::print(
 {
   _print(depth, "For");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
-  set_console(Con::White);
+  set_console(Con::WhiteFG);
   if(init_) std::print("Init ");
   if(cond_) std::print("Cond ");
   if(update_) std::print("Update ");
@@ -394,21 +394,21 @@ auto AstWhile::print(
 {
   _print(depth, "While");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   std::print(
     "{}is_dowhile = {}{}\n",
-    manip_string(Con::White),
+    manip_string(Con::WhiteFG),
     is_dowhile ? "True" : "False",
     manip_string(Con::Reset)
   );
 
   cond_->print(depth + 1, "While.Cond");
   for(const auto& child : body_)
-    child->print(depth + 1, std::nullopt);
+    child->print(depth + 1, Nothing);
 }
 
 auto AstSubscript::print(
@@ -417,7 +417,7 @@ auto AstSubscript::print(
 {
   _print(depth, "Subscript");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -433,12 +433,12 @@ auto AstBinExpr::print(
 {
   _print(depth, "BinExpr");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
   
-  set_console(Con::Blue);
+  set_console(Con::BlueFG);
   std::print("{}\n", op_type_.to_string());
   set_console(Con::Reset);
 
@@ -452,17 +452,17 @@ auto AstUnaryExpr::print(
 {
   _print(depth, "UnaryExpr");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   std::print(
     "{}{}{} {}is_postfix = {}\n",
-    manip_string(Con::Blue),
+    manip_string(Con::BlueFG),
     op_type_.to_string(),
     manip_string(Con::Reset),
-    manip_string(Con::White),
+    manip_string(Con::WhiteFG),
     is_postfix ? "True" : "False"
   );
 
@@ -476,12 +476,12 @@ auto AstScalarLiteral::print(
 {
   _print(depth, "ScalarLit");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
-  set_console(Con::Blue);
+  set_console(Con::BlueFG);
   std::print("{}\n", value_);
   set_console(Con::Reset);
 }
@@ -492,7 +492,7 @@ auto AstAggregateLiteral::print(
 {
   _print(depth, "AggregateLit");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\"\n", *alias);
     set_console(Con::Reset);
   } else {
@@ -500,7 +500,7 @@ auto AstAggregateLiteral::print(
   }
 
   for(const auto& child : children_)
-    child->print(depth + 1, std::nullopt);
+    child->print(depth + 1, Nothing);
 }
 
 auto AstEntityRef::print(
@@ -509,12 +509,12 @@ auto AstEntityRef::print(
 {
   _print(depth, "EntityRef");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
-  set_console(Con::Blue);
+  set_console(Con::BlueFG);
   std::println("ID = {}", (uint32_t)id_);
   set_console(Con::Reset);
 }
@@ -525,12 +525,12 @@ auto AstEntityRefThunk::print(
 {
   _print(depth, "EntityRefThunk");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
-  set_console(Con::Blue);
+  set_console(Con::BlueFG);
   for(const auto& str : name_) {
     std::print("{}", str);
   }
@@ -545,7 +545,7 @@ auto AstTypeRef::print(
 {
   _print(depth, "TypeRef");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -559,7 +559,7 @@ auto AstTypeRefThunk::print(
 {
   _print(depth, "TypeRefThunk");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
@@ -573,14 +573,14 @@ auto AstNamespace::print(
 {
   _print(depth, "NamespaceBlock");
   if(alias.has_value()) {
-    set_console(Con::Green);
+    set_console(Con::GreenFG);
     std::print("\"{}\" ", *alias);
     set_console(Con::Reset);
   }
 
   std::println("");
   for(const auto& child : body_)
-    child->print(depth + 1, std::nullopt);
+    child->print(depth + 1, Nothing);
 }
 
 END_NAMESPACE(n19);

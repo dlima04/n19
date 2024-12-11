@@ -10,7 +10,7 @@
 #define RINGQUEUE_HPP
 #include <Core/Panic.hpp>
 #include <Core/RingBase.hpp>
-#include <Core/Result.hpp>
+#include <Core/Maybe.hpp>
 #include <Core/Forward.hpp>
 BEGIN_NAMESPACE(n19);
 
@@ -88,7 +88,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::try_dequeue() -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
   if(lhead == ltail) {   // the buffer is empty.
-    return std::nullopt; // we can't read anything.
+    return Nothing; // we can't read anything.
   }
   const ValueType val = buff_[ ltail ];
   tail_.fetch_add(1, std::memory_order::release);
@@ -118,7 +118,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::try_peek(const size_t amnt) -> Maybe<V
     ? lhead - ltail
     : (size_ - ltail) + lhead;
   if(amnt >= max_distance) {
-    return std::nullopt;
+    return Nothing;
   }
 
   return buff_[ (ltail + amnt) & size_mask_ ];
@@ -189,7 +189,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::try_current() const -> Maybe<ValueType
   const size_t ltail = tail_.load(std::memory_order::acquire);
 
   if((lhead & size_mask_) == (ltail & size_mask_)) {
-    return std::nullopt;
+    return Nothing;
   }
 
   return buff_[ ltail & size_mask_ ];

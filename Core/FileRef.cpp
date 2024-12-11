@@ -47,7 +47,7 @@ auto n19::FileRef::create_or_open(const std::wstring& fname) -> Result<FileRef> 
     return ref;
   }
 
-  file.open(fname, std::ios::binary | std::ios::in | std::ios::out);
+  file.open(fs::path(fname), std::ios::binary | std::ios::in | std::ios::out);
   if(!file.is_open()) {
     return make_error(ErrC::FileIO, "Failed to create file.");
   }
@@ -85,8 +85,7 @@ auto n19::FileRef::create(const std::string& fname) -> Result<FileRef> {
   if(fs::exists(fname)) {
     return make_error(ErrC::InvalidArg, "The file already exists.");
   }
-
-  file.open(fname, std::ios::binary | std::ios::in | std::ios::out);
+  file.open(fs::path(fname), std::ios::binary | std::ios::in | std::ios::out);
   if(!file.is_open()) {
     return make_error(ErrC::FileIO, "Failed to create/open file.");
   }
@@ -102,8 +101,7 @@ auto n19::FileRef::create(const std::wstring& fname) -> Result<FileRef> {
   if(fs::exists(fname)) {
     return make_error(ErrC::InvalidArg, "File already exists.");
   }
-
-  file.open(fname, std::ios::binary | std::ios::in | std::ios::out);
+  file.open(fs::path(fname), std::ios::binary | std::ios::in | std::ios::out);
   if(!file.is_open()) {
     return make_error(ErrC::FileIO, "Could not create the file.");
   }
@@ -120,7 +118,7 @@ auto n19::FileRef::size() const -> Result<uintmax_t> try {
 }
 
 auto n19::FileRef::write(
-  const Bytes& bytes, const bool app ) const -> Result<None>
+  const Bytes& bytes, const bool app ) const -> Result<void>
 {
   ASSERT(!bytes.empty());
   auto flags = std::ios::binary;
@@ -139,10 +137,10 @@ auto n19::FileRef::write(
   );
 
   stream.close();
-  return make_result<None>();
+  return make_result<void>();
 }
 
-auto n19::FileRef::read_into(const WritableBytes& bytes) const -> Result<None> {
+auto n19::FileRef::read_into(const WritableBytes& bytes) const -> Result<void> {
   ASSERT(!bytes.empty());
   std::ifstream stream(path_, std::ios::binary);
   DEFER_IF(stream.is_open(), stream.close());
@@ -158,5 +156,5 @@ auto n19::FileRef::read_into(const WritableBytes& bytes) const -> Result<None> {
     static_cast<std::streamsize>(bytes.size_bytes())
   );
 
-  return make_result<None>();
+  return make_result<void>();
 }

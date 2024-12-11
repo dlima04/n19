@@ -12,7 +12,7 @@
 BEGIN_NAMESPACE(n19::sys);
 #if defined(N19_POSIX)
 
-auto IODevice::write(const Bytes &bytes) const -> Result<None> {
+auto IODevice::write(const Bytes &bytes) const -> Result<void> {
   ASSERT(!bytes.empty());
   pollfd fds[1] = { 0 };
   fds[0].fd     = value_;
@@ -25,10 +25,10 @@ auto IODevice::write(const Bytes &bytes) const -> Result<None> {
     return make_error(ErrC::Native, last_error());
   }
 
-  return make_result<None>();
+  return make_result<void>();
 }
 
-auto IODevice::read_into(WritableBytes& bytes) const -> Result<None>{
+auto IODevice::read_into(WritableBytes& bytes) const -> Result<void>{
   ASSERT(!bytes.empty());
   pollfd fds[1] = { 0 };
   fds[0].fd     = value_;
@@ -41,7 +41,7 @@ auto IODevice::read_into(WritableBytes& bytes) const -> Result<None>{
     return make_error(ErrC::Native, last_error());
   }
 
-  return make_result<None>();
+  return make_result<void>();
 }
 
 auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
@@ -59,12 +59,12 @@ auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
   return make_result<decltype(arr)>(arr);
 }
 
-auto IODevice::flush_handle() const -> Result<None> {
+auto IODevice::flush_handle() const -> Result<void> {
   if(::fsync(value_) == -1) {
     return make_error(ErrC::Native, last_error());
   }
 
-  return make_result<None>();
+  return make_result<void>();
 }
 
 auto IODevice::from_stderr() -> Result<IODevice> {
@@ -91,7 +91,7 @@ auto IODevice::from_stdin() -> Result<IODevice> {
 #else // IF WINDOWS
 
 auto IODevice::write(
-  const Bytes &bytes ) const -> Result<None>
+  const Bytes &bytes ) const -> Result<void>
 {
   ASSERT(!bytes.empty());
   if(!WriteFile(
@@ -105,11 +105,11 @@ auto IODevice::write(
       ErrC::Native, "{}", last_error());
   }
 
-  return make_result<None>();
+  return make_result<void>();
 }
 
 auto IODevice::read_into(
-  WritableBytes& bytes ) const -> Result<None>
+  WritableBytes& bytes ) const -> Result<void>
 {
   ASSERT(!bytes.empty());
   if(!ReadFile(
@@ -123,7 +123,7 @@ auto IODevice::read_into(
       ErrC::Native, "{}", last_error());
   }
 
-  return make_result<None>();
+  return make_result<void>();
 }
 
 auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
@@ -142,12 +142,12 @@ auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
   return arr;
 }
 
-auto IODevice::flush_handle() const -> Result<None> {
+auto IODevice::flush_handle() const -> Result<void> {
   if(!::FlushFileBuffers(value_)) {
     return make_error(ErrC::Native, last_error());
   }
 
-  return make_result<None>();
+  return make_result<void>();
 }
 
 auto IODevice::from_stderr() -> Result<IODevice> {
