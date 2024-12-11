@@ -1004,15 +1004,15 @@ auto Lexer::get_keyword(const std::u8string_view& str) -> Maybe<Keyword> {
 auto Lexer::is_reserved_byte(const char8_t c) -> bool {
   constexpr static auto bytes = []() consteval -> auto {
     constexpr char8_t chars[] = {
-      u8';', u8'(', u8')', u8'{', u8'}', u8',', u8'-', u8'+', u8'*',
-      u8'/', u8'%', u8'=', u8'<', u8'>', u8'&', u8'|', u8'!', u8'~',
-      u8'^', u8'\'', u8'"', u8'`', u8'[', u8']', u8'?', u8':', u8'#',
-      u8'@', u8'.', u8'\\', u8'$', u8'\0'
+      u8';', u8'(',  u8')',  u8'{', u8'}', u8',', u8'-', u8'+', u8'*',
+      u8'/', u8'%',  u8'=',  u8'<', u8'>', u8'&', u8'|', u8'!', u8'~',
+      u8'^', u8'\'', u8'"',  u8'`', u8'[', u8']', u8'?', u8':', u8'#',
+      u8'@', u8'.',  u8'\\', u8'$', u8'\0'
     };
 
     std::array<bool, 256> table = { false };
     for(const char8_t ch : chars) { table[ch] = true; }
-
+    std::expected
     return table;
   }();
 

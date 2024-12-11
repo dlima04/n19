@@ -37,23 +37,38 @@ public:
   auto operator=(Maybe&& other)      -> Maybe& = default;
   auto operator=(const Maybe& other) -> Maybe& = default;
 
-  // I need to define these const/non const overloads
-  // explicitly. Trying to use "deducing this" results in
-  // ambiguous calls apparently... fuck this language
   [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
-    ASSERT(has_value_ == true, "Bad Maybe access!");
+    #ifndef __N19_CORE_THROW_EXCEPTIONS
+      ASSERT( has_value_ == true, "Bad Maybe access!" );
+    #endif//__N19_CORE_THROW_EXCEPTIONS
     return std::get<T>( value_ );
   }
 
   [[nodiscard]] N19_FORCEINLINE auto value() -> T& {
-    ASSERT(has_value_ == true, "Bad maybe access!");
+    #ifndef __N19_CORE_THROW_EXCEPTIONS
+      ASSERT(has_value_ == true, "Bad Maybe access!");
+    #endif//__N19_CORE_THROW_EXCEPTIONS
     return std::get<T>( value_ );
   }
 
+  N19_FORCEINLINE auto operator->(this auto&& self) -> decltype(auto) {
+    #ifndef __N19_CORE_THROW_EXCEPTIONS
+      ASSERT( has_value_ == true, "Bad Maybe access!" );
+    #endif//__N19_CORE_THROW_EXCEPTIONS
+    return &self.value();
+  }
+
+  N19_FORCEINLINE auto operator*(this auto&& self) -> decltype(auto) {
+    #ifndef __N19_CORE_THROW_EXCEPTIONS
+      ASSERT( has_value_ == true, "Bad Maybe access!" );
+    #endif//__N19_CORE_THROW_EXCEPTIONS
+    return self.value();
+  }
+
   [[nodiscard]] N19_FORCEINLINE auto value_or(T &&val) const -> T {
-    if(has_value_) {
-      return std::get<T>( value_ );
-    } return val; // else, return provided value type.
+    if(has_value_) {                 // return the value if it exists.
+      return std::get<T>( value_ );  // else ::
+    } return val;                    // return provided value type.
   }
 
   [[nodiscard]] N19_FORCEINLINE auto release() -> T {
@@ -72,16 +87,6 @@ public:
   template<class O>
   N19_FORCEINLINE auto operator==(const O& other) -> bool {
     return has_value_ && other == value();
-  }
-
-  N19_FORCEINLINE auto operator->(this auto&& self) -> decltype(auto) {
-    ASSERT( self.has_value_ == true, "Bad Maybe access!");
-    return &self.value();
-  }
-
-  N19_FORCEINLINE auto operator*(this auto&& self) -> decltype(auto) {
-    ASSERT(self.has_value_ == true, "Bad Maybe access!");
-    return self.value();
   }
 
   template<class ... Args>
@@ -103,9 +108,8 @@ public:
   }
 
   N19_FORCEINLINE auto clear() -> void {
-    if(!has_value_) return;
-    value_ = Nothing;
-    has_value_ = false;
+    value_      = Nothing;
+    has_value_  = false;
   }
 
   N19_FORCEINLINE Maybe(const T& val)     : has_value_(true), value_(val) {}

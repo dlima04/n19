@@ -62,44 +62,58 @@ public:
   N19_FORCEINLINE __Result(__Result&& other)      = default;
   N19_FORCEINLINE __Result(const __Result& other) = default;
 
-  N19_FORCEINLINE auto has_value() const -> bool {
-    return std::holds_alternative<T>( value_ );
-  }
-
-  N19_FORCEINLINE explicit operator bool() const {
-    return std::holds_alternative<T>( value_ );
-  }
-
   [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
-    ASSERT( has_value() == true && "Result contains an error!" );
+    #ifndef __N19_CORE_THROW_EXCEPTIONS
+      ASSERT( has_value() == true, "Result contains an error!" );
+    #endif//__N19_CORE_THROW_EXCEPTIONS
     return std::get<T>( value_ );
   }
 
   [[nodiscard]] N19_FORCEINLINE auto value() -> T& {
-    ASSERT( has_value() == true && "Result contains an error!" );
+    #ifndef __N19_CORE_THROW_EXCEPTIONS
+      ASSERT( has_value() == true, "Result contains an error!" );
+    #endif//__N19_CORE_THROW_EXCEPTIONS
     return std::get<T>( value_ );
   }
 
   [[nodiscard]] N19_FORCEINLINE auto error() const -> const E& {
-    ASSERT( has_value() == false && "Result contains a value!" );
+    #ifndef __N19_CORE_THROW_EXCEPTIONS
+      ASSERT( has_value() == false, "Result contains a value!" );
+    #endif//__N19_CORE_THROW_EXCEPTIONS
     return std::get<E>( value_ );
   }
 
   [[nodiscard]] N19_FORCEINLINE auto error() -> E& {
-    ASSERT( has_value() == false && "Result contains a value!" );
+    #ifndef __N19_CORE_THROW_EXCEPTIONS
+      ASSERT( has_value() == false, "Result contains a value!" );
+    #endif//__N19_CORE_THROW_EXCEPTIONS
     return std::get<E>( value_ );
   }
 
+  N19_FORCEINLINE auto operator->(this auto&& self) -> decltype(auto) {
+    #ifndef __N19_CORE_THROW_EXCEPTIONS
+      ASSERT( has_value() == true, "Result contains an error!" );
+    #endif//__N19_CORE_THROW_EXCEPTIONS
+    return &( forward<decltype(self)>(self).value() );
+  }
+
+  N19_FORCEINLINE auto operator*(this auto&& self) -> decltype(auto) {
+    #ifndef __N19_CORE_THROW_EXCEPTIONS
+      ASSERT( has_value() == true, "Result contains an error!" );
+    #endif//__N19_CORE_THROW_EXCEPTIONS
+    return forward<decltype(self)>(self).value();
+  }
+
   N19_FORCEINLINE auto value_or(this auto&& self, T&& val) -> T {
-    if(self.has_value()) {
-      return self.value();  // return the error if it exists.
-    } return val;           // else, return provided value type.
+    if(self.has_value()) {  // return the error if it exists.
+      return self.value();  // else ::
+    } return val;           // return provided value type.
   }
 
   N19_FORCEINLINE auto error_or(this auto&& self, E&& val) -> E {
-    if(!self.has_value()) {
-      return self.error();  // return the error if it exists.
-    } return val;           // else, return provided error type.
+    if(!self.has_value()) { // return the error if it exists.
+      return self.error();  // else ::
+    } return val;           // return provided error type.
   }
 
   template<class C> /* C = Callable type */
@@ -126,14 +140,12 @@ public:
     return has_value() && other == value();
   }
 
-  N19_FORCEINLINE auto operator->(this auto&& self) -> decltype(auto) {
-    ASSERT( self.has_value() == true && "Result contains an error!" );
-    return &( forward<decltype(self)>(self).value() );
+  [[nodiscard]] N19_FORCEINLINE auto has_value() const -> bool {
+    return std::holds_alternative<T>( value_ );
   }
 
-  N19_FORCEINLINE auto operator*(this auto&& self) -> decltype(auto) {
-    ASSERT( self.has_value() == true && "Result contains an error!" );
-    return forward<decltype(self)>(self).value();
+  [[nodiscard]] N19_FORCEINLINE explicit operator bool() const {
+    return std::holds_alternative<T>( value_ );
   }
 
   N19_FORCEINLINE __Result(T&& value)       : value_(value) {}
@@ -166,7 +178,7 @@ template<typename T, typename ...Args>
 auto make_result(Args&&... args) -> Result<T> {
   if constexpr(std::is_void_v<T>)
     return Result<__Nothing>{};
-   else
+  else
     return T{ std::forward<Args>(args)... };
 }
 
