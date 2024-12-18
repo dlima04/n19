@@ -29,6 +29,7 @@ BEGIN_NAMESPACE(n19);
   X(NotFound)   \
   X(BadToken)   \
   X(Native)     \
+  X(Conversion) \
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -53,14 +54,13 @@ struct __ErrorType {      // The default error type used by n19.
 };
 
 template<class T, class E = __ErrorType>
-class [[nodiscard]] __Result {
+class /* [[nodiscard]] */ __Result {
+N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(__Result);
+N19_MAKE_DEFAULT_COPY_CONSTRUCTIBLE(__Result);
 public:
   using ValueType   = T;
   using PointerType = T*;
   using __Variant   = std::variant<T, E> ;
-
-  N19_FORCEINLINE __Result(__Result&& other)      = default;
-  N19_FORCEINLINE __Result(const __Result& other) = default;
 
   [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
     #ifndef __N19_CORE_THROW_EXCEPTIONS
@@ -92,14 +92,14 @@ public:
 
   N19_FORCEINLINE auto operator->(this auto&& self) -> decltype(auto) {
     #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( has_value() == true, "Result contains an error!" );
+      ASSERT( self.has_value() == true, "Result contains an error!" );
     #endif//__N19_CORE_THROW_EXCEPTIONS
     return &( forward<decltype(self)>(self).value() );
   }
 
   N19_FORCEINLINE auto operator*(this auto&& self) -> decltype(auto) {
     #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( has_value() == true, "Result contains an error!" );
+      ASSERT( self.has_value() == true, "Result contains an error!" );
     #endif//__N19_CORE_THROW_EXCEPTIONS
     return forward<decltype(self)>(self).value();
   }

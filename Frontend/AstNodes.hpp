@@ -48,6 +48,7 @@
   X(Subscript)        \
 
 BEGIN_NAMESPACE(n19);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class AstNode {
 public:
@@ -57,11 +58,19 @@ public:
   };
   #undef X
 
+  // Type aliases //
+  //////////////////////////////////////////
   template<typename T = AstNode>
   using Ptr = std::unique_ptr<T>;
 
   template<typename T = AstNode>
   using Children = std::vector<Ptr<T>>;
+  //////////////////////////////////////////
+
+  auto _print(
+    uint32_t depth,
+    const std::string& node_name
+  ) const -> void;
 
   virtual auto print(
     uint32_t depth,
@@ -76,18 +85,16 @@ public:
     const std::string& file = ""
   ) -> Ptr<T>;
 
+  // Public fields //
+  //////////////////////////////////////////
   AstNode* parent_ = nullptr;
   size_t pos_      = 0;
   uint32_t line_   = 1;
   std::string file_;
   Type type_;
+  //////////////////////////////////////////
 
   virtual ~AstNode() = default;
-protected:
-  auto _print(
-    uint32_t depth,
-    const std::string& node_name
-  ) const -> void;
 };
 
 class AstBinExpr final : public AstNode {

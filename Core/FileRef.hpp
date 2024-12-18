@@ -21,7 +21,6 @@ namespace fs = std::filesystem;
 BEGIN_NAMESPACE(n19);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 // n19::FileRef is very similar to n19::IODevice, except
 // that it specifically deals with files, and uses higher level
 // STL features to accomplish its tasks rather than native

@@ -50,28 +50,31 @@ public:
   auto expect(TokenCategory cat, bool = true) -> Result<void>;
   auto expect(TokenType type, bool = true)    -> Result<void>;
 
-  static auto create(const FileRef& ref)  -> Result<std::shared_ptr<Lexer>>;
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Begin static methods.
+
+  static auto create(const FileRef& ref)                 -> Result<std::shared_ptr<Lexer>>;
   static auto get_keyword(const std::u8string_view& str) -> Maybe<struct Keyword>;
-  static auto is_reserved_byte(char8_t c) -> bool;
+  static auto is_reserved_byte(char8_t c)                -> bool;
 
   Lexer() = default;
   ~Lexer() = default;
 private:
-  // Internal character manipulation
-  // methods for consuming/iterating over
-  // raw bytes.
-  auto _current_char() const -> char8_t;
-  auto _consume_char(uint32_t) -> void;
-  auto _advance_line() -> void;
-  auto _skip_comment() -> void;
-  auto _advance_consume_line() -> void;
-  auto _skip_chars_until(std::function<bool(char8_t)> cb) -> bool;
-  auto _skip_utf8_sequence() -> bool;
-  auto _peek_char(uint32_t amnt = 1) const -> char8_t;
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Begin internal, character manipulation.
 
-  // The token generators.
-  // Each one of these is called by _consume_impl
-  // for tokens longer than a single character
+  auto _current_char() const                               -> char8_t;
+  auto _consume_char(uint32_t)                             -> void;
+  auto _advance_line()                                     -> void;
+  auto _skip_comment()                                     -> void;
+  auto _advance_consume_line()                             -> void;
+  auto _skip_chars_until(std::function<bool(char8_t)> cb)  -> bool;
+  auto _skip_utf8_sequence()                               -> bool;
+  auto _peek_char(uint32_t amnt = 1) const                 -> char8_t;
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Begin token generation methods.
+
   auto _produce_impl()    -> Token;
   auto _token_hyphen()    -> Token;
   auto _token_plus()      -> Token;
@@ -105,69 +108,70 @@ private:
   auto _token_hex_lit()   -> Token;
   auto _token_num_lit()   -> Token;
   auto _token_oct_lit()   -> Token;
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Begin fields.
 public:
-  std::vector<char8_t> src_;  // Source file buffer.
-  RingQueue<Token, 64> toks_; // Token ringbuffer.
-  sys::String file_name_;     // For error handling.
-  uint32_t index_  = 0;       // Current source index.
-  uint32_t line_   = 1;       // current line number.
+  std::vector<char8_t> src_;   // Source file buffer.
+  RingQueue<Token, 64> toks_;  // Token ringbuffer.
+  sys::String file_name_;      // For error handling.
+  uint32_t index_  = 0;        // Current source index.
+  uint32_t line_   = 1;        // current line number.
 };
 
-struct Keyword {
-  TokenType type;
-  TokenCategory cat;
+struct Keyword {               // Only used for Lexer::get_keyword().
+  TokenType type;              // The TokenType of the keyword.
+  TokenCategory cat;           // The category of the keyword.
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // very short functions, inlined here for perf.
 
-N19_FORCEINLINE auto Lexer::peek(const uint32_t amnt) -> Token {
+inline auto Lexer::peek(const uint32_t amnt) -> Token {
   if(const auto curr = current(); curr == TokenType::EndOfFile) {
     return curr;
   }
   return toks_.peek(amnt);
 }
 
-N19_FORCEINLINE auto Lexer::_skip_comment() -> void {
+inline auto Lexer::_skip_comment() -> void {
   _skip_chars_until([](const char8_t ch) {
     return ch == '\n';
   });
 }
 
-N19_FORCEINLINE auto Lexer::_current_char() const -> char8_t {
+inline auto Lexer::_current_char() const -> char8_t {
   return index_ >= src_.size()
-    ? u8'\0'
-    : src_[index_];
+    ? u8'\0' : src_[index_];
 }
 
-N19_FORCEINLINE auto Lexer::_peek_char(const uint32_t amnt) const -> char8_t {
+inline auto Lexer::_peek_char(const uint32_t amnt) const -> char8_t {
   return (index_ + amnt) >= src_.size()
-    ? u8'\0'
-    : src_[index_ + amnt];
+    ? u8'\0' : src_[index_ + amnt];
 }
 
-N19_FORCEINLINE auto Lexer::_consume_char(const uint32_t amnt) -> void {
+inline auto Lexer::_consume_char(const uint32_t amnt) -> void {
   if(index_ < src_.size()) index_ += amnt;
 }
 
-N19_FORCEINLINE auto Lexer::_advance_line() -> void {
+inline auto Lexer::_advance_line() -> void {
   if(index_ < src_.size()) ++line_;
 }
 
-N19_FORCEINLINE auto Lexer::_advance_consume_line() -> void {
+inline auto Lexer::_advance_consume_line() -> void {
   if(index_ < src_.size()) ++line_;
   _consume_char(1);
 }
 
-N19_FORCEINLINE auto Lexer::get_bytes() const -> Bytes {
+inline auto Lexer::get_bytes() const -> Bytes {
   return as_bytes(src_);
 }
 
-N19_FORCEINLINE auto Lexer::current() const -> Token {
+inline auto Lexer::current() const -> Token {
   return toks_.current();
 }
 
-N19_FORCEINLINE auto Lexer::produce() -> void {
+inline auto Lexer::produce() -> void {
   toks_.enqueue(_produce_impl());
 }
 

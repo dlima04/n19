@@ -37,33 +37,23 @@ public:
   using ReferenceType  = T&;
   using PointerType    = T*;
 
-  [[nodiscard]] N19_FORCEINLINE auto value() const& -> ReferenceType {
-    ASSERT(is_active_ == true && "Bad bytecopy access!");
+  [[nodiscard]] N19_FORCEINLINE auto value() const& -> const T& {
+    ASSERT(is_active_ == true, "Bad bytecopy access!");
+    return *std::launder<const T>( reinterpret_cast<const T*>(&value_) );
+  }
+
+  [[nodiscard]] N19_FORCEINLINE auto value() & -> T& {
+    ASSERT(is_active_ == true, "Bad bytecopy access!");
     return *std::launder<T>( reinterpret_cast<T*>(&value_) );
   }
 
-  [[nodiscard]] N19_FORCEINLINE auto value() & -> ReferenceType {
-    ASSERT(is_active_ == true && "Bad bytecopy access!");
-    return *std::launder<T>( reinterpret_cast<T*>(&value_) );
-  }
-
-  [[nodiscard]] N19_FORCEINLINE auto value() && -> ValueType {
-    ASSERT(is_active_ == true && "Bad bytecopy access!");
+  [[nodiscard]] N19_FORCEINLINE auto value() && -> T {
+    ASSERT(is_active_ == true, "Bad bytecopy access!");
     return release(); // For an Rvalue reference, release ownership.
   }
 
   [[nodiscard]] N19_FORCEINLINE auto bytes() const -> Bytes {
     return Bytes( reinterpret_cast<const Byte*>(&value_), sizeof(value_) );
-  }
-
-  template<class O>
-  N19_FORCEINLINE auto operator==(const ByteCopy<O>& other) -> bool {
-    return is_active_ == other.is_active_ && (!is_active_ || value() == other.value());
-  }
-
-  template<class O>
-  N19_FORCEINLINE auto operator==(const O& other) -> bool {
-    return is_active_ && value() == other;
   }
 
   N19_FORCEINLINE auto operator->(this auto &&self) -> decltype(auto) {
@@ -76,38 +66,37 @@ public:
     return forward<decltype(self)>(self).value();
   }
 
+  template<class O>
+  N19_FORCEINLINE auto operator==(const ByteCopy<O>& other) -> bool {
+    return is_active_ == other.is_active_ && (!is_active_ || value() == other.value());
+  }
+
+  template<class O>
+  N19_FORCEINLINE auto operator==(const O& other) -> bool {
+    return is_active_ && value() == other;
+  }
+
   N19_FORCEINLINE auto operator=(ByteCopy&& other) -> ByteCopy& {
-    if(is_active_) {
-      clear();
-    } if(other.is_active_) {
+    clear();                        // Clear the existing value.
+    is_active_ = other.is_active_;  // Change active state.
+    if(other.is_active_)            //////////////////////////////
       std::construct_at<T>(reinterpret_cast<T*>(&value_), other.release());
-      is_active_ = true;
-    }
     return *this;
   }
 
   N19_FORCEINLINE auto operator=(const ByteCopy& other) -> ByteCopy& {
-    if(is_active_) {
-      clear();
-    } if(other.is_active_) {
+    clear();                        // Clear the existing value.
+    is_active_ = other.is_active_;  // Change active state
+    if(other.is_active_)            //////////////////////////////
       std::construct_at<T>(reinterpret_cast<T*>(&value_), other.value());
-      is_active_ = true;
-    }
     return *this;
   }
 
-  N19_FORCEINLINE auto clear() -> void {
-    if(!is_active_) return;
-    value().~T();
-    is_active_ = false;
-  }
-
-  N19_FORCEINLINE auto release() -> T {
-    ASSERT(is_active_ == true);
-    T released = std::move(value());
-    value().~T();
-    is_active_ = false;
-    return released;
+  template<class ... Args>
+  N19_FORCEINLINE auto emplace(Args&&... args) -> void {
+    clear();           // Clear the existing value.
+    is_active_ = true; // maintain the value state.
+    std::construct_at<T>( reinterpret_cast<T*>(&value_), forward<Args>(args)... );
   }
 
   template<class ... Args>
@@ -128,14 +117,26 @@ public:
     is_active_ = true;
   }
 
+  N19_FORCEINLINE auto clear() -> void {
+    if(is_active_) value().~T();
+    is_active_ = false;
+  }
+
+  N19_FORCEINLINE auto release() -> T {
+    T released = std::move(value());
+    value().~T();
+    is_active_ = false;
+    return released;
+  }
+
   auto alive() const -> bool     { return is_active_; }
   explicit operator bool() const { return is_active_; }
 
   N19_FORCEINLINE ~ByteCopy() { clear(); }
   N19_FORCEINLINE ByteCopy()  { /*....*/ }
 private:
-  bool is_active_ = false;
-  alignas(T) uint8_t value_[ sizeof(T) ];
+  bool is_active_{false};
+  alignas(T) uint8_t value_[ sizeof(T) ]{};
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,7 +161,7 @@ N19_FORCEINLINE auto as_bytecopy(const T& val) -> ByteCopy<T> {
 
 template<typename T, typename ...Args>
 N19_FORCEINLINE auto construct_bytecopy(Args&&... args) -> ByteCopy<T> {
-  return ByteCopy<T>{ forward<Args>(args)... };
+  return ByteCopy<T>{ T{forward<Args>(args)...} };
 }
 
 END_NAMESPACE(n19);

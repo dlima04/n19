@@ -12,7 +12,7 @@
 BEGIN_NAMESPACE(n19::sys);
 #if defined(N19_POSIX)
 
-auto IODevice::write(const Bytes &bytes) const -> Result<void> {
+auto IODevice::write(const Bytes& bytes) const -> Result<void> {
   ASSERT(!bytes.empty());
   pollfd fds[1] = { 0 };
   fds[0].fd     = value_;
@@ -20,15 +20,14 @@ auto IODevice::write(const Bytes &bytes) const -> Result<void> {
 
   if(::poll(fds, 1, -1) == -1 || !(fds[0].revents & POLLOUT)) {
     return make_error(ErrC::Native, last_error());
-  }
-  if(::write(value_, bytes.data(), bytes.size_bytes()) == -1) {
+  } if(::write(value_, bytes.data(), bytes.size_bytes()) == -1) {
     return make_error(ErrC::Native, last_error());
   }
 
   return make_result<void>();
 }
 
-auto IODevice::read_into(WritableBytes& bytes) const -> Result<void>{
+auto IODevice::read_into(WritableBytes& bytes) const -> Result<void> {
   ASSERT(!bytes.empty());
   pollfd fds[1] = { 0 };
   fds[0].fd     = value_;
@@ -36,8 +35,7 @@ auto IODevice::read_into(WritableBytes& bytes) const -> Result<void>{
 
   if(::poll(fds, 1, -1) == -1 || !(fds[0].revents & POLLIN)) {
     return make_error(ErrC::Native, last_error());
-  }
-  if(::read(value_, bytes.data(), bytes.size_bytes()) == -1) {
+  } if(::read(value_, bytes.data(), bytes.size_bytes()) == -1) {
     return make_error(ErrC::Native, last_error());
   }
 
@@ -59,33 +57,25 @@ auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
   return make_result<decltype(arr)>(arr);
 }
 
-auto IODevice::flush_handle() const -> Result<void> {
-  if(::fsync(value_) == -1) {
-    return make_error(ErrC::Native, last_error());
-  }
-
-  return make_result<void>();
-}
-
-auto IODevice::from_stderr() -> Result<IODevice> {
+auto IODevice::from_stderr() -> IODevice {
   IODevice device;
   device.value_ = STDERR_FILENO;
   device.perms_ = Write;
-  return make_result<IODevice>(device);
+  return device;
 }
 
-auto IODevice::from_stdout() -> Result<IODevice> {
+auto IODevice::from_stdout() -> IODevice {
   IODevice device;
   device.value_ = STDOUT_FILENO;
   device.perms_ = Write;
-  return make_result<IODevice>(device);
+  return device;
 }
 
-auto IODevice::from_stdin() -> Result<IODevice> {
+auto IODevice::from_stdin() -> IODevice {
   IODevice device;
   device.value_ = STDIN_FILENO;
   device.perms_ = Read;
-  return make_result<IODevice>(device);
+  return device;
 }
 
 #else // IF WINDOWS
@@ -142,33 +132,25 @@ auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
   return arr;
 }
 
-auto IODevice::flush_handle() const -> Result<void> {
-  if(!::FlushFileBuffers(value_)) {
-    return make_error(ErrC::Native, last_error());
-  }
-
-  return make_result<void>();
-}
-
-auto IODevice::from_stderr() -> Result<IODevice> {
+auto IODevice::from_stderr() -> IODevice {
   IODevice device;
   device.value_ = ::GetStdHandle(STD_ERROR_HANDLE);
   device.perms_ = Write;
-  return make_result<IODevice>(device);
+  return device;
 }
 
-auto IODevice::from_stdout() -> Result<IODevice> {
+auto IODevice::from_stdout() -> IODevice {
   IODevice device;
   device.value_ = ::GetStdHandle(STD_OUTPUT_HANDLE);
   device.perms_ = Write;
-  return make_result<IODevice>(device);
+  return device;
 }
 
-auto IODevice::from_stdin() -> Result<IODevice> {
+auto IODevice::from_stdin() -> IODevice {
   IODevice device;
   device.value_ = ::GetStdHandle(STD_INPUT_HANDLE);
   device.perms_ = Read;
-  return make_result<IODevice>(device);
+  return device;
 }
 
 #endif

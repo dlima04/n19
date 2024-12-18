@@ -13,16 +13,21 @@
 #include <Core/Bytes.hpp>
 #include <Core/ConIO.hpp>
 #include <iostream>
+#include <Core/ArgParse.hpp>
 #include <print>
 
+using namespace n19;
+
 struct foo {
-  int x = 0;
-  int y = 123;
-  double b = 3.11;
+  int x;
+  int y;
 };
 
-using namespace n19;
 int main(int argc, char** argv){
+
+  std::string str = "Hello, world!\n";
+  auto stream = BufferedOStream<25>::from_stdout();
+
   //std::wcout << fmt(L"this is a test {}", L"motherfucker!!") << std::endl;
   //std::cout << fmt("hello bitch!!!! {} {}", "yes", 3.1e1) << std::endl;
 
@@ -43,6 +48,7 @@ int main(int argc, char** argv){
     std::cerr << "EXCEPTION: " << e.what() << std::endl;
   }
 
+  stream.flush();
   return 0;
 }
 

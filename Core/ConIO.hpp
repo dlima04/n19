@@ -6,34 +6,21 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#ifndef CONIO_HPP
-#define CONIO_HPP
-#include <Sys/IODevice.hpp>
-#include <Core/ClassTraits.hpp>
+#ifndef CORE_CONIO_HPP
+#define CORE_CONIO_HPP
+#include <Core/Stream.hpp>
 #include <Core/Fmt.hpp>
-#include <Core/Platform.hpp>
-#include <Core/Concepts.hpp>
-#include <string>
-#include <cstdint>
-#include <print>
+BEGIN_NAMESPACE(n19);
 
 #if defined(N19_WIN32)
-#  define WIN32_LEAN_AND_MEAN
-#  include <windows.h>
-#else //POSIX
-#  include <locale.h>
+auto win32_init_console()            -> void;
+auto win32_are_vsequences_enabled()  -> bool;
+auto win32_enable_vsequences()       -> void;
 #endif
 
-#if defined(N19_LARGE_OSTREAM_BUFFERS)
-#  define N19_COSTREAM_BUFFER_SIZE 8192
-#  define N19_CISTREAM_BUFFER_SIZE 8192
-#else
-#  define N19_COSTREAM_BUFFER_SIZE 4096
-#  define N19_CISTREAM_BUFFER_SIZE 4096
-#endif
-
-BEGIN_NAMESPACE(n19);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Each member of the Con enumeration is a value that
+// corresponds to an ASCII escape code, to be used in colour formatting.
 
 enum class Con : uint16_t {
   Reset      = 0,
@@ -50,33 +37,36 @@ enum class Con : uint16_t {
   RedFG      = 91,
 };
 
-#if defined(N19_WIN32)
-  auto win32_init_console()            -> void;
-  auto win32_are_vsequences_enabled()  -> bool;
-  auto win32_enable_vsequences()       -> void;
-#endif
-
-class COStream { // TODO: finish
-public:
-  static auto from_stdout() -> Result<COStream>;
-  static auto from_stderr() -> Result<COStream>;
-
-protected:
-  COStream() = default;
-private:
-  sys::IODevice fd_;
-};
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Utility functions
+// inlined header functions
 
-template<AreAll<Con> ...Args>
-N19_FORCEINLINE auto set_console(Args... values) -> void {
-  (std::print("\x1b[{}m", static_cast<uint16_t>(values)), ...);
+inline auto outs() -> OStream& {
+  static auto _outs = OStream::from_stdout();
+  return _outs;
+}
+
+inline auto errs() -> OStream& {
+  static auto _errs = OStream::from_stderr();
+  return _errs;
+}
+
+inline auto ins() -> IStream& {
+  static auto _ins = IStream::from_stdin();
+  return _ins;
+}
+
+inline auto operator<<(OStream& stream, const Con code) -> OStream& {
+  stream << "\x1b[" << static_cast<uint16_t>(code) << 'm';
+  return stream;
 }
 
 template<AreAll<Con> ...Args>
-N19_FORCEINLINE auto manip_string(Args... values) -> std::string {
+inline auto set_console(Args... values) -> void {
+  ((outs() << values), ...);
+}
+
+template<AreAll<Con> ...Args>
+inline auto manip_string(Args... values) -> std::string {
   std::string buff;
   ((buff += fmt( "\x1b[{}m", static_cast<uint16_t>(values) )), ...);
   return buff;

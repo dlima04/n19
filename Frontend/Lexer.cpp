@@ -851,149 +851,146 @@ inline auto Lexer::_token_ambiguous() -> Token {
 }
 
 auto Lexer::get_keyword(const std::u8string_view& str) -> Maybe<Keyword> {
-  if(str.size() > 12) {
-    return Nothing;
-  }
-
-  Keyword kw;                                // The keyword.
-  constexpr uint32_t seed = 0xbeef;          // Hash seed.
+  Keyword kw;                                /// The keyword.
+  constexpr uint32_t seed = 0xbeef;          /// Hash seed.
+  if(str.size() > 15) return Nothing;
 
   switch (murmur3_x86_32(str, seed)) {
-  case u8"return"_mm32:                      // "return"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"return"_mm32:                      /// "return"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::Return;
     break;
-  case u8"break"_mm32:                       // "break"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"break"_mm32:                       /// "break"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::Break;
     break;
-  case u8"continue"_mm32:                    // "continue"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"continue"_mm32:                    /// "continue"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::Continue;
     break;
-  case u8"for"_mm32:                         // "for"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"for"_mm32:                         /// "for"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::For;
     break;
-  case u8"while"_mm32:                       // "while"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"while"_mm32:                       /// "while"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::While;
     break;
-  case u8"do"_mm32:                          // "do"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"do"_mm32:                          /// "do"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::Do;
     break;
-  case u8"if"_mm32:                          // "if"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"if"_mm32:                          /// "if"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::If;
     break;
-  case u8"else"_mm32:                        // "else"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"else"_mm32:                        /// "else"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::Else;
     break;
-  case u8"struct"_mm32:                      // "struct"
-    kw.cat |= TokenCategory::Keyword;        // Keyword
-    kw.type = TokenType::Struct;             //
+  case u8"struct"_mm32:                      /// "struct"
+    kw.cat |= TokenCategory::Keyword;        /// Keyword
+    kw.type = TokenType::Struct;             ///
     break;
-  case u8"switch"_mm32:                      // "switch"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"switch"_mm32:                      /// "switch"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::Switch;
     break;
-  case u8"case"_mm32:                        // "case"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"case"_mm32:                        /// "case"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::Case;
     break;
-  case u8"default"_mm32:                     // "default"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"default"_mm32:                     /// "default"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::Default;
     break;
-  case u8"block"_mm32:                       // "block"
-    kw.cat |= TokenCategory::Keyword;        // Keyword
+  case u8"block"_mm32:                       /// "block"
+    kw.cat |= TokenCategory::Keyword;        /// Keyword
     kw.type = TokenType::Block;
     break;
-  case u8"defer"_mm32:                       // "defer"
-    kw.cat |= TokenCategory::Keyword;        // Keyword
+  case u8"defer"_mm32:                       /// "defer"
+    kw.cat |= TokenCategory::Keyword;        /// Keyword
     kw.type = TokenType::Defer;
     break;
-  case u8"defer_if"_mm32:                    // "defer_if"
-    kw.cat |= TokenCategory::Keyword;        // Keyword
+  case u8"defer_if"_mm32:                    /// "defer_if"
+    kw.cat |= TokenCategory::Keyword;        /// Keyword
     kw.type = TokenType::DeferIf;
     break;
-  case u8"sizeof"_mm32:                      // "sizeof"
-    kw.cat |= TokenCategory::Keyword;        // UnaryOp | ValidPrefix | Keyword
-    kw.cat |= TokenCategory::UnaryOp;        //
-    kw.cat |= TokenCategory::ValidPrefix;    //
+  case u8"sizeof"_mm32:                      /// "sizeof"
+    kw.cat |= TokenCategory::Keyword;        /// UnaryOp | ValidPrefix | Keyword
+    kw.cat |= TokenCategory::UnaryOp;        ///
+    kw.cat |= TokenCategory::ValidPrefix;    ///
     kw.type = TokenType::Sizeof;
     break;
-  case u8"typeof"_mm32:                      // "typeof"
-    kw.cat |= TokenCategory::Keyword;        // UnaryOp | ValidPrefix | Keyword
-    kw.cat |= TokenCategory::UnaryOp;        //
-    kw.cat |= TokenCategory::ValidPrefix;    //
+  case u8"typeof"_mm32:                      /// "typeof"
+    kw.cat |= TokenCategory::Keyword;        /// UnaryOp | ValidPrefix | Keyword
+    kw.cat |= TokenCategory::UnaryOp;        ///
+    kw.cat |= TokenCategory::ValidPrefix;    ///
     kw.type = TokenType::Typeof;
     break;
-  case u8"fallthrough"_mm32:                 // "fallthrough"
-    kw.cat |= TokenCategory::Keyword;        // ControlFlow | Keyword
-    kw.cat |= TokenCategory::ControlFlow;    //
+  case u8"fallthrough"_mm32:                 /// "fallthrough"
+    kw.cat |= TokenCategory::Keyword;        /// ControlFlow | Keyword
+    kw.cat |= TokenCategory::ControlFlow;    ///
     kw.type = TokenType::Fallthrough;
     break;
-  case u8"namespace"_mm32:                   // "namespace"
-    kw.cat |= TokenCategory::Keyword;        // Keyword
-    kw.type = TokenType::Namespace;          //
+  case u8"namespace"_mm32:                   /// "namespace"
+    kw.cat |= TokenCategory::Keyword;        /// Keyword
+    kw.type = TokenType::Namespace;          ///
     break;
-  case u8"where"_mm32:                       // "where"
-    kw.cat |= TokenCategory::Keyword;        // Keyword
-    kw.type = TokenType::Where;              //
+  case u8"where"_mm32:                       /// "where"
+    kw.cat |= TokenCategory::Keyword;        /// Keyword
+    kw.type = TokenType::Where;              ///
     break;
-  case u8"otherwise"_mm32:                   // "otherwise"
-    kw.cat |= TokenCategory::Keyword;        // Keyword
-    kw.type = TokenType::Otherwise;          //
+  case u8"otherwise"_mm32:                   /// "otherwise"
+    kw.cat |= TokenCategory::Keyword;        /// Keyword
+    kw.type = TokenType::Otherwise;          ///
     break;
-  case u8"proc"_mm32:                        // "proc"
-    kw.cat |= TokenCategory::Keyword;        // Keyword
-    kw.type = TokenType::Proc;               //
+  case u8"proc"_mm32:                        /// "proc"
+    kw.cat |= TokenCategory::Keyword;        /// Keyword
+    kw.type = TokenType::Proc;               ///
     break;
-  case u8"let"_mm32:                         // "let"
-    kw.cat |= TokenCategory::Keyword;        // Keyword
-    kw.type = TokenType::Let;                //
+  case u8"let"_mm32:                         /// "let"
+    kw.cat |= TokenCategory::Keyword;        /// Keyword
+    kw.type = TokenType::Let;                ///
     break;
-  case u8"const"_mm32:                       // "const"
-    kw.cat |= TokenCategory::Keyword;        // Keyword
-    kw.type = TokenType::Const;              //
+  case u8"const"_mm32:                       /// "const"
+    kw.cat |= TokenCategory::Keyword;        /// Keyword
+    kw.type = TokenType::Const;              ///
     break;
-  case u8"as"_mm32:                          // "as"
-    kw.cat |= TokenCategory::Keyword;        // UnaryOp | ValidPostfix | Keyword
-    kw.cat |= TokenCategory::ValidPostfix;   //
-    kw.cat |= TokenCategory::UnaryOp;        //
+  case u8"as"_mm32:                          /// "as"
+    kw.cat |= TokenCategory::Keyword;        /// UnaryOp | ValidPostfix | Keyword
+    kw.cat |= TokenCategory::ValidPostfix;   ///
+    kw.cat |= TokenCategory::UnaryOp;        ///
     kw.type = TokenType::As;
     break;
-  case u8"with"_mm32:                        // "with"
-    kw.cat |= TokenCategory::Keyword;        // UnaryOp | ValidPostfix | Keyword
-    kw.cat |= TokenCategory::ValidPostfix;   //
-    kw.cat |= TokenCategory::UnaryOp;        //
+  case u8"with"_mm32:                        /// "with"
+    kw.cat |= TokenCategory::Keyword;        /// UnaryOp | ValidPostfix | Keyword
+    kw.cat |= TokenCategory::ValidPostfix;   ///
+    kw.cat |= TokenCategory::UnaryOp;        ///
     kw.type = TokenType::With;
     break;
-  case u8"true"_mm32:                        // "true"
-    kw.cat  = TokenCategory::Literal;        // Literal
-    kw.type = TokenType::BooleanLiteral;
+  case u8"true"_mm32:                        /// "true"
+    kw.cat  = TokenCategory::Literal;        /// Literal
+    kw.type = TokenType::BooleanLiteral;     ///
     break;
-  case u8"false"_mm32:                       // "false"
-    kw.cat  = TokenCategory::Literal;        // Literal
-    kw.type = TokenType::BooleanLiteral;
+  case u8"false"_mm32:                       /// "false"
+    kw.cat  = TokenCategory::Literal;        /// Literal
+    kw.type = TokenType::BooleanLiteral;     ///
     break;
-  case u8"null"_mm32:                        // "null"
-    kw.cat  = TokenCategory::Literal;        // Literal
-    kw.type = TokenType::NullLiteral;
+  case u8"null"_mm32:                        /// "null"
+    kw.cat  = TokenCategory::Literal;        /// Literal
+    kw.type = TokenType::NullLiteral;        ///
     break;
   default: return Nothing;
   }
@@ -1012,7 +1009,6 @@ auto Lexer::is_reserved_byte(const char8_t c) -> bool {
 
     std::array<bool, 256> table = { false };
     for(const char8_t ch : chars) { table[ch] = true; }
-    std::expected
     return table;
   }();
 
@@ -1023,9 +1019,9 @@ inline auto Lexer::_skip_chars_until(std::function<bool(char8_t)> cb) -> bool {
   while(!cb(_current_char()) && _current_char() != '\0') {
     const char8_t curr = _current_char();
 
-    if(curr == '\n')            _advance_consume_line();  // line feed
-    else if(UTF8_LEADING(curr)) _skip_utf8_sequence();    // UTF8 codepoint begin
-    else _consume_char(1);                                // ASCII character
+    if(curr == '\n')            _advance_consume_line();  /// line feed
+    else if(UTF8_LEADING(curr)) _skip_utf8_sequence();    /// UTF8 codepoint begin
+    else _consume_char(1);                                /// ASCII character
   }
 
   return _current_char() != '\0';
@@ -1034,10 +1030,10 @@ inline auto Lexer::_skip_chars_until(std::function<bool(char8_t)> cb) -> bool {
 inline auto Lexer::_skip_utf8_sequence() -> bool {
   const auto ch = static_cast<uint8_t>(_current_char());
 
-  if ((ch & 0xE0) == 0xC0)      _consume_char(2); // 2 byte codepoint.
-  else if ((ch & 0xF0) == 0xE0) _consume_char(3); // 3 byte codepoint.
-  else if ((ch & 0xF8) == 0xF0) _consume_char(4); // 4 byte codepoint.
-  else return false;                              // Something's wrong?
+  if ((ch & 0xE0) == 0xC0)      _consume_char(2); /// 2 byte codepoint.
+  else if ((ch & 0xF0) == 0xE0) _consume_char(3); /// 3 byte codepoint.
+  else if ((ch & 0xF8) == 0xF0) _consume_char(4); /// 4 byte codepoint.
+  else return false;                              /// Something's wrong?
 
   return index_ - 1 < src_.size();
 }

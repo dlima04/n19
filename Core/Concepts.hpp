@@ -16,12 +16,30 @@ template<class T, class ...Us>
 concept AreAll = (IsSame<T, Us> && ...);
 
 template<class T, class ...Us>
-concept IsAnyOf = (IsSame<T, Us> || ...);
+concept AnyOf = (IsSame<T, Us> || ...);
 
 template<class T, class ...Us>
 concept CallableWith = requires(T&& t, Us&&... us){
   { t(forward<Us>(us)...) };
 };
+
+template<class T>
+concept Character = IsCharacter<T>;
+
+template<class T>
+concept Integer = IsIntegral<T>;
+
+template<class T>
+concept Pointer = IsPointer<T>;
+
+template<class T>
+concept Reference = IsReference<T>;
+
+template<class T>
+concept FloatingPoint = IsFloatingPoint<T>;
+
+template<class T>
+concept IntOrFloat = IsIntegral<T> || IsFloatingPoint<T>;
 
 END_NAMESPACE(n19);
 #endif //CONCEPTS_HPP

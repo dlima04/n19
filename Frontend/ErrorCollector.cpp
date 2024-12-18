@@ -12,7 +12,6 @@
 #include <Core/Try.hpp>
 #include <Core/Panic.hpp>
 #include <Core/ConIO.hpp>
-#include <Sys/Stream.hpp>
 #include <Frontend/ErrorCollector.hpp>
 #include <Frontend/Lexer.hpp>
 #include <algorithm>
@@ -66,12 +65,12 @@ auto n19::ErrorCollector::display_error(
 {
   const auto current = lxr.current();
   display_error(
-    msg,             // forward message
-    lxr.file_name_,
-    lxr.src_,
-    current.pos_,    // assume current token's position.
-    current.line_,   // assume current token's line.
-    is_warn);
+    msg,             /// forward message
+    lxr.file_name_,  ///
+    lxr.src_,        ///
+    current.pos_,    /// assume current token's position.
+    current.line_,   /// assume current token's line.
+    is_warn);        ///
 }
 
 auto n19::ErrorCollector::display_error(
@@ -81,20 +80,20 @@ auto n19::ErrorCollector::display_error(
   const bool is_warn ) -> void
 {
   display_error(
-    msg,             // forward message
-    lxr.file_name_,
-    lxr.src_,
-    tok.pos_,        // error on passed token's position.
-    tok.line_,       // error on passed token's line #.
-    is_warn);
+    msg,             /// forward message
+    lxr.file_name_,  ///
+    lxr.src_,        ///
+    tok.pos_,        /// error on passed token's position.
+    tok.line_,       /// error on passed token's line #.
+    is_warn);        ///
 }
 
 auto n19::ErrorCollector::display_error(
-  const std::string& msg,       // The error/warning message.
-  const FileRef& file,          // The FileRef we need to read from.
-  const size_t pos,             // File buffer offset.
-  const uint32_t line,          // Line number, optional.
-  const bool is_warn ) -> void  // Red/yellow error text
+  const std::string& msg,
+  const FileRef& file,
+  const size_t pos,
+  const uint32_t line,
+  const bool is_warn ) -> void
 {
   const auto fsize = file.size();
   if(!fsize) return;
@@ -112,25 +111,25 @@ auto n19::ErrorCollector::display_error(
 }
 
 auto n19::ErrorCollector::display_error(
-  const std::string& msg,           // The error/warning message.
-  const sys::String& fname,         // The name given to this file.
-  const std::vector<char8_t>& buff, // File buffer.
-  size_t pos,                       // File buffer offset.
-  const uint32_t line,              // Line number, optional
-  const bool is_warn ) -> void      // Red/yellow error text
+  const std::string& msg,           /// The error/warning message.
+  const sys::String& fname,         /// The name given to this file.
+  const std::vector<char8_t>& buff, /// File buffer.
+  size_t pos,                       /// File buffer offset.
+  const uint32_t line,              /// Line number, optional
+  const bool is_warn ) -> void      /// Red/yellow error text
 {
   ASSERT(!buff.empty());
-  std::string before;   // The bytes that appear before "pos"
-  std::string after;    // The byte at "pos", and the ones after it.
-  std::string filler;   // The squiggly lines and pointy arrow.
-  std::string spaces;   // The spaces to the left of the message.
+  std::string before;               /// The bytes that appear before "pos"
+  std::string after;                /// The byte at "pos", and the ones after it.
+  std::string filler;               /// The squiggly lines and pointy arrow.
+  std::string spaces;               /// The spaces to the left of the message.
 
-  if(pos >= buff.size()) {
-    pos = buff.size() - 1;
+  if(pos >= buff.size()) {          /// Sanity check the position.
+    pos = buff.size() - 1;          ///
   }
 
   IGNORE_EXCEPT(
-    for(size_t i = pos - 1; buff.at(i) != '\n'; i--) {
+   for(size_t i = pos - 1; buff.at(i) != '\n'; i--) {
       const char ch = buff.at(i);
       if(!std::isprint(static_cast<uint8_t>(ch)))
         continue;
@@ -154,19 +153,23 @@ auto n19::ErrorCollector::display_error(
     spaces += ' ';
   }
 
-  set_console(Con::Bold);
-  sys::outs() << _nstr("In ") << fname;
-  if(line != 0) {
-    std::println(":{}", line);
-  }
-
-  set_console(Con::Reset);
-  std::println("{}", before);
-  std::println("{}", filler);
-
-  set_console(is_warn ? Con::YellowFG : Con::RedFG);
-  std::println("{}{}\n", spaces, msg);
-  set_console(Con::Reset);
+  outs()
+    << Con::Bold     /// Set console to bold.
+    << _nstr("In ")  ///
+    << fname         /// Display file name in bold.
+    << ':'           /// File : line number
+    << line          /// display line number.
+    << '\n'          ///
+    << Con::Reset    /// Reset console
+    << before        /// Display full line.
+    << '\n'          ///
+    << filler        /// Filler contents, tildes below line.
+    << '\n'          ///
+    << (is_warn ? Con::YellowFG : Con::RedFG)
+    << spaces        ///
+    << msg           /// Display user-provided message in red or yellow.
+    << Con::Reset    /// Reset console.
+    << Endl;         ///
 }
 
 auto n19::ErrorCollector::emit() const -> Result<void> {

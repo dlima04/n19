@@ -52,19 +52,19 @@ public:
   // writing to, and flushing the device.
   auto write(const Bytes& bytes) const -> Result<void>;
   auto read_into(WritableBytes& bytes) const -> Result<void>;
-  auto flush_handle() const -> Result<void>;
+  auto flush_handle() const -> void;
 
   // Some operator overloads to simplify
   // reading/writing to the IODevice.
-  template<typename T> auto operator<<(const T& val) -> IODevice&;
-  template<typename T> auto operator>>(T& val) -> IODevice&;
+  template<typename T> auto operator<<(const T& val)   -> IODevice&;
+  template<typename T> auto operator>>(T& val)         -> IODevice&;
 
   // Static methods / factories.
   // These can be called to gain access
   // to common native I/O handles.
-  static auto from_stdout() -> Result<IODevice>;
-  static auto from_stderr() -> Result<IODevice>;
-  static auto from_stdin()  -> Result<IODevice>;
+  static auto from_stdout() -> IODevice;
+  static auto from_stderr() -> IODevice;
+  static auto from_stdin()  -> IODevice;
   static auto create_pipe() -> Result<std::array<IODevice, 2>>;
 
   IODevice() = default;
@@ -110,8 +110,12 @@ inline auto IODevice::close() -> void {
   invalidate();
 }
 
-inline auto IODevice::is_invalid() -> bool {
+N19_FORCEINLINE auto IODevice::is_invalid() -> bool {
   return value_ == -1;
+}
+
+N19_FORCEINLINE auto IODevice::flush_handle() const -> void {
+  ::fsync(value_); // sync the file descriptor.
 }
 
 #else // IF WINDOWS
@@ -125,8 +129,12 @@ inline auto IODevice::close() -> void {
   invalidate();
 }
 
-inline auto IODevice::is_invalid() -> bool {
+N19_FORCEINLINE auto IODevice::is_invalid() -> bool {
   return value_ == (::HANDLE)nullptr;
+}
+
+N19_FORCEINLINE auto IODevice::flush_handle() const -> void {
+  ::FlushFileBuffers(value_); // Flush Win32 file buff.
 }
 
 #endif //IF defined(N19_POSIX)

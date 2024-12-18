@@ -7,24 +7,7 @@
 */
 
 #include <Core/ConIO.hpp>
-#include <Core/Try.hpp>
-#include <print>
-#include <utility>
 BEGIN_NAMESPACE(n19);
-
-auto COStream::from_stderr() -> Result<COStream> {
-  auto the_stream = COStream();
-  auto stream_res = TRY(sys::IODevice::from_stderr());
-  the_stream.fd_  = stream_res.value();
-  return make_result<COStream>(std::move(the_stream));
-}
-
-auto COStream::from_stdout() -> Result<COStream> {
-  auto the_stream = COStream();
-  auto stream_res = TRY(sys::IODevice::from_stdout());
-  the_stream.fd_  = stream_res.value();
-  return make_result<COStream>(std::move(the_stream));
-}
 
 #if defined(N19_WIN32)
 auto win32_are_vsequences_enabled() -> bool {

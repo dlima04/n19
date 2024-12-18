@@ -19,23 +19,14 @@ BEGIN_NAMESPACE(n19)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T>
-class [[nodiscard]] Maybe {
+class /* [[nodiscard]] */ Maybe {
+N19_MAKE_DEFAULT_CONSTRUCTIBLE(Maybe);
+N19_MAKE_DEFAULT_ASSIGNABLE(Maybe);
 public:
   using ValueType     = T;
   using PointerType   = T*;
   using ReferenceType = T&;
   using __Variant     = std::variant<T, __Nothing>;
-
-  N19_FORCEINLINE Maybe(Maybe&& other)      = default;
-  N19_FORCEINLINE Maybe(const Maybe& other) = default;
-
-  auto has_value() const -> bool { return has_value_; }
-  explicit operator bool() const { return has_value_; }
-
-  // Reassignment ops, these can simply be defaulted as
-  // variant will handle the semantics for us.
-  auto operator=(Maybe&& other)      -> Maybe& = default;
-  auto operator=(const Maybe& other) -> Maybe& = default;
 
   [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
     #ifndef __N19_CORE_THROW_EXCEPTIONS
@@ -53,14 +44,14 @@ public:
 
   N19_FORCEINLINE auto operator->(this auto&& self) -> decltype(auto) {
     #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( has_value_ == true, "Bad Maybe access!" );
+      ASSERT( self.has_value_ == true, "Bad Maybe access!" );
     #endif//__N19_CORE_THROW_EXCEPTIONS
     return &self.value();
   }
 
   N19_FORCEINLINE auto operator*(this auto&& self) -> decltype(auto) {
     #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( has_value_ == true, "Bad Maybe access!" );
+      ASSERT( self.has_value_ == true, "Bad Maybe access!" );
     #endif//__N19_CORE_THROW_EXCEPTIONS
     return self.value();
   }
@@ -111,6 +102,9 @@ public:
     value_      = Nothing;
     has_value_  = false;
   }
+
+  auto has_value() const -> bool { return has_value_; }
+  explicit operator bool() const { return has_value_; }
 
   N19_FORCEINLINE Maybe(const T& val)     : has_value_(true), value_(val) {}
   N19_FORCEINLINE Maybe(T&& val)          : has_value_(true), value_(val) {}
