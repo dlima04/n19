@@ -53,7 +53,7 @@ struct __ErrorType {      // The default error type used by n19.
   __ErrC code = __ErrC::None;
 };
 
-template<class T, class E = __ErrorType>
+template<typename T, typename E = __ErrorType>
 class /* [[nodiscard]] */ __Result {
 N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(__Result);
 N19_MAKE_DEFAULT_COPY_CONSTRUCTIBLE(__Result);
@@ -104,26 +104,26 @@ public:
     } return val;           // return provided error type.
   }
 
-  template<class C> /* C = Callable type */
+  template<typename C> /* C = Callable type */
   N19_FORCEINLINE auto call_if_error(this auto&& self, C&& cb) -> decltype(self) {
     if(!self.has_value()) cb( forward<decltype(self)>(self) );
     return self;
   }
 
-  template<class C> /* C = Callable type */
+  template<typename C> /* C = Callable type */
   N19_FORCEINLINE auto call_if_value(this auto&& self, C&& cb) -> decltype(self) {
     if(self.has_value()) cb( forward<decltype(self)>(self) );
     return self;
   }
 
-  template<class O>
+  template<typename O>
   N19_FORCEINLINE auto operator==(const __Result<O>& other) -> bool {
     if(has_value() != other.has_value()) {
       return false;
     } return !has_value() || value() == other.value();
   }
 
-  template<class O>
+  template<typename O>
   N19_FORCEINLINE auto operator==(const O& other) -> bool {
     return has_value() && other == value();
   }
@@ -145,7 +145,7 @@ protected:
   __Variant value_;
 };
 
-template<class T>
+template<typename T>
 struct __Result_Dispatch {
   using Type = __Result<T>;
 };
@@ -155,7 +155,7 @@ struct __Result_Dispatch<void> {
   using Type = __Result<__Nothing>;
 };
 
-template<class T>
+template<typename T>
 using Result = typename __Result_Dispatch<T>::Type;
 using ErrC   = __ErrC;
 using ErrorT = __ErrorType;

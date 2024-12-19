@@ -48,7 +48,7 @@ public:
   virtual ~ValueBase() = default;
 };
 
-template<class T>
+template<typename T>
 class Value final : public ValueBase {
 public:
   auto convert(const sys::String&) -> Result<void> override = delete;

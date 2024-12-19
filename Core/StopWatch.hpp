@@ -8,19 +8,20 @@
 
 #ifndef STOPWATCH_HPP
 #define STOPWATCH_HPP
+#include <Core/Platform.hpp>
 #include <chrono>
 
 namespace n19 {
   template<
-    class T = double,
-    class Units = std::milli,
-    class Clock = std::chrono::high_resolution_clock>
+    typename T = double,
+    typename Units = std::milli,
+    typename Clock = std::chrono::high_resolution_clock>
   class StopWatch;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class T, class Units, class Clock>
+template<typename T, typename Units, typename Clock>
 class n19::StopWatch {
 public:
   using Duration      = std::chrono::duration<T, Units>;
@@ -28,8 +29,15 @@ public:
   using MilliSeconds  = std::milli;
   using NanoSeconds   = std::nano;
 
-  auto elapsed() const -> T;
-  auto restart() -> void;
+  N19_FORCEINLINE auto elapsed() const -> T {
+    auto end = Clock::now();
+    auto dur = std::chrono::duration_cast<Duration>(end - start_t_);
+    return dur.count();
+  }
+
+  N19_FORCEINLINE auto restart() -> void {
+    start_t_ = Clock::now();
+  }
 
   StopWatch() : start_t_(Clock::now()) {}
   ~StopWatch() = default;
@@ -38,17 +46,5 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-template<class T, class Units, class Clock>
-auto n19::StopWatch<T, Units, Clock>::restart() -> void {
-  start_t_ = Clock::now();
-}
-
-template<class T, class Units, class Clock>
-auto n19::StopWatch<T, Units, Clock>::elapsed() const -> T {
-  auto end = Clock::now();
-  auto dur = std::chrono::duration_cast<Duration>(end - start_t_);
-  return dur.count();
-}
 
 #endif //STOPWATCH_HPP

@@ -10,6 +10,7 @@
 #define RINGBUFFER_HPP
 #include <Core/RingBase.hpp>
 #include <Core/Result.hpp>
+#include <Core/Maybe.hpp>
 #include <Core/Forward.hpp>
 BEGIN_NAMESPACE(n19);
 
@@ -26,7 +27,7 @@ BEGIN_NAMESPACE(n19);
 // code here heavily relies on release-acquire memory ordering semantics,
 // which may be sequentially inconsistent otherwise.
 
-template<class T, size_t size_>
+template<typename T, size_t size_>
 class RingBuffer : public RingBase<T, size_>{
 public:
   using ValueType     = T;
@@ -42,8 +43,8 @@ public:
   // write() will attempt to construct
   // an object of type T directly at the head indice using the
   // parameter pack Args.
-  template<class ...Args> auto write(Args&&... args) -> bool;
-  template<class ...Args> auto overwrite(Args&&... args) -> void;
+  template<typename ...Args> auto write(Args&&... args) -> bool;
+  template<typename ...Args> auto overwrite(Args&&... args) -> void;
 
   // For reading values from the ringbuffer.
   // note that current() and try_current retrieve the value at
@@ -58,7 +59,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class T, size_t size_> template<class ... Args>
+template<typename T, size_t size_> template<typename ... Args>
 N19_FORCEINLINE auto RingBuffer<T, size_>::write(Args&&... args) -> bool {
   static_assert(std::constructible_from<T, Args...>);
   if(this->is_full()) {
@@ -70,7 +71,7 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::write(Args&&... args) -> bool {
   return true;
 }
 
-template<class T, size_t size_> template<class ... Args>
+template<typename T, size_t size_> template<typename ... Args>
 N19_FORCEINLINE auto RingBuffer<T, size_>::overwrite(Args&&... args) -> void {
   static_assert(std::constructible_from<T, Args...>);
   if(this->is_full()) {
@@ -81,12 +82,12 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::overwrite(Args&&... args) -> void {
   head_.fetch_add(1, std::memory_order::release);
 }
 
-template<class T, size_t size_>
+template<typename T, size_t size_>
 N19_FORCEINLINE auto RingBuffer<T, size_>::read() -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
   if(lhead == ltail) {    // buffer is empty.
-    return Nothing;  // we can't read anything.
+    return Nothing;       // we can't read anything.
   }
 
   const ValueType val = buff_[ ltail ];
@@ -94,7 +95,7 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::read() -> Maybe<ValueType> {
   return val;
 }
 
-template<class T, size_t size_>
+template<typename T, size_t size_>
 N19_FORCEINLINE auto RingBuffer<T, size_>::try_current() const -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
@@ -106,7 +107,7 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::try_current() const -> Maybe<ValueTyp
   return buff_[ ltail & size_mask_ ];
 }
 
-template<class T, size_t size_>
+template<typename T, size_t size_>
 N19_FORCEINLINE auto RingBuffer<T, size_>::current() const -> ValueType {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);

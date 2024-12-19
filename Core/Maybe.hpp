@@ -19,7 +19,7 @@ BEGIN_NAMESPACE(n19)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class T>
+template<typename T>
 class /* [[nodiscard]] */ Maybe {
 N19_MAKE_DEFAULT_CONSTRUCTIBLE(Maybe);
 N19_MAKE_DEFAULT_ASSIGNABLE(Maybe);
@@ -62,30 +62,30 @@ public:
     return released;
   }
 
-  template<class O>
+  template<typename O>
   N19_FORCEINLINE auto operator==(const Maybe<O>& other) -> bool {
     return has_value_ == other.has_value_
       && (!has_value_ || value() == other.value());
   }
 
-  template<class O>
+  template<typename O>
   N19_FORCEINLINE auto operator==(const O& other) -> bool {
     return has_value_ && other == value();
   }
 
-  template<class ... Args>
+  template<typename ... Args>
   N19_FORCEINLINE explicit Maybe(Args&& ...args){
     value_.template emplace<T>( forward<Args>(args)... );
     has_value_ = true;
   }
 
-  template<class U> requires std::constructible_from<T, U>
+  template<typename U> requires std::constructible_from<T, U>
   N19_FORCEINLINE Maybe(U&& value) {
     value_.template emplace<T>( forward<U>(value) );
     has_value_ = true;
   }
 
-  template<class ... Args>
+  template<typename ... Args>
   N19_FORCEINLINE auto emplace(Args &&...args) -> void {
     value_.template emplace<T>( forward<Args>(args)... );
     has_value_ = true;

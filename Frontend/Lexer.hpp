@@ -14,6 +14,7 @@
 #include <Core/FileRef.hpp>
 #include <Core/Result.hpp>
 #include <Core/RingQueue.hpp>
+#include <Core/Maybe.hpp>
 #include <Frontend/Token.hpp>
 #include <Sys/String.hpp>
 #include <memory>

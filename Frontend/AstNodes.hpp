@@ -10,6 +10,8 @@
 #define ASTNODES_HPP
 #include <Frontend/Token.hpp>
 #include <Frontend/EntityQualifier.hpp>
+#include <Core/Maybe.hpp>
+#include <Core/Result.hpp>
 #include <Core/ConIO.hpp>
 #include <Core/Concepts.hpp>
 #include <vector>

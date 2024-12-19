@@ -23,7 +23,7 @@ BEGIN_NAMESPACE(n19);
 // overloaded call operators should never be used.
 // It's also not default constructible to keep things simple.
 
-template<class T>
+template<typename T>
 class Callback {
 N19_MAKE_NONCOPYABLE(Callback);
 public:
@@ -51,8 +51,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class T> template<CallableWith<T> ... Args>
-N19_FORCEINLINE auto Callback<T>::operator()(Args &&...args) -> decltype(auto) {
+template<typename T> template<CallableWith<T> ...Args>
+N19_FORCEINLINE auto Callback<T>::operator()(Args&&... args) -> decltype(auto) {
   return obj_( forward<Args>(args)... );
 }
 

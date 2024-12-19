@@ -18,7 +18,7 @@ BEGIN_NAMESPACE(n19);
 // Implements basic shared functionality like head and tail indices,
 // checking if the buffer is full/empty, etc.
 
-template<class T, size_t size_>
+template<typename T, size_t size_>
 class RingBase {
 public:
   // The size of the buffer should be a power of 2, always.
@@ -49,7 +49,7 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class T, size_t size_>
+template<typename T, size_t size_>
 N19_FORCEINLINE auto RingBase<T, size_>::is_full() const -> bool {
   constexpr auto order  = std::memory_order::acquire;
   const size_t lhead    = (head_.load(order) + 1) & size_mask_;
@@ -57,7 +57,7 @@ N19_FORCEINLINE auto RingBase<T, size_>::is_full() const -> bool {
   return lhead == ltail;
 }
 
-template<class T, size_t size_>
+template<typename T, size_t size_>
 N19_FORCEINLINE auto RingBase<T, size_>::is_empty() const -> bool {
   constexpr auto order  = std::memory_order::acquire;
   const size_t lhead    = head_.load(order) & size_mask_;
@@ -65,7 +65,7 @@ N19_FORCEINLINE auto RingBase<T, size_>::is_empty() const -> bool {
   return lhead == ltail;
 }
 
-template<class T, size_t size_>
+template<typename T, size_t size_>
 N19_FORCEINLINE auto RingBase<T, size_>::data() const -> T* {
   return buff_;
 }

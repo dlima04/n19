@@ -28,7 +28,7 @@ using WritableBytes  = std::span<Byte>;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class T>
+template<typename T>
 class ByteCopy {
 static_assert(!IsReference<T>);
 static_assert(!std::is_array_v<T>);
@@ -66,12 +66,12 @@ public:
     return forward<decltype(self)>(self).value();
   }
 
-  template<class O>
+  template<typename O>
   N19_FORCEINLINE auto operator==(const ByteCopy<O>& other) -> bool {
     return is_active_ == other.is_active_ && (!is_active_ || value() == other.value());
   }
 
-  template<class O>
+  template<typename O>
   N19_FORCEINLINE auto operator==(const O& other) -> bool {
     return is_active_ && value() == other;
   }
@@ -92,14 +92,14 @@ public:
     return *this;
   }
 
-  template<class ... Args>
+  template<typename ... Args>
   N19_FORCEINLINE auto emplace(Args&&... args) -> void {
     clear();           // Clear the existing value.
     is_active_ = true; // maintain the value state.
     std::construct_at<T>( reinterpret_cast<T*>(&value_), forward<Args>(args)... );
   }
 
-  template<class ... Args>
+  template<typename ... Args>
   N19_FORCEINLINE ByteCopy(Args&&... args) {
     std::construct_at<T>( reinterpret_cast<T*>(&value_), forward<Args>(args)... );
     is_active_ = true;

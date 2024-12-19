@@ -12,33 +12,33 @@
 #include <Core/Forward.hpp>
 BEGIN_NAMESPACE(n19);
 
-template<class T, class ...Us>
+template<typename T, typename ...Us>
 concept AreAll = (IsSame<T, Us> && ...);
 
-template<class T, class ...Us>
+template<typename T, typename ...Us>
 concept AnyOf = (IsSame<T, Us> || ...);
 
-template<class T, class ...Us>
+template<typename T, typename ...Us>
 concept CallableWith = requires(T&& t, Us&&... us){
   { t(forward<Us>(us)...) };
 };
 
-template<class T>
+template<typename T>
 concept Character = IsCharacter<T>;
 
-template<class T>
+template<typename T>
 concept Integer = IsIntegral<T>;
 
-template<class T>
+template<typename T>
 concept Pointer = IsPointer<T>;
 
-template<class T>
+template<typename T>
 concept Reference = IsReference<T>;
 
-template<class T>
+template<typename T>
 concept FloatingPoint = IsFloatingPoint<T>;
 
-template<class T>
+template<typename T>
 concept IntOrFloat = IsIntegral<T> || IsFloatingPoint<T>;
 
 END_NAMESPACE(n19);

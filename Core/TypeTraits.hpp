@@ -108,10 +108,10 @@ struct __MakeUnsigned<bool> {
   using Type = bool;
 };
 
-template<class T>
+template<typename T>
 using AddConst = T const;
 
-template<class T>
+template<typename T>
 using AddPtr = T*;
 
 template<typename T>
@@ -137,12 +137,12 @@ struct __RemoveReference {
   using Type = T;
 };
 
-template<class T>
+template<typename T>
 struct __RemoveReference<T&> {
   using Type = T;
 };
 
-template<class T>
+template<typename T>
 struct __RemoveReference<T&&> {
   using Type = T;
 };
@@ -152,36 +152,36 @@ struct __RemovePointer {
   using Type = T;
 };
 
-template<class T>
+template<typename T>
 struct __RemovePointer<T*> {
   using Type = T;
 };
 
-template<class T>
+template<typename T>
 struct __RemoveConst {
   using Type = T;
 };
 
-template<class T>
+template<typename T>
 struct __RemoveConst<T const> {
   using Type = T;
 };
 
-template<class T>
+template<typename T>
 using RemoveConst = typename __RemoveConst<T>::Type;
 
 template<typename T>
 using RemoveReference = typename __RemoveReference<T>::Type;
 
-template<class T>
+template<typename T>
 using RemovePointer = typename __RemovePointer<T>::Type;
 
-template<class T>
+template<typename T>
 struct __RemoveVolatile {
   using Type = T;
 };
 
-template<class T>
+template<typename T>
 struct __RemoveVolatile<T volatile> {
   using Type = T;
 };
@@ -214,13 +214,13 @@ template<> inline constexpr bool __IsIntegral<char32_t>           = true;
 template<typename T>
 inline constexpr bool IsIntegral = __IsIntegral<DecayT<MakeUnsigned<T>>>;
 
-template<class T> inline constexpr bool IsLvalueReference         = false;
-template<class T> inline constexpr bool IsLvalueReference<T&>     = true;
-template<class T> inline constexpr bool IsRvalueReference         = false;
-template<class T> inline constexpr bool IsRvalueReference<T&&>    = true;
-template<class T> inline constexpr bool IsReference               = false;
-template<class T> inline constexpr bool IsReference<T&>           = true;
-template<class T> inline constexpr bool IsReference<T&&>          = true;
+template<typename T> inline constexpr bool IsLvalueReference      = false;
+template<typename T> inline constexpr bool IsLvalueReference<T&>  = true;
+template<typename T> inline constexpr bool IsRvalueReference      = false;
+template<typename T> inline constexpr bool IsRvalueReference<T&&> = true;
+template<typename T> inline constexpr bool IsReference            = false;
+template<typename T> inline constexpr bool IsReference<T&>        = true;
+template<typename T> inline constexpr bool IsReference<T&&>       = true;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IsFloatingPoint
@@ -253,8 +253,8 @@ inline constexpr bool IsCharacter = __IsCharacter<DecayT<T>>;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IsPointer
 
-template<class T> inline constexpr bool __IsPointer               = false;
-template<class T> inline constexpr bool __IsPointer<T*>           = true;
+template<typename T> inline constexpr bool __IsPointer            = false;
+template<typename T> inline constexpr bool __IsPointer<T*>        = true;
 
 template<typename T>
 inline constexpr bool IsPointer = __IsPointer<RemoveCV<T>>;
@@ -265,13 +265,13 @@ inline constexpr bool IsPointer = __IsPointer<RemoveCV<T>>;
 template<typename T, typename... Args>
 inline constexpr bool IsConstructible = requires { ::new T(declval<Args>()...); };
 
-template<class T,  class ...Us>
+template<typename T, typename ...Us>
 inline constexpr bool IsInvocableWith = requires { T(declval<Us>()...); };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IsSame, IsVoid
 
-template<class T>
+template<typename T>
 inline constexpr bool IsVoid = false;
 
 template<>
