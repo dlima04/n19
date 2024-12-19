@@ -48,11 +48,12 @@ inline constexpr struct __Endl {
   constexpr __Endl() = default;
 } Endl;
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // OStream is a very basic stream class that supports writing compiler
 // specific types and strings of different encodings, including UTF16 and UTF8.
-// It uses a buffer internally that can be periodically flushed. Note that there
-// is no thread synchronization of any kind done here.
+// This is the most basic kind of stream, and as such does not use any kind of
+// buffering internally. It simply writes directly to whatever file descriptor it's using.
 
 class OStream {
 public:
@@ -71,14 +72,14 @@ public:
   // Begin inline class methods
 
   N19_FORCEINLINE auto operator<<(const __Flush&) -> OStream& {
-    this->flush();   // Flush but don't add a newline
-    return *this;    // return this stream
+    this->flush();   /// Flush but don't add a newline
+    return *this;    /// return this stream
   }
 
   N19_FORCEINLINE auto operator<<(const __Endl&) -> OStream& {
-    *this << '\n';   // add a new line
-    this->flush();   // Flush
-    return *this;    // return this stream
+    *this << '\n';   /// add a new line
+    this->flush();   /// Flush
+    return *this;    /// return this stream
   }
 
   template<Character T>
@@ -91,10 +92,10 @@ public:
 
   template<IntOrFloat T> requires(!IsCharacter<T>)
   auto operator<<(const T value) -> OStream& {
-    char buff[ 40 ] = { 0 };   // Conversion buffer
+    char buff[ 40 ] = { 0 };   /// Conversion buffer
     auto [ptr, ec]  = std::to_chars(buff, buff + sizeof(buff) - 1, value);
 
-    buff[39] = '\0';           // shizophrenia
+    buff[39] = '\0';           /// shizophrenia
     if(ec == std::errc()) *this << std::string_view{buff};
     return *this;
   }
@@ -102,10 +103,10 @@ public:
   template<Pointer T> requires(!IsCharacter<RemovePointer<T>>)
   auto operator<<(const T value) -> OStream& {
     const auto conv  = reinterpret_cast<uintptr_t>(value);
-    char buff [ 40 ] = { 0 };  // conversion buffer
+    char buff [ 40 ] = { 0 };  /// conversion buffer
     auto [ptr, ec]   = std::to_chars(buff, buff + sizeof(buff) - 1, conv, 16);
 
-    buff[39] = '\0';           // shizophrenia
+    buff[39] = '\0';           /// shizophrenia
     if(ec == std::errc()) *this << std::string_view{buff};
     return *this;
   }
@@ -128,26 +129,26 @@ public:
     if(str.empty()) return *this;
 
     const int req_size = WideCharToMultiByte(
-      CP_UTF8,         // Code page: UTF-8
-      0,               // Conversion flags
-      str.data(),      // Source UTF-16 string
-      str.size(),      // Number of codepoints
-      nullptr,         // No output buffer yet
-      0,               // Request buffer size
-      nullptr, nullptr // Default char mappings (unused for UTF-8)
+      CP_UTF8,         /// Code page: UTF-8
+      0,               /// Conversion flags
+      str.data(),      /// Source UTF-16 string
+      str.size(),      /// Number of codepoints
+      nullptr,         /// No output buffer yet
+      0,               /// Request buffer size
+      nullptr, nullptr /// Default char mappings (unused for UTF-8)
     );
 
     if(req_size == 0) return *this;
     std::vector<char> outbuf((size_t)req_size, '\0');
 
     const int result = WideCharToMultiByte(
-      CP_UTF8,         // Code page: UTF-8
-      0,               // Conversion flags
-      str.data(),      // Source UTF-16 string
-      str.size(),      // Number of codepoints
-      outbuf.data(),   // Destination buffer
-      outbuf.size(),   // Buffer size
-      nullptr, nullptr // Default char mappings (unused for UTF-8)
+      CP_UTF8,         /// Code page: UTF-8
+      0,               /// Conversion flags
+      str.data(),      /// Source UTF-16 string
+      str.size(),      /// Number of codepoints
+      outbuf.data(),   /// Destination buffer
+      outbuf.size(),   /// Buffer size
+      nullptr, nullptr /// Default char mappings (unused for UTF-8)
     );
 
     std::string_view the_view{ outbuf.begin(), outbuf.end() };
@@ -165,12 +166,12 @@ public:
 #endif
 
   virtual auto write(const __Span& buff) -> OStream& {
-    fd_.write(buff);     // Write to the underlying IODevice object.
-    return *this;        // return this stream
+    fd_.write(buff);     /// Write to the underlying IODevice object.
+    return *this;        /// return this stream
   }
 
   virtual auto flush() -> OStream& {
-    fd_.flush_handle();  // sync handle
+    fd_.flush_handle();  /// sync handle
     return *this;
   }
 
@@ -179,6 +180,12 @@ public:
 protected:
   sys::IODevice fd_;
 };
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// BufferedOStream<size_> is the buffered version of OStream.
+// It uses a fixed-size buffer internally, of which the size is determined by
+// the template parameter. The size should not be 0.
 
 template<size_t size_>
 class BufferedOStream : public OStream {
@@ -263,6 +270,15 @@ public:
 protected:
   __Buffer buff_{};
   __Index curr_ {__begin};
+};
+
+class NullOStream final : public OStream {
+public:
+  auto write(const __Span&) -> OStream & override { return *this; }
+  auto flush() -> OStream & override { return *this; }
+
+ ~NullOStream() override = default;
+  NullOStream() = default;
 };
 
 class IStream {

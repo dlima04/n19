@@ -61,7 +61,6 @@ set(N19_ENUMERATE_SYS_INCLUDE
   Sys/LastError.hpp
   Sys/IODevice.hpp
   Sys/Handle.hpp
-  Sys/Stream.hpp
 )
 
 set(N19_ENUMERATE_SYS_SOURCE

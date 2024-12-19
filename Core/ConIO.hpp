@@ -50,6 +50,11 @@ inline auto errs() -> OStream& {
   return _errs;
 }
 
+inline auto nulls() -> OStream& {
+  static auto _nulls = NullOStream();
+  return _nulls;
+}
+
 inline auto ins() -> IStream& {
   static auto _ins = IStream::from_stdin();
   return _ins;

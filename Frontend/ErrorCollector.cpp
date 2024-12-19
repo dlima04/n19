@@ -24,7 +24,6 @@ auto n19::ErrorCollector::store_error(
   const uint32_t line ) -> ErrorCollector&
 {
   ASSERT(line);
-  max_err_chk();
   ++error_count_;
   errs_[file_name].emplace_back( msg, pos, line, false );
   return *this;
@@ -48,7 +47,6 @@ auto n19::ErrorCollector::store_error_or_warning(
 {
   ASSERT(err.line);
   if(!err.is_warning) {
-    max_err_chk();
     ++error_count_;
   } else {
     ++warning_count_;
@@ -61,6 +59,7 @@ auto n19::ErrorCollector::store_error_or_warning(
 auto n19::ErrorCollector::display_error(
   const std::string& msg,
   const Lexer &lxr,
+  OStream& stream,
   const bool is_warn ) -> void
 {
   const auto current = lxr.current();
@@ -68,6 +67,7 @@ auto n19::ErrorCollector::display_error(
     msg,             /// forward message
     lxr.file_name_,  ///
     lxr.src_,        ///
+    stream,          /// Forward provided output stream.
     current.pos_,    /// assume current token's position.
     current.line_,   /// assume current token's line.
     is_warn);        ///
@@ -77,12 +77,14 @@ auto n19::ErrorCollector::display_error(
   const std::string& msg,
   const Lexer &lxr,
   const Token& tok,
+  OStream& stream,
   const bool is_warn ) -> void
 {
   display_error(
     msg,             /// forward message
     lxr.file_name_,  ///
     lxr.src_,        ///
+    stream,          /// Forward provided output stream.
     tok.pos_,        /// error on passed token's position.
     tok.line_,       /// error on passed token's line #.
     is_warn);        ///
@@ -91,6 +93,7 @@ auto n19::ErrorCollector::display_error(
 auto n19::ErrorCollector::display_error(
   const std::string& msg,
   const FileRef& file,
+  OStream& stream,
   const size_t pos,
   const uint32_t line,
   const bool is_warn ) -> void
@@ -105,6 +108,7 @@ auto n19::ErrorCollector::display_error(
     display_error(
       msg,file.nstr(),
       buff,
+      stream,
       pos,
       line,
       is_warn);
@@ -114,6 +118,7 @@ auto n19::ErrorCollector::display_error(
   const std::string& msg,           /// The error/warning message.
   const sys::String& fname,         /// The name given to this file.
   const std::vector<char8_t>& buff, /// File buffer.
+  OStream& stream,                  /// Output stream.
   size_t pos,                       /// File buffer offset.
   const uint32_t line,              /// Line number, optional
   const bool is_warn ) -> void      /// Red/yellow error text
@@ -153,7 +158,7 @@ auto n19::ErrorCollector::display_error(
     spaces += ' ';
   }
 
-  outs()
+  stream
     << Con::Bold     /// Set console to bold.
     << _nstr("In ")  ///
     << fname         /// Display file name in bold.
@@ -172,7 +177,7 @@ auto n19::ErrorCollector::display_error(
     << Endl;         ///
 }
 
-auto n19::ErrorCollector::emit() const -> Result<void> {
+auto n19::ErrorCollector::emit(OStream& stream) const -> Result<void> {
   std::vector<char8_t> buff;
   for(const auto &[file_name, errs] : errs_) {
     const auto file = TRY(FileRef::open(file_name));
@@ -181,12 +186,13 @@ auto n19::ErrorCollector::emit() const -> Result<void> {
     buff.resize(*size);
     file->read_into(as_writable_bytes(buff)).OR_RETURN();
 
-    // Print the error using the file buffer
+    /// Emit the error using the file buffer
     for(const auto& err : errs)
       display_error(
         err.message,
         file_name,
         buff,
+        stream,
         err.file_pos,
         err.line,
         err.is_warning);

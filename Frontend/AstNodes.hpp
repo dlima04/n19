@@ -10,6 +10,7 @@
 #define ASTNODES_HPP
 #include <Frontend/Token.hpp>
 #include <Frontend/EntityQualifier.hpp>
+#include <Core/ConIO.hpp>
 #include <Core/Concepts.hpp>
 #include <vector>
 #include <memory>
@@ -66,14 +67,16 @@ public:
   template<typename T = AstNode>
   using Children = std::vector<Ptr<T>>;
   //////////////////////////////////////////
-
+  
   auto _print(
     uint32_t depth,
+    OStream& stream,
     const std::string& node_name
   ) const -> void;
 
   virtual auto print(
     uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void = 0;
 
@@ -105,9 +108,10 @@ public:
   AstNode::Ptr<> right_ = nullptr;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
-
+  
   ~AstBinExpr() override = default;
   AstBinExpr() = default;
 };
@@ -120,6 +124,7 @@ public:
   bool is_postfix         = false; // only relevant for '--' and '++'
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -140,6 +145,7 @@ public:
   } type_ = None;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -152,6 +158,7 @@ public:
   AstNode::Children<> children_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -164,6 +171,7 @@ public:
   Entity::ID id_= N19_INVALID_ENTITY_ID;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -176,6 +184,7 @@ public:
   std::vector<std::string> name_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -188,6 +197,7 @@ public:
   EntityQualifier descriptor_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -200,6 +210,7 @@ public:
   EntityQualifierThunk descriptor_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -213,6 +224,7 @@ public:
   AstNode::Ptr<> condition_ = nullptr;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -225,6 +237,7 @@ public:
   AstNode::Children<> body_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -236,6 +249,7 @@ class AstNamespace final : public AstNode {
   AstNode::Children<> body_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -249,6 +263,7 @@ public:
   AstNode::Ptr<> condition_ = nullptr;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -261,6 +276,7 @@ public:
   AstNode::Children<> body_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -274,6 +290,7 @@ public:
   AstNode::Ptr<AstElse> else_ = nullptr; // Can be null!
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -287,6 +304,7 @@ public:
   AstNode::Ptr<AstOtherwise> otherwise_ = nullptr; // Can be null!
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -301,6 +319,7 @@ public:
   AstNode::Children<> children_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -313,6 +332,7 @@ public:
   AstNode::Children<> children_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -327,6 +347,7 @@ public:
   AstNode::Children<AstCase> cases_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -339,6 +360,7 @@ public:
   AstNode::Children<> children_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -352,6 +374,7 @@ public:
   AstNode::Children<> arguments_;
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -364,6 +387,7 @@ public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -377,6 +401,7 @@ public:
   AstNode::Ptr<> condition_ = nullptr;  // The condition on which we call this.
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -390,6 +415,7 @@ public:
   AstNode::Ptr<> type_ = nullptr;  // TypeRef or TypeRefThunk
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -404,6 +430,7 @@ public:
   AstNode::Children<> body_;      // The body of the procedure
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -416,6 +443,7 @@ public:
   AstNode::Ptr<> value_ = nullptr; // Can be null!
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -426,6 +454,7 @@ public:
 class AstBreak final : public AstNode {
 public:
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -436,6 +465,7 @@ public:
 class AstContinue final : public AstNode {
 public:
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
   ~AstContinue() override = default;
@@ -449,6 +479,7 @@ public:
   AstNode::Ptr<> cond_    = nullptr; // Can be null!
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -463,6 +494,7 @@ public:
   bool is_dowhile      = false;   // If true: the loop is a do-while.
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 
@@ -476,6 +508,7 @@ public:
   AstNode::Ptr<> value_   = nullptr; // The index value.
 
   auto print(uint32_t depth,
+    OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
 

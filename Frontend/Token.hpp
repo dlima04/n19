@@ -172,7 +172,7 @@ public:
   constexpr auto operator|=(Value other) -> void;
 
   size_t value = NonCategorical;
-  constexpr TokenCategory()  = default;
+  constexpr TokenCategory() = default;
   constexpr TokenCategory(const size_t value) : value(value) {}
 };
 

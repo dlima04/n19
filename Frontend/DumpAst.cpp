@@ -7,24 +7,24 @@
 */
 
 #include <Frontend/AstNodes.hpp>
-#include <Core/ConIO.hpp>
-#include <print>
 BEGIN_NAMESPACE(n19);
 
 auto AstNode::_print(
-  const uint32_t depth, const std::string& node_name ) const -> void
+  const uint32_t depth,
+  OStream& stream,
+  const std::string& node_name ) const -> void
 {
   for(uint32_t i = 0; i < depth; i++) 
-    outs() << "  |";
+    stream << "  |";
   if(depth) 
-    outs() << "_ ";
+    stream << "_ ";
   
-  outs()              ////////////////////////////////////
+  stream              ////////////////////////////////////
     << Con::Bold      // Begin "title":
     << Con::MagentaFG // Bold, magenta.
     << node_name      // The node's name.
     << Con::Reset;    // Reset colour.
-  outs()              //
+  stream              //
     << " <"           // Line, position info.
     << Con::YellowFG  // Line number: yellow.
     << this->line_    // 
@@ -38,423 +38,445 @@ auto AstNode::_print(
 
 auto AstBranch::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "Branch");
+  _print(depth, stream, "Branch");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
   
-  outs()
+  stream
     << Con::WhiteFG
     << "has_else = "
     << (else_ ? "true" : "false")
     << Con::Reset;
 
-  if_->print(depth + 1, "Branch.If");
-  if(else_) else_->print(depth + 1, "Branch.Else");
+  if_->print(depth + 1, stream, "Branch.If");
+  if(else_) else_->print(depth + 1, stream, "Branch.Else");
 }
 
 auto AstConstBranch::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "ConstBranch");
+  _print(depth, stream, "ConstBranch");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs()
+  stream
     << Con::WhiteFG
     << "has_otherwise = "
     << (otherwise_ ? "true" : "false")
     << Con::Reset;
 
-  where_->print(depth + 1, "ConstBranch.Where");
+  where_->print(depth + 1, stream, "ConstBranch.Where");
   if(otherwise_ != nullptr)
-    otherwise_->print(depth + 1, "ConstBranch.Otherwise");
+    otherwise_->print(depth + 1, stream, "ConstBranch.Otherwise");
 }
 
 auto AstIf::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "If");
+  _print(depth, stream, "If");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
-  condition_->print(depth + 1, "If.Condition");
+  stream << '\n';
+  condition_->print(depth + 1, stream, "If.Condition");
   for(const auto& child : body_)
-    child->print(depth + 1, Nothing);
+    child->print(depth + 1, stream, Nothing);
 }
 
 auto AstElse::print(
   const uint32_t depth,
+  OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "Else");
+  _print(depth, stream, "Else");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
+  stream << '\n';
   for(const auto& child : body_)
-    child->print(depth + 1, Nothing);
+    child->print(depth + 1, stream, Nothing);
 }
 
 auto AstWhere::print(
   const uint32_t depth,
+  OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "Where");
+  _print(depth, stream, "Where");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
-  condition_->print(depth + 1, "Where.Condition");
+  stream << '\n';
+  condition_->print(depth + 1, stream, "Where.Condition");
   for(const auto& child : body_)
-    child->print(depth + 1, Nothing);
+    child->print(depth + 1, stream, Nothing);
 }
 
 auto AstOtherwise::print(
   const uint32_t depth,
+  OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "Otherwise");
+  _print(depth, stream, "Otherwise");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
+  stream << '\n';
   for(const auto& child : body_)
-    child->print(depth + 1, Nothing);
+    child->print(depth + 1, stream, Nothing);
 }
 
 auto AstBreak::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "BreakStmt");
+  _print(depth, stream, "BreakStmt");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
-  outs() << '\n';
+  stream << '\n';
 }
 
 auto AstContinue::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "ContinueStmt");
+  _print(depth, stream, "ContinueStmt");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
-  outs() << '\n';
+  stream << '\n';
 }
 
 auto AstReturn::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "ReturnStmt");
+  _print(depth, stream, "ReturnStmt");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs()
+  stream
     << Con::WhiteFG
     << "has_value = "
     << (value_ ? "true" : "false")
     << Con::Reset;
 
   if(value_ != nullptr)
-    value_->print(depth + 1, "Return.Value");
+    value_->print(depth + 1, stream, "Return.Value");
 }
 
 auto AstCall::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "Call");
+  _print(depth, stream, "Call");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
+  stream << '\n';
   for(size_t i = 0; i < arguments_.size(); i++) {
-    arguments_.at(i)->print(depth + 1, fmt("Call.Args.{}", i + 1));
+    arguments_.at(i)->print(depth + 1, stream, fmt("Call.Args.{}", i + 1));
   }
-  target_->print(depth + 1, "Call.Target");
+  target_->print(depth + 1, stream, "Call.Target");
 }
 
 auto AstDefer::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "Defer");
+  _print(depth, stream, "Defer");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
-  call_->print(depth + 1, "Defer.Target");
+  stream << '\n';
+  call_->print(depth + 1, stream, "Defer.Target");
 }
 
 auto AstDeferIf::print(
   const uint32_t depth,
+  OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "DeferIf");
+  _print(depth, stream, "DeferIf");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
-  condition_->print(depth + 1, "DeferIf.Condition");
-  call_->print(depth + 1, "DeferIf.Target");
+  stream << '\n';
+  condition_->print(depth + 1, stream, "DeferIf.Condition");
+  call_->print(depth + 1, stream, "DeferIf.Target");
 }
 
 auto AstVardecl::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "VarDecl");
+  _print(depth, stream, "VarDecl");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
-  name_->print(depth + 1, "VarDecl.Name");
-  type_->print(depth + 1, "Vardecl.Type");
+  stream << '\n';
+  name_->print(depth + 1, stream, "VarDecl.Name");
+  type_->print(depth + 1, stream, "Vardecl.Type");
 }
 
 auto AstProcDecl::print(
   const uint32_t depth,
+  OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "VarDecl");
+  _print(depth, stream, "VarDecl");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
-  name_->print(depth + 1, "ProcDecl.Name");
+  stream << '\n';
+  name_->print(depth + 1, stream, "ProcDecl.Name");
 
   for(size_t i = 0; i < arg_decls_.size(); i++)
-    arg_decls_.at(i)->print(depth + 1, fmt("ProcDecl.Arg.{}", i + 1));
+    arg_decls_.at(i)->print(depth + 1, stream, fmt("ProcDecl.Arg.{}", i + 1));
 
   for(const auto& child : body_)
-    child->print(depth + 1, Nothing);
+    child->print(depth + 1, stream, Nothing);
 }
 
 auto AstCase::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "Case");
+  _print(depth, stream, "Case");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs()
+  stream
     << Con::WhiteFG
     << "is_fallthrough = "
     << (is_fallthrough ? "True\n" : "False\n")
     << Con::Reset;
 
-  value_->print(depth + 1, "Case.Value");
+  value_->print(depth + 1, stream, "Case.Value");
   for(const auto& child : children_)
-    child->print(depth + 1, Nothing);
+    child->print(depth + 1, stream, Nothing);
 }
 
 auto AstDefault::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "Default");
+  _print(depth, stream, "Default");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
+  stream << '\n';
   for(const auto& child : children_)
-    child->print(depth + 1, Nothing);
+    child->print(depth + 1, stream, Nothing);
 }
 
 auto AstSwitch::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "Switch");
+  _print(depth, stream, "Switch");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs()
+  stream
     << "num_cases = "
     << Con::BlueFG
     << cases_.size()
     << Con::Reset
     << Endl;
 
-  target_->print(depth + 1, "Switch.Target");
-  dflt_->print(depth + 1, "Switch.Default");
+  target_->print(depth + 1, stream, "Switch.Target");
+  dflt_->print(depth + 1, stream, "Switch.Default");
 
   for(size_t i = 0; i < cases_.size(); i++)
-    cases_.at(i)->print(depth + 1, fmt("Switch.Case.{}", i + 1));
+    cases_.at(i)->print(depth + 1, stream, fmt("Switch.Case.{}", i + 1));
 }
 
 auto AstScopeBlock::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "ScopeBlock");
+  _print(depth, stream, "ScopeBlock");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
+  stream << '\n';
   for(const auto& child : children_)
-    child->print(depth + 1, Nothing);
+    child->print(depth + 1, stream, Nothing);
 }
 
 auto AstFor::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "For");
+  _print(depth, stream, "For");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << Con::WhiteFG;
-  if(init_) outs()   << "Init ";
-  if(cond_) outs()   << "Cond ";
-  if(update_) outs() << "Update ";
-  outs() << Con::Reset;
+  stream << Con::WhiteFG;
+  if(init_) stream   << "Init ";
+  if(cond_) stream   << "Cond ";
+  if(update_) stream << "Update ";
+  stream << Con::Reset;
 
-  outs() << '\n';
-  if(init_) init_->print(depth + 1, "For.Init");
-  if(cond_) cond_->print(depth + 1, "For.Cond");
-  if(update_) update_->print(depth + 1, "For.Update");
+  stream << '\n';
+  if(init_) init_->print(depth + 1, stream, "For.Init");
+  if(cond_) cond_->print(depth + 1, stream, "For.Cond");
+  if(update_) update_->print(depth + 1, stream, "For.Update");
 }
 
 auto AstWhile::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "While");
+  _print(depth, stream, "While");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs()
+  stream
     << Con::WhiteFG
     << "is_dowhile = "
     << (is_dowhile ? "True\n" : "False\n")
     << Con::Reset;
 
-  cond_->print(depth + 1, "While.Cond");
+  cond_->print(depth + 1, stream, "While.Cond");
   for(const auto& child : body_)
-    child->print(depth + 1, Nothing);
+    child->print(depth + 1, stream, Nothing);
 }
 
 auto AstSubscript::print(
   const uint32_t depth,
+  OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "Subscript");
+  _print(depth, stream, "Subscript");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
-
-  outs() << '\n';
-  operand_->print(depth + 1, "Subscript.Operand");
-  value_->print(depth + 1, "Subscript.Value");
+  
+  stream << '\n';
+  operand_->print(depth + 1, stream, "Subscript.Operand");
+  value_->print(depth + 1, stream, "Subscript.Value");
 }
 
 auto AstBinExpr::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "BinExpr");
+  _print(depth, stream, "BinExpr");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
   
   const auto as_str = op_type_.to_string();
-
-  outs()
+  stream
     << Con::BlueFG
     << as_str
     << Con::Reset
     << '\n';
 
-  right_->print(depth + 1, "Binexpr.Right");
-  left_->print(depth + 1, "Binexpr.Left");
+  right_->print(depth + 1, stream, "Binexpr.Right");
+  left_->print(depth + 1, stream, "Binexpr.Left");
 }
 
 auto AstUnaryExpr::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "UnaryExpr");
+  _print(depth, stream, "UnaryExpr");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
   const auto as_str = op_type_.to_string();
 
-  outs() // -------------
+  stream // -------------
     << Con::BlueFG
     << as_str
     << Con::Reset
@@ -462,21 +484,22 @@ auto AstUnaryExpr::print(
     << (is_postfix ? "True\n" : "False\n")
     << Con::Reset;
 
-  operand_->print(depth + 1, "UnaryExpr.Operand");
+  operand_->print(depth + 1, stream, "UnaryExpr.Operand");
 }
 
 auto AstScalarLiteral::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "ScalarLit");
+  _print(depth, stream, "ScalarLit");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs()
+  stream
     << Con::BlueFG
     << value_
     << '\n'
@@ -485,32 +508,34 @@ auto AstScalarLiteral::print(
 
 auto AstAggregateLiteral::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "AggregateLit");
+  _print(depth, stream, "AggregateLit");
   if(alias.has_value())
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
+  stream << '\n';
   for(const auto& child : children_)
-    child->print(depth + 1, Nothing);
+    child->print(depth + 1, stream, Nothing);
 }
 
 auto AstEntityRef::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "EntityRef");
+  _print(depth, stream, "EntityRef");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs()
+  stream
     << Con::BlueFG
     << "ID = "
     << id_
@@ -520,67 +545,71 @@ auto AstEntityRef::print(
 
 auto AstEntityRefThunk::print(
   const uint32_t depth,
+  OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "EntityRefThunk");
+  _print(depth, stream, "EntityRefThunk");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << Con::BlueFG;
+  stream << Con::BlueFG;
   for(const auto& str : name_) {
-    outs() << str << ' ';
+    stream << str << ' ';
   }
 
-  outs() << Con::Reset << '\n';
+  stream << Con::Reset << '\n';
 }
 
 auto AstTypeRef::print(
   const uint32_t depth,
+  OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "TypeRef");
+  _print(depth, stream, "TypeRef");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
   const auto formatted = descriptor_.format();
-  outs() << formatted << '\n';
+  stream << formatted << '\n';
 }
 
 auto AstTypeRefThunk::print(
   const uint32_t depth,
-  const Maybe<std::string>& alias ) const -> void
+  OStream& stream,
+  const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "TypeRefThunk");
+  _print(depth, stream, "TypeRefThunk");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
   const auto formatted = descriptor_.format();
-  outs() << formatted << '\n';
+  stream << formatted << '\n';
 }
 
 auto AstNamespace::print(
   const uint32_t depth,
+  OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, "NamespaceBlock");
+  _print(depth, stream, "NamespaceBlock");
   if(alias.has_value()) 
-    outs()
+    stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  outs() << '\n';
+  stream << '\n';
   for(const auto& child : body_)
-    child->print(depth + 1, Nothing);
+    child->print(depth + 1, stream, Nothing);
 }
 
 END_NAMESPACE(n19);

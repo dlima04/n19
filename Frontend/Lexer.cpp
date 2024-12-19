@@ -10,6 +10,7 @@
 #include <Core/Murmur3.hpp>
 #include <Frontend/Lexer.hpp>
 #include <Frontend/ErrorCollector.hpp>
+#include <Core/ConIO.hpp>
 #include <filesystem>
 #include <algorithm>
 #include <limits>
@@ -1107,7 +1108,7 @@ auto Lexer::dump() -> void {
   } while(curr_tok != TokenType::EndOfFile && curr_tok != TokenType::Illegal);
 
   if(curr_tok == TokenType::Illegal) {
-    ErrorCollector::display_error("Illegal token!", *this, curr_tok);
+    ErrorCollector::display_error("Illegal token!", *this, curr_tok, outs());
   }
 }
 

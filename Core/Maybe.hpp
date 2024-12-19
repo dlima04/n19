@@ -12,6 +12,7 @@
 #include <Core/Panic.hpp>
 #include <Core/Nothing.hpp>
 #include <Core/Forward.hpp>
+#include <Core/ClassTraits.hpp>
 #include <utility>
 #include <variant>
 BEGIN_NAMESPACE(n19)
@@ -29,30 +30,22 @@ public:
   using __Variant     = std::variant<T, __Nothing>;
 
   [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
-    #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( has_value_ == true, "Bad Maybe access!" );
-    #endif//__N19_CORE_THROW_EXCEPTIONS
+    ASSERT( has_value_ == true, "Bad Maybe access!" );
     return std::get<T>( value_ );
   }
 
   [[nodiscard]] N19_FORCEINLINE auto value() -> T& {
-    #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT(has_value_ == true, "Bad Maybe access!");
-    #endif//__N19_CORE_THROW_EXCEPTIONS
+    ASSERT(has_value_ == true, "Bad Maybe access!");
     return std::get<T>( value_ );
   }
 
   N19_FORCEINLINE auto operator->(this auto&& self) -> decltype(auto) {
-    #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( self.has_value_ == true, "Bad Maybe access!" );
-    #endif//__N19_CORE_THROW_EXCEPTIONS
+    ASSERT( self.has_value_ == true, "Bad Maybe access!" );
     return &self.value();
   }
 
   N19_FORCEINLINE auto operator*(this auto&& self) -> decltype(auto) {
-    #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( self.has_value_ == true, "Bad Maybe access!" );
-    #endif//__N19_CORE_THROW_EXCEPTIONS
+    ASSERT( self.has_value_ == true, "Bad Maybe access!" );
     return self.value();
   }
 
@@ -107,7 +100,7 @@ public:
   explicit operator bool() const { return has_value_; }
 
   N19_FORCEINLINE Maybe(const T& val)     : has_value_(true), value_(val) {}
-  N19_FORCEINLINE Maybe(T&& val)          : has_value_(true), value_(val) {}
+  N19_FORCEINLINE Maybe(T&& val)          : has_value_(true), value_(std::move(val)) {}
   N19_FORCEINLINE Maybe(const __Nothing&) : value_(__Nothing{}) {}
   N19_FORCEINLINE Maybe(/*......*/)       : value_(__Nothing{}) {}
 protected:

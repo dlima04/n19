@@ -11,6 +11,7 @@
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
 #include <Core/FileRef.hpp>
+#include <Core/Stream.hpp>
 #include <Core/Bytes.hpp>
 #include <Sys/String.hpp>
 #include <string>
@@ -19,27 +20,23 @@
 #include <unordered_map>
 
 #define N19_MAX_ERRORS 40
-
-namespace n19 {
-  class ErrorCollector;
-  struct ErrorLocation;
-}
-
+BEGIN_NAMESPACE(n19);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct n19::ErrorLocation {
+struct ErrorLocation {
   std::string message;
   size_t file_pos;
   uint32_t line;
   bool is_warning;
 };
 
-class n19::ErrorCollector {
+class ErrorCollector {
 N19_MAKE_NONCOPYABLE(ErrorCollector);
 public:
   static auto display_error(
     const std::string &msg,
     const FileRef &file,
+    OStream& stream,
     const size_t pos,
     const uint32_t line,
     bool is_warn = false
@@ -49,6 +46,7 @@ public:
     const std::string& msg,
     const sys::String& fname,
     const std::vector<char8_t>& buff,
+    OStream& stream,
     const size_t pos,
     const uint32_t line,
     bool is_warn = false
@@ -57,6 +55,7 @@ public:
   static auto display_error(
     const std::string& msg,
     class Lexer const& lxr,
+    OStream& stream,
     bool is_warn = false
   ) -> void;
 
@@ -64,6 +63,7 @@ public:
     const std::string& msg,
     class Lexer const& lxr,
     class Token const& tok,
+    OStream& stream,
     bool is_warn = false
   ) -> void;
 
@@ -86,8 +86,7 @@ public:
     const ErrorLocation& err
   ) -> ErrorCollector&;
 
-  auto emit()        const -> Result<void>;
-  auto max_err_chk() const -> void;
+  auto emit(OStream& stream) const -> Result<void>;
   auto has_errors()  const -> bool;
 
   ErrorCollector() = default;
@@ -103,16 +102,11 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-N19_FORCEINLINE auto n19::ErrorCollector::max_err_chk() const -> void {
-  if(error_count_ + 1 < N19_MAX_ERRORS) [[likely]]
-    return;
-  [[maybe_unused]] const auto _ = emit();
-  FATAL("Maximum amount of permitted errors reached. Aborting compilation now.");
-}
-
-N19_FORCEINLINE auto n19::ErrorCollector::has_errors() const -> bool {
+N19_FORCEINLINE auto ErrorCollector::has_errors() const -> bool {
   return error_count_ > 0;
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+END_NAMESPACE(n19);
 #endif //ERRORCOLLECTOR_HPP

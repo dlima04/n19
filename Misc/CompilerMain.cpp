@@ -14,7 +14,6 @@
 #include <Core/ConIO.hpp>
 #include <iostream>
 #include <Core/ArgParse.hpp>
-#include <print>
 
 using namespace n19;
 
@@ -23,32 +22,44 @@ struct foo {
   int y;
 };
 
+struct MyArgs : argp::Parser {
+  int64_t& num_jobs  = arg<int64_t>("--num-jobs", "-j", "numba of jobs");
+  sys::String& name  = arg<sys::String>("--input", "-i", "the input file.", "Default value!!!");
+  bool& verbose      = arg<bool>("--verbose", "-v", "verbose mode");
+};
+
 int main(int argc, char** argv){
+  std::vector<sys::String> strs = { "--num-jobs=42069", "--verbose=false" };
 
-  std::string str = "Hello, world!\n";
-  auto stream = BufferedOStream<25>::from_stdout();
+  MyArgs args;
+  auto res = args.style(argp::ArgStyle::UNIX)
+    .take_argv(std::move(strs))
+    .parse(outs());
 
-  //std::wcout << fmt(L"this is a test {}", L"motherfucker!!") << std::endl;
-  //std::cout << fmt("hello bitch!!!! {} {}", "yes", 3.1e1) << std::endl;
-
-  // auto thing = COStream::from_stdout();
-  // if(!thing) {
-  //   std::cerr << "failed: " << thing.error().msg;
-  // }
-
-  try {
-    const auto file = MUST(FileRef::open(CURRENT_TEST));
-    auto lxr = Lexer::create(*file);
-    if(!lxr) {
-      return 1;
-    }
-
-    lxr.value()->dump();
-  } catch(const std::exception& e) {
-    std::cerr << "EXCEPTION: " << e.what() << std::endl;
+  if(!res) {
+    return 1;
   }
 
-  stream.flush();
+  std::cout << "num_jobs=" << args.num_jobs << '\n';
+  std::cout << "name=" << args.name << '\n';
+  std::cout << std::boolalpha << "verbose=" << args.verbose << std::endl;
+
+  args.help(outs());
+
+  //try {
+  //  const auto file = MUST(FileRef::open(CURRENT_TEST));
+  //  auto lxr = Lexer::create(*file);
+  //  if(!lxr) {
+  //    return 1;
+  //  }
+//
+  //  lxr.value()->dump();
+  //} catch(const std::exception& e) {
+  //  std::cerr << "EXCEPTION: " << e.what() << std::endl;
+  //}
+
+  outs().flush();
+  errs().flush();
   return 0;
 }
 

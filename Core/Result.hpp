@@ -63,44 +63,32 @@ public:
   using __Variant   = std::variant<T, E> ;
 
   [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
-    #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( has_value() == true, "Result contains an error!" );
-    #endif//__N19_CORE_THROW_EXCEPTIONS
+    ASSERT( has_value() == true, "Result contains an error!" );
     return std::get<T>( value_ );
   }
 
   [[nodiscard]] N19_FORCEINLINE auto value() -> T& {
-    #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( has_value() == true, "Result contains an error!" );
-    #endif//__N19_CORE_THROW_EXCEPTIONS
+    ASSERT( has_value() == true, "Result contains an error!" );
     return std::get<T>( value_ );
   }
 
   [[nodiscard]] N19_FORCEINLINE auto error() const -> const E& {
-    #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( has_value() == false, "Result contains a value!" );
-    #endif//__N19_CORE_THROW_EXCEPTIONS
+    ASSERT( has_value() == false, "Result contains a value!" );
     return std::get<E>( value_ );
   }
 
   [[nodiscard]] N19_FORCEINLINE auto error() -> E& {
-    #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( has_value() == false, "Result contains a value!" );
-    #endif//__N19_CORE_THROW_EXCEPTIONS
+    ASSERT( has_value() == false, "Result contains a value!" );
     return std::get<E>( value_ );
   }
 
   N19_FORCEINLINE auto operator->(this auto&& self) -> decltype(auto) {
-    #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( self.has_value() == true, "Result contains an error!" );
-    #endif//__N19_CORE_THROW_EXCEPTIONS
+    ASSERT( self.has_value() == true, "Result contains an error!" );
     return &( forward<decltype(self)>(self).value() );
   }
 
   N19_FORCEINLINE auto operator*(this auto&& self) -> decltype(auto) {
-    #ifndef __N19_CORE_THROW_EXCEPTIONS
-      ASSERT( self.has_value() == true, "Result contains an error!" );
-    #endif//__N19_CORE_THROW_EXCEPTIONS
+    ASSERT( self.has_value() == true, "Result contains an error!" );
     return forward<decltype(self)>(self).value();
   }
 
@@ -148,9 +136,9 @@ public:
     return std::holds_alternative<T>( value_ );
   }
 
-  N19_FORCEINLINE __Result(T&& value)       : value_(value) {}
+  N19_FORCEINLINE __Result(T&& value)       : value_(std::move(value)) {}
+  N19_FORCEINLINE __Result(E&& error)       : value_(std::move(error)) {}
   N19_FORCEINLINE __Result(const T& value)  : value_(value) {}
-  N19_FORCEINLINE __Result(E&& error)       : value_(error) {}
   N19_FORCEINLINE __Result(const E& error)  : value_(error) {}
   N19_FORCEINLINE __Result(/*.....*/)       : value_(E{}  ) {}
 protected:
@@ -177,7 +165,7 @@ using ErrorT = __ErrorType;
 template<typename T, typename ...Args>
 auto make_result(Args&&... args) -> Result<T> {
   if constexpr(std::is_void_v<T>)
-    return Result<__Nothing>{};
+    return Result<__Nothing>{__Nothing{}};
   else
     return T{ std::forward<Args>(args)... };
 }
