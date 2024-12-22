@@ -20,7 +20,6 @@
 #include <limits>
 
 #if defined(N19_WIN32)
-#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #  include <vector>
 #else //POSIX
@@ -28,9 +27,9 @@
 #endif
 
 #ifdef N19_LARGE_OSTREAM_BUFFERS
-#  define N19_OSTREAM_BUFFSIZE 2048LU
+#  define N19_OSTREAM_BUFFSIZE 2048
 #else
-#  define N19_OSTREAM_BUFFSIZE 1024LU
+#  define N19_OSTREAM_BUFFSIZE 1024
 #endif
 
 BEGIN_NAMESPACE(n19);
@@ -128,7 +127,7 @@ public:
   auto operator<<(const std::wstring_view& str) -> COStream & {
     if(str.empty()) return *this;
 
-    const int req_size = WideCharToMultiByte(
+    const int req_size = ::WideCharToMultiByte(
       CP_UTF8,         /// Code page: UTF-8
       0,               /// Conversion flags
       str.data(),      /// Source UTF-16 string
@@ -141,7 +140,7 @@ public:
     if(req_size == 0) return *this;
     std::vector<char> outbuf((size_t)req_size, '\0');
 
-    const int result = WideCharToMultiByte(
+    const int result = ::WideCharToMultiByte(
       CP_UTF8,         /// Code page: UTF-8
       0,               /// Conversion flags
       str.data(),      /// Source UTF-16 string
@@ -187,7 +186,7 @@ protected:
 // It uses a fixed-size buffer internally, of which the size is determined by
 // the template parameter. The size should not be 0.
 
-template<size_t size_>
+template<size_t size_ = N19_OSTREAM_BUFFSIZE>
 class BufferedOStream : public OStream {
 public:
   constexpr static size_t __size  = size_;

@@ -12,6 +12,7 @@
 #include <Core/Panic.hpp>
 #include <Core/Nothing.hpp>
 #include <Core/Forward.hpp>
+#include <Core/Concepts.hpp>
 #include <Core/ClassTraits.hpp>
 #include <utility>
 #include <variant>
@@ -19,7 +20,7 @@ BEGIN_NAMESPACE(n19)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<typename T>
+template<Concrete T>
 class /* [[nodiscard]] */ Maybe {
 N19_MAKE_DEFAULT_CONSTRUCTIBLE(Maybe);
 N19_MAKE_DEFAULT_ASSIGNABLE(Maybe);
@@ -39,23 +40,23 @@ public:
     return std::get<T>( value_ );
   }
 
-  N19_FORCEINLINE auto operator->(this auto&& self) -> decltype(auto) {
+  auto operator->(this auto&& self) -> decltype(auto) {
     ASSERT( self.has_value_ == true, "Bad Maybe access!" );
     return &self.value();
   }
 
-  N19_FORCEINLINE auto operator*(this auto&& self) -> decltype(auto) {
+  auto operator*(this auto&& self) -> decltype(auto) {
     ASSERT( self.has_value_ == true, "Bad Maybe access!" );
     return self.value();
   }
 
-  [[nodiscard]] N19_FORCEINLINE auto value_or(T &&val) const -> T {
-    if(has_value_) {                 // return the value if it exists.
-      return std::get<T>( value_ );  // else ::
-    } return val;                    // return provided value type.
+  [[nodiscard]] auto value_or(T &&val) const -> T {
+    if(has_value_) {                 /// return the value if it exists.
+      return std::get<T>( value_ );  /// else ::
+    } return val;                    /// return provided value type.
   }
 
-  [[nodiscard]] N19_FORCEINLINE auto release() -> T {
+  [[nodiscard]] auto release() -> T {
     T released = std::move( value() );
     has_value_ = false;
     value_     = Nothing;
@@ -63,13 +64,13 @@ public:
   }
 
   template<typename O>
-  N19_FORCEINLINE auto operator==(const Maybe<O>& other) -> bool {
+  auto operator==(const Maybe<O>& other) -> bool {
     return has_value_ == other.has_value_
       && (!has_value_ || value() == other.value());
   }
 
   template<typename O>
-  N19_FORCEINLINE auto operator==(const O& other) -> bool {
+  auto operator==(const O& other) -> bool {
     return has_value_ && other == value();
   }
 
@@ -96,13 +97,13 @@ public:
     has_value_  = false;
   }
 
-  auto has_value() const -> bool { return has_value_; }
-  explicit operator bool() const { return has_value_; }
+  N19_FORCEINLINE auto has_value() const -> bool { return has_value_; }
+  N19_FORCEINLINE explicit operator bool() const { return has_value_; }
 
-  N19_FORCEINLINE Maybe(const T& val)     : has_value_(true), value_(val) {}
-  N19_FORCEINLINE Maybe(T&& val)          : has_value_(true), value_(std::move(val)) {}
-  N19_FORCEINLINE Maybe(const __Nothing&) : value_(__Nothing{}) {}
-  N19_FORCEINLINE Maybe(/*......*/)       : value_(__Nothing{}) {}
+  Maybe(const T& val)     : has_value_(true), value_(val) {}
+  Maybe(T&& val)          : has_value_(true), value_(std::move(val)) {}
+  Maybe(const __Nothing&) : value_(__Nothing{}) {}
+  Maybe(/*......*/)       : value_(__Nothing{}) {}
 protected:
   bool has_value_ { false };
   __Variant value_;

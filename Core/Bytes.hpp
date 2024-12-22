@@ -27,10 +27,10 @@ using Bytes          = std::span<const Byte>;
 using WritableBytes  = std::span<Byte>;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Class that stores a byte buffer representation of a given object
 
-template<typename T>
-class ByteCopy {
-static_assert(!IsReference<T>);
+template<Concrete T>
+class ByteCopy final {
 static_assert(!std::is_array_v<T>);
 public:
   using ValueType      = T;

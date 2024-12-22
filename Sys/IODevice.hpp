@@ -16,7 +16,6 @@
 #include <span>
 
 #if defined(N19_WIN32)
-#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #else // POSIX
 #  include <unistd.h>
@@ -56,8 +55,8 @@ public:
 
   // Some operator overloads to simplify
   // reading/writing to the IODevice.
-  template<typename T> auto operator<<(const T& val)   -> IODevice&;
-  template<typename T> auto operator>>(T& val)         -> IODevice&;
+  template<typename T> auto operator<<(const T& val) -> IODevice&;
+  template<typename T> auto operator>>(T& val)       -> IODevice&;
 
   // Static methods / factories.
   // These can be called to gain access

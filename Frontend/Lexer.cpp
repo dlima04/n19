@@ -1104,7 +1104,7 @@ auto Lexer::dump() -> void {
   Token curr_tok;
   do {
     curr_tok = _produce_impl();
-    std::println("{}", curr_tok.format(*this));
+    outs() << curr_tok.format(*this);
   } while(curr_tok != TokenType::EndOfFile && curr_tok != TokenType::Illegal);
 
   if(curr_tok == TokenType::Illegal) {

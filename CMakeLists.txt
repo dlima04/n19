@@ -8,7 +8,7 @@ set(N19_ENUMERATE_CORE_INCLUDE
   Core/Fmt.hpp
   Core/FileRef.hpp
   Core/Concepts.hpp
-  Core/StopWatch.hpp
+  Core/Time.hpp
   Core/RingBase.hpp
   Core/Bytes.hpp
   Core/Platform.hpp
@@ -34,6 +34,7 @@ set(N19_ENUMERATE_CORE_SOURCE
   Core/Panic.cpp
   Core/Stream.cpp
   Core/ArgParse.cpp
+  Core/Time.cpp
 )
 
 set(N19_ENUMERATE_FRONTEND_INCLUDE
@@ -66,6 +67,7 @@ set(N19_ENUMERATE_SYS_INCLUDE
 set(N19_ENUMERATE_SYS_SOURCE
   Sys/LastError.cpp
   Sys/IODevice.cpp
+  Sys/Channel.hpp
 )
 
 # Build the main compiler executable.

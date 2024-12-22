@@ -91,8 +91,7 @@ auto IODevice::write(
     nullptr,
     nullptr
   )) {
-    return make_error(
-      ErrC::Native, "{}", last_error());
+    return make_error(ErrC::Native, last_error());
   }
 
   return make_result<void>();
@@ -109,8 +108,7 @@ auto IODevice::read_into(
     nullptr,
     nullptr
   )) {
-    return make_error(
-      ErrC::Native, "{}", last_error());
+    return make_error(ErrC::Native, last_error());
   }
 
   return make_result<void>();

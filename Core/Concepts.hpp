@@ -41,5 +41,8 @@ concept FloatingPoint = IsFloatingPoint<T>;
 template<typename T>
 concept IntOrFloat = IsIntegral<T> || IsFloatingPoint<T>;
 
+template<typename T>
+concept Concrete = !IsReference<T>;
+
 END_NAMESPACE(n19);
 #endif //CONCEPTS_HPP
