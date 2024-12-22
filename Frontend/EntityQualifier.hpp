@@ -18,19 +18,14 @@
   X(Constant, 1ULL)        \
   X(Rvalue, 1ULL << 1)     \
 
-namespace n19 {
-  class EntityQualifierBase;
-  class EntityQualifier;
-  class EntityQualifierThunk;
-}
-
+BEGIN_NAMESPACE(n19);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Base class. Represents a reference to a n19::Type.
-// n19::TypeDescriptorBase applies qualifications to this type,
-// namely pointer depth, constness and array lengths.
-// this class does not represent the type itself.
-class n19::EntityQualifierBase {
+/// Base class. Represents a reference to a n19::Type.
+/// n19::TypeDescriptorBase applies qualifications to this type,
+/// namely pointer depth, constness and array lengths.
+/// this class does not represent the type itself.
+class EntityQualifierBase {
 public:
   [[nodiscard]] auto is_constant() const -> bool;
   [[nodiscard]] auto is_rvalue()   const -> bool;
@@ -52,10 +47,10 @@ public:
   EntityQualifierBase() = default;
 };
 
-// Represents a fully resolved reference to a n19::Type.
-// Holds an entity ID and provides a way to access this
-// entity.
-class n19::EntityQualifier final
+/// Represents a fully resolved reference to a n19::Type.
+/// Holds an entity ID and provides a way to access this
+/// entity.
+class EntityQualifier final
   : public EntityQualifierBase {
 public:
   [[nodiscard]] auto to_string(
@@ -63,10 +58,6 @@ public:
     bool include_qualifiers = true,
     bool include_postfixes = true
   ) const -> std::string;
-
-  [[nodiscard]] auto get_entity_ptr(
-    const EntityTable& tbl
-  ) const -> Entity::Ptr<Type>;
 
   [[nodiscard]] auto format() const -> std::string;
   static auto get_const_bool() -> EntityQualifier;
@@ -80,11 +71,11 @@ public:
   EntityQualifier()  = default;
 };
 
-// Represents an unresolved reference to a n19::Type.
-// Each type is represented as a relative namespace path to
-// a type that may or may not exist. Can be resolved into
-// a joy::TypeDescriptor.
-class n19::EntityQualifierThunk final
+/// Represents an unresolved reference to a n19::Type.
+/// Each type is represented as a relative namespace path to
+/// a type that may or may not exist. Can be resolved into
+/// a joy::TypeDescriptor.
+class EntityQualifierThunk final
   : public EntityQualifierBase {
 public:
   [[nodiscard]] auto to_string(
@@ -102,34 +93,25 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-inline auto n19::EntityQualifier::get_entity_ptr(const EntityTable &tbl) const
--> Entity::Ptr<Type> {
-  return std::dynamic_pointer_cast<Type>(tbl.find(id_));
-}
-
-inline auto n19::EntityQualifierBase::is_constant() const
--> bool {
+inline auto EntityQualifierBase::is_constant() const -> bool {
   return flags_ & Constant;
 }
 
-inline auto n19::EntityQualifierBase::is_rvalue() const
--> bool {
+inline auto EntityQualifierBase::is_rvalue() const -> bool {
   return flags_ & Rvalue;
 }
 
-inline auto n19::EntityQualifierBase::is_pointer() const
--> bool {
+inline auto EntityQualifierBase::is_pointer() const -> bool {
   return ptr_depth_ > 0;
 }
 
-inline auto n19::EntityQualifierBase::is_array() const
--> bool {
+inline auto EntityQualifierBase::is_array() const -> bool {
   return !arr_lengths_.empty();
 }
 
-inline auto n19::EntityQualifierBase::is_matrice() const
--> bool {
+inline auto EntityQualifierBase::is_matrice() const -> bool {
   return arr_lengths_.size() > 1;
 }
 
+END_NAMESPACE(n19);
 #endif //ENTITYQUALIFIER_HPP

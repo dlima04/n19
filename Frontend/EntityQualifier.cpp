@@ -11,11 +11,12 @@
 
 auto n19::EntityQualifier::format() const -> std::string {
   std::string buff;
+
   #define X(EQ_FLAG, UNUSED)                    \
   if(flags_ & n19::EntityQualifier::EQ_FLAG){   \
     buff += #EQ_FLAG " | ";                     \
   }
-  N19_EQ_FLAG_LIST
+    N19_EQ_FLAG_LIST
   #undef X
 
   if(!buff.empty()) {
@@ -32,25 +33,24 @@ auto n19::EntityQualifier::format() const -> std::string {
   }
 
   return fmt(
-    "{}ID: {} {}{}{}{}",         // Fmt string
-    manip_string(Con::BlueFG),     // ID color = blue
-    static_cast<uint32_t>(id_),  // The ID
-    manip_string(Con::Reset),    // Reset console
-    manip_string(Con::WhiteFG),    // buff = white
-    buff,                        // The buff
-    manip_string(Con::Reset)     // Reset console
-  );
+    "{}ID: {} {}{}{}{}",         /// Fmt string
+    manip_string(Con::BlueFG),   /// ID color = blue
+    static_cast<uint32_t>(id_),  /// The ID
+    manip_string(Con::Reset),    /// Reset console
+    manip_string(Con::WhiteFG),  /// buff = white
+    buff,                        /// The buff
+    manip_string(Con::Reset));   /// Reset console
 }
 
 auto n19::EntityQualifierThunk::format() const -> std::string {
-  std::string buff;      // the flags and qualifiers
-  std::string full_name; // full entity name
+  std::string buff;      /// the flags and qualifiers
+  std::string full_name; /// full entity name
 
   #define X(EQ_FLAG, UNUSED)                    \
   if(flags_ & n19::EntityQualifier::EQ_FLAG){   \
     buff += #EQ_FLAG " | ";                     \
   }
-  N19_EQ_FLAG_LIST
+    N19_EQ_FLAG_LIST
   #undef X
 
   if(!buff.empty()) {
@@ -69,14 +69,13 @@ auto n19::EntityQualifierThunk::format() const -> std::string {
   }
 
   return fmt(
-    "{}{} {}{}{}{}",             // Fmt string
-    manip_string(Con::BlueFG),     // ID color = blue
-    full_name,                   // The ID
-    manip_string(Con::Reset),    // Reset console
-    manip_string(Con::WhiteFG),    // buff = white
-    buff,                        // The buff
-    manip_string(Con::Reset)     // Reset console
-  );
+    "{}{} {}{}{}{}",             /// Fmt string
+    manip_string(Con::BlueFG),   /// ID color = blue
+    full_name,                   /// The ID
+    manip_string(Con::Reset),    /// Reset console
+    manip_string(Con::WhiteFG),  /// buff = white
+    buff,                        /// The buff
+    manip_string(Con::Reset));   /// Reset console
 }
 
 auto n19::EntityQualifier::get_const_bool() -> EntityQualifier {
@@ -127,11 +126,10 @@ auto n19::EntityQualifier::to_string(
   }
 
   if(include_postfixes) {
-    for(const auto& len : arr_lengths_) {
+    for(const auto& len : arr_lengths_)
       buff.append(fmt("[{}]", len));
-    } for(uint32_t i = 0; i < ptr_depth_; i++) {
+    for(uint32_t i = 0; i < ptr_depth_; i++)
       buff.append("*");
-    }
   }
 
   return buff;
@@ -163,11 +161,10 @@ auto n19::EntityQualifierThunk::to_string(
   }
 
   if(include_postfixes) {
-    for(const auto& len : arr_lengths_) {
+    for(const auto& len : arr_lengths_)
       buff.append(fmt("[{}]", len));
-    } for(uint32_t i = 0; i < ptr_depth_; i++) {
+    for(uint32_t i = 0; i < ptr_depth_; i++)
       buff.append("*");
-    }
   }
 
   return buff;

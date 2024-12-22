@@ -15,36 +15,11 @@
 #include <memory>
 
 // Some constants:
-// The root entity ID ALWAYS begins at 1.
+// The root entity ID begins at 1.
 // a value of 0 is an invalid ID.
 #define N19_ROOT_ENTITY_ID 1
 #define N19_INVALID_ENTITY_ID 0
 
-// All entity types that can be
-// found in an EntityTable.
-// Can be later represented as an
-// enumeration, class name, etc.
-#define N19_ENTITY_TYPE_LIST  \
-  X(Entity)                   \
-  X(RootEntity)               \
-  X(Procedure)                \
-  X(Type)                     \
-  X(PlaceHolder)              \
-  X(SymLink)                  \
-  X(Variable)                 \
-  X(Static)                   \
-  X(Enum)                     \
-  X(Struct)                   \
-  X(AliasType)                \
-  X(BuiltinType)              \
-  X(GenericType)              \
-  X(GenericProcedure)         \
-
-// List of builtin entity types.
-// - the name
-// - the string representation
-// - The guaranteed ID it has in the table.
-// - ID should always be ROOT_ID + n
 #define N19_ENTITY_BUILTIN_LIST            \
   X(I8,   "i8",  N19_ROOT_ENTITY_ID + 1)   \
   X(U8,   "u8",  N19_ROOT_ENTITY_ID + 2)   \
@@ -59,33 +34,52 @@
   X(Ptr,  "ptr", N19_ROOT_ENTITY_ID + 11)  \
   X(Bool, "bool",N19_ROOT_ENTITY_ID + 12)  \
 
-namespace n19 {
-  enum class EntityType : uint16_t {
-  #define X(NAME) NAME,
-    N19_ENTITY_TYPE_LIST
-    None,
-  #undef X
-  };
-  #define X(NAME) class NAME;
-    N19_ENTITY_TYPE_LIST
-  #undef X
-}
+#define N19_ENTITY_TYPE_LIST               \
+  X(Entity)      /* Base class for all  */ \
+  X(RootEntity)  /* First in the tree   */ \
+  X(Proc)        /* Callable procedures */ \
+  X(Type)        /* Data types          */ \
+  X(PlaceHolder) /* Temporary entities  */ \
+  X(SymLink)     /* Indirection entity  */ \
+  X(Variable)    /* For local variables */ \
+  X(Static)      /* For namespaces, etc */ \
+  X(Enum)        /* Enumeration         */ \
+  X(Struct)      /* C-style structures  */ \
+  X(AliasType)   /* Indirection, Type   */ \
+  X(BuiltinType) /* Builtin, e.g. "int" */ \
+  X(GenericType) /* Generic types       */ \
+  X(GenericProc) /* Generic procedure   */ \
+
+BEGIN_NAMESPACE(n19);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin macro cancer aids fuckery.
+
+#define X(NAME) class NAME;
+  N19_ENTITY_TYPE_LIST
+#undef X
+
+enum class EntityType : uint16_t {
+#define X(NAME) NAME,
+  N19_ENTITY_TYPE_LIST
+  None,
+#undef X
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin class definitions
 
-// The base class for all compilation entities.
-class n19::Entity {
+class Entity {
 public:
   template<typename T = Entity>
   using Ptr = std::shared_ptr<T>;
   using ID  = uint32_t;
   using Children = std::vector<ID>;
 
-  ID          id_      = 0;
-  ID          parent_  = 0;
-  uint32_t    line_    = 0;
-  size_t      pos_     = 0;
-  EntityType  type_    = EntityType::None;
+  Entity::ID  id_     = 0;
+  Entity::ID  parent_ = 0;
+  uint32_t    line_   = 0;
+  size_t      pos_    = 0;
+  EntityType  type_   = EntityType::None;
   std::string file_;
   std::string lname_;
   std::string name_;
@@ -95,26 +89,19 @@ public:
   Entity() = default;
 };
 
-// The root entity in the entity tree.
-// All other entities are children of this one,
-// including the builtin types.
-class n19::RootEntity final : public Entity {
+class RootEntity final : public Entity {
 public:
   RootEntity() = default;
   ~RootEntity() override = default;
 };
 
-// The base class for all Type entities.
-class n19::Type : public Entity {
+class Type : public Entity {
 public:
   ~Type() override = default;
   Type() = default;
 };
 
-// Represents a builtin scalar type,
-// including integers, floating point types, and "ptr".
-// All BuiltinTypes are children of Root.
-class n19::BuiltinType final : public Type {
+class BuiltinType final : public Type {
 public:
   #define X(TYPE, UNUSED, VALUE) TYPE = VALUE,
   enum Type : Entity::ID {
@@ -127,4 +114,5 @@ public:
   explicit BuiltinType(Type type);
 };
 
+END_NAMESPACE(n19);
 #endif //ENTITY_HPP
