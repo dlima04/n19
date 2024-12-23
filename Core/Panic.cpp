@@ -10,11 +10,12 @@
 #include <Core/ConIO.hpp>
 #include <Core/Fmt.hpp>
 #include <cstdlib>
-#include <string>
 BEGIN_NAMESPACE(n19);
 
 auto panic_impl_(
-  const std::string &file, const int line, const std::string &msg ) -> void
+  const std::string &file,
+  const int line,
+  const std::string &msg ) -> void
 {
   set_console(Con::RedFG, Con::Bold);
   outs()

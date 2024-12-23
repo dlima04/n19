@@ -148,18 +148,15 @@ using ErrorT = __ErrorType;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Begin error type helper functions
 
-inline auto
-make_error(const ErrC code) -> ErrorT {
+inline ErrorT make_error(const ErrC code) {
   return ErrorT{.msg = "", .code = code};
 }
 
-inline auto
-make_error(const ErrC code, const std::string& msg) -> ErrorT {
+inline ErrorT make_error(const ErrC code, const std::string& msg) {
   return ErrorT{.msg = msg, .code = code};
 }
 
-inline auto
-make_error(const ErrC code, std::string&& msg) -> ErrorT {
+inline ErrorT make_error(const ErrC code, std::string&& msg) {
   return ErrorT{.msg = msg, .code = code};
 }
 
@@ -167,7 +164,7 @@ make_error(const ErrC code, std::string&& msg) -> ErrorT {
 // Utility function for constructing result types.
 
 template<typename T, typename ...Args>
-[[nodiscard]] auto make_result(Args&&... args) -> Result<T> {
+[[nodiscard]] Result<T> make_result(Args&&... args) {
   if constexpr(IsVoid<T>)
     return Result<__Nothing>{__Nothing{}};
   else

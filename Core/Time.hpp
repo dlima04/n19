@@ -24,17 +24,17 @@ BEGIN_NAMESPACE(n19::time);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Begin class definitions.
 
-struct __LTFormatter {
-  const class LocalTime& time_;
+struct __STFormatter {
+  const class SystemTime& time_;
   [[nodiscard]] auto format()  const -> std::string;
   [[nodiscard]] auto month()   const -> std::string;
   [[nodiscard]] auto weekday() const -> std::string;
-  __LTFormatter(const LocalTime& t) : time_(t) {}
+  __STFormatter(const SystemTime& t) : time_(t) {}
 };
 
-class LocalTime {
-N19_MAKE_DEFAULT_ASSIGNABLE(LocalTime);
-N19_MAKE_DEFAULT_CONSTRUCTIBLE(LocalTime);
+class SystemTime {
+N19_MAKE_DEFAULT_ASSIGNABLE(SystemTime);
+N19_MAKE_DEFAULT_CONSTRUCTIBLE(SystemTime);
 public:
 #ifdef N19_WIN32
   using __SysRepr = ::SYSTEMTIME;
@@ -54,12 +54,12 @@ public:
   __Value month_   = 0;
   __Value year_    = 0;
 
-  auto strings() const     -> __LTFormatter;
-  static auto from_local() -> Result<LocalTime>;
-  static auto from_utc()   -> Result<LocalTime>;
+  auto strings() const     -> __STFormatter;
+  static auto from_local() -> Result<SystemTime>;
+  static auto from_utc()   -> Result<SystemTime>;
 
- ~LocalTime() = default;
-  LocalTime() = default;
+ ~SystemTime() = default;
+  SystemTime() = default;
 };
 
 template<typename T, typename Units, typename Clock>

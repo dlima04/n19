@@ -13,6 +13,8 @@
 
 #define U32_CONSTANT(X) X##LU
 #define U64_CONSTANT(X) X##LLU
+#define AS_U64(CT_EXPR) static_cast<uint64_t>(CT_EXPR)
+#define AS_U32(CT_EXPR) static_cast<uint32_t>(CT_EXPR)
 
 BEGIN_NAMESPACE(n19);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,10 +60,10 @@ constexpr auto murmur3_x86_32(
   uint32_t chnk = 0;    // intermediate value for work.
 
   for(uint32_t i = 0; i < num_blocks; i++) {
-    chnk  = static_cast<uint32_t>(key[i * 4 + 0]) << 0;
-    chnk |= static_cast<uint32_t>(key[i * 4 + 1]) << 8;
-    chnk |= static_cast<uint32_t>(key[i * 4 + 2]) << 16;
-    chnk |= static_cast<uint32_t>(key[i * 4 + 3]) << 24;
+    chnk  = AS_U32(key[i * 4 + 0]) << 0;
+    chnk |= AS_U32(key[i * 4 + 1]) << 8;
+    chnk |= AS_U32(key[i * 4 + 2]) << 16;
+    chnk |= AS_U32(key[i * 4 + 3]) << 24;
 
     chnk *= c1;
     chnk  = std::rotl(chnk,15);
@@ -113,26 +115,26 @@ constexpr auto murmur3_x64_128(
     const auto* pchnk2 = &block_ptr[(i * 16) + 8];
 
     // Copy lower 64 bits:
-    chnk1  = static_cast<uint64_t>(pchnk1[0]) << 0;
-    chnk1 |= static_cast<uint64_t>(pchnk1[1]) << 8;
-    chnk1 |= static_cast<uint64_t>(pchnk1[2]) << 16;
-    chnk1 |= static_cast<uint64_t>(pchnk1[3]) << 24;
+    chnk1  = AS_U64(pchnk1[0]) << 0;
+    chnk1 |= AS_U64(pchnk1[1]) << 8;
+    chnk1 |= AS_U64(pchnk1[2]) << 16;
+    chnk1 |= AS_U64(pchnk1[3]) << 24;
 
-    chnk1 |= static_cast<uint64_t>(pchnk1[4]) << 32;
-    chnk1 |= static_cast<uint64_t>(pchnk1[5]) << 40;
-    chnk1 |= static_cast<uint64_t>(pchnk1[6]) << 48;
-    chnk1 |= static_cast<uint64_t>(pchnk1[7]) << 56;
+    chnk1 |= AS_U64(pchnk1[4]) << 32;
+    chnk1 |= AS_U64(pchnk1[5]) << 40;
+    chnk1 |= AS_U64(pchnk1[6]) << 48;
+    chnk1 |= AS_U64(pchnk1[7]) << 56;
 
     // Copy upper 64 bits:
-    chnk2  = static_cast<uint64_t>(pchnk2[0]) << 0;
-    chnk2 |= static_cast<uint64_t>(pchnk2[1]) << 8;
-    chnk2 |= static_cast<uint64_t>(pchnk2[2]) << 16;
-    chnk2 |= static_cast<uint64_t>(pchnk2[3]) << 24;
+    chnk2  = AS_U64(pchnk2[0]) << 0;
+    chnk2 |= AS_U64(pchnk2[1]) << 8;
+    chnk2 |= AS_U64(pchnk2[2]) << 16;
+    chnk2 |= AS_U64(pchnk2[3]) << 24;
 
-    chnk2 |= static_cast<uint64_t>(pchnk2[4]) << 32;
-    chnk2 |= static_cast<uint64_t>(pchnk2[5]) << 40;
-    chnk2 |= static_cast<uint64_t>(pchnk2[6]) << 48;
-    chnk2 |= static_cast<uint64_t>(pchnk2[7]) << 56;
+    chnk2 |= AS_U64(pchnk2[4]) << 32;
+    chnk2 |= AS_U64(pchnk2[5]) << 40;
+    chnk2 |= AS_U64(pchnk2[6]) << 48;
+    chnk2 |= AS_U64(pchnk2[7]) << 56;
 
     chnk1 *= c1;
     chnk1  = std::rotl(chnk1, 31);
@@ -157,24 +159,24 @@ constexpr auto murmur3_x64_128(
   chnk2 = 0;
 
   switch(len_bytes & 15) {
-    case 15: chnk2 ^= static_cast<uint64_t>(tail[14]) << 48;
-    case 14: chnk2 ^= static_cast<uint64_t>(tail[13]) << 40;
-    case 13: chnk2 ^= static_cast<uint64_t>(tail[12]) << 32;
-    case 12: chnk2 ^= static_cast<uint64_t>(tail[11]) << 24;
-    case 11: chnk2 ^= static_cast<uint64_t>(tail[10]) << 16;
-    case 10: chnk2 ^= static_cast<uint64_t>(tail[ 9]) << 8;
-    case  9: chnk2 ^= static_cast<uint64_t>(tail[ 8]) << 0;
+    case 15: chnk2 ^= AS_U64(tail[14]) << 48;
+    case 14: chnk2 ^= AS_U64(tail[13]) << 40;
+    case 13: chnk2 ^= AS_U64(tail[12]) << 32;
+    case 12: chnk2 ^= AS_U64(tail[11]) << 24;
+    case 11: chnk2 ^= AS_U64(tail[10]) << 16;
+    case 10: chnk2 ^= AS_U64(tail[ 9]) << 8;
+    case  9: chnk2 ^= AS_U64(tail[ 8]) << 0;
     chnk2 *= c2; chnk2 = std::rotl(chnk2, 33);
     chnk2 *= c1; hash2 ^= chnk2;
 
-    case  8: chnk1 ^= static_cast<uint64_t>(tail[ 7]) << 56;
-    case  7: chnk1 ^= static_cast<uint64_t>(tail[ 6]) << 48;
-    case  6: chnk1 ^= static_cast<uint64_t>(tail[ 5]) << 40;
-    case  5: chnk1 ^= static_cast<uint64_t>(tail[ 4]) << 32;
-    case  4: chnk1 ^= static_cast<uint64_t>(tail[ 3]) << 24;
-    case  3: chnk1 ^= static_cast<uint64_t>(tail[ 2]) << 16;
-    case  2: chnk1 ^= static_cast<uint64_t>(tail[ 1]) << 8;
-    case  1: chnk1 ^= static_cast<uint64_t>(tail[ 0]) << 0;
+    case  8: chnk1 ^= AS_U64(tail[ 7]) << 56;
+    case  7: chnk1 ^= AS_U64(tail[ 6]) << 48;
+    case  6: chnk1 ^= AS_U64(tail[ 5]) << 40;
+    case  5: chnk1 ^= AS_U64(tail[ 4]) << 32;
+    case  4: chnk1 ^= AS_U64(tail[ 3]) << 24;
+    case  3: chnk1 ^= AS_U64(tail[ 2]) << 16;
+    case  2: chnk1 ^= AS_U64(tail[ 1]) << 8;
+    case  1: chnk1 ^= AS_U64(tail[ 0]) << 0;
     chnk1 *= c1; chnk1 = std::rotl(chnk1, 31);
     chnk1 *= c2; hash1 ^= chnk1;
   }

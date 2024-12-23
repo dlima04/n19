@@ -11,7 +11,7 @@
 #include <Sys/LastError.hpp>
 BEGIN_NAMESPACE(n19::time);
 
-auto __LTFormatter::weekday() const -> std::string {
+auto __STFormatter::weekday() const -> std::string {
   switch(time_.weekday_) {
     case 7  : [[fallthrough]];
     case 0  : return "Sun";
@@ -27,7 +27,7 @@ auto __LTFormatter::weekday() const -> std::string {
   UNREACHABLE;
 }
 
-auto __LTFormatter::month() const -> std::string {
+auto __STFormatter::month() const -> std::string {
   #ifndef N19_WIN32
     const auto val = time_.month_ + 1;
   #else   // WINDOWS
@@ -53,7 +53,7 @@ auto __LTFormatter::month() const -> std::string {
   UNREACHABLE;
 }
 
-auto __LTFormatter::format() const -> std::string {
+auto __STFormatter::format() const -> std::string {
   return fmt("{}, {} {} {} - {}:{}:{}",
     this->weekday(),   /// Format weekday to human readable.
     this->month(),     /// Format month to human readable.
@@ -64,8 +64,8 @@ auto __LTFormatter::format() const -> std::string {
     time_.second_);    /// second - unchanged
 }
 
-auto LocalTime::strings() const -> __LTFormatter {
-  return __LTFormatter{ *this };
+auto SystemTime::strings() const -> __STFormatter {
+  return __STFormatter{ *this };
 }
 
 #ifdef N19_WIN32
@@ -100,8 +100,8 @@ auto LocalTime::from_local() -> Result<LocalTime> {
 }
 
 #else // POSIX
-auto LocalTime::from_utc() -> Result<LocalTime> {
-  LocalTime time = {}; /// To return.
+auto SystemTime::from_utc() -> Result<SystemTime> {
+  SystemTime time = {}; /// To return.
   __Epoch epoch  = {}; /// UNIX epoch.
   __SysRepr repr = {}; /// POSIX time struct.
 
@@ -120,8 +120,8 @@ auto LocalTime::from_utc() -> Result<LocalTime> {
   return time;
 }
 
-auto LocalTime::from_local() -> Result<LocalTime> {
-  LocalTime time = {}; /// To return.
+auto SystemTime::from_local() -> Result<SystemTime> {
+  SystemTime time = {}; /// To return.
   __Epoch epoch  = {}; /// UNIX epoch.
   __SysRepr repr = {}; /// POSIX time struct.
 
