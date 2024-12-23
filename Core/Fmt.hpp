@@ -8,7 +8,6 @@
 
 #ifndef FMT_HPP
 #define FMT_HPP
-#include <Core/Forward.hpp>
 #include <string>
 #include <format>
 BEGIN_NAMESPACE(n19);

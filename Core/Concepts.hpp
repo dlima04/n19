@@ -9,7 +9,7 @@
 #ifndef CONCEPTS_HPP
 #define CONCEPTS_HPP
 #include <Core/TypeTraits.hpp>
-#include <Core/Forward.hpp>
+#include <utility>
 BEGIN_NAMESPACE(n19);
 
 template<typename T, typename ...Us>
@@ -17,11 +17,6 @@ concept AreAll = (IsSame<T, Us> && ...);
 
 template<typename T, typename ...Us>
 concept AnyOf = (IsSame<T, Us> || ...);
-
-template<typename T, typename ...Us>
-concept CallableWith = requires(T&& t, Us&&... us){
-  { t(forward<Us>(us)...) };
-};
 
 template<typename T>
 concept Character = IsCharacter<T>;
@@ -43,6 +38,14 @@ concept IntOrFloat = IsIntegral<T> || IsFloatingPoint<T>;
 
 template<typename T>
 concept Concrete = !IsReference<T>;
+
+template<typename T, typename U>
+concept Is = IsSame<DecayT<T>, U>;
+
+template<typename T, typename ...Us>
+concept CallableWith = requires(T&& t, Us&&... us){
+  { t(std::forward<Us>(us)...) };
+};
 
 END_NAMESPACE(n19);
 #endif //CONCEPTS_HPP

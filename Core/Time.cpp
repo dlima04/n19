@@ -11,7 +11,7 @@
 #include <Sys/LastError.hpp>
 BEGIN_NAMESPACE(n19::time);
 
-auto __LCFormatter::weekday() const -> std::string {
+auto __LTFormatter::weekday() const -> std::string {
   switch(time_.weekday_) {
     case 7  : [[fallthrough]];
     case 0  : return "Sun";
@@ -27,7 +27,7 @@ auto __LCFormatter::weekday() const -> std::string {
   UNREACHABLE;
 }
 
-auto __LCFormatter::month() const -> std::string {
+auto __LTFormatter::month() const -> std::string {
   #ifndef N19_WIN32
     const auto val = time_.month_ + 1;
   #else   // WINDOWS
@@ -53,7 +53,7 @@ auto __LCFormatter::month() const -> std::string {
   UNREACHABLE;
 }
 
-auto __LCFormatter::format() const -> std::string {
+auto __LTFormatter::format() const -> std::string {
   return fmt("{}, {} {} {} - {}:{}:{}",
     this->weekday(),   /// Format weekday to human readable.
     this->month(),     /// Format month to human readable.
@@ -64,8 +64,8 @@ auto __LCFormatter::format() const -> std::string {
     time_.second_);    /// second - unchanged
 }
 
-auto LocalTime::strings() const -> __LCFormatter {
-  return __LCFormatter{ *this };
+auto LocalTime::strings() const -> __LTFormatter {
+  return __LTFormatter{ *this };
 }
 
 #ifdef N19_WIN32

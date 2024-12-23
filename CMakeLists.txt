@@ -18,7 +18,6 @@ set(N19_ENUMERATE_CORE_INCLUDE
   Core/Murmur3.hpp
   Core/TypeTraits.hpp
   Core/Callback.hpp
-  Core/Forward.hpp
   Core/Result.hpp
   Core/Maybe.hpp
   Core/ConIO.hpp

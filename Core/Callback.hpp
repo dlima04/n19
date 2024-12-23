@@ -9,9 +9,9 @@
 #ifndef CALLBACK_HPP
 #define CALLBACK_HPP
 #include <Core/Concepts.hpp>
-#include <Core/Forward.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
+#include <utility>
 BEGIN_NAMESPACE(n19);
 
 #define DEFER_IF(COND, ...) ::n19::DeferImpl _([&]{ if((COND)){ __VA_ARGS__; }})
@@ -53,7 +53,7 @@ public:
 
 template<typename T> template<CallableWith<T> ...Args>
 N19_FORCEINLINE auto Callback<T>::operator()(Args&&... args) -> decltype(auto) {
-  return obj_( forward<Args>(args)... );
+  return obj_( std::forward<Args>(args)... );
 }
 
 END_NAMESPACE(n19);

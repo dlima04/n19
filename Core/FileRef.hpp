@@ -11,7 +11,6 @@
 #include <Core/Result.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Bytes.hpp>
-#include <Core/Forward.hpp>
 #include <Sys/String.hpp>
 #include <filesystem>
 #include <cstdint>
@@ -28,8 +27,6 @@ BEGIN_NAMESPACE(n19);
 
 class FileRef {
 public:
-  // Attempts to convert the type T to a
-  // n19::ByteView (AKA std::span<std::byte).
   template<typename T> auto operator<<(const T& val) -> FileRef&;
   template<typename T> auto operator>>(T& val)       -> FileRef&;
 
@@ -57,9 +54,6 @@ public:
   static auto create_or_open(const std::wstring& fname) -> Result<FileRef>;
   static auto create_or_open(const std::string& fname)  -> Result<FileRef>;
 
-  // Opens the specified file, ONLY if the file
-  // already exists. If it does not exist, the call fails
-  // and an error value is returned.
   static auto open(const std::wstring& fname) -> Result<FileRef>;
   static auto open(const std::string& fname)  -> Result<FileRef>;
 
@@ -105,15 +99,15 @@ inline auto FileRef::nstr() const -> sys::String {
 }
 
 N19_FORCEINLINE auto FileRef::operator*(this auto &&self) -> auto& {
-  return forward<decltype(self)>(self).path_;
+  return std::forward<decltype(self)>(self).path_;
 }
 
 N19_FORCEINLINE auto FileRef::operator->(this auto &&self) -> auto* {
-  return &(forward<decltype(self)>(self).path_);
+  return &(std::forward<decltype(self)>(self).path_);
 }
 
 N19_FORCEINLINE auto FileRef::path(this auto &&self) -> auto& {
-  return forward<decltype(self)>(self).path_;
+  return std::forward<decltype(self)>(self).path_;
 }
 
 END_NAMESPACE(n19);

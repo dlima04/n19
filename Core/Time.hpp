@@ -24,12 +24,12 @@ BEGIN_NAMESPACE(n19::time);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Begin class definitions.
 
-struct __LCFormatter {
+struct __LTFormatter {
   const class LocalTime& time_;
   [[nodiscard]] auto format()  const -> std::string;
   [[nodiscard]] auto month()   const -> std::string;
   [[nodiscard]] auto weekday() const -> std::string;
-  __LCFormatter(const LocalTime& t) : time_(t) {}
+  __LTFormatter(const LocalTime& t) : time_(t) {}
 };
 
 class LocalTime {
@@ -54,7 +54,7 @@ public:
   __Value month_   = 0;
   __Value year_    = 0;
 
-  auto strings() const     -> __LCFormatter;
+  auto strings() const     -> __LTFormatter;
   static auto from_local() -> Result<LocalTime>;
   static auto from_utc()   -> Result<LocalTime>;
 

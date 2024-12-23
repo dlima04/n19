@@ -58,12 +58,12 @@ public:
 
   N19_FORCEINLINE auto operator->(this auto &&self) -> decltype(auto) {
     ASSERT(self.is_active_ == true && "Bad bytecopy access!");
-    return &( forward<decltype(self)>(self).value() );
+    return &( std::forward<decltype(self)>(self).value() );
   }
 
   N19_FORCEINLINE auto operator*(this auto &&self) -> decltype(auto) {
     ASSERT(self.is_active_ == true && "Bad bytecopy access!");
-    return forward<decltype(self)>(self).value();
+    return std::forward<decltype(self)>(self).value();
   }
 
   template<typename O>
@@ -77,31 +77,24 @@ public:
   }
 
   N19_FORCEINLINE auto operator=(ByteCopy&& other) -> ByteCopy& {
-    clear();                        // Clear the existing value.
-    is_active_ = other.is_active_;  // Change active state.
-    if(other.is_active_)            //////////////////////////////
+    clear();                        /// Clear the existing value.
+    is_active_ = other.is_active_;  /// Change active state.
+    if(other.is_active_)            ///
       std::construct_at<T>(reinterpret_cast<T*>(&value_), other.release());
     return *this;
   }
 
   N19_FORCEINLINE auto operator=(const ByteCopy& other) -> ByteCopy& {
-    clear();                        // Clear the existing value.
-    is_active_ = other.is_active_;  // Change active state
-    if(other.is_active_)            //////////////////////////////
+    clear();                        /// Clear the existing value.
+    is_active_ = other.is_active_;  /// Change active state
+    if(other.is_active_)            ///
       std::construct_at<T>(reinterpret_cast<T*>(&value_), other.value());
     return *this;
   }
 
   template<typename ... Args>
-  N19_FORCEINLINE auto emplace(Args&&... args) -> void {
-    clear();           // Clear the existing value.
-    is_active_ = true; // maintain the value state.
-    std::construct_at<T>( reinterpret_cast<T*>(&value_), forward<Args>(args)... );
-  }
-
-  template<typename ... Args>
   N19_FORCEINLINE ByteCopy(Args&&... args) {
-    std::construct_at<T>( reinterpret_cast<T*>(&value_), forward<Args>(args)... );
+    std::construct_at<T>( reinterpret_cast<T*>(&value_), std::forward<Args>(args)... );
     is_active_ = true;
   }
 
@@ -161,7 +154,7 @@ N19_FORCEINLINE auto as_bytecopy(const T& val) -> ByteCopy<T> {
 
 template<typename T, typename ...Args>
 N19_FORCEINLINE auto construct_bytecopy(Args&&... args) -> ByteCopy<T> {
-  return ByteCopy<T>{ T{forward<Args>(args)...} };
+  return ByteCopy<T>{ T{std::forward<Args>(args)...} };
 }
 
 END_NAMESPACE(n19);

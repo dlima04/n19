@@ -101,6 +101,7 @@ auto n19::FileRef::create(const std::wstring& fname) -> Result<FileRef> {
   if(fs::exists(fname)) {
     return make_error(ErrC::InvalidArg, "File already exists.");
   }
+
   file.open(fs::path(fname), std::ios::binary | std::ios::in | std::ios::out);
   if(!file.is_open()) {
     return make_error(ErrC::FileIO, "Could not create the file.");

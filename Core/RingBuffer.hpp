@@ -11,7 +11,7 @@
 #include <Core/RingBase.hpp>
 #include <Core/Result.hpp>
 #include <Core/Maybe.hpp>
-#include <Core/Forward.hpp>
+#include <utility>
 BEGIN_NAMESPACE(n19);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::write(Args&&... args) -> bool {
     return false;
   }
 
-  buff_[ head_.load() & size_mask_ ] = T{forward<Args>(args)...};
+  buff_[ head_.load() & size_mask_ ] = T{std::forward<Args>(args)...};
   head_.fetch_add(1, std::memory_order::release);
   return true;
 }
@@ -78,7 +78,7 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::overwrite(Args&&... args) -> void {
     tail_.fetch_add(1, std::memory_order::release);
   }
 
-  buff_[ head_.load() & size_mask_ ] = T{forward<Args>(args)...};
+  buff_[ head_.load() & size_mask_ ] = T{std::forward<Args>(args)...};
   head_.fetch_add(1, std::memory_order::release);
 }
 

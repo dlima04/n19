@@ -15,6 +15,7 @@
 #include <Core/Time.hpp>
 #include <iostream>
 #include <Core/ArgParse.hpp>
+#include <Core/TypeTraits.hpp>
 
 using namespace n19;
 
@@ -30,11 +31,14 @@ struct foo {
 // };
 
 int main(int argc, char** argv){
-
   const auto time = time::LocalTime::from_utc();
   if(!time) {
     return 1;
   }
+
+  std::cout << std::boolalpha;
+  std::cout << IsVoid<int> << std::endl;
+  std::cout << IsVoid<void> << std::endl;
 
   std::cout << time->strings().format() << std::endl;
 

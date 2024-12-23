@@ -11,17 +11,16 @@
 #include <Core/Platform.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Nothing.hpp>
-#include <Core/Forward.hpp>
 #include <Core/Concepts.hpp>
 #include <Core/ClassTraits.hpp>
 #include <utility>
 #include <variant>
-BEGIN_NAMESPACE(n19)
 
+BEGIN_NAMESPACE(n19)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<Concrete T>
-class /* [[nodiscard]] */ Maybe {
+class Maybe {
 N19_MAKE_DEFAULT_CONSTRUCTIBLE(Maybe);
 N19_MAKE_DEFAULT_ASSIGNABLE(Maybe);
 public:
@@ -56,6 +55,24 @@ public:
     } return val;                    /// return provided value type.
   }
 
+  template<typename ... Args>
+  N19_FORCEINLINE explicit Maybe(Args&& ...args){
+    value_.template emplace<T>( std::forward<Args>(args)... );
+    has_value_ = true;
+  }
+
+  template<typename U> requires std::constructible_from<T, U>
+  N19_FORCEINLINE Maybe(U&& value) {
+    value_.template emplace<T>( std::forward<U>(value) );
+    has_value_ = true;
+  }
+
+  template<typename ... Args>
+  N19_FORCEINLINE auto emplace(Args &&...args) -> void {
+    value_.template emplace<T>( std::forward<Args>(args)... );
+    has_value_ = true;
+  }
+
   [[nodiscard]] auto release() -> T {
     T released = std::move( value() );
     has_value_ = false;
@@ -63,38 +80,9 @@ public:
     return released;
   }
 
-  template<typename O>
-  auto operator==(const Maybe<O>& other) -> bool {
-    return has_value_ == other.has_value_
-      && (!has_value_ || value() == other.value());
-  }
-
-  template<typename O>
-  auto operator==(const O& other) -> bool {
-    return has_value_ && other == value();
-  }
-
-  template<typename ... Args>
-  N19_FORCEINLINE explicit Maybe(Args&& ...args){
-    value_.template emplace<T>( forward<Args>(args)... );
-    has_value_ = true;
-  }
-
-  template<typename U> requires std::constructible_from<T, U>
-  N19_FORCEINLINE Maybe(U&& value) {
-    value_.template emplace<T>( forward<U>(value) );
-    has_value_ = true;
-  }
-
-  template<typename ... Args>
-  N19_FORCEINLINE auto emplace(Args &&...args) -> void {
-    value_.template emplace<T>( forward<Args>(args)... );
-    has_value_ = true;
-  }
-
   N19_FORCEINLINE auto clear() -> void {
-    value_      = Nothing;
-    has_value_  = false;
+    value_     = Nothing;
+    has_value_ = false;
   }
 
   N19_FORCEINLINE auto has_value() const -> bool { return has_value_; }

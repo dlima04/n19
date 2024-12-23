@@ -11,50 +11,44 @@
 #include <Core/Platform.hpp>
 #include <Core/Panic.hpp>
 #include <Core/ClassTraits.hpp>
+#include <Core/TypeTraits.hpp>
 #include <Core/Nothing.hpp>
-#include <Core/Forward.hpp>
 #include <string>
 #include <utility>
 #include <variant>
-#include <type_traits>
+
 BEGIN_NAMESPACE(n19);
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#define N19_ERRC_LIST \
-  X(None)       \
-  X(InvalidArg) \
-  X(FileIO)     \
-  X(Internal)   \
-  X(NotFound)   \
-  X(BadToken)   \
-  X(Native)     \
-  X(Conversion) \
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin error code, default error types.
 
 struct __ErrC final {
 N19_MAKE_COMPARABLE_MEMBER(__ErrC, value);
-#define X(NAME) NAME,
   enum Value : uint16_t {
-    N19_ERRC_LIST
+    None       = 0x00, /// No error has occurred.
+    InvalidArg = 0x01, /// A provided argument is incorrect.
+    FileIO     = 0x02, /// Filesystem error of some kind.
+    Internal   = 0x03, /// Internal, shouldn't be exposed user side
+    NotFound   = 0x04, /// Couldn't find what you're looking for.
+    BadToken   = 0x05, /// For lexing usually.
+    Native     = 0x06, /// Generic native / OS error.
+    Conversion = 0x07, /// No valid conversion available.
   };
-#undef X
-  Value value = None;     // Underlying error value
-  [[nodiscard]] auto to_string() const -> std::string;
-  [[nodiscard]] auto critical()  const -> bool;
-
+                       ///
+  Value value = None;  /// Underlying error value
   constexpr __ErrC(const Value v) : value(v) {}
   constexpr __ErrC() = default;
 };
-
-struct __ErrorType {      // The default error type used by n19.
-  std::string msg;        // The optional message. Can be empty.
+                       ///
+struct __ErrorType {   /// n19's default error type.
+  std::string msg;
   __ErrC code = __ErrC::None;
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin default result type.
+
 template<typename T, typename E = __ErrorType>
-class /* [[nodiscard]] */ __Result {
+class __Result {
 N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(__Result);
 N19_MAKE_DEFAULT_COPY_CONSTRUCTIBLE(__Result);
 public:
@@ -84,12 +78,12 @@ public:
 
   auto operator->(this auto&& self) -> decltype(auto) {
     ASSERT( self.has_value() == true, "Result contains an error!" );
-    return &( forward<decltype(self)>(self).value() );
+    return &(std::forward<decltype(self)>(self).value());
   }
 
   auto operator*(this auto&& self) -> decltype(auto) {
     ASSERT( self.has_value() == true, "Result contains an error!" );
-    return forward<decltype(self)>(self).value();
+    return std::forward<decltype(self)>(self).value();
   }
 
   auto value_or(this auto&& self, T&& val) -> T {
@@ -104,44 +98,37 @@ public:
     return val;             /// return provided error type.
   }
 
-  template<typename C> /* C = Callable type */
+  template<typename C>
   auto call_if_error(this auto&& self, C&& cb) -> decltype(self) {
-    if(!self.has_value()) cb( forward<decltype(self)>(self) );
+    if(!self.has_value()) cb( std::forward<decltype(self)>(self) );
     return self;
   }
 
-  template<typename C> /* C = Callable type */
+  template<typename C>
   auto call_if_value(this auto&& self, C&& cb) -> decltype(self) {
-    if(self.has_value()) cb( forward<decltype(self)>(self) );
+    if(self.has_value()) cb( std::forward<decltype(self)>(self) );
     return self;
   }
 
-  template<typename O>
-  auto operator==(const __Result<O>& other) -> bool {
-    return has_value() == other.has_value() && (!has_value() || value() == other.value());
-  }
-
-  template<typename O>
-  auto operator==(const O& other) -> bool {
-    return has_value() && other == value();
-  }
-
-  [[nodiscard]] N19_FORCEINLINE auto has_value() const -> bool {
+  [[nodiscard]] auto has_value() const -> bool {
     return std::holds_alternative<T>( value_ );
   }
 
-  [[nodiscard]] N19_FORCEINLINE explicit operator bool() const {
+  [[nodiscard]] explicit operator bool() const {
     return std::holds_alternative<T>( value_ );
   }
 
-  __Result(T&& value)       : value_(std::move(value)) {}
-  __Result(E&& error)       : value_(std::move(error)) {}
-  __Result(const T& value)  : value_(value) {}
-  __Result(const E& error)  : value_(error) {}
-  __Result(/*.....*/)       : value_(E{}  ) {}
+  __Result(T&& value)      : value_(std::move(value)) {}
+  __Result(E&& error)      : value_(std::move(error)) {}
+  __Result(const T& value) : value_(value) {}
+  __Result(const E& error) : value_(error) {}
+  __Result(/*.....*/)      : value_(E{}  ) {}
 protected:
   __Variant value_;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin type aliases
 
 template<typename T>
 struct __Result_Dispatch {
@@ -159,39 +146,32 @@ using ErrC   = __ErrC;
 using ErrorT = __ErrorType;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Begin inline methods
+// Begin error type helper functions
+
+inline auto
+make_error(const ErrC code) -> ErrorT {
+  return ErrorT{.msg = "", .code = code};
+}
+
+inline auto
+make_error(const ErrC code, const std::string& msg) -> ErrorT {
+  return ErrorT{.msg = msg, .code = code};
+}
+
+inline auto
+make_error(const ErrC code, std::string&& msg) -> ErrorT {
+  return ErrorT{.msg = msg, .code = code};
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Utility function for constructing result types.
 
 template<typename T, typename ...Args>
-auto make_result(Args&&... args) -> Result<T> {
-  if constexpr(std::is_void_v<T>)
+[[nodiscard]] auto make_result(Args&&... args) -> Result<T> {
+  if constexpr(IsVoid<T>)
     return Result<__Nothing>{__Nothing{}};
   else
     return T{ std::forward<Args>(args)... };
-}
-
-inline auto make_error(const ErrC code) -> ErrorT {
-  return ErrorT{ .msg = "", .code = code, };
-}
-
-inline auto make_error(const ErrC code, const std::string& msg) -> ErrorT {
-  return ErrorT{ .msg = msg, .code = code };
-}
-
-inline auto make_error(const ErrC code, std::string&& msg) -> ErrorT {
-  return ErrorT{ .msg = msg, .code = code };
-}
-
-inline auto __ErrC::critical() const -> bool {
-  return this->value == Internal;
-}
-
-inline auto __ErrC::to_string() const -> std::string {
-#define X(NAME) case NAME: return #NAME;
-  switch(this->value) {
-    N19_ERRC_LIST
-    default: return "Unknown";
-  }
-#undef X
 }
 
 END_NAMESPACE(n19);

@@ -11,7 +11,7 @@
 #include <Core/Panic.hpp>
 #include <Core/RingBase.hpp>
 #include <Core/Maybe.hpp>
-#include <Core/Forward.hpp>
+#include <utility>
 BEGIN_NAMESPACE(n19);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +144,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::enqueue(Args&&... args) -> void {
     tail_.wait(ltail, std::memory_order::acquire);
   }
 
-  buff_[ lhead & size_mask_ ] = T{forward<Args>(args)...};
+  buff_[ lhead & size_mask_ ] = T{std::forward<Args>(args)...};
   head_.fetch_add(1, std::memory_order::release);
   head_.notify_all();
 }
@@ -159,7 +159,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::try_enqueue(Args&&... args) -> bool {
     return false;
   }
 
-  buff_[ lhead & size_mask_ ] = T{forward<Args>(args)...};
+  buff_[ lhead & size_mask_ ] = T{std::forward<Args>(args)...};
   head_.fetch_add(1, std::memory_order::release);
   head_.notify_all();
   return true;
