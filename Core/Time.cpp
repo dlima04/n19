@@ -31,7 +31,7 @@ auto __STFormatter::month() const -> std::string {
   #ifndef N19_WIN32
     const auto val = time_.month_ + 1;
   #else   // WINDOWS
-    const auto value = time_.month_;
+    const auto val = time_.month_;
   #endif
 
   switch(val) {
