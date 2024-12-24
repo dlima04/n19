@@ -6,10 +6,10 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#include <Core/Time.hpp>
-#include <Core/Fmt.hpp>
+#include <Sys/Time.hpp>
 #include <Sys/LastError.hpp>
-BEGIN_NAMESPACE(n19::time);
+#include <Core/Fmt.hpp>
+BEGIN_NAMESPACE(n19::sys);
 
 auto __STFormatter::weekday() const -> std::string {
   switch(time_.weekday_) {
@@ -69,9 +69,9 @@ auto SystemTime::strings() const -> __STFormatter {
 }
 
 #ifdef N19_WIN32
-auto LocalTime::from_utc() -> Result<LocalTime> {
-  LocalTime time = {}; /// To return.
-  __SysRepr repr = {}; /// Windows SYSTEMTIME.
+auto SystemTime::from_utc() -> Result<LocalTime> {
+  SystemTime time = {}; /// To return.
+  __SysRepr repr  = {}; /// Windows SYSTEMTIME.
 
   ::GetSystemTime(&repr);
   time.second_  = repr.wSecond;
@@ -84,9 +84,9 @@ auto LocalTime::from_utc() -> Result<LocalTime> {
   return time;
 }
 
-auto LocalTime::from_local() -> Result<LocalTime> {
-  LocalTime time = {}; /// To return.
-  __SysRepr repr = {}; /// Windows SYSTEMTIME.
+auto SystemTime::from_local() -> Result<LocalTime> {
+  SystemTime time = {}; /// To return.
+  __SysRepr repr  = {}; /// Windows SYSTEMTIME.
 
   ::GetLocalTime(&repr);
   time.second_  = repr.wSecond;
@@ -102,8 +102,8 @@ auto LocalTime::from_local() -> Result<LocalTime> {
 #else // POSIX
 auto SystemTime::from_utc() -> Result<SystemTime> {
   SystemTime time = {}; /// To return.
-  __Epoch epoch  = {}; /// UNIX epoch.
-  __SysRepr repr = {}; /// POSIX time struct.
+  __Epoch epoch   = {}; /// UNIX epoch.
+  __SysRepr repr  = {}; /// POSIX time struct.
 
   ::time(&epoch);
   if(::gmtime_r(&epoch, &repr) == nullptr) {
@@ -122,8 +122,8 @@ auto SystemTime::from_utc() -> Result<SystemTime> {
 
 auto SystemTime::from_local() -> Result<SystemTime> {
   SystemTime time = {}; /// To return.
-  __Epoch epoch  = {}; /// UNIX epoch.
-  __SysRepr repr = {}; /// POSIX time struct.
+  __Epoch epoch   = {}; /// UNIX epoch.
+  __SysRepr repr  = {}; /// POSIX time struct.
 
   ::time(&epoch);
   if(::localtime_r(&epoch, &repr) == nullptr) {
@@ -141,4 +141,4 @@ auto SystemTime::from_local() -> Result<SystemTime> {
 }
 
 #endif // N19_WIN32
-END_NAMESPACE(n19::time);
+END_NAMESPACE(n19::sys);

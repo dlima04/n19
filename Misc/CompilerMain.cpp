@@ -12,7 +12,7 @@
 #include <Frontend/Lexer.hpp>
 #include <Core/Bytes.hpp>
 #include <Core/ConIO.hpp>
-#include <Core/Time.hpp>
+#include <Sys/Time.hpp>
 #include <iostream>
 #include <Core/ArgParse.hpp>
 #include <Core/TypeTraits.hpp>
@@ -31,7 +31,7 @@ struct MyArgs : argp::Parser {
 };
 
 int main(int argc, char** argv){
-  const auto time = time::SystemTime::from_utc();
+  const auto time = sys::SystemTime::from_utc();
   if(!time) {
     return 1;
   }
