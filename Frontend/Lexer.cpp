@@ -1039,7 +1039,7 @@ inline auto Lexer::_skip_utf8_sequence() -> bool {
   return index_ - 1 < src_.size();
 }
 
-auto Lexer::create(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> {
+auto Lexer::create_shared(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> {
   const auto fsize = TRY( ref.size() );
 
   /// Check against maximum allowed file size.
@@ -1060,6 +1060,7 @@ auto Lexer::create(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> {
   lxr->src_.resize(*fsize);
 
   TRY(ref.read_into(as_writable_bytes(lxr->src_)));
+  lxr->curr_ = lxr->_produce_impl();
   return make_result<std::shared_ptr<Lexer>>(lxr);
 }
 
@@ -1067,7 +1068,7 @@ auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<void> {
   if(current().cat_ != cat) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token of kind \"{}\".", cat.to_string());
-    return make_error(errc, std::ref(msg));
+    return make_error(errc, std::cref(msg));
   }
 
   if(cons) consume(1);
@@ -1078,38 +1079,33 @@ auto Lexer::expect(const TokenType type, const bool cons) -> Result<void> {
   if(current().type_ != type) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token \"{}\".", type.to_string());
-    return make_error(errc, std::ref(msg));
+    return make_error(errc, std::cref(msg));
   }
 
   if(cons) consume(1);
   return make_result<void>();
 }
 
-auto Lexer::consume(const uint32_t amnt) -> Token {
-  const auto curr = current();
-  if(curr == TokenType::EndOfFile) {
-    return curr;
-  }
+auto Lexer::consume(const uint32_t amnt) -> const Token& {
+  if(curr_ == TokenType::EndOfFile)
+    return curr_;
 
-  Token next_tok;
   for(uint32_t i = 0; i < amnt; i++) {
-    next_tok = toks_.dequeue();
-    if(next_tok == TokenType::EndOfFile) break;
+    curr_ = _produce_impl();
+    if(curr_ == TokenType::EndOfFile) break;
   }
 
-  return next_tok;
+  return curr_;
 }
 
 auto Lexer::dump() -> void {
-  Token curr_tok;
   do {
-    curr_tok = _produce_impl();
-    outs() << curr_tok.format(*this);
-  } while(curr_tok != TokenType::EndOfFile && curr_tok != TokenType::Illegal);
+    outs() << curr_.format(*this);
+    consume(1);
+  } while(curr_ != TokenType::EndOfFile && curr_ != TokenType::Illegal);
 
-  if(curr_tok == TokenType::Illegal) {
-    ErrorCollector::display_error("Illegal token!", *this, curr_tok, outs());
-  }
+  if(curr_ == TokenType::Illegal)
+    ErrorCollector::display_error("Illegal token!", *this, curr_, outs());
 }
 
 END_NAMESPACE(n19);

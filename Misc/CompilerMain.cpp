@@ -59,17 +59,17 @@ int main(int argc, char** argv){
 //
    //args.help(outs());
 
-   //try {
-   //  const auto file = MUST(FileRef::open(CURRENT_TEST));
-   //  auto lxr = Lexer::create(*file);
-   //  if(!lxr) {
-   //    return 1;
-   //  }
-//
-   //  lxr.value()->dump();
-   //} catch(const std::exception& e) {
-   //  std::cerr << "EXCEPTION: " << e.what() << std::endl;
-   //}
+   try {
+     const auto file = MUST(FileRef::open(CURRENT_TEST));
+     auto lxr = Lexer::create_shared(*file);
+     if(!lxr) {
+       return 1;
+     }
+
+     lxr.value()->dump();
+   } catch(const std::exception& e) {
+     std::cerr << "EXCEPTION: " << e.what() << std::endl;
+   }
 
   outs().flush();
   errs().flush();

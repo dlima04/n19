@@ -130,13 +130,8 @@ BEGIN_NAMESPACE(n19);
   X(Terminator, 1ULL << 16)      \
   X(ControlFlow, 1ULL << 17)     \
 
-namespace n19 {
-  class Token;
-  class TokenType;
-  class TokenCategory;
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin class definitions.
 
 class TokenType {
 N19_MAKE_COMPARABLE_MEMBER(TokenType, value);
@@ -149,7 +144,6 @@ public:
 
   [[nodiscard]] auto string_repr() const -> std::string;
   [[nodiscard]] auto to_string() const -> std::string;
-  [[nodiscard]] auto maybe_entity_begin() const -> bool;
 
   Value value  = None;
   constexpr TokenType() = default;
@@ -180,11 +174,11 @@ class Token {
 N19_MAKE_COMPARABLE_ON(TokenType, type_);
 N19_MAKE_COMPARABLE_MEMBER(Token, type_);
 public:
-  uint32_t pos_  = 0;
-  uint32_t len_  = 0;
-  uint32_t line_ = 1;
-  TokenCategory cat_;
-  TokenType type_;
+  uint32_t pos_  = 0;   /// File offset.
+  uint32_t len_  = 0;   /// Length of the token.
+  uint32_t line_ = 1;   /// The line it appears on.
+  TokenCategory cat_;   /// It's flags or modifiers.
+  TokenType type_;      /// The type of token.
 
   [[nodiscard]] auto value(const class Lexer&) const -> Maybe<std::string>;
   [[nodiscard]] auto format(const class Lexer&) const -> std::string;
@@ -195,6 +189,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin inlined methods.
 
 N19_FORCEINLINE constexpr auto TokenCategory::operator|=(
   const TokenCategory &other ) -> void
@@ -206,10 +201,6 @@ N19_FORCEINLINE constexpr auto TokenCategory::operator|=(
   const Value other ) -> void
 {
   value |= other;
-}
-
-N19_FORCEINLINE auto TokenType::maybe_entity_begin() const -> bool {
-  return value == NamespaceOperator || value == Identifier;
 }
 
 N19_FORCEINLINE auto TokenCategory::isa(const Value val) const -> bool {

@@ -118,18 +118,14 @@ auto n19::EntityQualifier::to_string(
   buff += ent->name_;
   if(!generics_.empty() && include_qualifiers) {
     buff.append("$[");
-    for(const auto& gen : generics_) {
-      buff += fmt("{}, ", gen.to_string(tbl));
-    }
+    for(const auto& gen : generics_) buff.append(fmt("{}, ", gen.to_string(tbl)));
     buff.erase(buff.size()-2);
     buff.append("]");
   }
 
   if(include_postfixes) {
-    for(const auto& len : arr_lengths_)
-      buff.append(fmt("[{}]", len));
-    for(uint32_t i = 0; i < ptr_depth_; i++)
-      buff.append("*");
+    for(const auto& len : arr_lengths_) buff.append(fmt("[{}]", len));
+    for(int i = 0; i < ptr_depth_; i++) buff.append("*");
   }
 
   return buff;
@@ -140,10 +136,10 @@ auto n19::EntityQualifierThunk::to_string(
   const bool include_postfixes ) const -> std::string
 {
   std::string buff;
-  if(include_postfixes) {
+  if(include_qualifiers) {
     #define X(VAL, UNUSED) \
       if(flags_ & VAL) buff.append(#VAL " ");
-    N19_EQ_FLAG_LIST // Convert postfixes to string
+    N19_EQ_FLAG_LIST /* convert to string repr */
     #undef X
   }
 
@@ -153,18 +149,14 @@ auto n19::EntityQualifierThunk::to_string(
 
   if(!generics_.empty() && include_qualifiers) {
     buff.append("$[");
-    for(const auto& gen : generics_) {
-      buff += fmt("{}, ", gen.to_string());
-    }
+    for(const auto& gen : generics_) buff += fmt("{}, ", gen.to_string());
     buff.erase(buff.size()-2);
     buff.append("]");
   }
 
   if(include_postfixes) {
-    for(const auto& len : arr_lengths_)
-      buff.append(fmt("[{}]", len));
-    for(uint32_t i = 0; i < ptr_depth_; i++)
-      buff.append("*");
+    for(const auto& len : arr_lengths_) buff.append(fmt("[{}]", len));
+    for(int i = 0; i < ptr_depth_; i++) buff.append("*");
   }
 
   return buff;
