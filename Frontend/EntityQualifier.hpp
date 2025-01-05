@@ -16,7 +16,8 @@
 #define N19_EQ_FLAG_LIST   \
   X(None, 0ULL)            \
   X(Constant, 1ULL)        \
-  X(Rvalue, 1ULL << 1)     \
+  X(Reference, 1ULL << 1)  \
+  X(Rvalue, 1ULL << 2)     \
 
 BEGIN_NAMESPACE(n19);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +65,6 @@ public:
   static auto get_const_f64()  -> EntityQualifier;
   static auto get_const_ptr()  -> EntityQualifier;
 
-  std::vector<EntityQualifier> generics_;
   Entity::ID id_ = 0;
 
   ~EntityQualifier() = default;
@@ -85,7 +85,6 @@ public:
   [[nodiscard]] auto format() const -> std::string;
 
   std::vector<std::string> name_;
-  std::vector<EntityQualifierThunk> generics_;
 
   ~EntityQualifierThunk() = default;
   EntityQualifierThunk()  = default;

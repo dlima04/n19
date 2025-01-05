@@ -25,7 +25,6 @@ auto n19::EntityQualifier::format() const -> std::string {
   }
 
   buff += fmt("ptr_depth = {}, ", ptr_depth_);
-  buff += generics_.empty() ? "has_generics = True, " : "has_generics = False, ";
   buff += arr_lengths_.empty() ? "array_lengths = N/A " : "array_lengths = ";
 
   for(const auto& length : arr_lengths_) {
@@ -59,7 +58,6 @@ auto n19::EntityQualifierThunk::format() const -> std::string {
   }
 
   buff += fmt("ptr_depth = {}, ", ptr_depth_);
-  buff += generics_.empty() ? "has_generics = True, " : "has_generics = False, ";
   buff += arr_lengths_.empty() ? "array_lengths = N/A " : "array_lengths = ";
 
   for(const auto& length : arr_lengths_) {
@@ -116,13 +114,6 @@ auto n19::EntityQualifier::to_string(
   }
 
   buff += ent->name_;
-  if(!generics_.empty() && include_qualifiers) {
-    buff.append("$[");
-    for(const auto& gen : generics_) buff.append(fmt("{}, ", gen.to_string(tbl)));
-    buff.erase(buff.size()-2);
-    buff.append("]");
-  }
-
   if(include_postfixes) {
     for(const auto& len : arr_lengths_) buff.append(fmt("[{}]", len));
     for(int i = 0; i < ptr_depth_; i++) buff.append("*");
@@ -145,13 +136,6 @@ auto n19::EntityQualifierThunk::to_string(
 
   for(const auto& chunk : name_) {
     buff.append(chunk);
-  }
-
-  if(!generics_.empty() && include_qualifiers) {
-    buff.append("$[");
-    for(const auto& gen : generics_) buff += fmt("{}, ", gen.to_string());
-    buff.erase(buff.size()-2);
-    buff.append("]");
   }
 
   if(include_postfixes) {

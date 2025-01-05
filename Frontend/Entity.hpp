@@ -47,8 +47,6 @@
   X(Struct)      /* C-style structures  */ \
   X(AliasType)   /* Indirection, Type   */ \
   X(BuiltinType) /* Builtin, e.g. "int" */ \
-  X(GenericType) /* Generic types       */ \
-  X(GenericProc) /* Generic procedure   */ \
 
 BEGIN_NAMESPACE(n19);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +90,7 @@ public:
 class RootEntity final : public Entity {
 public:
   RootEntity() = default;
-  ~RootEntity() override = default;
+ ~RootEntity() override = default;
 };
 
 class Type : public Entity {
