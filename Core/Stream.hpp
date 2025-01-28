@@ -15,6 +15,7 @@
 #include <string_view>
 #include <cstdint>
 #include <cstring>
+
 #include <system_error>
 #include <charconv>
 #include <limits>
@@ -226,7 +227,7 @@ public:
   N19_FORCEINLINE auto to_buffer(const __Span& buff) -> OStream& {
     ASSERT(curr_ <= __size, "Invalid current buffer index.");
     ASSERT(buff.size_bytes() <= (__size - curr_), "Buffer overrun!");
-    ASSERT(!buff.empty(), "to_buffer: empty span!");
+    ASSERT(buff.size_bytes() != 0, "to_buffer: empty span!");
 
     std::memcpy(&buff_[curr_], buff.data(), buff.size_bytes());
     curr_ += buff.size_bytes();
@@ -266,7 +267,7 @@ public:
 
  ~BufferedOStream() override = default;
   BufferedOStream() = default;
-protected:
+public:
   __Buffer buff_{};
   __Index curr_ {__begin};
 };

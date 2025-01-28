@@ -11,17 +11,20 @@
 #include <Core/Concepts.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
+#include <Core/MacroUtil.hpp>
 #include <utility>
 BEGIN_NAMESPACE(n19);
 
-#define DEFER_IF(COND, ...) ::n19::DeferImpl _([&]{ if((COND)){ __VA_ARGS__; }})
-#define DEFER(...)          ::n19::DeferImpl _([&]{ __VA_ARGS__; })
+#define DEFER_IF(COND, ...)                        \
+  ::n19::DeferImpl N19_UNIQUE_NAME(__n19defer)     \
+  { [&]{ if((COND)){ __VA_ARGS__; }} }             \
 
-// n19::Callback is a lightweight wrapper around an
-// invocable object. It should ONLY be used with
-// function pointers or lambdas. Expensive objects with
-// overloaded call operators should never be used.
-// It's also not default constructible to keep things simple.
+#define DEFER(...)                                 \
+  ::n19::DeferImpl N19_UNIQUE_NAME(__n19defer)     \
+  { [&]{ __VA_ARGS__; } }                          \
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin invocable utility classes.
 
 template<typename T>
 class Callback {

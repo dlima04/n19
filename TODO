@@ -1,5 +1,6 @@
 TODO
-- Add a logging library
-- Add a small datetime library (will be useful for logging)
+- hexdump
+- testing
+- backtrace  
 - Refine compilation entity system
 - Start work on the parser

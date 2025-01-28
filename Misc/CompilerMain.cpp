@@ -31,16 +31,24 @@ struct MyArgs : argp::Parser {
 };
 
 int main(int argc, char** argv){
-  const auto time = sys::SystemTime::from_utc();
-  if(!time) {
-    return 1;
-  }
 
-  std::cout << std::boolalpha;
-  std::cout << IsVoid<int> << std::endl;
-  std::cout << IsVoid<void> << std::endl;
+  // auto stream = BufferedOStream<15>::from_stdout();
+  // stream << "Hello world!";
+  // stream << "A";
+  //
+  // std::cout << "curr_=" << BufferedOStream<15>::__size - stream.curr_ << std::endl;
+  // stream << "AAAAAA" << Endl;
 
-  std::cout << time->strings().format() << std::endl;
+  // const auto time = sys::SystemTime::from_utc();
+  // if(!time) {
+  //   return 1;
+  // }
+  //
+  // std::cout << std::boolalpha;
+  // std::cout << IsVoid<int> << std::endl;
+  // std::cout << IsVoid<void> << std::endl;
+  //
+  // std::cout << time->strings().format() << std::endl;
 
    //std::vector<sys::String> strs = { "--num-jobs=42069", "--verbose=false" };
 //
@@ -59,17 +67,17 @@ int main(int argc, char** argv){
 //
    //args.help(outs());
 
-   try {
-     const auto file = MUST(FileRef::open(CURRENT_TEST));
-     auto lxr = Lexer::create_shared(*file);
-     if(!lxr) {
-       return 1;
-     }
+  try {
+    const auto file = MUST(FileRef::open(CURRENT_TEST));
+    auto lxr = Lexer::create_shared(*file);
+    if(!lxr) {
+      return 1;
+    }
 
-     lxr.value()->dump();
-   } catch(const std::exception& e) {
-     std::cerr << "EXCEPTION: " << e.what() << std::endl;
-   }
+    lxr.value()->dump();
+  } catch(const std::exception& e) {
+    std::cerr << "EXCEPTION: " << e.what() << std::endl;
+  }
 
   outs().flush();
   errs().flush();

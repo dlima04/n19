@@ -41,12 +41,12 @@ enum class Con : uint16_t {
 // inlined header functions
 
 inline auto outs() -> OStream& {
-  static auto _outs = OStream::from_stdout();
+  static auto _outs = BufferedOStream<>::from_stdout();
   return _outs;
 }
 
 inline auto errs() -> OStream& {
-  static auto _errs = OStream::from_stderr();
+  static auto _errs = BufferedOStream<>::from_stderr();
   return _errs;
 }
 

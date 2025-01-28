@@ -6,10 +6,13 @@
 * found in the LICENSE file in the root directory of this project's source tree.
 */
 
-#ifndef GLOBAL_HPP
-#define GLOBAL_HPP
+#ifndef N19_GLOBAL_HPP
+#define N19_GLOBAL_HPP
+
+
+
 #define BEGIN_NAMESPACE(NAME) namespace NAME {
 #define END_NAMESPACE(NAME) }
 #define IGNORE_EXCEPT(EXPR) try{ EXPR } catch(...) {/*...*/}
 
-#endif //GLOBAL_HPP
+#endif //N19_GLOBAL_HPP

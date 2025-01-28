@@ -3,7 +3,38 @@ project(n19)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(N19_ENUMERATE_CORE_INCLUDE
+set(N19_ENUMERATE_GLOBAL_SOURCES
+  Frontend/ErrorCollector.cpp
+  Frontend/EntityTable.cpp
+  Frontend/Entity.cpp
+  Frontend/EntityQualifier.cpp
+  Frontend/DumpAst.cpp
+  Frontend/Lexer.cpp
+  Frontend/Token.cpp
+  Sys/LastError.cpp
+  Sys/IODevice.cpp
+  Sys/Time.cpp
+  Core/ConIO.cpp
+  Core/FileRef.cpp
+  Core/Panic.cpp
+  Core/Stream.cpp
+  Core/ArgParse.cpp
+)
+
+set(N19_ENUMERATE_GLOBAL_HEADERS
+  Sys/String.hpp
+  Sys/LastError.hpp
+  Sys/IODevice.hpp
+  Sys/Handle.hpp
+  Sys/Time.hpp
+  Frontend/Token.hpp
+  Frontend/ErrorCollector.hpp
+  Frontend/AstNodes.hpp
+  Frontend/EntityQualifier.hpp
+  Frontend/EntityTable.hpp
+  Frontend/Entity.hpp
+  Frontend/Lexer.hpp
+  Misc/Global.hpp
   Core/Panic.hpp
   Core/Fmt.hpp
   Core/FileRef.hpp
@@ -24,70 +55,13 @@ set(N19_ENUMERATE_CORE_INCLUDE
   Core/Try.hpp
   Core/Stream.hpp
   Core/ArgParse.hpp
+  Core/MacroUtil.hpp
 )
 
-set(N19_ENUMERATE_CORE_SOURCE
-  Core/ConIO.cpp
-  Core/FileRef.cpp
-  Core/Panic.cpp
-  Core/Stream.cpp
-  Core/ArgParse.cpp
+set(N19_ENUMERATE_PRIMARY_EXECUTABLES
+  n19      # Main compiler executable
+  bulwark  # The unit test executable
 )
-
-set(N19_ENUMERATE_FRONTEND_INCLUDE
-  Frontend/Token.hpp
-  Frontend/ErrorCollector.hpp
-  Frontend/AstNodes.hpp
-  Frontend/EntityQualifier.hpp
-  Frontend/EntityTable.hpp
-  Frontend/Entity.hpp
-  Frontend/Lexer.hpp
-)
-
-set(N19_ENUMERATE_FRONTEND_SOURCE
-  Frontend/Token.cpp
-  Frontend/ErrorCollector.cpp
-  Frontend/EntityTable.cpp
-  Frontend/Entity.cpp
-  Frontend/EntityQualifier.cpp
-  Frontend/DumpAst.cpp
-  Frontend/Lexer.cpp
-)
-
-set(N19_ENUMERATE_SYS_INCLUDE
-  Sys/String.hpp
-  Sys/LastError.hpp
-  Sys/IODevice.hpp
-  Sys/Handle.hpp
-  Sys/Time.hpp
-)
-
-set(N19_ENUMERATE_SYS_SOURCE
-  Sys/LastError.cpp
-  Sys/IODevice.cpp
-  Sys/Channel.hpp
-  Sys/Time.cpp
-)
-
-# Build the main compiler executable.
-add_executable(n19
-  Misc/CompilerMain.cpp
-  Misc/Global.hpp
-  ${N19_ENUMERATE_CORE_SOURCE}
-  ${N19_ENUMERATE_FRONTEND_SOURCE}
-  ${N19_ENUMERATE_SYS_SOURCE}
-)
-
-target_sources(n19
-  PRIVATE FILE_SET HEADERS
-  FILES
-    ${N19_ENUMERATE_CORE_INCLUDE}
-    ${N19_ENUMERATE_FRONTEND_INCLUDE}
-    ${N19_ENUMERATE_SYS_INCLUDE}
-)
-
-# Set main include directory
-target_include_directories(n19 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(N19_BUILD_PLATFORM ${CMAKE_HOST_SYSTEM_NAME})
 set(N19_IS_MACOS OFF)
@@ -96,9 +70,6 @@ set(N19_IS_POSIX OFF)
 set(N19_IS_WINDOWS OFF)
 
 # Determine build platform...
-# also, is this actually reliable?
-# Need to look into this more...
-
 if(WIN32 OR N19_BUILD_PLATFORM STREQUAL "Windows")
   set(N19_IS_WINDOWS ON)
 elseif(N19_BUILD_PLATFORM STREQUAL "Linux")
@@ -111,20 +82,63 @@ else()
   message(FATAL_ERROR "Unsupported build platform.")
 endif()
 
-# Create definitions for the compiler
-if(N19_IS_LINUX)
-  target_compile_definitions(n19 PRIVATE N19_POSIX)
-  target_compile_definitions(n19 PRIVATE N19_LINUX)
-elseif(N19_IS_MACOS)
-  target_compile_definitions(n19 PRIVATE N19_POSIX)
-  target_compile_definitions(n19 PRIVATE N19_MACOS)
-else()
-  target_compile_definitions(n19 PRIVATE N19_WIN32)
-endif()
+# Build the main compiler executable
+add_executable(n19
+  Misc/CompilerMain.cpp
+  ${N19_ENUMERATE_GLOBAL_SOURCES}
+  ${N19_ENUMERATE_GLOBAL_HEADERS}
+)
 
-# Set global includes
-if(MSVC)
-  target_compile_options(n19 PUBLIC /FI Misc/Global.hpp)
-else()
-  target_compile_options(n19 PUBLIC -include Misc/Global.hpp)
-endif()
+# Build the unit test executable
+add_executable(bulwark
+  Misc/BulwarkMain.cpp
+  Bulwark/Case.hpp
+  Bulwark/Benchmark.hpp
+  Bulwark/Registry.hpp
+  Bulwark/Suite.hpp
+  Bulwark/Registry.cpp
+  Bulwark/Suite.cpp
+  Bulwark/Reporting.hpp
+  Bulwark/All.hpp
+  ${N19_ENUMERATE_GLOBAL_SOURCES}
+  ${N19_ENUMERATE_GLOBAL_HEADERS}
+)
+
+function(add_platform_macros target)
+  if(N19_IS_LINUX)
+    target_compile_definitions(${target} PRIVATE N19_POSIX)
+    target_compile_definitions(${target} PRIVATE N19_LINUX)
+  elseif(N19_IS_MACOS)
+    target_compile_definitions(${target} PRIVATE N19_POSIX)
+    target_compile_definitions(${target} PRIVATE N19_MACOS)
+  else()
+    target_compile_definitions(${target} PRIVATE N19_WIN32)
+    target_compile_definitions(${target} PRIVATE N19_DOGSHIT_PLATFORM)
+  endif()
+endfunction()
+
+function(enable_clang_asan target)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    message(STATUS "Build Target ${target} -- Clang Asan Enabled")
+    target_compile_options(${target} PRIVATE -fsanitize=address -g -fno-omit-frame-pointer)
+    target_link_libraries(${target} PRIVATE -fsanitize=address)
+  else()
+    message(FATAL_ERROR "enable_clang_asan must be used on clang targets!")
+    message(FATAL_ERROR "CMAKE_CXX_COMPILER_ID = ${CMAKE_CXX_COMPILER_ID}")
+  endif()
+endfunction()
+
+# Build all executables
+foreach(executable ${N19_ENUMERATE_PRIMARY_EXECUTABLES})
+  target_include_directories(${executable} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  add_platform_macros(${executable})
+
+  # TODO: this is temporary.
+  enable_clang_asan(${executable})
+
+  if(MSVC)
+    target_compile_options(${executable} PRIVATE /FI Misc/Global.hpp)
+  else()
+    target_compile_options(${executable} PRIVATE -include Misc/Global.hpp)
+  endif()
+endforeach()

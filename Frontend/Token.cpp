@@ -97,11 +97,10 @@ auto Token::value(const Lexer& lxr) const -> Maybe<std::string> {
 // For debugging/testing purposes only.
 auto Token::format(const Lexer& lxr) const -> std::string {
   std::string buffer;
-  buffer += fmt("{:<10}: \"{}\"\n", type_.to_string(), value(lxr).value_or("N/A"));
-  buffer += fmt("{:<10}: {}\n", "Line", line_);
-  buffer += fmt("{:<10}: {}\n", "Position", pos_);
-  buffer += fmt("{:<10}: {}\n", "Category", cat_.to_string());
-  buffer += '\n';
+  buffer += fmt("{:<12}: ", type_.to_string());
+  buffer += fmt("\"{}\" -- ", value(lxr).value_or("N/A"));
+  buffer += fmt("LINE={},POS={} -- ", line_, pos_);
+  buffer += fmt("{}\n", cat_.to_string());
   return buffer;
 }
 

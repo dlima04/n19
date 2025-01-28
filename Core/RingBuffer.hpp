@@ -20,12 +20,9 @@ BEGIN_NAMESPACE(n19);
 // is wait-free. When the buffer is full and a write attempts to be made,
 // the write will fail. depending on the method called. This is unlike
 // RingQueue which includes blocking writes.
-
+//
 // Lastly, note that this class should be used in
 // Single-Producer Single-Consumer (SPSC) scenarios ONLY.
-// It is unsafe to use multiple producers or consumers because
-// code here heavily relies on release-acquire memory ordering semantics,
-// which may be sequentially inconsistent otherwise.
 
 template<typename T, size_t size_>
 class RingBuffer : public RingBase<T, size_>{
@@ -40,7 +37,7 @@ public:
   using RingBase<T, size_>::can_mod_opt_;
   using RingBase<T, size_>::size_mask_;
 
-  // write() will attempt to construct
+  // write() and overwrite() will attempt to construct
   // an object of type T directly at the head indice using the
   // parameter pack Args.
   template<typename ...Args> auto write(Args&&... args) -> bool;

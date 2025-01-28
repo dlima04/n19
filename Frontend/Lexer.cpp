@@ -1094,7 +1094,7 @@ auto Lexer::consume(const uint32_t amnt) -> const Token& {
     curr_ = _produce_impl();
     if(curr_ == TokenType::EndOfFile) break;
   }
-
+  
   return curr_;
 }
 
