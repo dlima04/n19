@@ -7,22 +7,40 @@
 */
 
 #include <Core/ConIO.hpp>
-#include <Bulwark/All.hpp>
+#include <Bulwark/Bulwark.hpp>
+#include <Bulwark/Context.hpp>
+#include <algorithm>
+using namespace n19;
 
-TEST_CASE(TestSuite, HelloWorld) {
-  __ctx.curr_section = "fucker";
-  n19::outs() << "Hello from test!!\n";
+TEST_CASE(Vector, VectorOfInts) {
+  std::vector<int> x = {2,4,1,10,88,12,44,11};
+
+  SECTION(Sorting, {
+    std::ranges::sort(x);
+    REQUIRE(x.front() == 1);
+    REQUIRE(x.back() == 88);
+  });
+
+  SECTION(Find, {
+    auto iter = std::ranges::find(x, 12);
+    REQUIRE(iter != x.end());
+    REQUIRE(*iter == 12);
+  });
+
+  TEST_INFO("Info diagnostic");
+  TEST_WARN("Warning diagnostic");
 }
 
 int main() {
-  using namespace n19;
+#ifdef N19_WIN32
+  win32_init_console();
+#endif
 
-  test::ExecutionContext ctx;
-  for(const auto& suite : test::g_registry.suites_) {
-    outs() << suite.name_ << '\n';
-    suite.cases_.front().fn_(ctx);
-    outs() << ctx.curr_section << '\n';
-  }
+  test::Context::the().flags_ |= test::Context::Colours;
+  test::Context::the().flags_ |= test::Context::Verbose;
+  test::Context::the().flags_ |= test::Context::Debug;
+
+  test::g_registry.run_all();
 
   outs().flush();
   return 0;

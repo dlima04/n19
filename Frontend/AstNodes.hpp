@@ -70,7 +70,7 @@ public:
   using Children = std::vector<Ptr<T>>;
   //////////////////////////////////////////
   
-  auto _print(
+  auto print_(
     uint32_t depth,
     OStream& stream,
     const std::string& node_name

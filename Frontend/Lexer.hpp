@@ -23,7 +23,7 @@
 #include <cctype>
 #include <cstdint>
 
-#define UTF8_LEADING(CH) (((uint8_t)CH) >= 0x80)
+#define UTF8_LEADING(CH) (static_cast<uint8_t>(CH) >= 0x80)
 #define CH_IS_XDIGIT(CH) (std::isxdigit((uint8_t)CH))
 #define CH_IS_CTRL(CH)   (std::iscntrl((uint8_t)CH))
 #define CH_IS_SPACE(CH)  (std::isspace((uint8_t)CH))
@@ -61,51 +61,51 @@ private:
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Begin internal, character manipulation.
 
-  auto _current_char() const                               -> char8_t;
-  auto _consume_char(uint32_t)                             -> void;
-  auto _advance_line()                                     -> void;
-  auto _skip_comment()                                     -> void;
-  auto _advance_consume_line()                             -> void;
-  auto _skip_chars_until(std::function<bool(char8_t)> cb)  -> bool;
-  auto _skip_utf8_sequence()                               -> bool;
-  auto _peek_char(uint32_t amnt = 1) const                 -> char8_t;
+  auto current_char_() const                               -> char8_t;
+  auto consume_char_(uint32_t)                             -> void;
+  auto advance_line_()                                     -> void;
+  auto skip_comment_()                                     -> void;
+  auto advance_consume_line_()                             -> void;
+  auto skip_chars_until_(std::function<bool(char8_t)> cb)  -> bool;
+  auto skip_utf8_sequence_()                               -> bool;
+  auto peek_char_(uint32_t amnt = 1) const                 -> char8_t;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Begin token generation methods.
 
-  auto _produce_impl()    -> Token;
-  auto _token_hyphen()    -> Token;
-  auto _token_plus()      -> Token;
-  auto _token_asterisk()  -> Token;
-  auto _token_fwdslash()  -> Token;
-  auto _token_percent()   -> Token;
-  auto _token_equals()    -> Token;
-  auto _token_lthan()     -> Token;
-  auto _token_null()      -> Token;
-  auto _token_tilde()     -> Token;
-  auto _token_at()        -> Token;
-  auto _token_money()     -> Token;
-  auto _token_lsqbrckt()  -> Token;
-  auto _token_rsqbrckt()  -> Token;
-  auto _token_semicolon() -> Token;
-  auto _token_lparen()    -> Token;
-  auto _token_rparen()    -> Token;
-  auto _token_lbrace()    -> Token;
-  auto _token_rbrace()    -> Token;
-  auto _token_comma()     -> Token;
-  auto _token_gthan()     -> Token;
-  auto _token_ampersand() -> Token;
-  auto _token_pipe()      -> Token;
-  auto _token_bang()      -> Token;
-  auto _token_uparrow()   -> Token;
-  auto _token_quote()     -> Token;
-  auto _token_squote()    -> Token;
-  auto _token_colon()     -> Token;
-  auto _token_dot()       -> Token;
-  auto _token_ambiguous() -> Token;
-  auto _token_hex_lit()   -> Token;
-  auto _token_num_lit()   -> Token;
-  auto _token_oct_lit()   -> Token;
+  auto produce_impl_()    -> Token;
+  auto token_hyphen_()    -> Token;
+  auto token_plus_()      -> Token;
+  auto token_asterisk_()  -> Token;
+  auto token_fwdslash_()  -> Token;
+  auto token_percent_()   -> Token;
+  auto token_equals_()    -> Token;
+  auto token_lthan_()     -> Token;
+  auto token_null_()      -> Token;
+  auto token_tilde_()     -> Token;
+  auto token_at_()        -> Token;
+  auto token_money_()     -> Token;
+  auto token_lsqbrckt_()  -> Token;
+  auto token_rsqbrckt_()  -> Token;
+  auto token_semicolon_() -> Token;
+  auto token_lparen_()    -> Token;
+  auto token_rparen_()    -> Token;
+  auto token_lbrace_()    -> Token;
+  auto token_rbrace_()    -> Token;
+  auto token_comma_()     -> Token;
+  auto token_gthan_()     -> Token;
+  auto token_ampersand_() -> Token;
+  auto token_pipe_()      -> Token;
+  auto token_bang_()      -> Token;
+  auto token_uparrow_()   -> Token;
+  auto token_quote_()     -> Token;
+  auto token_squote_()    -> Token;
+  auto token_colon_()     -> Token;
+  auto token_dot_()       -> Token;
+  auto token_ambiguous_() -> Token;
+  auto token_hex_lit_()   -> Token;
+  auto token_num_lit_()   -> Token;
+  auto token_oct_lit_()   -> Token;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Begin fields.
@@ -139,35 +139,35 @@ inline auto Lexer::peek(const uint32_t amnt) -> Token {
   return peeked;
 }
 
-inline auto Lexer::_skip_comment() -> void {
-  _skip_chars_until([](const char8_t ch) {
+inline auto Lexer::skip_comment_() -> void {
+  skip_chars_until_([](const char8_t ch) {
     return ch == '\n' || ch == '\0';
   });
 }
 
-inline auto Lexer::_current_char() const -> char8_t {
+inline auto Lexer::current_char_() const -> char8_t {
   return index_ >= src_.size()
     ? u8'\0'
     : src_[index_];
 }
 
-inline auto Lexer::_peek_char(const uint32_t amnt) const -> char8_t {
+inline auto Lexer::peek_char_(const uint32_t amnt) const -> char8_t {
   return (index_ + amnt) >= src_.size()
     ? u8'\0'
     : src_[index_ + amnt];
 }
 
-inline auto Lexer::_consume_char(const uint32_t amnt) -> void {
+inline auto Lexer::consume_char_(const uint32_t amnt) -> void {
   if(index_ < src_.size()) index_ += amnt;
 }
 
-inline auto Lexer::_advance_line() -> void {
+inline auto Lexer::advance_line_() -> void {
   if(index_ < src_.size()) ++line_;
 }
 
-inline auto Lexer::_advance_consume_line() -> void {
+inline auto Lexer::advance_consume_line_() -> void {
   if(index_ < src_.size()) ++line_;
-  _consume_char(1);
+  consume_char_(1);
 }
 
 inline auto Lexer::get_bytes() const -> Bytes {

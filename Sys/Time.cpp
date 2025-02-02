@@ -11,7 +11,7 @@
 #include <Core/Fmt.hpp>
 BEGIN_NAMESPACE(n19::sys);
 
-auto __STFormatter::weekday() const -> std::string {
+auto STFormatter_::weekday() const -> std::string {
   switch(time_.weekday_) {
     case 7  : [[fallthrough]];
     case 0  : return "Sun";
@@ -27,7 +27,7 @@ auto __STFormatter::weekday() const -> std::string {
   UNREACHABLE;
 }
 
-auto __STFormatter::month() const -> std::string {
+auto STFormatter_::month() const -> std::string {
   #ifndef N19_WIN32
     const auto val = time_.month_ + 1;
   #else   // WINDOWS
@@ -53,7 +53,7 @@ auto __STFormatter::month() const -> std::string {
   UNREACHABLE;
 }
 
-auto __STFormatter::format() const -> std::string {
+auto STFormatter_::format() const -> std::string {
   return fmt("{}, {} {} {} - {}:{}:{}",
     this->weekday(),   /// Format weekday to human readable.
     this->month(),     /// Format month to human readable.
@@ -64,14 +64,14 @@ auto __STFormatter::format() const -> std::string {
     time_.second_);    /// second - unchanged
 }
 
-auto SystemTime::strings() const -> __STFormatter {
-  return __STFormatter{ *this };
+auto SystemTime::strings() const -> STFormatter_ {
+  return STFormatter_{ *this };
 }
 
 #ifdef N19_WIN32
 auto SystemTime::from_utc() -> Result<LocalTime> {
   SystemTime time = {}; /// To return.
-  __SysRepr repr  = {}; /// Windows SYSTEMTIME.
+  SysRepr_ repr   = {}; /// Windows SYSTEMTIME.
 
   ::GetSystemTime(&repr);
   time.second_  = repr.wSecond;
@@ -86,7 +86,7 @@ auto SystemTime::from_utc() -> Result<LocalTime> {
 
 auto SystemTime::from_local() -> Result<LocalTime> {
   SystemTime time = {}; /// To return.
-  __SysRepr repr  = {}; /// Windows SYSTEMTIME.
+  SysRepr_ repr   = {}; /// Windows SYSTEMTIME.
 
   ::GetLocalTime(&repr);
   time.second_  = repr.wSecond;
@@ -102,8 +102,8 @@ auto SystemTime::from_local() -> Result<LocalTime> {
 #else // POSIX
 auto SystemTime::from_utc() -> Result<SystemTime> {
   SystemTime time = {}; /// To return.
-  __Epoch epoch   = {}; /// UNIX epoch.
-  __SysRepr repr  = {}; /// POSIX time struct.
+  Epoch_ epoch   = {};  /// UNIX epoch.
+  SysRepr_ repr  = {};  /// POSIX time struct.
 
   ::time(&epoch);
   if(::gmtime_r(&epoch, &repr) == nullptr) {
@@ -122,8 +122,8 @@ auto SystemTime::from_utc() -> Result<SystemTime> {
 
 auto SystemTime::from_local() -> Result<SystemTime> {
   SystemTime time = {}; /// To return.
-  __Epoch epoch   = {}; /// UNIX epoch.
-  __SysRepr repr  = {}; /// POSIX time struct.
+  Epoch_ epoch   = {};  /// UNIX epoch.
+  SysRepr_ repr  = {};  /// POSIX time struct.
 
   ::time(&epoch);
   if(::localtime_r(&epoch, &repr) == nullptr) {

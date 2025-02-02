@@ -27,7 +27,7 @@ public:
   using ValueType     = T;
   using PointerType   = T*;
   using ReferenceType = T&;
-  using __Variant     = std::variant<T, __Nothing>;
+  using Variant_      = std::variant<T, Nothing_>;
 
   [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
     ASSERT( has_value_ == true, "Bad Maybe access!" );
@@ -90,11 +90,11 @@ public:
 
   Maybe(const T& val)     : has_value_(true), value_(val) {}
   Maybe(T&& val)          : has_value_(true), value_(std::move(val)) {}
-  Maybe(const __Nothing&) : value_(__Nothing{}) {}
-  Maybe(/*......*/)       : value_(__Nothing{}) {}
+  Maybe(const Nothing_&) : value_(Nothing_{}) {}
+  Maybe(/*......*/)       : value_(Nothing_{}) {}
 protected:
   bool has_value_ { false };
-  __Variant value_;
+  Variant_ value_;
 };
 
 END_NAMESPACE(n19);

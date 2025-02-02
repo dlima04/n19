@@ -13,8 +13,8 @@
 // Miscellanous macro utilities that don't really fit inside any other
 // header file should be placed here.
 
-#define __N19_MACRO_CONCAT_IMPL(X, Y) X##Y
-#define N19_MACRO_CONCAT(X, Y) __N19_MACRO_CONCAT_IMPL(X, Y)
+#define N19_MACRO_CONCAT_IMPL_(X, Y) X##Y
+#define N19_MACRO_CONCAT(X, Y) N19_MACRO_CONCAT_IMPL_(X, Y)
 #define N19_UNIQUE_NAME(X) N19_MACRO_CONCAT(X, __COUNTER__)
 #define N19_EXPAND_SAFE_IF(COND, __VA_ARGS__) do{ if( COND ) __VA_ARGS__ }while(false);
 

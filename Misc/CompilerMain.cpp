@@ -28,16 +28,10 @@ struct MyArgs : argp::Parser {
   int64_t& num_jobs  = arg<int64_t>("--num-jobs", "-j", "numba of jobs");
   sys::String& name  = arg<sys::String>("--input", "-i", "the input file.", "Default value!!!");
   bool& verbose      = arg<bool>("--verbose", "-v", "verbose mode");
+  argp::PackType& arr = arg<argp::PackType>("--blabla", "-b", "idk lol");
 };
 
 int main(int argc, char** argv){
-
-  // auto stream = BufferedOStream<15>::from_stdout();
-  // stream << "Hello world!";
-  // stream << "A";
-  //
-  // std::cout << "curr_=" << BufferedOStream<15>::__size - stream.curr_ << std::endl;
-  // stream << "AAAAAA" << Endl;
 
   // const auto time = sys::SystemTime::from_utc();
   // if(!time) {
@@ -50,34 +44,38 @@ int main(int argc, char** argv){
   //
   // std::cout << time->strings().format() << std::endl;
 
-   //std::vector<sys::String> strs = { "--num-jobs=42069", "--verbose=false" };
-//
-   //MyArgs args;
-   //auto res = args.style(argp::ArgStyle::UNIX)
-   //  .take_argv(std::move(strs))
-   //  .parse(outs());
-//
-   //if(!res) {
-   //  return 1;
-   //}
-//
-   //std::cout << "num_jobs=" << args.num_jobs << '\n';
-   //std::cout << "name=" << args.name << '\n';
-   //std::cout << std::boolalpha << "verbose=" << args.verbose << std::endl;
-//
-   //args.help(outs());
+   std::vector<sys::String> strs = { "--num-jobs=42069", "--verbose=4444", "-b=one,two,three" };
 
-  try {
-    const auto file = MUST(FileRef::open(CURRENT_TEST));
-    auto lxr = Lexer::create_shared(*file);
-    if(!lxr) {
-      return 1;
-    }
+   MyArgs args;
+   auto res = args.style(argp::ArgStyle::UNIX)
+     .take_argv(std::move(strs))
+     .parse(outs());
 
-    lxr.value()->dump();
-  } catch(const std::exception& e) {
-    std::cerr << "EXCEPTION: " << e.what() << std::endl;
-  }
+   if(!res) {
+     return 1;
+   }
+
+   std::cout << "num_jobs=" << args.num_jobs << '\n';
+   std::cout << "name=" << args.name << '\n';
+   std::cout << std::boolalpha << "verbose=" << args.verbose << std::endl;
+
+   for(const auto& str : args.arr) {
+     std::cout << str << std::endl;
+   }
+
+   args.help(outs());
+
+  // try {
+  //   const auto file = MUST(FileRef::open(CURRENT_TEST));
+  //   auto lxr = Lexer::create_shared(*file);
+  //   if(!lxr) {
+  //     return 1;
+  //   }
+  //
+  //   lxr.value()->dump();
+  // } catch(const std::exception& e) {
+  //   std::cerr << "EXCEPTION: " << e.what() << std::endl;
+  // }
 
   outs().flush();
   errs().flush();

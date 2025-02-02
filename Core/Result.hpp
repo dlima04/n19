@@ -21,8 +21,8 @@ BEGIN_NAMESPACE(n19);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Begin error code, default error types.
 
-struct __ErrC final {
-N19_MAKE_COMPARABLE_MEMBER(__ErrC, value);
+struct ErrC_ final {
+N19_MAKE_COMPARABLE_MEMBER(ErrC_, value);
   enum Value : uint16_t {
     None       = 0x00, /// No error has occurred.
     InvalidArg = 0x01, /// A provided argument is incorrect.
@@ -35,26 +35,26 @@ N19_MAKE_COMPARABLE_MEMBER(__ErrC, value);
   };
                        ///
   Value value = None;  /// Underlying error value
-  constexpr __ErrC(const Value v) : value(v) {}
-  constexpr __ErrC() = default;
+  constexpr ErrC_(const Value v) : value(v) {}
+  constexpr ErrC_() = default;
 };
                        ///
-struct __ErrorType {   /// n19's default error type.
+struct ErrorType_ {   /// n19's default error type.
   std::string msg;
-  __ErrC code = __ErrC::None;
+  ErrC_ code = ErrC_::None;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Begin default result type.
 
-template<typename T, typename E = __ErrorType>
-class __Result {
-N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(__Result);
-N19_MAKE_DEFAULT_COPY_CONSTRUCTIBLE(__Result);
+template<typename T, typename E = ErrorType_>
+class Result_ {
+N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(Result_);
+N19_MAKE_DEFAULT_COPY_CONSTRUCTIBLE(Result_);
 public:
   using ValueType   = T;
   using PointerType = T*;
-  using __Variant   = std::variant<T, E> ;
+  using Variant_    = std::variant<T, E> ;
 
   [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
     ASSERT( has_value() == true, "Result contains an error!" );
@@ -118,32 +118,32 @@ public:
     return std::holds_alternative<T>( value_ );
   }
 
-  __Result(T&& value)      : value_(std::move(value)) {}
-  __Result(E&& error)      : value_(std::move(error)) {}
-  __Result(const T& value) : value_(value) {}
-  __Result(const E& error) : value_(error) {}
-  __Result(/*.....*/)      : value_(E{}  ) {}
+  Result_(T&& value)      : value_(std::move(value)) {}
+  Result_(E&& error)      : value_(std::move(error)) {}
+  Result_(const T& value) : value_(value) {}
+  Result_(const E& error) : value_(error) {}
+  Result_(/*.....*/)      : value_(E{}  ) {}
 protected:
-  __Variant value_;
+  Variant_ value_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Begin type aliases
 
 template<typename T>
-struct __Result_Dispatch {
-  using Type = __Result<T>;
+struct Result_Dispatch_ {
+  using Type = Result_<T>;
 };
 
 template<>
-struct __Result_Dispatch<void> {
-  using Type = __Result<__Nothing>;
+struct Result_Dispatch_<void> {
+  using Type = Result_<Nothing_>;
 };
 
 template<typename T>
-using Result = typename __Result_Dispatch<T>::Type;
-using ErrC   = __ErrC;
-using ErrorT = __ErrorType;
+using Result = typename Result_Dispatch_<T>::Type;
+using ErrC   = ErrC_;
+using ErrorT = ErrorType_;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Begin error type helper functions
@@ -166,7 +166,7 @@ inline ErrorT make_error(const ErrC code, std::string&& msg) {
 template<typename T, typename ...Args>
 [[nodiscard]] Result<T> make_result(Args&&... args) {
   if constexpr(IsVoid<T>)
-    return Result<__Nothing>{__Nothing{}};
+    return Result<Nothing_>{Nothing_{}};
   else
     return T{ std::forward<Args>(args)... };
 }

@@ -13,48 +13,48 @@
 #include <Core/Panic.hpp>
 #include <string>
 
-inline thread_local auto __n19_last_errc = n19::ErrC::None;
-inline thread_local auto __n19_last_msg  = std::string();
+inline thread_local auto n19_last_errc_ = n19::ErrC::None;
+inline thread_local auto n19_last_msg_  = std::string();
 
-#define __N19_TRANSFORM_RESULT_IMPL                          \
-  call_if_error([](auto&& value){                            \
-    __n19_last_errc = value.error().code.value;              \
-    __n19_last_msg  = value.error().msg;                     \
-  });                                                        \
+#define N19_TRANSFORM_RESULT_IMPL_                         \
+  call_if_error([](auto&& value){                          \
+    ::n19_last_errc_ = value.error().code.value;           \
+    ::n19_last_msg_  = value.error().msg;                  \
+  });                                                      \
 
-#define TRY(EXPR)                                            \
-  (EXPR).__N19_TRANSFORM_RESULT_IMPL                         \
-  if(__n19_last_errc != ::n19::ErrC::None) {                 \
-    auto __tmp = __n19_last_errc;                            \
-    __n19_last_errc = ::n19::ErrC::None;                     \
-    return ::n19::make_error(__tmp, __n19_last_msg);         \
-  }                                                          \
+#define TRY(EXPR)                                          \
+  (EXPR).N19_TRANSFORM_RESULT_IMPL_                        \
+  if(::n19_last_errc_ != ::n19::ErrC::None) {              \
+    auto tmpe_ = ::n19_last_errc_;                         \
+    ::n19_last_errc_ = ::n19::ErrC::None;                  \
+    return ::n19::make_error(tmpe_, ::n19_last_msg_);      \
+  }                                                        \
 
-#define MUST(EXPR)                                           \
-  (EXPR).__N19_TRANSFORM_RESULT_IMPL                         \
-  if(__n19_last_errc != ::n19::ErrC::None) {                 \
-    PANIC(::n19::fmt(                                        \
-      "The expression \"" #EXPR                              \
-      "\" Evaluated to an error in a \"MUST\" context. \n"   \
-      "Error message = {} ",                                 \
-     __n19_last_msg ));                                      \
+#define MUST(EXPR)                                         \
+  (EXPR).N19_TRANSFORM_RESULT_IMPL_                        \
+  if(::n19_last_errc_ != ::n19::ErrC::None) {              \
+    PANIC(::n19::fmt(                                      \
+      "The expression \"" #EXPR                            \
+      "\" Evaluated to an error in a \"MUST\" context. \n" \
+      "Error message = {} ",                               \
+     ::n19_last_msg_ ));                                   \
   }
 
-#define OR_RETURN()                                          \
-  __N19_TRANSFORM_RESULT_IMPL                                \
-  if(__n19_last_errc != ::n19::ErrC::None) {                 \
-    auto __tmp = __n19_last_errc;                            \
-    __n19_last_errc = ::n19::ErrC::None;                     \
-    return ::n19::make_error(__tmp, __n19_last_msg);         \
-  }                                                          \
+#define OR_RETURN()                                        \
+  N19_TRANSFORM_RESULT_IMPL_                               \
+  if(::n19_last_errc_ != ::n19::ErrC::None) {              \
+    auto tmpe_ = ::n19_last_errc_;                         \
+    ::n19_last_errc_ = ::n19::ErrC::None;                  \
+    return ::n19::make_error(tmpe_, ::n19_last_msg_);      \
+  }                                                        \
 
-#define OR_PANIC()                                           \
-  __N19_TRANSFORM_RESULT_IMPL                                \
-  if(__n19_last_errc != ::n19::ErrC::None) {                 \
-    PANIC(::n19::fmt(                                        \
-      "A n19::Result<T> evaluated to an error "              \
-      "in a \"MUST\" context.\n Last error message = {}",    \
-     __n19_last_msg ));                                      \
-  }                                                          \
+#define OR_PANIC()                                         \
+  N19_TRANSFORM_RESULT_IMPL_                               \
+  if(::n19_last_errc_ != ::n19::ErrC::None) {              \
+    PANIC(::n19::fmt(                                      \
+      "A n19::Result<T> evaluated to an error "            \
+      "in a \"MUST\" context.\n Last error message = {}",  \
+     ::n19_last_msg_ ));                                   \
+  }                                                        \
 
 #endif //TRY_HPP

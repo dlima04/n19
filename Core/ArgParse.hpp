@@ -110,6 +110,20 @@ private:
   sys::String value_{};
 };
 
+using PackType = std::vector<sys::String>;
+
+template<>
+class Value<PackType> final : public ValueBase {
+public:
+  auto convert(const sys::String &) -> Result<void> override;
+  N19_FORCEINLINE auto value() -> PackType& { return value_; }
+
+  Value() = default;
+ ~Value() = default;
+private:
+  PackType value_{};
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Additional helper structures and enumerations.
 
@@ -157,15 +171,13 @@ public:
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Begin internal methods
 private:
-
-  auto _print_chunk_error(size_t at, OStream&, const std::string& msg) const -> void;
-  auto _already_passed(size_t index) const -> bool;
-  auto _is_flag_begin(const sys::StringView&) const -> bool;
+  auto print_chunk_error_(size_t at, OStream&, const std::string& msg) const -> void;
+  auto already_passed_(size_t index) const -> bool;
+  auto is_flag_begin_(const sys::StringView&) const -> bool;
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Begin extra inline methods
 public:
-
   inline auto style(const ArgStyle s = ArgStyle::UNIX) -> Parser& {
     arg_style_ = s;       /// set flag name style
     return *this;         ///

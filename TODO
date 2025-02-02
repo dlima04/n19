@@ -1,6 +1,6 @@
 TODO
 - hexdump
-- testing
+- benchmarking for unit tests (maybe, idk yet)
 - backtrace  
 - Refine compilation entity system
-- Start work on the parser
+- Parser

@@ -22,12 +22,12 @@ BEGIN_NAMESPACE(n19::sys);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Begin class definitions.
 
-struct __STFormatter {
+struct STFormatter_ {
   const class SystemTime& time_;
   [[nodiscard]] auto format()  const -> std::string;
   [[nodiscard]] auto month()   const -> std::string;
   [[nodiscard]] auto weekday() const -> std::string;
-  __STFormatter(const SystemTime& t) : time_(t) {}
+  STFormatter_(const SystemTime& t) : time_(t) {}
 };
 
 class SystemTime {
@@ -35,24 +35,24 @@ N19_MAKE_DEFAULT_ASSIGNABLE(SystemTime);
 N19_MAKE_DEFAULT_CONSTRUCTIBLE(SystemTime);
 public:
 #ifdef N19_WIN32
-  using __SysRepr = ::SYSTEMTIME;
-  using __Epoch   = ::time_t;
-  using __Value   = ::WORD;
+  using SysRepr_ = ::SYSTEMTIME;
+  using Epoch_   = ::time_t;
+  using Value_   = ::WORD;
 #else // POSIX
-  using __SysRepr = struct ::tm;
-  using __Epoch   = ::time_t;
-  using __Value   = int;
+  using SysRepr_ = struct ::tm;
+  using Epoch_   = ::time_t;
+  using Value_   = int;
 #endif
 
-  __Value second_  = 0;
-  __Value minute_  = 0;
-  __Value hour_    = 0;
-  __Value day_     = 0;
-  __Value weekday_ = 0;
-  __Value month_   = 0;
-  __Value year_    = 0;
+  Value_ second_  = 0;
+  Value_ minute_  = 0;
+  Value_ hour_    = 0;
+  Value_ day_     = 0;
+  Value_ weekday_ = 0;
+  Value_ month_   = 0;
+  Value_ year_    = 0;
 
-  auto strings() const     -> __STFormatter;
+  auto strings() const     -> STFormatter_;
   static auto from_local() -> Result<SystemTime>;
   static auto from_utc()   -> Result<SystemTime>;
 

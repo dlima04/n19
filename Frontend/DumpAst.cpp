@@ -9,7 +9,7 @@
 #include <Frontend/AstNodes.hpp>
 BEGIN_NAMESPACE(n19);
 
-auto AstNode::_print(
+auto AstNode::print_(
   const uint32_t depth,
   OStream& stream,
   const std::string& node_name ) const -> void
@@ -41,7 +41,7 @@ auto AstBranch::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "Branch");
+  print_(depth, stream, "Branch");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -63,7 +63,7 @@ auto AstConstBranch::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "ConstBranch");
+  print_(depth, stream, "ConstBranch");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -86,7 +86,7 @@ auto AstIf::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "If");
+  print_(depth, stream, "If");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -104,7 +104,7 @@ auto AstElse::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "Else");
+  print_(depth, stream, "Else");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -121,7 +121,7 @@ auto AstWhere::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "Where");
+  print_(depth, stream, "Where");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -139,7 +139,7 @@ auto AstOtherwise::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "Otherwise");
+  print_(depth, stream, "Otherwise");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -156,7 +156,7 @@ auto AstBreak::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "BreakStmt");
+  print_(depth, stream, "BreakStmt");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -170,7 +170,7 @@ auto AstContinue::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "ContinueStmt");
+  print_(depth, stream, "ContinueStmt");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -184,7 +184,7 @@ auto AstReturn::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "ReturnStmt");
+  print_(depth, stream, "ReturnStmt");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -206,7 +206,7 @@ auto AstCall::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "Call");
+  print_(depth, stream, "Call");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -225,7 +225,7 @@ auto AstDefer::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "Defer");
+  print_(depth, stream, "Defer");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -241,7 +241,7 @@ auto AstDeferIf::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "DeferIf");
+  print_(depth, stream, "DeferIf");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -258,7 +258,7 @@ auto AstVardecl::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "VarDecl");
+  print_(depth, stream, "VarDecl");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -275,7 +275,7 @@ auto AstProcDecl::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "VarDecl");
+  print_(depth, stream, "VarDecl");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -297,7 +297,7 @@ auto AstCase::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "Case");
+  print_(depth, stream, "Case");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -320,7 +320,7 @@ auto AstDefault::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "Default");
+  print_(depth, stream, "Default");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -337,7 +337,7 @@ auto AstSwitch::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "Switch");
+  print_(depth, stream, "Switch");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -363,7 +363,7 @@ auto AstScopeBlock::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "ScopeBlock");
+  print_(depth, stream, "ScopeBlock");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -380,7 +380,7 @@ auto AstFor::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "For");
+  print_(depth, stream, "For");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -404,7 +404,7 @@ auto AstWhile::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "While");
+  print_(depth, stream, "While");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -427,7 +427,7 @@ auto AstSubscript::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "Subscript");
+  print_(depth, stream, "Subscript");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -444,7 +444,7 @@ auto AstBinExpr::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "BinExpr");
+  print_(depth, stream, "BinExpr");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -467,7 +467,7 @@ auto AstUnaryExpr::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "UnaryExpr");
+  print_(depth, stream, "UnaryExpr");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -492,7 +492,7 @@ auto AstScalarLiteral::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "ScalarLit");
+  print_(depth, stream, "ScalarLit");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -511,7 +511,7 @@ auto AstAggregateLiteral::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "AggregateLit");
+  print_(depth, stream, "AggregateLit");
   if(alias.has_value())
     stream
       << Con::GreenFG
@@ -528,7 +528,7 @@ auto AstEntityRef::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "EntityRef");
+  print_(depth, stream, "EntityRef");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -548,7 +548,7 @@ auto AstEntityRefThunk::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "EntityRefThunk");
+  print_(depth, stream, "EntityRefThunk");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -568,7 +568,7 @@ auto AstTypeRef::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "TypeRef");
+  print_(depth, stream, "TypeRef");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -584,7 +584,7 @@ auto AstTypeRefThunk::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "TypeRefThunk");
+  print_(depth, stream, "TypeRefThunk");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
@@ -600,7 +600,7 @@ auto AstNamespace::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  _print(depth, stream, "NamespaceBlock");
+  print_(depth, stream, "NamespaceBlock");
   if(alias.has_value()) 
     stream
       << Con::GreenFG

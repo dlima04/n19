@@ -41,23 +41,23 @@ enum class Con : uint16_t {
 // inlined header functions
 
 inline auto outs() -> OStream& {
-  static auto _outs = BufferedOStream<>::from_stdout();
-  return _outs;
+  static auto outs_ = BufferedOStream<>::from_stdout();
+  return outs_;
 }
 
 inline auto errs() -> OStream& {
-  static auto _errs = BufferedOStream<>::from_stderr();
-  return _errs;
+  static auto errs_ = BufferedOStream<>::from_stderr();
+  return errs_;
 }
 
 inline auto nulls() -> OStream& {
-  static auto _nulls = NullOStream();
-  return _nulls;
+  static auto nulls_ = NullOStream();
+  return nulls_;
 }
 
 inline auto ins() -> IStream& {
-  static auto _ins = IStream::from_stdin();
-  return _ins;
+  static auto ins_ = IStream::from_stdin();
+  return ins_;
 }
 
 inline auto operator<<(OStream& stream, const Con code) -> OStream& {

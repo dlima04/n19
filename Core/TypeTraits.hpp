@@ -17,94 +17,94 @@ using VoidType = void;
 // Type traits for adding qualifiers
 
 template<typename T, typename = void>
-struct __AddReference {
+struct AddReference_ {
   using LvalueType = T;
   using TvalueType = T;
 };
 
 template<typename T>
-struct __AddReference<T, VoidType<T&>> {
+struct AddReference_<T, VoidType<T&>> {
   using LvalueType = T&;
   using RvalueType = T&&;
 };
 
 template<typename T>
-struct __MakeUnsigned {
+struct MakeUnsigned_ {
   using Type = void;
 };
 
 template<>
-struct __MakeUnsigned<signed char> {
+struct MakeUnsigned_<signed char> {
   using Type = unsigned char;
 };
 
 template<>
-struct __MakeUnsigned<short> {
+struct MakeUnsigned_<short> {
   using Type = unsigned short;
 };
 
 template<>
-struct __MakeUnsigned<int> {
+struct MakeUnsigned_<int> {
   using Type = unsigned int;
 };
 
 template<>
-struct __MakeUnsigned<long> {
+struct MakeUnsigned_<long> {
   using Type = unsigned long;
 };
 
 template<>
-struct __MakeUnsigned<long long> {
+struct MakeUnsigned_<long long> {
   using Type = unsigned long long;
 };
 
 template<>
-struct __MakeUnsigned<unsigned char> {
+struct MakeUnsigned_<unsigned char> {
   using Type = unsigned char;
 };
 
 template<>
-struct __MakeUnsigned<unsigned short> {
+struct MakeUnsigned_<unsigned short> {
   using Type = unsigned short;
 };
 
 template<>
-struct __MakeUnsigned<unsigned int> {
+struct MakeUnsigned_<unsigned int> {
   using Type = unsigned int;
 };
 
 template<>
-struct __MakeUnsigned<unsigned long> {
+struct MakeUnsigned_<unsigned long> {
   using Type = unsigned long;
 };
 
 template<>
-struct __MakeUnsigned<unsigned long long> {
+struct MakeUnsigned_<unsigned long long> {
   using Type = unsigned long long;
 };
 
 template<>
-struct __MakeUnsigned<char> {
+struct MakeUnsigned_<char> {
   using Type = unsigned char;
 };
 
 template<>
-struct __MakeUnsigned<char8_t> {
+struct MakeUnsigned_<char8_t> {
   using Type = char8_t;
 };
 
 template<>
-struct __MakeUnsigned<char16_t> {
+struct MakeUnsigned_<char16_t> {
   using Type = char16_t;
 };
 
 template<>
-struct __MakeUnsigned<char32_t> {
+struct MakeUnsigned_<char32_t> {
   using Type = char32_t;
 };
 
 template<>
-struct __MakeUnsigned<bool> {
+struct MakeUnsigned_<bool> {
   using Type = bool;
 };
 
@@ -115,79 +115,79 @@ template<typename T>
 using AddPtr = T*;
 
 template<typename T>
-using MakeUnsigned = typename __MakeUnsigned<T>::Type;
+using MakeUnsigned = typename MakeUnsigned_<T>::Type;
 
 template<typename T>
-using AddLvalueReference = typename __AddReference<T>::LvalueType;
+using AddLvalueReference = typename AddReference_<T>::LvalueType;
 
 template<typename T>
-using AddRvalueReference = typename __AddReference<T>::RvalueType;
+using AddRvalueReference = typename AddReference_<T>::RvalueType;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // declval: "simulate" an ephemeral construction of type T
 
 template<typename T>
-typename __AddReference<T>::RvalueType declval();
+typename AddReference_<T>::RvalueType declval();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Type traits for removing qualifiers
 
 template<typename T>
-struct __RemoveReference {
+struct RemoveReference_ {
   using Type = T;
 };
 
 template<typename T>
-struct __RemoveReference<T&> {
+struct RemoveReference_<T&> {
   using Type = T;
 };
 
 template<typename T>
-struct __RemoveReference<T&&> {
+struct RemoveReference_<T&&> {
   using Type = T;
 };
 
 template<typename T>
-struct __RemovePointer {
+struct RemovePointer_ {
   using Type = T;
 };
 
 template<typename T>
-struct __RemovePointer<T*> {
+struct RemovePointer_<T*> {
   using Type = T;
 };
 
 template<typename T>
-struct __RemoveConst {
+struct RemoveConst_ {
   using Type = T;
 };
 
 template<typename T>
-struct __RemoveConst<T const> {
+struct RemoveConst_<T const> {
   using Type = T;
 };
 
 template<typename T>
-using RemoveConst = typename __RemoveConst<T>::Type;
+using RemoveConst = typename RemoveConst_<T>::Type;
 
 template<typename T>
-using RemoveReference = typename __RemoveReference<T>::Type;
+using RemoveReference = typename RemoveReference_<T>::Type;
 
 template<typename T>
-using RemovePointer = typename __RemovePointer<T>::Type;
+using RemovePointer = typename RemovePointer_<T>::Type;
 
 template<typename T>
-struct __RemoveVolatile {
+struct RemoveVolatile_ {
   using Type = T;
 };
 
 template<typename T>
-struct __RemoveVolatile<T volatile> {
+struct RemoveVolatile_<T volatile> {
   using Type = T;
 };
 
 template<typename T>
-using RemoveVolatile = typename __RemoveVolatile<T>::Type;
+using RemoveVolatile = typename RemoveVolatile_<T>::Type;
 
 template<typename T>
 using RemoveCV = RemoveVolatile<RemoveConst<T>>;
@@ -199,20 +199,20 @@ using DecayT = RemoveReference<RemoveCV<T>>;
 // IsIntegral
 
 template<typename T>
-inline constexpr bool __IsIntegral = false; //base
+inline constexpr bool IsIntegral_ = false; //base
 
-template<> inline constexpr bool __IsIntegral<bool>               = true;
-template<> inline constexpr bool __IsIntegral<unsigned char>      = true;
-template<> inline constexpr bool __IsIntegral<unsigned short>     = true;
-template<> inline constexpr bool __IsIntegral<unsigned int>       = true;
-template<> inline constexpr bool __IsIntegral<unsigned long>      = true;
-template<> inline constexpr bool __IsIntegral<unsigned long long> = true;
-template<> inline constexpr bool __IsIntegral<char8_t>            = true;
-template<> inline constexpr bool __IsIntegral<char16_t>           = true;
-template<> inline constexpr bool __IsIntegral<char32_t>           = true;
+template<> inline constexpr bool IsIntegral_<bool>                = true;
+template<> inline constexpr bool IsIntegral_<unsigned char>       = true;
+template<> inline constexpr bool IsIntegral_<unsigned short>      = true;
+template<> inline constexpr bool IsIntegral_<unsigned int>        = true;
+template<> inline constexpr bool IsIntegral_<unsigned long>       = true;
+template<> inline constexpr bool IsIntegral_<unsigned long long>  = true;
+template<> inline constexpr bool IsIntegral_<char8_t>             = true;
+template<> inline constexpr bool IsIntegral_<char16_t>            = true;
+template<> inline constexpr bool IsIntegral_<char32_t>            = true;
 
 template<typename T>
-inline constexpr bool IsIntegral = __IsIntegral<DecayT<MakeUnsigned<T>>>;
+inline constexpr bool IsIntegral = IsIntegral_<DecayT<MakeUnsigned<T>>>;
 
 template<typename T> inline constexpr bool IsLvalueReference      = false;
 template<typename T> inline constexpr bool IsLvalueReference<T&>  = true;
@@ -226,38 +226,38 @@ template<typename T> inline constexpr bool IsReference<T&&>       = true;
 // IsFloatingPoint
 
 template<typename T>
-inline constexpr bool __IsFloatingPoint = false; //base
+inline constexpr bool IsFloatingPoint_ = false; //base
 
-template<> inline constexpr bool __IsFloatingPoint<double>        = true;
-template<> inline constexpr bool __IsFloatingPoint<long double>   = true;
-template<> inline constexpr bool __IsFloatingPoint<float>         = true;
+template<> inline constexpr bool IsFloatingPoint_<double>         = true;
+template<> inline constexpr bool IsFloatingPoint_<long double>    = true;
+template<> inline constexpr bool IsFloatingPoint_<float>          = true;
 
 template<typename T>
-inline constexpr bool IsFloatingPoint = __IsFloatingPoint<DecayT<T>>;
+inline constexpr bool IsFloatingPoint = IsFloatingPoint_<DecayT<T>>;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IsCharacter
 
 template<typename T>
-inline constexpr bool __IsCharacter = false; //base
+inline constexpr bool IsCharacter_ = false; //base
 
-template<> inline constexpr bool __IsCharacter<char8_t>           = true;
-template<> inline constexpr bool __IsCharacter<char16_t>          = true;
-template<> inline constexpr bool __IsCharacter<char32_t>          = true;
-template<> inline constexpr bool __IsCharacter<char>              = true;
-template<> inline constexpr bool __IsCharacter<wchar_t>           = true;
+template<> inline constexpr bool IsCharacter_<char8_t>            = true;
+template<> inline constexpr bool IsCharacter_<char16_t>           = true;
+template<> inline constexpr bool IsCharacter_<char32_t>           = true;
+template<> inline constexpr bool IsCharacter_<char>               = true;
+template<> inline constexpr bool IsCharacter_<wchar_t>            = true;
 
 template<typename T>
-inline constexpr bool IsCharacter = __IsCharacter<DecayT<T>>;
+inline constexpr bool IsCharacter = IsCharacter_<DecayT<T>>;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IsPointer
 
-template<typename T> inline constexpr bool __IsPointer            = false;
-template<typename T> inline constexpr bool __IsPointer<T*>        = true;
+template<typename T> inline constexpr bool IsPointer_             = false;
+template<typename T> inline constexpr bool IsPointer_<T*>         = true;
 
 template<typename T>
-inline constexpr bool IsPointer = __IsPointer<RemoveCV<T>>;
+inline constexpr bool IsPointer = IsPointer_<RemoveCV<T>>;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IsConstructible, IsInvocableWith

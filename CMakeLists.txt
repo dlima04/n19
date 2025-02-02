@@ -92,14 +92,16 @@ add_executable(n19
 # Build the unit test executable
 add_executable(bulwark
   Misc/BulwarkMain.cpp
-  Bulwark/Case.hpp
-  Bulwark/Benchmark.hpp
-  Bulwark/Registry.hpp
-  Bulwark/Suite.hpp
+  Bulwark/Reporting.cpp
   Bulwark/Registry.cpp
+  Bulwark/Case.cpp
   Bulwark/Suite.cpp
+  Bulwark/Case.hpp
+  Bulwark/Registry.hpp
+  Bulwark/Context.hpp
+  Bulwark/Suite.hpp
   Bulwark/Reporting.hpp
-  Bulwark/All.hpp
+  Bulwark/Bulwark.hpp
   ${N19_ENUMERATE_GLOBAL_SOURCES}
   ${N19_ENUMERATE_GLOBAL_HEADERS}
 )

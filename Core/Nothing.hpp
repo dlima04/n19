@@ -9,10 +9,10 @@
 #ifndef NOTHING_HPP
 #define NOTHING_HPP
 
-struct __Nothing {
-  unsigned char __dummy_value = 0;
-  constexpr __Nothing() = default;
+struct Nothing_ {
+  unsigned char dummy_value_ = 0;
+  constexpr Nothing_() = default;
 };
 
-constexpr inline __Nothing Nothing;
+constexpr inline Nothing_ Nothing;
 #endif //NOTHING_HPP

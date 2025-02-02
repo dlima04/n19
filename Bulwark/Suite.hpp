@@ -8,16 +8,17 @@
 
 #ifndef N19_TEST_SUITE_HPP
 #define N19_TEST_SUITE_HPP
+#include <Sys/String.hpp>
 #include <Bulwark/Case.hpp>
 #include <vector>
-#include <string_view>
 BEGIN_NAMESPACE(n19::test);
 
 class Suite {
 public:
-  std::string_view name_ = "<UNNAMED>";
+  sys::StringView name_ = _nstr("<UNNAMED>");
   std::vector<Case> cases_;
 
+  auto run_all(OStream& s) -> void;
  ~Suite() = default;
   constexpr Suite() = default;
 };

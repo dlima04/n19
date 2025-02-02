@@ -11,6 +11,7 @@
 #include <Core/Fmt.hpp>
 #include <string>
 #include <algorithm>
+#include <ranges>
 BEGIN_NAMESPACE(n19::argp);
 
 auto Value<int64_t>::convert(const sys::String& str) -> Result<void> {
@@ -54,7 +55,15 @@ auto Value<sys::String>::convert(const sys::String& str) -> Result<void> {
   return make_result<void>();             /// just store the string and leave...
 }
 
-auto Parser::_already_passed(const size_t index ) const -> bool {
+auto Value<PackType>::convert(const sys::String& str) -> Result<void> {
+  auto split_views = str | std::ranges::views::split(_nchr(','));
+  for(auto&& view : split_views)
+    value_.emplace_back(sys::String{ view.begin(), view.end() });
+
+  return make_result<void>();
+}
+
+auto Parser::already_passed_(const size_t index ) const -> bool {
   ASSERT(index < args_.size());           /// Assert Not OOB
   for(size_t i = 0; i < index; ++i) {     /// Check all elements before index
     if(args_[i] == args_[index]) return true;
@@ -63,7 +72,7 @@ auto Parser::_already_passed(const size_t index ) const -> bool {
   return false;                           /// Otherwise we haven't passed it.
 }
 
-auto Parser::_print_chunk_error(
+auto Parser::print_chunk_error_(
   const size_t at, OStream& stream, const std::string& msg ) const -> void
 {
   sys::String filler;                     /// String for filler characters
@@ -108,9 +117,10 @@ auto Parser::_print_chunk_error(
   //             This is not a valid flag!
 
   stream << msg;
+  stream << Flush;
 }
 
-auto Parser::_is_flag_begin(const sys::StringView& str) const -> bool {
+auto Parser::is_flag_begin_(const sys::StringView& str) const -> bool {
   switch(arg_style_) {
     case ArgStyle::UNIX : return str.starts_with(_nstr("-"));
     case ArgStyle::DOS  : return str.starts_with(_nstr("/"));
@@ -139,8 +149,8 @@ auto Parser::help(OStream& stream) const -> void {
 
 auto Parser::parse(OStream& stream) -> Result<void> {
   for(size_t i = 0; i < args_.size(); i++) {
-    if(!_is_flag_begin(args_[i])) {
-      _print_chunk_error(i, stream, "Invalid flag format.");
+    if(!is_flag_begin_(args_[i])) {
+      print_chunk_error_(i, stream, "Invalid flag format.");
       return make_error(ErrC::InvalidArg);
     }
 
@@ -160,7 +170,7 @@ auto Parser::parse(OStream& stream) -> Result<void> {
     if(equ_char != sys::String::npos) {
       the_flag  = args_[i].substr(0, equ_char);
       the_value = args_[i].substr(equ_char);
-    } else if(i + 1 < args_.size() && !_is_flag_begin(args_[i + 1])) {
+    } else if(i + 1 < args_.size() && !is_flag_begin_(args_[i + 1])) {
       the_flag  = args_[i];
       the_value = args_[i + 1];
       ++i;
@@ -174,17 +184,17 @@ auto Parser::parse(OStream& stream) -> Result<void> {
     });
 
     if(param_ptr == params_.end()) {
-      _print_chunk_error(i, stream, "Flag does not exist.");
+      print_chunk_error_(i, stream, "Flag does not exist.");
       return make_error(ErrC::InvalidArg);
     }
     
     if(the_value == "=") {
-      _print_chunk_error(i, stream, "Expected a value after \"=\"");
+      print_chunk_error_(i, stream, "Expected a value after \"=\"");
       return make_error(ErrC::InvalidArg);
     }
 
-    if(_already_passed(flag_pos)) {
-      _print_chunk_error(flag_pos, stream, "Flag was passed more than once.");
+    if(already_passed_(flag_pos)) {
+      print_chunk_error_(flag_pos, stream, "Flag was passed more than once.");
       return make_error(ErrC::InvalidArg);
     }
     
@@ -193,7 +203,7 @@ auto Parser::parse(OStream& stream) -> Result<void> {
     }
 
     if(!param_ptr->val_->convert(the_value).has_value()) {
-      _print_chunk_error(i, stream, "Invalid type for this value.");
+      print_chunk_error_(i, stream, "Invalid type for this value.");
       return make_error(ErrC::InvalidArg);
     }
   }

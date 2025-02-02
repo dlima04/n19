@@ -23,22 +23,22 @@ BEGIN_NAMESPACE(n19::test);
 class Registry {
 public:
   auto add_case(
-    const Case::__FuncType& case_func,
-    const Case::__NameType& case_name,
+    const Case::FuncType_& case_func,
+    const Case::NameType_& case_name,
     const std::string_view& suite_name
   ) noexcept -> bool;
 
-  std::vector<Suite> suites_;
+  auto run_all(OStream& stream = outs()) -> void;
+  auto find(const sys::StringView& sv) -> Suite*;
 
+  std::vector<Suite> suites_;
   constexpr Registry() = default;
   ~Registry() = default;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Global objects
+// Global registry object
 
-constinit extern size_t g_total_passed;
-constinit extern size_t g_total_failed;
 constinit extern Registry g_registry;
 
 END_NAMESPACE(n19::test);

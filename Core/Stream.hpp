@@ -15,7 +15,6 @@
 #include <string_view>
 #include <cstdint>
 #include <cstring>
-
 #include <system_error>
 #include <charconv>
 #include <limits>
@@ -38,14 +37,14 @@ BEGIN_NAMESPACE(n19);
 // Some stream manipulators, their values are not actually used,
 // the types themselved as an indicator of what the stream should do.
 
-inline constexpr struct __Flush {
-  unsigned char __dummy_value = 0;
-  constexpr __Flush() = default;
+inline constexpr struct Flush_ {
+  unsigned char dummy_value_ = 0;
+  constexpr Flush_() = default;
 } Flush;
 
-inline constexpr struct __Endl {
-  unsigned char __dummy_value = 0;
-  constexpr __Endl() = default;
+inline constexpr struct Endl_ {
+  unsigned char dummy_value_ = 0;
+  constexpr Endl_() = default;
 } Endl;
 
 
@@ -57,9 +56,9 @@ inline constexpr struct __Endl {
 
 class OStream {
 public:
-  using __Index  = size_t;
-  using __Char   = Byte;
-  using __Span   = std::span<const __Char>;
+  using Index_ = size_t;
+  using Char_  = Byte;
+  using Span_  = std::span<const Char_>;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Factories
@@ -71,12 +70,12 @@ public:
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Begin inline class methods
 
-  N19_FORCEINLINE auto operator<<(const __Flush&) -> OStream& {
+  N19_FORCEINLINE auto operator<<(const Flush_&) -> OStream& {
     this->flush();   /// Flush but don't add a newline
     return *this;    /// return this stream
   }
 
-  N19_FORCEINLINE auto operator<<(const __Endl&) -> OStream& {
+  N19_FORCEINLINE auto operator<<(const Endl_&) -> OStream& {
     *this << '\n';   /// add a new line
     this->flush();   /// Flush
     return *this;    /// return this stream
@@ -125,7 +124,7 @@ public:
   }
 
 #if defined(N19_WIN32)
-  auto operator<<(const std::wstring_view& str) -> COStream & {
+  auto operator<<(const std::wstring_view& str) -> COStream& {
     if(str.empty()) return *this;
 
     const int req_size = ::WideCharToMultiByte(
@@ -165,7 +164,7 @@ public:
   }
 #endif
 
-  virtual auto write(const __Span& buff) -> OStream& {
+  virtual auto write(const Span_& buff) -> OStream& {
     fd_.write(buff);     /// Write to the underlying IODevice object.
     return *this;        /// return this stream
   }
@@ -190,9 +189,9 @@ protected:
 template<size_t size_ = N19_OSTREAM_BUFFSIZE>
 class BufferedOStream : public OStream {
 public:
-  constexpr static size_t __size  = size_;
-  constexpr static size_t __begin = 0;
-  constexpr static size_t __end   = __size - 1;
+  constexpr static size_t len_   = size_;
+  constexpr static size_t begin_ = 0;
+  constexpr static size_t end_   = len_ - 1;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Factories
@@ -218,15 +217,15 @@ public:
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Type aliases
 
-  using __Buffer = OStream::__Char[ __size ];
-  using __Index  = OStream::__Index;
+  using Buffer_ = OStream::Char_[ len_ ];
+  using Index_  = OStream::Index_;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Begin inline class methods
 
-  N19_FORCEINLINE auto to_buffer(const __Span& buff) -> OStream& {
-    ASSERT(curr_ <= __size, "Invalid current buffer index.");
-    ASSERT(buff.size_bytes() <= (__size - curr_), "Buffer overrun!");
+  N19_FORCEINLINE auto to_buffer(const Span_& buff) -> OStream& {
+    ASSERT(curr_ <= len_, "Invalid current buffer index.");
+    ASSERT(buff.size_bytes() <= (len_ - curr_), "Buffer overrun!");
     ASSERT(buff.size_bytes() != 0, "to_buffer: empty span!");
 
     std::memcpy(&buff_[curr_], buff.data(), buff.size_bytes());
@@ -235,24 +234,24 @@ public:
   }
 
   N19_FORCEINLINE auto flush() -> OStream& override {
-    ASSERT(curr_ <= __size, "Buffer overrun!");
-    if(curr_ > __begin) {
-      fd_.write(Bytes{&buff_[__begin], curr_});
-      curr_ = __begin;        /// Reset the buffer index.
+    ASSERT(curr_ <= len_, "Buffer overrun!");
+    if(curr_ > begin_) {
+      fd_.write(Bytes{&buff_[begin_], curr_});
+      curr_ = begin_;         /// Reset the buffer index.
     }                         ///
 
     fd_.flush_handle();       /// FIXME: this is retarded.
     return *this;             /// return instance
   }
 
-  auto write(const __Span& buff) -> OStream& override {
-    const size_t remaining = __size - curr_;
+  auto write(const Span_& buff) -> OStream& override {
+    const size_t remaining = len_ - curr_;
     const size_t size_new  = buff.size_bytes();
     const bool   no_space  = remaining < size_new;
 
     if(buff.empty()) {        /// Disallow empty buffers.
       return *this;           /// Early return.
-    } if(size_new > __size) { /// buffer is too large.
+    } if(size_new > len_) {   /// buffer is too large.
       flush();                ///
       fd_.write(buff);        /// write contents directly.
     } else if(no_space) {     /// remaining size is too small,
@@ -268,13 +267,13 @@ public:
  ~BufferedOStream() override = default;
   BufferedOStream() = default;
 public:
-  __Buffer buff_{};
-  __Index curr_ {__begin};
+  Buffer_ buff_{};
+  Index_ curr_ {begin_};
 };
 
 class NullOStream final : public OStream {
 public:
-  auto write(const __Span&) -> OStream & override { return *this; }
+  auto write(const Span_&) -> OStream & override { return *this; }
   auto flush() -> OStream & override { return *this; }
 
  ~NullOStream() override = default;

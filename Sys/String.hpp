@@ -23,8 +23,8 @@ namespace n19::sys {
   using StringView = std::wstring_view;
   using Char       = wchar_t;
 #else
-#define _nstr(STR) (const char*)u8##STR
-#define _nchr(CHR) (const char)u8##CHR
+#define _nstr(STR) STR
+#define _nchr(CHR) CHR
   using String     = std::string;
   using StringView = std::string_view;
   using Char       = char;

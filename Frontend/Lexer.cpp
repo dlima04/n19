@@ -18,12 +18,12 @@
 #include <array>
 BEGIN_NAMESPACE(n19);
 
-inline auto Lexer::_token_hyphen() -> Token {
+inline auto Lexer::token_hyphen_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.line_ = line_;
 
-  switch(_peek_char()) {
+  switch(peek_char_()) {
   case u8'=': // '-='
     curr_tok.type_ = TokenType::SubEq;
     curr_tok.cat_  = TokenCategory::BinaryOp;
@@ -31,7 +31,7 @@ inline auto Lexer::_token_hyphen() -> Token {
     curr_tok.cat_ |= TokenCategory::PointerArithOp;
     curr_tok.cat_ |= TokenCategory::ArithmeticOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
     break;
   case u8'-': // '--'
     curr_tok.type_ = TokenType::Dec;
@@ -42,46 +42,46 @@ inline auto Lexer::_token_hyphen() -> Token {
     curr_tok.cat_ |= TokenCategory::ArithAssignOp;
     curr_tok.cat_ |= TokenCategory::ArithmeticOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
     break;
   case u8'>': // '->'
     curr_tok.type_ = TokenType::SkinnyArrow;
     curr_tok.cat_  = TokenCategory::ValidPostfix;
     curr_tok.cat_ |= TokenCategory::BinaryOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
   default: // '-'
     curr_tok.type_ = TokenType::Sub;
     curr_tok.cat_  = TokenCategory::BinaryOp;
     curr_tok.cat_ |= TokenCategory::ArithmeticOp;
     curr_tok.cat_ |= TokenCategory::PointerArithOp;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
     break;
   }
 
   return curr_tok;
 }
 
-inline auto Lexer::_token_ampersand() -> Token {
+inline auto Lexer::token_ampersand_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.line_ = line_;
   curr_tok.cat_  = TokenCategory::BinaryOp;
 
-  switch(_peek_char()) {
+  switch(peek_char_()) {
   case u8'=': // '&='
     curr_tok.type_ = TokenType::BitwiseAndEq;
     curr_tok.cat_ |= TokenCategory::BitwiseAssignOp;
     curr_tok.cat_ |= TokenCategory::BitwiseOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
     break;
   case u8'&': // '&&'
     curr_tok.type_ = TokenType::LogicalAnd;
     curr_tok.cat_ |= TokenCategory::LogicalOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
     break;
   default: // '&'
     curr_tok.type_  = TokenType::BitwiseAnd;
@@ -89,74 +89,74 @@ inline auto Lexer::_token_ampersand() -> Token {
     curr_tok.cat_  |= TokenCategory::UnaryOp;
     curr_tok.cat_  |= TokenCategory::ValidPrefix;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
     break;
   }
 
   return curr_tok;
 }
 
-inline auto Lexer::_token_dot() -> Token {
+inline auto Lexer::token_dot_() -> Token {
   Token curr_tok;
   curr_tok.line_ = line_;
   curr_tok.cat_  = TokenCategory::NonCategorical;
   curr_tok.pos_  = index_;
 
-  if(_peek_char(1) == u8'.' && _peek_char(2) == u8'.') { // '...'
+  if(peek_char_(1) == u8'.' && peek_char_(2) == u8'.') { // '...'
     curr_tok.type_ = TokenType::DotThree;
     curr_tok.len_  = 3;
-    _consume_char(3);
-  } else if(_peek_char(1) == u8'.') { // '..'
+    consume_char_(3);
+  } else if(peek_char_(1) == u8'.') { // '..'
     curr_tok.type_ = TokenType::DotTwo;
-    curr_tok.len_  = 2; 
-    _consume_char(2);
+    curr_tok.len_  = 2;
+    consume_char_(2);
   } else { // '.'
     curr_tok.type_ = TokenType::Dot;
     curr_tok.cat_  = TokenCategory::ValidPostfix | TokenCategory::BinaryOp;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
   }
-  
+
   return curr_tok;
 }
 
-inline auto Lexer::_token_equals() -> Token {
+inline auto Lexer::token_equals_() -> Token {
   Token curr_tok;
   curr_tok.line_ = line_;
   curr_tok.pos_ = index_;
 
-  switch(_peek_char()) {
+  switch(peek_char_()) {
   case '=': // '=='
     curr_tok.type_ = TokenType::Eq;
     curr_tok.cat_  = TokenCategory::BinaryOp;
     curr_tok.cat_ |= TokenCategory::LogicalOp;
     curr_tok.cat_ |= TokenCategory::ComparisonOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
     break;
   case '>': // '=>'
     curr_tok.type_ = TokenType::FatArrow;
     curr_tok.cat_  = TokenCategory::NonCategorical;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
     break;
   default: // '='
     curr_tok.type_ = TokenType::ValueAssignment;
     curr_tok.cat_  = TokenCategory::BinaryOp;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
     break;
   }
-  
+
   return curr_tok;
 }
 
-inline auto Lexer::_token_plus() -> Token {
+inline auto Lexer::token_plus_() -> Token {
   Token curr_tok;
   curr_tok.line_ = line_;
   curr_tok.pos_ = index_;
 
-  switch(_peek_char()) {
+  switch(peek_char_()) {
   case '=': // '+='
     curr_tok.type_ = TokenType::PlusEq;
     curr_tok.cat_  = TokenCategory::BinaryOp;
@@ -164,7 +164,7 @@ inline auto Lexer::_token_plus() -> Token {
     curr_tok.cat_ |= TokenCategory::ArithmeticOp;
     curr_tok.cat_ |= TokenCategory::PointerArithOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
     break;
   case '+': // '++'
     curr_tok.type_ = TokenType::Inc;
@@ -175,7 +175,7 @@ inline auto Lexer::_token_plus() -> Token {
     curr_tok.cat_ |= TokenCategory::ValidPostfix;
     curr_tok.cat_ |= TokenCategory::ValidPrefix;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
     break;
   default: // '+'
     curr_tok.type_ = TokenType::Plus;
@@ -185,86 +185,86 @@ inline auto Lexer::_token_plus() -> Token {
     curr_tok.cat_ |= TokenCategory::PointerArithOp;
     curr_tok.cat_ |= TokenCategory::ValidPrefix;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
     break;
   }
 
   return curr_tok;
 }
 
-inline auto Lexer::_token_gthan() -> Token {
+inline auto Lexer::token_gthan_() -> Token {
   Token curr_tok;
   curr_tok.cat_  = TokenCategory::BinaryOp;
   curr_tok.line_ = line_;
   curr_tok.pos_  = index_;
-  
-  if(_peek_char(1) == '=') { // '>='
+
+  if(peek_char_(1) == '=') { // '>='
     curr_tok.type_ = TokenType::Gte;
     curr_tok.cat_ |= TokenCategory::LogicalOp | TokenCategory::ComparisonOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
-  } else if(_peek_char(1) == '>' && _peek_char(2) == '=') { // '>>='
+    consume_char_(2);
+  } else if(peek_char_(1) == '>' && peek_char_(2) == '=') { // '>>='
     curr_tok.type_ = TokenType::RshiftEq;
     curr_tok.cat_ |= TokenCategory::BitwiseOp | TokenCategory::BitwiseAssignOp;
     curr_tok.len_  = 3;
-    _consume_char(3);
-  } else if(_peek_char(1) == '>') { // '>>'
+    consume_char_(3);
+  } else if(peek_char_(1) == '>') { // '>>'
     curr_tok.type_ = TokenType::Rshift;
     curr_tok.cat_ |= TokenCategory::BitwiseOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
   } else { // '>'
     curr_tok.type_ = TokenType::Gt;
     curr_tok.cat_ |= TokenCategory::LogicalOp | TokenCategory::ComparisonOp;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
   }
 
   return curr_tok;
 }
 
-inline auto Lexer::_token_squote() -> Token {
+inline auto Lexer::token_squote_() -> Token {
   Token curr_tok;
   curr_tok.line_ = line_;
   curr_tok.pos_  = index_;
-  
+
   //
   // Check what's INSIDE the quotes first.
   // TODO: not sure if this code is fully correct...
   //
 
-  _consume_char(1);
-  if(_current_char() == '\\') {
-    _consume_char(1);
-    if(UTF8_LEADING(_current_char())) {
+  consume_char_(1);
+  if(current_char_() == '\\') {
+    consume_char_(1);
+    if(UTF8_LEADING(current_char_())) {
       curr_tok.len_  = index_ - curr_tok.pos_;
       curr_tok.type_ = TokenType::Illegal;
       return curr_tok;
     }
-    _consume_char(1);
-  } else if(_current_char() == '\'') {
-    _consume_char(1);
+    consume_char_(1);
+  } else if(current_char_() == '\'') {
+    consume_char_(1);
     curr_tok.type_ = TokenType::ByteLiteral;
     curr_tok.cat_  = TokenCategory::Literal;
     curr_tok.len_  = index_ - curr_tok.pos_;
     return curr_tok;
-  } else if(UTF8_LEADING(_current_char()) || _current_char() == '\n') {
+  } else if(UTF8_LEADING(current_char_()) || current_char_() == '\n') {
     curr_tok.type_ = TokenType::Illegal;
     curr_tok.cat_  = TokenCategory::NonCategorical;
     curr_tok.len_  = index_ - curr_tok.pos_;
     return curr_tok;
   } else {
-    _consume_char(1);
+    consume_char_(1);
   }
 
   //
   // Ensure the following character is a closing quote, token == illegal otherwise.
   //
 
-  if(_current_char() == '\0') {
+  if(current_char_() == '\0') {
     curr_tok = Token::eof(src_.size() - 1, line_);
-  } else if(_current_char() == '\'') [[likely]] {
-    _consume_char(1);
+  } else if(current_char_() == '\'') [[likely]] {
+    consume_char_(1);
     curr_tok.type_ = TokenType::ByteLiteral;
     curr_tok.cat_  = TokenCategory::Literal;
     curr_tok.len_  = index_ - curr_tok.pos_;
@@ -277,116 +277,116 @@ inline auto Lexer::_token_squote() -> Token {
   return curr_tok;
 }
 
-inline auto Lexer::_token_asterisk() -> Token {
+inline auto Lexer::token_asterisk_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
 
-  if(_peek_char() == u8'=') { // '*='
+  if(peek_char_() == u8'=') { // '*='
     curr_tok.type_ = TokenType::MulEq;
     curr_tok.cat_  = TokenCategory::BinaryOp;
     curr_tok.cat_ |= TokenCategory::ArithAssignOp;
     curr_tok.cat_ |= TokenCategory::ArithmeticOp;
     curr_tok.len_ = 2;
-    _consume_char(2);
+    consume_char_(2);
   } else [[likely]] { // '*'
     curr_tok.type_ = TokenType::Mul;
     curr_tok.cat_  = TokenCategory::BinaryOp;
     curr_tok.cat_ |= TokenCategory::UnaryOp;
     curr_tok.cat_ |= TokenCategory::ArithmeticOp;
     curr_tok.cat_ |= TokenCategory::ValidPrefix;
-    _consume_char(1);
+    consume_char_(1);
   }
 
   return curr_tok;
 }
 
-inline auto Lexer::_token_colon() -> Token {
+inline auto Lexer::token_colon_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.line_ = line_;
-  
-  if(_peek_char() == u8':') { // '::'
+
+  if(peek_char_() == u8':') { // '::'
     curr_tok.type_  = TokenType::NamespaceOperator;
     curr_tok.cat_   = TokenCategory::ValidPrefix;
     curr_tok.len_   = 2;
-    _consume_char(2);
+    consume_char_(2);
   } else { // ':'
     curr_tok.type_  = TokenType::TypeAssignment;
     curr_tok.cat_   = TokenCategory::NonCategorical;
     curr_tok.len_   = 1;
-    _consume_char(1);
+    consume_char_(1);
   }
 
   return curr_tok;
 }
 
-auto Lexer::_token_bang() -> Token {
+auto Lexer::token_bang_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.line_ = line_;
 
-  if(_peek_char() == u8'=') { // '!='
+  if(peek_char_() == u8'=') { // '!='
     curr_tok.type_ = TokenType::Neq;
     curr_tok.cat_  = TokenCategory::BinaryOp;
     curr_tok.cat_ |= TokenCategory::LogicalOp;
     curr_tok.cat_ |= TokenCategory::ComparisonOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
   } else { // '!'
     curr_tok.type_ = TokenType::LogicalNot;
     curr_tok.cat_  = TokenCategory::UnaryOp;
     curr_tok.cat_ |= TokenCategory::ValidPrefix;
     curr_tok.cat_ |= TokenCategory::LogicalOp;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
   }
-  
+
   return curr_tok;
 }
 
-inline auto Lexer::_token_percent() -> Token {
+inline auto Lexer::token_percent_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.line_ = line_;
   curr_tok.cat_  = TokenCategory::BinaryOp | TokenCategory::ArithmeticOp;
-  
-  if(_peek_char() == u8'=') { // '%='
+
+  if(peek_char_() == u8'=') { // '%='
     curr_tok.type_ = TokenType::ModEq;
     curr_tok.cat_ |= TokenCategory::ArithAssignOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
   } else { // '%'
     curr_tok.type_ = TokenType::Mod;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
   }
 
   return curr_tok;
 }
 
-inline auto Lexer::_token_uparrow() -> Token {
+inline auto Lexer::token_uparrow_() -> Token {
   Token curr_tok;
   curr_tok.cat_  = TokenCategory::BinaryOp | TokenCategory::BitwiseOp;
   curr_tok.pos_  = index_;
   curr_tok.line_ = line_;
 
-  if(_peek_char() == u8'=') { // '^='
+  if(peek_char_() == u8'=') { // '^='
     curr_tok.type_ = TokenType::XorEq;
     curr_tok.cat_ |= TokenCategory::BitwiseAssignOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
   } else { // '^'
     curr_tok.type_ = TokenType::Xor;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
   }
 
   return curr_tok;
 }
 
-inline auto Lexer::_token_pipe() -> Token {
+inline auto Lexer::token_pipe_() -> Token {
   Token curr_tok {
     .pos_  = index_,
     .len_  = 2,
@@ -394,61 +394,61 @@ inline auto Lexer::_token_pipe() -> Token {
     .cat_  = TokenCategory::BinaryOp
   };
 
-  switch(_peek_char()) {
+  switch(peek_char_()) {
   case u8'|': // '||'
     curr_tok.type_ = TokenType::LogicalOr;
     curr_tok.cat_ |= TokenCategory::LogicalOp;
-    _consume_char(2);
+    consume_char_(2);
     break;
   case u8'=': // '|='
     curr_tok.type_  = TokenType::BitwiseOrEq;
     curr_tok.cat_  |= TokenCategory::BitwiseOp | TokenCategory::BitwiseAssignOp;
-    _consume_char(2);
+    consume_char_(2);
     break;
   default: // '|'
     curr_tok.type_ = TokenType::BitwiseOr;
     curr_tok.cat_  = TokenCategory::BitwiseOp;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
     break;
   }
 
   return curr_tok;
 }
 
-inline auto Lexer::_token_lthan() -> Token {
+inline auto Lexer::token_lthan_() -> Token {
   Token curr_tok {
     .pos_  = index_,
     .line_ = line_,
     .cat_  = TokenCategory::BinaryOp
   };
 
-  if(_peek_char(1) == u8'=') { // '<='
+  if(peek_char_(1) == u8'=') { // '<='
     curr_tok.type_ = TokenType::Lte;
     curr_tok.cat_ |= TokenCategory::LogicalOp | TokenCategory::ComparisonOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
-  } else if(_peek_char(1) == u8'<' && _peek_char(2) == u8'=') [[unlikely]] { // <<=
+    consume_char_(2);
+  } else if(peek_char_(1) == u8'<' && peek_char_(2) == u8'=') [[unlikely]] { // <<=
     curr_tok.type_ = TokenType::LshiftEq;
     curr_tok.cat_ |= TokenCategory::BitwiseOp | TokenCategory::BitwiseAssignOp;
     curr_tok.len_  = 3;
-    _consume_char(3);
-  } else if(_peek_char(1) == u8'<') { // '<<'
+    consume_char_(3);
+  } else if(peek_char_(1) == u8'<') { // '<<'
     curr_tok.type_ = TokenType::Lshift;
     curr_tok.cat_ |= TokenCategory::BitwiseOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
   } else { // '<'
     curr_tok.type_ = TokenType::Lt;
     curr_tok.cat_ |= TokenCategory::LogicalOp | TokenCategory::ComparisonOp;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
   }
 
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_null()  -> Token {
+N19_FORCEINLINE auto Lexer::token_null_()  -> Token {
   Token curr_tok;
   curr_tok.type_ = TokenType::EndOfFile;
   curr_tok.cat_  = TokenCategory::NonCategorical;
@@ -457,191 +457,191 @@ N19_FORCEINLINE auto Lexer::_token_null()  -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_tilde() -> Token {
+N19_FORCEINLINE auto Lexer::token_tilde_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::BitwiseNot;
   curr_tok.cat_  = TokenCategory::UnaryOp | TokenCategory::BitwiseOp | TokenCategory::ValidPrefix;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
-  _consume_char(1);
+  consume_char_(1);
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_at() -> Token {
+N19_FORCEINLINE auto Lexer::token_at_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::At;
   curr_tok.cat_  = TokenCategory::NonCategorical;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
-  _consume_char(1);
+  consume_char_(1);
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_money() -> Token {
+N19_FORCEINLINE auto Lexer::token_money_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::Money;
   curr_tok.cat_  = TokenCategory::NonCategorical;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
-  _consume_char(1);
+  consume_char_(1);
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_lsqbrckt() -> Token {
+N19_FORCEINLINE auto Lexer::token_lsqbrckt_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::LeftSqBracket;
   curr_tok.cat_  = TokenCategory::Punctuator | TokenCategory::ValidPostfix;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
-  _consume_char(1);
+  consume_char_(1);
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_rsqbrckt() -> Token {
+N19_FORCEINLINE auto Lexer::token_rsqbrckt_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::RightSqBracket;
   curr_tok.cat_  = TokenCategory::Punctuator;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
-  _consume_char(1);
+  consume_char_(1);
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_semicolon() -> Token {
+N19_FORCEINLINE auto Lexer::token_semicolon_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::Semicolon;
   curr_tok.cat_  = TokenCategory::Punctuator;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
-  _consume_char(1);
+  consume_char_(1);
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_lparen() -> Token {
+N19_FORCEINLINE auto Lexer::token_lparen_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::LeftParen;
   curr_tok.cat_  = TokenCategory::Punctuator | TokenCategory::ValidPostfix;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
-  _consume_char(1);
+  consume_char_(1);
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_rparen() -> Token {
+N19_FORCEINLINE auto Lexer::token_rparen_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::RightParen;
   curr_tok.cat_  = TokenCategory::Punctuator;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
-  _consume_char(1);
+  consume_char_(1);
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_lbrace() -> Token {
+N19_FORCEINLINE auto Lexer::token_lbrace_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::LeftBrace;
   curr_tok.cat_  = TokenCategory::Punctuator;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
-  _consume_char(1);
+  consume_char_(1);
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_rbrace() -> Token {
+N19_FORCEINLINE auto Lexer::token_rbrace_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::RightBrace;
   curr_tok.cat_  = TokenCategory::Punctuator;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
-  _consume_char(1);
+  consume_char_(1);
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::_token_comma() -> Token {
+N19_FORCEINLINE auto Lexer::token_comma_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::Comma;
   curr_tok.cat_  = TokenCategory::Punctuator | TokenCategory::Terminator;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
-  _consume_char(1);
+  consume_char_(1);
   return curr_tok;
 }
 
-auto Lexer::_produce_impl() -> Token {
+auto Lexer::produce_impl_() -> Token {
   if(index_ >= src_.size()) {
     return Token::eof(src_.size() - 1, line_);
   }
 
   SWITCH_BEGIN:
-  switch(_current_char()) {
+  switch(current_char_()) {
     case u8'\\' : [[fallthrough]]; // illegal character! fallthrough.
     case u8'?'  : return Token::illegal(index_, 1, line_);
-    case u8'#'  : _skip_comment();         goto SWITCH_BEGIN;
-    case u8'\n' : _advance_consume_line(); goto SWITCH_BEGIN;
+    case u8'#'  : skip_comment_();         goto SWITCH_BEGIN;
+    case u8'\n' : advance_consume_line_(); goto SWITCH_BEGIN;
     case u8' '  : [[fallthrough]]; // skip character.
     case u8'\r' : [[fallthrough]]; // skip character.
     case u8'\b' : [[fallthrough]]; // skip character.
     case u8'\a' : [[fallthrough]]; // skip character.
     case u8'\v' : [[fallthrough]]; // skip character.
-    case u8'\t' : _consume_char(1);        goto SWITCH_BEGIN;
-    case u8'/'  : return _token_fwdslash();
-    case u8'\0' : return _token_null();
-    case u8'~'  : return _token_tilde();
-    case u8'@'  : return _token_at();
-    case u8'$'  : return _token_money();
-    case u8'['  : return _token_lsqbrckt();
-    case u8']'  : return _token_rsqbrckt();
-    case u8';'  : return _token_semicolon();
-    case u8'('  : return _token_lparen();
-    case u8')'  : return _token_rparen();
-    case u8'{'  : return _token_lbrace();
-    case u8'}'  : return _token_rbrace();
-    case u8','  : return _token_comma();
-    case u8'-'  : return _token_hyphen();
-    case u8'&'  : return _token_ampersand();
-    case u8'.'  : return _token_dot();
-    case u8'!'  : return _token_bang();
-    case u8'<'  : return _token_lthan();
-    case u8'>'  : return _token_gthan();
-    case u8'+'  : return _token_plus();
-    case u8'*'  : return _token_asterisk();
-    case u8'%'  : return _token_percent();
-    case u8'='  : return _token_equals();
-    case u8'|'  : return _token_pipe();
-    case u8'^'  : return _token_uparrow();
-    case u8'\'' : return _token_squote();
-    case u8'"'  : return _token_quote();
-    case u8'`'  : return _token_quote();
-    case u8':'  : return _token_colon();
-    default     : return _token_ambiguous();
+    case u8'\t' : consume_char_(1);        goto SWITCH_BEGIN;
+    case u8'/'  : return token_fwdslash_();
+    case u8'\0' : return token_null_();
+    case u8'~'  : return token_tilde_();
+    case u8'@'  : return token_at_();
+    case u8'$'  : return token_money_();
+    case u8'['  : return token_lsqbrckt_();
+    case u8']'  : return token_rsqbrckt_();
+    case u8';'  : return token_semicolon_();
+    case u8'('  : return token_lparen_();
+    case u8')'  : return token_rparen_();
+    case u8'{'  : return token_lbrace_();
+    case u8'}'  : return token_rbrace_();
+    case u8','  : return token_comma_();
+    case u8'-'  : return token_hyphen_();
+    case u8'&'  : return token_ampersand_();
+    case u8'.'  : return token_dot_();
+    case u8'!'  : return token_bang_();
+    case u8'<'  : return token_lthan_();
+    case u8'>'  : return token_gthan_();
+    case u8'+'  : return token_plus_();
+    case u8'*'  : return token_asterisk_();
+    case u8'%'  : return token_percent_();
+    case u8'='  : return token_equals_();
+    case u8'|'  : return token_pipe_();
+    case u8'^'  : return token_uparrow_();
+    case u8'\'' : return token_squote_();
+    case u8'"'  : return token_quote_();
+    case u8'`'  : return token_quote_();
+    case u8':'  : return token_colon_();
+    default     : return token_ambiguous_();
   }
 
   UNREACHABLE; // assertion
 }
 
-inline auto Lexer::_token_fwdslash() -> Token {
+inline auto Lexer::token_fwdslash_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.line_ = line_;
 
-  if(_peek_char() == u8'=') { // '/='
+  if(peek_char_() == u8'=') { // '/='
     curr_tok.type_ = TokenType::DivEq;
     curr_tok.cat_  = TokenCategory::BinaryOp;
     curr_tok.cat_ |= TokenCategory::ArithAssignOp;
     curr_tok.cat_ |= TokenCategory::ArithmeticOp;
     curr_tok.len_  = 2;
-    _consume_char(2);
+    consume_char_(2);
   } else { // '/'
     curr_tok.type_ = TokenType::Div;
     curr_tok.cat_  = TokenCategory::BinaryOp;
@@ -649,26 +649,26 @@ inline auto Lexer::_token_fwdslash() -> Token {
     curr_tok.cat_ |= TokenCategory::ArithmeticOp;
     curr_tok.cat_ |= TokenCategory::ValidPrefix;
     curr_tok.len_  = 1;
-    _consume_char(1);
+    consume_char_(1);
   }
 
   return curr_tok;
 }
 
-inline auto Lexer::_token_quote() -> Token {
+inline auto Lexer::token_quote_() -> Token {
   Token curr_tok;
-  const auto opening_quote = _current_char();
+  const auto opening_quote = current_char_();
   const auto string_start  = index_;
 
-  _consume_char(1);
+  consume_char_(1);
   while(true) {
-    if(_current_char() == '\0' || _current_char() == '\n') {
+    if(current_char_() == '\0' || current_char_() == '\n') {
       curr_tok.type_ = TokenType::Illegal;
       curr_tok.cat_  = TokenCategory::NonCategorical;
       curr_tok.pos_  = string_start;
       break;
-    } if(_current_char() == opening_quote) {
-      _consume_char(1);
+    } if(current_char_() == opening_quote) {
+      consume_char_(1);
       curr_tok.type_ = TokenType::StringLiteral;
       curr_tok.cat_  = TokenCategory::Literal;
       curr_tok.pos_  = string_start;
@@ -677,25 +677,25 @@ inline auto Lexer::_token_quote() -> Token {
     }
 
     /// skip escaped quote.
-    if(_current_char() == '\\' && _peek_char() == opening_quote) {
-      _consume_char(2);
-    } else if(UTF8_LEADING(_current_char())) {
-      _skip_utf8_sequence();
+    if(current_char_() == '\\' && peek_char_() == opening_quote) {
+      consume_char_(2);
+    } else if(UTF8_LEADING(current_char_())) {
+      skip_utf8_sequence_();
     } else {
-      _consume_char(1);
+      consume_char_(1);
     }
   }
 
   return curr_tok;
 }
 
-inline auto Lexer::_token_hex_lit() -> Token {
-  ASSERT(_current_char() == '0');
-  ASSERT(_peek_char() == 'x' || _peek_char() == 'X');
+inline auto Lexer::token_hex_lit_() -> Token {
+  ASSERT(current_char_() == '0');
+  ASSERT(peek_char_() == 'x' || peek_char_() == 'X');
 
   const auto start = index_;
-  _consume_char(2); // move past "0x"
-  _skip_chars_until([](const char8_t ch) {
+  consume_char_(2); // move past "0x"
+  skip_chars_until_([](const char8_t ch) {
     return !CH_IS_XDIGIT(ch);
   });
 
@@ -715,8 +715,8 @@ inline auto Lexer::_token_hex_lit() -> Token {
   return token;
 }
 
-inline auto Lexer::_token_num_lit() -> Token {
-  ASSERT( CH_IS_DIGIT(_current_char()) );
+inline auto Lexer::token_num_lit_() -> Token {
+  ASSERT( CH_IS_DIGIT(current_char_()) );
   const size_t start = index_;
   bool seen_exponent = false;
   bool seen_dot      = false;
@@ -727,8 +727,8 @@ inline auto Lexer::_token_num_lit() -> Token {
   curr_tok.cat_  = TokenCategory::Literal;
 
   while(true) {
-    const char8_t curr = _current_char();
-    const char8_t next = _peek_char();
+    const char8_t curr = current_char_();
+    const char8_t next = peek_char_();
 
     /// Switch to parsing the decimal portion now.
     /// Time to parse it out!!! :)
@@ -751,12 +751,12 @@ inline auto Lexer::_token_num_lit() -> Token {
         curr_tok.type_ = TokenType::Illegal;
         curr_tok.cat_  = TokenCategory::NonCategorical;
         return curr_tok;
-      } if((next == u8'-' || next == u8'+') && !CH_IS_DIGIT(_peek_char(2))) {
+      } if((next == u8'-' || next == u8'+') && !CH_IS_DIGIT(peek_char_(2))) {
         curr_tok.type_ = TokenType::Illegal;
         curr_tok.cat_  = TokenCategory::NonCategorical;
         return curr_tok;
-      } if((next == u8'-' || next == u8'+') && CH_IS_DIGIT(_peek_char(2))) {
-        _consume_char(1);
+      } if((next == u8'-' || next == u8'+') && CH_IS_DIGIT(peek_char_(2))) {
+        consume_char_(1);
       }
 
       seen_exponent = true;
@@ -764,12 +764,12 @@ inline auto Lexer::_token_num_lit() -> Token {
 
     /// If we don't see '.' or 'e' and it isn't a digit,
     /// we've finished parsing this integer sequence.
-    else if(!CH_IS_DIGIT(_current_char())) {
+    else if(!CH_IS_DIGIT(current_char_())) {
       break;
     }
 
     /// Otherwise just consume the current character.
-    _consume_char(1);
+    consume_char_(1);
   }
 
   if(seen_dot || seen_exponent) {
@@ -783,9 +783,9 @@ inline auto Lexer::_token_num_lit() -> Token {
   return curr_tok;
 }
 
-inline auto Lexer::_token_oct_lit() -> Token {
-  ASSERT(_current_char() == '0');
-  ASSERT(CH_IS_DIGIT(_peek_char()));
+inline auto Lexer::token_oct_lit_() -> Token {
+  ASSERT(current_char_() == '0');
+  ASSERT(CH_IS_DIGIT(peek_char_()));
 
   Token curr_tok;
   curr_tok.pos_  = index_;
@@ -798,37 +798,37 @@ inline auto Lexer::_token_oct_lit() -> Token {
   };
 
   while(true) {
-    if(!CH_IS_DIGIT(_current_char())) {
+    if(!CH_IS_DIGIT(current_char_())) {
       break;
-    } if(!is_octal_digit(_current_char())) {
+    } if(!is_octal_digit(current_char_())) {
       curr_tok.type_ = TokenType::Illegal;
       curr_tok.cat_  = TokenCategory::NonCategorical;
       return curr_tok;
     }
-    _consume_char(1);
+    consume_char_(1);
   }
 
   curr_tok.len_ = index_ - curr_tok.pos_;
   return curr_tok;
 }
 
-inline auto Lexer::_token_ambiguous() -> Token {
+inline auto Lexer::token_ambiguous_() -> Token {
   ASSERT(index_ < src_.size());
-  ASSERT(!is_reserved_byte(_current_char()));
+  ASSERT(!is_reserved_byte(current_char_()));
 
-  const char8_t next = _peek_char();
-  const char8_t curr = _current_char();
+  const char8_t next = peek_char_();
+  const char8_t curr = current_char_();
 
   if(curr == u8'0' && (next == u8'x' || next == u8'X')) {
-    return _token_hex_lit();
+    return token_hex_lit_();
   } if(curr == u8'0' && CH_IS_DIGIT( next )) {
-    return _token_oct_lit();
+    return token_oct_lit_();
   } if(CH_IS_DIGIT( curr )) {
-    return _token_num_lit();
+    return token_num_lit_();
   }
 
   const auto start = index_;
-  _skip_chars_until([](const char8_t ch) {
+  skip_chars_until_([](const char8_t ch) {
     return CH_IS_SPACE(ch) || CH_IS_CTRL(ch) || is_reserved_byte(ch);
   });
 
@@ -1016,24 +1016,24 @@ auto Lexer::is_reserved_byte(const char8_t c) -> bool {
   return bytes[ c ] == true;
 }
 
-inline auto Lexer::_skip_chars_until(std::function<bool(char8_t)> cb) -> bool {
-  while(!cb(_current_char()) && _current_char() != '\0') {
-    const char8_t curr = _current_char();
+inline auto Lexer::skip_chars_until_(std::function<bool(char8_t)> cb) -> bool {
+  while(!cb(current_char_()) && current_char_() != '\0') {
+    const char8_t curr = current_char_();
 
-    if(curr == '\n')            _advance_consume_line();  /// line feed
-    else if(UTF8_LEADING(curr)) _skip_utf8_sequence();    /// UTF8 codepoint begin
-    else _consume_char(1);                                /// ASCII character
+    if(curr == '\n')            advance_consume_line_();  /// line feed
+    else if(UTF8_LEADING(curr)) skip_utf8_sequence_();    /// UTF8 codepoint begin
+    else consume_char_(1);                                /// ASCII character
   }
 
-  return _current_char() != '\0';
+  return current_char_() != '\0';
 }
 
-inline auto Lexer::_skip_utf8_sequence() -> bool {
-  const auto ch = static_cast<uint8_t>(_current_char());
+inline auto Lexer::skip_utf8_sequence_() -> bool {
+  const auto ch = static_cast<uint8_t>(current_char_());
 
-  if ((ch & 0xE0) == 0xC0)      _consume_char(2); /// 2 byte codepoint.
-  else if ((ch & 0xF0) == 0xE0) _consume_char(3); /// 3 byte codepoint.
-  else if ((ch & 0xF8) == 0xF0) _consume_char(4); /// 4 byte codepoint.
+  if ((ch & 0xE0) == 0xC0)      consume_char_(2); /// 2 byte codepoint.
+  else if ((ch & 0xF0) == 0xE0) consume_char_(3); /// 3 byte codepoint.
+  else if ((ch & 0xF8) == 0xF0) consume_char_(4); /// 4 byte codepoint.
   else return false;                              /// Something's wrong?
 
   return index_ - 1 < src_.size();
@@ -1060,7 +1060,7 @@ auto Lexer::create_shared(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> 
   lxr->src_.resize(*fsize);
 
   TRY(ref.read_into(as_writable_bytes(lxr->src_)));
-  lxr->curr_ = lxr->_produce_impl();
+  lxr->curr_ = lxr->produce_impl_();
   return make_result<std::shared_ptr<Lexer>>(lxr);
 }
 
@@ -1091,7 +1091,7 @@ auto Lexer::consume(const uint32_t amnt) -> const Token& {
     return curr_;
 
   for(uint32_t i = 0; i < amnt; i++) {
-    curr_ = _produce_impl();
+    curr_ = produce_impl_();
     if(curr_ == TokenType::EndOfFile) break;
   }
   

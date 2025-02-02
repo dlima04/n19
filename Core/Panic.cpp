@@ -32,7 +32,7 @@ auto panic_impl_(
 auto fatal_impl_(const std::string &msg) -> void {
   auto stream = OStream::from_stderr();
   stream << Con::RedFG << Con::Bold;
-  stream << "FATAL :: " << msg;
+  stream << "FATAL :: " << msg << Endl;
   ::exit(1);
 }
 

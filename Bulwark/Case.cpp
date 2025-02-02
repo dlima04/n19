@@ -1,0 +1,37 @@
+/*
+* Copyright (c) 2025 Diago Lima
+* All rights reserved.
+*
+* This software is licensed under the BSD 3-Clause "New" or "Revised" license
+* found in the LICENSE file in the root directory of this project's source tree.
+*/
+
+#include <Bulwark/Case.hpp>
+#include <Core/Panic.hpp>
+BEGIN_NAMESPACE(n19::test);
+
+auto Result::to_colour() const -> Con {
+  switch(val_) {
+    case Failed:    return Con::RedFG;
+    case Passed:    return Con::GreenFG;
+    case Exception: return Con::YellowFG;
+    case Skipped:   return Con::CyanFG;
+    default: break;
+  }
+
+  UNREACHABLE;
+}
+
+auto Result::to_string() const -> std::string {
+  switch(val_) {
+    case Failed:    return "FAIL";
+    case Passed:    return "PASS";
+    case Exception: return "EXCT";
+    case Skipped:   return "SKIP";
+    default: break;
+  }
+
+  UNREACHABLE;
+}
+
+END_NAMESPACE(n19::test);
