@@ -98,7 +98,7 @@ add_executable(bulwark
   Bulwark/Suite.cpp
   Bulwark/Case.hpp
   Bulwark/Registry.hpp
-  Bulwark/Context.hpp
+  Bulwark/BulwarkContext.hpp
   Bulwark/Suite.hpp
   Bulwark/Reporting.hpp
   Bulwark/Bulwark.hpp

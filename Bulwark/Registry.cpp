@@ -8,7 +8,7 @@
 
 #include <Bulwark/Registry.hpp>
 #include <Bulwark/Reporting.hpp>
-#include <Bulwark/Context.hpp>
+#include <Bulwark/BulwarkContext.hpp>
 #include <Core/Panic.hpp>
 #include <algorithm>
 BEGIN_NAMESPACE(n19::test);

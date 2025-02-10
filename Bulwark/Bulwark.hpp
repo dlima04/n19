@@ -12,7 +12,7 @@
 #include <Core/Panic.hpp>
 #include <Bulwark/Registry.hpp>
 #include <Bulwark/Reporting.hpp>
-#include <Bulwark/Context.hpp>
+#include <Bulwark/BulwarkContext.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // This header includes all unit testing related functionality.

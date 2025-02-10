@@ -8,7 +8,7 @@
 
 #include <Bulwark/Suite.hpp>
 #include <Bulwark/Reporting.hpp>
-#include <Bulwark/Context.hpp>
+#include <Bulwark/BulwarkContext.hpp>
 BEGIN_NAMESPACE(n19::test);
 
 auto Suite::run_all(OStream& s) -> void {

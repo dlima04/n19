@@ -8,7 +8,7 @@
 
 #include <Core/ConIO.hpp>
 #include <Bulwark/Bulwark.hpp>
-#include <Bulwark/Context.hpp>
+#include <Bulwark/BulwarkContext.hpp>
 #include <algorithm>
 using namespace n19;
 
