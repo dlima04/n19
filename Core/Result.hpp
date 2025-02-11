@@ -39,7 +39,7 @@ N19_MAKE_COMPARABLE_MEMBER(ErrC_, value);
   constexpr ErrC_() = default;
 };
                        ///
-struct ErrorType_ {   /// n19's default error type.
+struct ErrorType_ {    /// n19's default error type.
   std::string msg;
   ErrC_ code = ErrC_::None;
 };
@@ -118,11 +118,9 @@ public:
     return std::holds_alternative<T>( value_ );
   }
 
-  Result_(T&& value)      : value_(std::move(value)) {}
-  Result_(E&& error)      : value_(std::move(error)) {}
-  Result_(const T& value) : value_(value) {}
-  Result_(const E& error) : value_(error) {}
-  Result_(/*.....*/)      : value_(E{}  ) {}
+  Result_(T&& value) : value_(std::forward<T>(value)) {}
+  Result_(E&& error) : value_(std::forward<E>(error)) {}
+  Result_(/*.....*/) : value_(E{}  ) {}
 protected:
   Variant_ value_;
 };

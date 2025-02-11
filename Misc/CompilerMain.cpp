@@ -19,11 +19,6 @@
 
 using namespace n19;
 
-struct foo {
-  int x;
-  int y;
-};
-
 struct MyArgs : argp::Parser {
   int64_t& num_jobs  = arg<int64_t>("--num-jobs", "-j", "numba of jobs");
   sys::String& name  = arg<sys::String>("--input", "-i", "the input file.", "Default value!!!");
@@ -33,49 +28,49 @@ struct MyArgs : argp::Parser {
 
 int main(int argc, char** argv){
 
-  // const auto time = sys::SystemTime::from_utc();
-  // if(!time) {
-  //   return 1;
-  // }
-  //
-  // std::cout << std::boolalpha;
-  // std::cout << IsVoid<int> << std::endl;
-  // std::cout << IsVoid<void> << std::endl;
-  //
-  // std::cout << time->strings().format() << std::endl;
-
-   std::vector<sys::String> strs = { "--num-jobs=42069", "--verbose=4444", "-b=one,two,three" };
-
-   MyArgs args;
-   auto res = args.style(argp::ArgStyle::UNIX)
-     .take_argv(std::move(strs))
-     .parse(outs());
-
-   if(!res) {
+   const auto time = sys::SystemTime::from_utc();
+   if(!time) {
      return 1;
    }
 
-   std::cout << "num_jobs=" << args.num_jobs << '\n';
-   std::cout << "name=" << args.name << '\n';
-   std::cout << std::boolalpha << "verbose=" << args.verbose << std::endl;
+   std::cout << std::boolalpha;
+   std::cout << IsVoid<int> << std::endl;
+   std::cout << IsVoid<void> << std::endl;
 
-   for(const auto& str : args.arr) {
-     std::cout << str << std::endl;
-   }
+   std::cout << time->strings().format() << std::endl;
 
-   args.help(outs());
+   //std::vector<sys::String> strs = { "--num-jobs=42069", "--verbose=true", "-b=one,two,three" };
+//
+   //MyArgs args;
+   //auto res = args.style(argp::ArgStyle::UNIX)
+   //  .take_argv(std::move(strs))
+   //  .parse(outs());
+//
+   //if(!res) {
+   //  return 1;
+   //}
+//
+   //std::cout << "num_jobs=" << args.num_jobs << '\n';
+   //std::cout << "name=" << args.name << '\n';
+   //std::cout << std::boolalpha << "verbose=" << args.verbose << std::endl;
+//
+   //for(const auto& str : args.arr) {
+   //  std::cout << str << std::endl;
+   //}
+//
+   //args.help(outs());
 
-  // try {
-  //   const auto file = MUST(FileRef::open(CURRENT_TEST));
-  //   auto lxr = Lexer::create_shared(*file);
-  //   if(!lxr) {
-  //     return 1;
-  //   }
-  //
-  //   lxr.value()->dump();
-  // } catch(const std::exception& e) {
-  //   std::cerr << "EXCEPTION: " << e.what() << std::endl;
-  // }
+  try {
+    const auto file = MUST(FileRef::open(CURRENT_TEST));
+    auto lxr = Lexer::create_shared(*file);
+    if(!lxr) {
+      return 1;
+    }
+
+    lxr.value()->dump();
+  } catch(const std::exception& e) {
+    std::cerr << "EXCEPTION: " << e.what() << std::endl;
+  }
 
   outs().flush();
   errs().flush();

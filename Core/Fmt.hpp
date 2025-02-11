@@ -15,9 +15,7 @@ BEGIN_NAMESPACE(n19);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A small header for runtime formatting utility.
 // Note, that formatting of this kind using the STL should be done
-// very sparingly. It does not support UTF8 encoded strings,
-// i.e. std::u8string, yet. calling outs() is always the preferred method
-// for printing to the console.
+// very sparingly.
 
 template<typename ... Args>
 auto fmt(const std::format_string<Args...> fmt, Args&&... args) -> std::string {

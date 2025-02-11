@@ -76,19 +76,23 @@ public:
     return is_active_ && value() == other;
   }
 
-  N19_FORCEINLINE auto operator=(ByteCopy&& other) -> ByteCopy& {
+  N19_FORCEINLINE auto operator=(ByteCopy&& other) noexcept -> ByteCopy& {
+    if(&other == this) return *this;
     clear();                        /// Clear the existing value.
     is_active_ = other.is_active_;  /// Change active state.
     if(other.is_active_)            ///
       std::construct_at<T>(reinterpret_cast<T*>(&value_), other.release());
+
     return *this;
   }
 
   N19_FORCEINLINE auto operator=(const ByteCopy& other) -> ByteCopy& {
+    if(&other == this) return *this;
     clear();                        /// Clear the existing value.
     is_active_ = other.is_active_;  /// Change active state
     if(other.is_active_)            ///
       std::construct_at<T>(reinterpret_cast<T*>(&value_), other.value());
+
     return *this;
   }
 
