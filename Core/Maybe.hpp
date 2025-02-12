@@ -12,24 +12,9 @@
 #include <Core/Panic.hpp>
 #include <Core/Nothing.hpp>
 #include <Core/Concepts.hpp>
-#include <Core/ClassTraits.hpp>
 #include <utility>
-#include <variant>
-
+#include <new>
 BEGIN_NAMESPACE(n19)
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// auto operator->(this auto&& self) -> decltype(auto) {
-//   ASSERT( self.has_value_ == true, "Bad Maybe access!" );
-//   return &self.value();
-// }
-//
-// auto operator*(this auto&& self) -> decltype(auto) {
-//   ASSERT( self.has_value_ == true, "Bad Maybe access!" );
-//   return self.value();
-// }
-// Maybe(const Nothing_&)  : value_(Nothing_{}) {}
-// Maybe(/*......*/)       : value_(Nothing_{}) {}
 
 template<Concrete T>
 class Maybe {

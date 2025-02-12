@@ -16,6 +16,7 @@
 #include <iostream>
 #include <Core/ArgParse.hpp>
 #include <Core/TypeTraits.hpp>
+#include <Core/RingQueue.hpp>
 
 using namespace n19;
 
