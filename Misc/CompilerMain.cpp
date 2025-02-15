@@ -17,6 +17,7 @@
 #include <Core/ArgParse.hpp>
 #include <Core/TypeTraits.hpp>
 #include <Core/RingQueue.hpp>
+#include <type_traits>
 
 using namespace n19;
 
@@ -27,18 +28,32 @@ struct MyArgs : argp::Parser {
   argp::PackType& arr = arg<argp::PackType>("--blabla", "-b", "idk lol");
 };
 
+struct foobar {
+   int x = 1;
+   ~foobar() { std::cout << "destructor called" << std::endl; }
+   foobar() = default;
+};
+
+auto get_value(int x) -> Result<foobar> {
+   if(x > 400) return make_error(ErrC::Internal);
+   return {};
+}
+
 int main(int argc, char** argv){
 
-   const auto time = sys::SystemTime::from_utc();
-   if(!time) {
-     return 1;
-   }
+   auto val = MUST(get_value(100));
 
-   std::cout << std::boolalpha;
-   std::cout << IsVoid<int> << std::endl;
-   std::cout << IsVoid<void> << std::endl;
-
-   std::cout << time->strings().format() << std::endl;
+  //  const auto time = sys::SystemTime::from_utc();
+  //  if(!time) {
+  //    return 1;
+  //  }
+  //
+  //  std::cout << std::boolalpha;
+  //  std::cout << IsVoid<int> << std::endl;
+  //  std::cout << IsVoid<void> << std::endl;
+  //
+  // static_assert(std::is_default_constructible_v<FileRef>, "AAA");
+  //  std::cout << time->strings().format() << std::endl;
 
    //std::vector<sys::String> strs = { "--num-jobs=42069", "--verbose=true", "-b=one,two,three" };
 //
@@ -63,7 +78,7 @@ int main(int argc, char** argv){
 
   try {
     const auto file = MUST(FileRef::open(CURRENT_TEST));
-    auto lxr = Lexer::create_shared(*file);
+    auto lxr = Lexer::create_shared(file);
     if(!lxr) {
       return 1;
     }

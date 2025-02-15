@@ -40,8 +40,8 @@ constexpr auto ALIGN_AVOID_FALSESHARE = std::hardware_destructive_interference_s
 #  define N19_CLANG 0
 #  define N19_MSVC  1
 #else
-#  warning Platform.hpp: Unknown compiler!
-#  warning Expected Clang, GCC, or MSVC.
+#  warning "Core/Platform.hpp: Unknown compiler!"
+#  warning "Expected Clang, GCC, or MSVC."
 #endif
 
 ///
@@ -83,7 +83,7 @@ constexpr auto ALIGN_AVOID_FALSESHARE = std::hardware_destructive_interference_s
 #if N19_CLANG || N19_GCC
 #  define N19_PACKED_IMPL(KIND, NAME, BODY) \
     KIND __attribute__((packed)) NAME BODY;
-#elif defined(_MSC_VER)
+#elif N19_MSVC
 #  define N19_PACKED_IMPL(KIND, NAME, BODY) \
   __pragma(pack(push, 1))                   \
     KIND NAME BODY;                         \
@@ -95,5 +95,23 @@ constexpr auto ALIGN_AVOID_FALSESHARE = std::hardware_destructive_interference_s
 
 #define PACKED_STRUCT(NAME, BODY) N19_PACKED_IMPL(struct, NAME, BODY)
 #define PACKED_CLASS(NAME, BODY)  N19_PACKED_IMPL(class, NAME, BODY)
+
+///
+/// Note: it seems like MSVC doesn't have an equivalent attribute
+/// for this. will need to find a workaround at some point.
+#if N19_CLANG || N19_GCC
+#  define N19_USED __attribute__((used))
+#else
+#  define N19_USED
+#endif
+
+///
+/// Portable macro for specifying naked functions,
+/// i.e. ones that don't have prologues/epilogues in their generated code.
+#if N19_CLANG || N19_GCC
+#  define N19_NAKED __attribute__((naked))
+#elif N19_MSVC
+#  define N19_NAKED __declspec(naked)
+#endif
 
 #endif //PLATFORM_HPP

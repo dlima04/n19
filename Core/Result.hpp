@@ -86,16 +86,18 @@ public:
     return std::forward<decltype(self)>(self).value();
   }
 
-  auto value_or(this auto&& self, T&& val) -> T {
+  template<typename ...Args>
+  auto value_or(this auto&& self, Args&&... args) -> T {
     if(self.has_value())    /// return the error if it exists.
       return self.value();  /// else:
-    return val;             /// return provided value type.
+    return T{std::forward<Args>(args)...};
   }
 
-  auto error_or(this auto&& self, E&& val) -> E {
+  template<typename ...Args>
+  auto error_or(this auto&& self, Args&&... args) -> E {
     if(!self.has_value())   /// return the error if it exists.
       return self.error();  /// else:
-    return val;             /// return provided error type.
+    return E{std::forward<Args>(args)...};
   }
 
   template<typename C>

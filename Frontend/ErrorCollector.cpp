@@ -181,10 +181,10 @@ auto n19::ErrorCollector::emit(OStream& stream) const -> Result<void> {
   std::vector<char8_t> buff;
   for(const auto &[file_name, errs] : errs_) {
     const auto file = TRY(FileRef::open(file_name));
-    const auto size = TRY(file->size());
+    const auto size = TRY(file.size());
 
-    buff.resize(*size);
-    file->read_into(as_writable_bytes(buff)).OR_RETURN();
+    buff.resize(size);
+    TRY(file.read_into(as_writable_bytes(buff)));
 
     /// Emit the error using the file buffer
     for(const auto& err : errs)

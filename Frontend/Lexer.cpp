@@ -1044,20 +1044,20 @@ auto Lexer::create_shared(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> 
 
   /// Check against maximum allowed file size.
   /// No way this is ever true tbh.
-  if(*fsize >= std::numeric_limits<uint32_t>::max()) {
+  if(fsize >= std::numeric_limits<uint32_t>::max()) {
     return make_error(ErrC::InvalidArg, "File is too large");
   }
 
   /// Check for an empty file.
   /// TODO: should we really error on this? I don't know if
   /// this even makes sense.
-  if(*fsize == 0) {
+  if(fsize == 0) {
     return make_error(ErrC::InvalidArg, "File is empty.");
   }
 
   auto lxr = std::make_shared<Lexer>();
   lxr->file_name_ = fs::absolute(*ref).string();
-  lxr->src_.resize(*fsize);
+  lxr->src_.resize(fsize);
 
   TRY(ref.read_into(as_writable_bytes(lxr->src_)));
   lxr->curr_ = lxr->produce_impl_();
