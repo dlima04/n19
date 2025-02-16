@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <Core/Try.hpp>
@@ -745,7 +742,7 @@ inline auto Lexer::token_num_lit_() -> Token {
     }
 
     /// We've reached the exponent, then.
-    /// Time to parse it out!!! :)
+    /// Time to parse it out!!! :) The fog is coming!! :))
     else if(curr == u8'e' || curr == u8'E') {
       if(seen_exponent) {
         curr_tok.type_ = TokenType::Illegal;

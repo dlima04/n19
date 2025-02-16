@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <Core/FileRef.hpp>
@@ -115,22 +112,22 @@ auto n19::ErrorCollector::display_error(
 }
 
 auto n19::ErrorCollector::display_error(
-  const std::string& msg,           /// The error/warning message.
-  const sys::String& fname,         /// The name given to this file.
-  const std::vector<char8_t>& buff, /// File buffer.
-  OStream& stream,                  /// Output stream.
-  size_t pos,                       /// File buffer offset.
-  const uint32_t line,              /// Line number, optional
-  const bool is_warn ) -> void      /// Red/yellow error text
+  const std::string& msg,
+  const sys::String& fname,
+  const std::vector<char8_t>& buff,
+  OStream& stream,
+  size_t pos,
+  const uint32_t line,
+  const bool is_warn ) -> void
 {
   ASSERT(!buff.empty());
-  std::string before;               /// The bytes that appear before "pos"
-  std::string after;                /// The byte at "pos", and the ones after it.
-  std::string filler;               /// The squiggly lines and pointy arrow.
-  std::string spaces;               /// The spaces to the left of the message.
+  std::string before;        /// The bytes that appear before "pos"
+  std::string after;         /// The byte at "pos", and the ones after it.
+  std::string filler;        /// The squiggly lines and pointy arrow.
+  std::string spaces;        /// The spaces to the left of the message.
 
-  if(pos >= buff.size()) {          /// Sanity check the position.
-    pos = buff.size() - 1;          ///
+  if(pos >= buff.size()) {   /// Sanity check the position.
+    pos = buff.size() - 1;   ///
   }
 
   IGNORE_EXCEPT(

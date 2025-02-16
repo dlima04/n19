@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2025 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef N19_TEST_REPORTING_HPP
@@ -23,13 +20,15 @@ N19_MAKE_COMPARABLE_MEMBER(Diagnostic, val_);
     Debug  = 0x03,           /// Should only be displayed in debug mode.
   };                         ///
 
-  Value_ val_ = Info;        /// Underlying value.
+  Value_ val_ = Info;
   auto to_string() const -> std::string;
   auto to_colour() const -> Con;
 
   constexpr Diagnostic() = default;
   constexpr Diagnostic(const Value_ val) : val_(val) {}
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 auto diagnostic(             /// Display a diagnostic message.
   const std::string_view& m, /// Diagnostic message to be displayed.

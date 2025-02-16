@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef ARGPARSE_HPP
@@ -168,33 +165,26 @@ public:
     return outval;
   }
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Begin internal methods
 private:
   auto print_chunk_error_(size_t at, OStream&, const std::string& msg) const -> void;
   auto already_passed_(size_t index) const -> bool;
   auto is_flag_begin_(const sys::StringView&) const -> bool;
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Begin extra inline methods
 public:
-  inline auto style(const ArgStyle s = ArgStyle::UNIX) -> Parser& {
+  auto style(const ArgStyle s = ArgStyle::UNIX) -> Parser& {
     arg_style_ = s;       /// set flag name style
     return *this;         ///
   }
 
-  inline auto take_argv(std::vector<sys::String>&& a) -> Parser& {
+  auto take_argv(std::vector<sys::String>&& a) -> Parser& {
     args_ = std::move(a); /// take ownership
     return *this;         ///
   }
 
-  inline auto take_argv(const int argc, sys::Char** argv) -> Parser& {
+  auto take_argv(const int argc, sys::Char** argv) -> Parser& {
     for(int i = 1; i < argc; i++) args_.emplace_back(argv[i]);
     return *this;
   }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Begin externally implemented public methods
 
   auto parse(OStream& stream) -> Result<void>;
   auto help(OStream& stream) const -> void;

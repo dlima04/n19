@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef LEXER_HPP
@@ -31,9 +28,8 @@
 BEGIN_NAMESPACE(n19);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// n19::Lexer is the main lexer implementation. It's a "lazy" lexer,
-// which means it can easily support different lexing "modes"
-// for very context sensitive tokens.
+// n19::Lexer is the main lexer implementation. This is a lazy lexer,
+// sometimes referred to as a "one-at-a-time" (OAAT) lexer.
 
 class Lexer final : public std::enable_shared_from_this<Lexer> {
 N19_MAKE_NONCOPYABLE(Lexer);
@@ -48,19 +44,14 @@ public:
   auto expect(TokenCategory cat, bool = true) -> Result<void>;
   auto expect(TokenType type, bool = true)    -> Result<void>;
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Begin static methods.
-
   static auto create_shared(const FileRef& ref)          -> Result<std::shared_ptr<Lexer>>;
   static auto get_keyword(const std::u8string_view& str) -> Maybe<struct Keyword>;
   static auto is_reserved_byte(char8_t c)                -> bool;
 
   Lexer() = default;
   ~Lexer() = default;
-private:
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Begin internal, character manipulation.
 
+private:
   auto current_char_() const                               -> char8_t;
   auto consume_char_(uint32_t)                             -> void;
   auto advance_line_()                                     -> void;
@@ -69,9 +60,6 @@ private:
   auto skip_chars_until_(std::function<bool(char8_t)> cb)  -> bool;
   auto skip_utf8_sequence_()                               -> bool;
   auto peek_char_(uint32_t amnt = 1) const                 -> char8_t;
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Begin token generation methods.
 
   auto produce_impl_()    -> Token;
   auto token_hyphen_()    -> Token;
@@ -107,8 +95,6 @@ private:
   auto token_num_lit_()   -> Token;
   auto token_oct_lit_()   -> Token;
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Begin fields.
 public:
   std::vector<char8_t> src_;  /// Source file buffer.
   Token curr_;                /// The one we're sitting on.
@@ -121,9 +107,6 @@ struct Keyword {              /// Only used for Lexer::get_keyword().
   TokenType type;             /// The TokenType of the keyword.
   TokenCategory cat;          /// The category of the keyword.
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// very short functions, inlined here for perf.
 
 inline auto Lexer::peek(const uint32_t amnt) -> Token {
   const uint32_t line_tmp  = this->line_;
@@ -177,8 +160,6 @@ inline auto Lexer::get_bytes() const -> Bytes {
 inline auto Lexer::current() const -> const Token& {
   return curr_;
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 END_NAMESPACE(n19);
 #endif //LEXER_HPP

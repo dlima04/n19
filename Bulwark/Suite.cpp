@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2025 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <Bulwark/Suite.hpp>
@@ -25,11 +22,11 @@ auto Suite::run_all(OStream& s) -> void {
     report(case_, ctx.result, s);
 
     switch(ctx.result.val_) {
-      case Result::Failed:    ++g_total_failed;  break;
-      case Result::Passed:    ++g_total_passed;  break;
-      case Result::Exception: ++g_total_exc;     break;
-      case Result::Skipped:   ++g_total_skipped; break;
-      default: UNREACHABLE;
+    case Result::Failed:    ++g_total_failed;  break;
+    case Result::Passed:    ++g_total_passed;  break;
+    case Result::Exception: ++g_total_exc;     break;
+    case Result::Skipped:   ++g_total_skipped; break;
+    default: UNREACHABLE;
     }
 
     if(stopfail && ctx.result.val_ != Result::Passed)

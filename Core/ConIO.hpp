@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef CORE_CONIO_HPP
@@ -17,10 +14,6 @@ auto win32_init_console()            -> void;
 auto win32_are_vsequences_enabled()  -> bool;
 auto win32_enable_vsequences()       -> void;
 #endif
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Each member of the Con enumeration is a value that
-// corresponds to an ASCII escape code, to be used in colour formatting.
 
 enum class Con : uint16_t {
   Reset      = 0,
@@ -36,9 +29,6 @@ enum class Con : uint16_t {
   DefaultBG  = 49,
   RedFG      = 91,
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// inlined header functions
 
 inline auto outs() -> OStream& {
   static auto outs_ = BufferedOStream<>::from_stdout();
@@ -76,8 +66,6 @@ inline auto manip_string(Args... values) -> std::string {
   ((buff += fmt( "\x1b[{}m", static_cast<uint16_t>(values) )), ...);
   return buff;
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 END_NAMESPACE(n19);
 #endif //CONIO_HPP

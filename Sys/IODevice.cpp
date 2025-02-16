@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <Sys/IODevice.hpp>
@@ -80,16 +77,14 @@ auto IODevice::from_stdin() -> IODevice {
 
 #else // IF WINDOWS
 
-auto IODevice::write(
-  const Bytes &bytes ) const -> Result<void>
-{
+auto IODevice::write(const Bytes &bytes) const -> Result<void> {
   ASSERT(!bytes.empty());
-  if(!WriteFile(
-    value_,
-    (void*)bytes.data(),
-    (DWORD)bytes.size_bytes(),
-    nullptr,
-    nullptr
+  if(!WriteFile(                ///
+    value_,                     /// The output file handle.
+    (void*)bytes.data(),        /// Output buffer.
+    (DWORD)bytes.size_bytes(),  /// Size of the input buffer.
+    nullptr,                    /// Number of bytes written (optional)
+    nullptr                     /// OVERLAPPED struct (optional)
   )) {
     return make_error(ErrC::Native, last_error());
   }
@@ -97,16 +92,14 @@ auto IODevice::write(
   return make_result<void>();
 }
 
-auto IODevice::read_into(
-  WritableBytes& bytes ) const -> Result<void>
-{
+auto IODevice::read_into(WritableBytes& bytes) const -> Result<void> {
   ASSERT(!bytes.empty());
-  if(!ReadFile(
-    value_,
-    (void*)bytes.data(),
-    (DWORD)bytes.size_bytes(),
-    nullptr,
-    nullptr
+  if(!ReadFile(                 ///
+    value_,                     /// The input file handle.
+    (void*)bytes.data(),        /// The input buffer.
+    (DWORD)bytes.size_bytes(),  /// Size of our buffer.
+    nullptr,                    /// Number of bytes read from the file (optional)
+    nullptr                     /// OVERLAPPED struct (optional)
   )) {
     return make_error(ErrC::Native, last_error());
   }

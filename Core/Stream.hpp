@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef STREAM_HPP
@@ -33,9 +30,6 @@
 #endif
 
 BEGIN_NAMESPACE(n19);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Some stream manipulators, their values are not actually used,
-// the types themselved as an indicator of what the stream should do.
 
 inline constexpr struct Flush_ {
   unsigned char dummy_value_ = 0;
@@ -46,13 +40,6 @@ inline constexpr struct Endl_ {
   unsigned char dummy_value_ = 0;
   constexpr Endl_() = default;
 } Endl;
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// OStream is a very basic stream class that supports writing compiler
-// specific types and strings of different encodings, including UTF16 and UTF8.
-// This is the most basic kind of stream, and as such does not use any kind of
-// buffering internally. It simply writes directly to whatever file descriptor it's using.
 
 class OStream {
 public:
@@ -180,11 +167,6 @@ protected:
   sys::IODevice fd_;
 };
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// BufferedOStream<size_> is the buffered version of OStream.
-// It uses a fixed-size buffer internally, of which the size is determined by
-// the template parameter. The size should not be 0.
 
 template<size_t size_ = N19_OSTREAM_BUFFSIZE>
 class BufferedOStream : public OStream {

@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef RESULT_HPP
@@ -16,10 +13,7 @@
 #include <string>
 #include <utility>
 #include <variant>
-
 BEGIN_NAMESPACE(n19);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Begin error code, default error types.
 
 struct ErrC_ final {
 N19_MAKE_COMPARABLE_MEMBER(ErrC_, value);
@@ -57,32 +51,32 @@ public:
   using Variant_    = std::variant<T, E> ;
 
   [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
-    ASSERT( has_value() == true, "Result contains an error!" );
+    ASSERT(has_value() == true, "Result contains an error!");
     return std::get<T>( value_ );
   }
 
   [[nodiscard]] N19_FORCEINLINE auto value() -> T& {
-    ASSERT( has_value() == true, "Result contains an error!" );
+    ASSERT(has_value() == true, "Result contains an error!");
     return std::get<T>( value_ );
   }
 
   [[nodiscard]] N19_FORCEINLINE auto error() const -> const E& {
-    ASSERT( has_value() == false, "Result contains a value!" );
+    ASSERT(has_value() == false, "Result contains a value!");
     return std::get<E>( value_ );
   }
 
   [[nodiscard]] N19_FORCEINLINE auto error() -> E& {
-    ASSERT( has_value() == false, "Result contains a value!" );
+    ASSERT(has_value() == false, "Result contains a value!");
     return std::get<E>( value_ );
   }
 
   auto operator->(this auto&& self) -> decltype(auto) {
-    ASSERT( self.has_value() == true, "Result contains an error!" );
+    ASSERT(self.has_value() == true, "Result contains an error!");
     return &(std::forward<decltype(self)>(self).value());
   }
 
   auto operator*(this auto&& self) -> decltype(auto) {
-    ASSERT( self.has_value() == true, "Result contains an error!" );
+    ASSERT(self.has_value() == true, "Result contains an error!");
     return std::forward<decltype(self)>(self).value();
   }
 

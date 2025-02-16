@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef ERRORCOLLECTOR_HPP
@@ -21,7 +18,6 @@
 
 #define N19_MAX_ERRORS 40
 BEGIN_NAMESPACE(n19);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct ErrorLocation {
   std::string message;

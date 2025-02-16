@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef RINGBUFFER_HPP
@@ -16,13 +13,7 @@ BEGIN_NAMESPACE(n19);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // n19::RingBuffer is a circular buffer with atomic read/writes.
-// The difference between this class and n19::RingQueue is that this class
-// is wait-free. When the buffer is full and a write attempts to be made,
-// the write will fail. depending on the method called. This is unlike
-// RingQueue which includes blocking writes.
-//
-// Lastly, note that this class should be used in
-// Single-Producer Single-Consumer (SPSC) scenarios ONLY.
+// this class should be used in Single-Producer Single-Consumer (SPSC) scenarios ONLY.
 
 template<typename T, size_t size_>
 class RingBuffer : public RingBase<T, size_>{

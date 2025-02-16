@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <Frontend/EntityQualifier.hpp>
@@ -12,9 +9,9 @@
 auto n19::EntityQualifier::format() const -> std::string {
   std::string buff;
 
-  #define X(EQ_FLAG, UNUSED)                    \
-  if(flags_ & n19::EntityQualifier::EQ_FLAG){   \
-    buff += #EQ_FLAG " | ";                     \
+  #define X(EQ_FLAG, UNUSED)                      \
+  if(flags_ & n19::EntityQualifier::EQ_FLAG){     \
+    buff += #EQ_FLAG " | ";                       \
   }
     N19_EQ_FLAG_LIST
   #undef X
@@ -45,9 +42,9 @@ auto n19::EntityQualifierThunk::format() const -> std::string {
   std::string buff;      /// the flags and qualifiers
   std::string full_name; /// full entity name
 
-  #define X(EQ_FLAG, UNUSED)                    \
-  if(flags_ & n19::EntityQualifier::EQ_FLAG){   \
-    buff += #EQ_FLAG " | ";                     \
+  #define X(EQ_FLAG, UNUSED)                      \
+  if(flags_ & n19::EntityQualifier::EQ_FLAG){     \
+    buff += #EQ_FLAG " | ";                       \
   }
     N19_EQ_FLAG_LIST
   #undef X
@@ -107,8 +104,7 @@ auto n19::EntityQualifier::to_string(
   const auto ent = tbl.find(id_);
 
   if(include_qualifiers) {
-    #define X(VAL, UNUSED) \
-      if(flags_ & VAL) buff.append(#VAL " ");
+    #define X(VAL, UNUSED) if(flags_ & VAL) buff.append(#VAL " ");
     N19_EQ_FLAG_LIST /* convert to string repr */
     #undef X
   }
@@ -128,8 +124,7 @@ auto n19::EntityQualifierThunk::to_string(
 {
   std::string buff;
   if(include_qualifiers) {
-    #define X(VAL, UNUSED) \
-      if(flags_ & VAL) buff.append(#VAL " ");
+    #define X(VAL, UNUSED) if(flags_ & VAL) buff.append(#VAL " ");
     N19_EQ_FLAG_LIST /* convert to string repr */
     #undef X
   }

@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef FMT_HPP
@@ -11,11 +8,6 @@
 #include <string>
 #include <format>
 BEGIN_NAMESPACE(n19);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// A small header for runtime formatting utility.
-// Note, that formatting of this kind using the STL should be done
-// very sparingly.
 
 template<typename ... Args>
 auto fmt(const std::format_string<Args...> fmt, Args&&... args) -> std::string {

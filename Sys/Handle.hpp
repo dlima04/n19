@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef NATIVE_HANDLE_HPP
@@ -28,8 +25,6 @@ public:
 protected:
   Value value_{};
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename Value>
 N19_FORCEINLINE auto Handle<Value>::value() const -> Value {

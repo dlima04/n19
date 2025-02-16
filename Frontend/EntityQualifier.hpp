@@ -1,9 +1,6 @@
 /*
 * Copyright (c) 2024 Diago Lima
-* All rights reserved.
-*
-* This software is licensed under the BSD 3-Clause "New" or "Revised" license
-* found in the LICENSE file in the root directory of this project's source tree.
+* SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef ENTITYQUALIFIER_HPP
@@ -20,7 +17,6 @@
   X(Rvalue, 1ULL << 2)     \
 
 BEGIN_NAMESPACE(n19);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Base class. Represents a reference to a n19::Type.
 /// n19::TypeDescriptorBase applies qualifications to this type,
@@ -74,7 +70,7 @@ public:
 /// Represents an unresolved reference to a n19::Type.
 /// Each type is represented as a relative namespace path to
 /// a type that may or may not exist. Can be resolved into
-/// a joy::TypeDescriptor.
+/// a n19::TypeDescriptor.
 class EntityQualifierThunk final
   : public EntityQualifierBase {
 public:
