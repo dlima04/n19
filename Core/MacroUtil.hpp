@@ -9,10 +9,6 @@
 #ifndef CORE_MACRO_UTIL_HPP
 #define CORE_MACRO_UTIL_HPP
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Miscellanous macro utilities that don't really fit inside any other
-// header file should be placed here.
-
 #define N19_MACRO_CONCAT_IMPL_(X, Y) X##Y
 #define N19_MACRO_CONCAT(X, Y) N19_MACRO_CONCAT_IMPL_(X, Y)
 #define N19_UNIQUE_NAME(X) N19_MACRO_CONCAT(X, __COUNTER__)

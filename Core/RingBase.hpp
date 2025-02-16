@@ -9,6 +9,7 @@
 #ifndef RINGBASE_HPP
 #define RINGBASE_HPP
 #include <Core/Platform.hpp>
+#include <Core/Iterator.hpp>
 #include <atomic>
 #include <type_traits>
 BEGIN_NAMESPACE(n19);
@@ -39,6 +40,12 @@ public:
   auto is_empty() const -> bool;
   auto data()     const -> T*;
 
+  /// Define some iterator methods. These aren't really all that
+  /// important for a ring buffer but migh still come in handy.
+  using IteratorType = BasicIterator<T>;
+  [[nodiscard]] auto end()   -> IteratorType;
+  [[nodiscard]] auto begin() -> IteratorType;
+
   ~RingBase() = default;
   RingBase()  = default;
 protected:
@@ -68,6 +75,16 @@ N19_FORCEINLINE auto RingBase<T, size_>::is_empty() const -> bool {
 template<typename T, size_t size_>
 N19_FORCEINLINE auto RingBase<T, size_>::data() const -> T* {
   return buff_;
+}
+
+template<typename T, size_t size_>
+N19_FORCEINLINE auto RingBase<T, size_>::begin() -> IteratorType {
+  return buff_;
+}
+
+template<typename T, size_t size_>
+N19_FORCEINLINE auto RingBase<T, size_>::end() -> IteratorType {
+  return buff_ + (sizeof(buff_) / sizeof(T));
 }
 
 END_NAMESPACE(n19);

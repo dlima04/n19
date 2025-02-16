@@ -42,6 +42,7 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Core/RingBase.hpp
   Core/Bytes.hpp
   Core/Platform.hpp
+        Core/Iterator.hpp
   Core/ClassTraits.hpp
   Core/RingBuffer.hpp
   Core/RingQueue.hpp

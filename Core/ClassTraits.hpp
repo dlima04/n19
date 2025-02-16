@@ -8,6 +8,7 @@
 
 #ifndef CLASSTRAITS_HPP
 #define CLASSTRAITS_HPP
+#include <compare>
 
 #define N19_MAKE_COMPARABLE_IMPL_(OP, MB, CLASS)               \
   bool operator OP (const CLASS& other) const {                \
@@ -58,5 +59,8 @@
 #define N19_MAKE_DEFAULT_CONSTRUCTIBLE(C)                      \
   N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(C)                       \
   N19_MAKE_DEFAULT_COPY_CONSTRUCTIBLE(C)                       \
+
+#define N19_MAKE_SPACESHIP(C)                                  \
+  public: auto operator<=>(const C&) const = default;          \
 
 #endif //CLASSTRAITS_HPP
