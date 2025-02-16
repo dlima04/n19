@@ -25,20 +25,7 @@ struct MyArgs : argp::Parser {
   argp::PackType& arr = arg<argp::PackType>("--blabla", "-b", "idk lol");
 };
 
-struct foobar {
-   int x = 1;
-   ~foobar() { std::cout << "destructor called" << std::endl; }
-   foobar() = default;
-};
-
-auto get_value(int x) -> Result<foobar> {
-   if(x > 400) return make_error(ErrC::Internal);
-   return {};
-}
-
 int main(int argc, char** argv){
-
-   auto val = MUST(get_value(100));
 
   //  const auto time = sys::SystemTime::from_utc();
   //  if(!time) {
@@ -73,22 +60,23 @@ int main(int argc, char** argv){
 //
    //args.help(outs());
 
-   RingQueue<int, 16> rq;
-   for(const int& val : rq) {
-      outs() << val << '\n';
-   }
+  try {
+    const auto file = MUST(FileRef::open(CURRENT_TEST));
+    auto lxr = Lexer::create_shared(file);
+    if(!lxr) {
+      return 1;
+    }
 
-  //try {
-  //  const auto file = MUST(FileRef::open(CURRENT_TEST));
-  //  auto lxr = Lexer::create_shared(file);
-  //  if(!lxr) {
-  //    return 1;
-  //  }
-//
-  //  lxr.value()->dump();
-  //} catch(const std::exception& e) {
-  //  std::cerr << "EXCEPTION: " << e.what() << std::endl;
-  //}
+    auto peeked = lxr->get()->batched_peek<10>();
+    for(const auto& elem : peeked) {
+      outs() << elem.format(**lxr);
+    }
+
+    outs() << lxr->get()->current().format(**lxr);
+
+  } catch(const std::exception& e) {
+    std::cerr << "EXCEPTION: " << e.what() << std::endl;
+  }
 
   outs().flush();
   errs().flush();

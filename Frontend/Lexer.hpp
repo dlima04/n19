@@ -15,6 +15,7 @@
 #include <Sys/String.hpp>
 #include <memory>
 #include <vector>
+#include <array>
 #include <functional>
 #include <string_view>
 #include <cctype>
@@ -38,8 +39,12 @@ public:
   auto current() const        -> const Token&;
   auto consume(uint32_t amnt) -> const Token&;
   auto get_bytes() const      -> Bytes;
-  auto peek(uint32_t amnt)    -> Token;
   auto dump()                 -> void;
+  auto revert(const Token&)   -> void;
+
+  template<size_t sz_>
+  auto batched_peek()         -> std::array<Token, sz_>;
+  auto peek(uint32_t amnt)    -> Token;
 
   auto expect(TokenCategory cat, bool = true) -> Result<void>;
   auto expect(TokenType type, bool = true)    -> Result<void>;
@@ -50,16 +55,15 @@ public:
 
   Lexer() = default;
   ~Lexer() = default;
-
 private:
-  auto current_char_() const                               -> char8_t;
-  auto consume_char_(uint32_t)                             -> void;
-  auto advance_line_()                                     -> void;
-  auto skip_comment_()                                     -> void;
-  auto advance_consume_line_()                             -> void;
-  auto skip_chars_until_(std::function<bool(char8_t)> cb)  -> bool;
-  auto skip_utf8_sequence_()                               -> bool;
-  auto peek_char_(uint32_t amnt = 1) const                 -> char8_t;
+  char8_t current_char_() const;
+  void consume_char_(uint32_t);
+  void advance_line_();
+  void skip_comment_();
+  void advance_consume_line_();
+  bool skip_chars_until_(std::function<bool(char8_t)> cb);
+  bool skip_utf8_sequence_();
+  char8_t peek_char_(uint32_t amnt = 1) const;
 
   auto produce_impl_()    -> Token;
   auto token_hyphen_()    -> Token;
@@ -94,7 +98,6 @@ private:
   auto token_hex_lit_()   -> Token;
   auto token_num_lit_()   -> Token;
   auto token_oct_lit_()   -> Token;
-
 public:
   std::vector<char8_t> src_;  /// Source file buffer.
   Token curr_;                /// The one we're sitting on.
@@ -108,7 +111,7 @@ struct Keyword {              /// Only used for Lexer::get_keyword().
   TokenCategory cat;          /// The category of the keyword.
 };
 
-inline auto Lexer::peek(const uint32_t amnt) -> Token {
+N19_FORCEINLINE auto Lexer::peek(const uint32_t amnt) -> Token {
   const uint32_t line_tmp  = this->line_;
   const size_t   index_tmp = this->index_;
   const Token    tok_tmp   = this->curr_;
@@ -116,10 +119,32 @@ inline auto Lexer::peek(const uint32_t amnt) -> Token {
   consume(amnt);
   const Token peeked = curr_;
 
-  line_  = line_tmp;          /// Restore line
-  index_ = index_tmp;         /// Restore index
-  curr_  = tok_tmp;           /// Restore current token
-  return peeked;
+  this->line_  = line_tmp;    /// Restore line
+  this->index_ = index_tmp;   /// Restore index
+  this->curr_  = tok_tmp;     /// Restore current token
+  return peeked;              ///
+}
+
+template<size_t sz_>
+N19_FORCEINLINE auto Lexer::batched_peek() -> std::array<Token, sz_> {
+  const uint32_t line_tmp  = this->line_;
+  const size_t   index_tmp = this->index_;
+  const Token    tok_tmp   = this->curr_;
+
+  std::array<Token, sz_> toks{};
+  for(size_t i = 0; i < toks.size(); i++) {
+    toks[i] = consume(1);
+  }
+
+  this->line_  = line_tmp;    /// Restore line
+  this->index_ = index_tmp;   /// Restore index
+  this->curr_  = tok_tmp;     /// Restore current token
+  return toks;                /// possibly expensive copy
+}
+
+inline auto Lexer::revert(const Token& tok) -> void {
+  curr_ = tok;
+  index_ = tok.pos_ + tok.len_;
 }
 
 inline auto Lexer::skip_comment_() -> void {
@@ -130,14 +155,12 @@ inline auto Lexer::skip_comment_() -> void {
 
 inline auto Lexer::current_char_() const -> char8_t {
   return index_ >= src_.size()
-    ? u8'\0'
-    : src_[index_];
+    ? u8'\0' : src_[index_];
 }
 
 inline auto Lexer::peek_char_(const uint32_t amnt) const -> char8_t {
   return (index_ + amnt) >= src_.size()
-    ? u8'\0'
-    : src_[index_ + amnt];
+    ? u8'\0' : src_[index_ + amnt];
 }
 
 inline auto Lexer::consume_char_(const uint32_t amnt) -> void {
