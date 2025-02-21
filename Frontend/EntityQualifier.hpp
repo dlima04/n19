@@ -6,6 +6,7 @@
 #ifndef ENTITYQUALIFIER_HPP
 #define ENTITYQUALIFIER_HPP
 #include <Frontend/EntityTable.hpp>
+#include <Core/Platform.hpp>
 #include <vector>
 #include <memory>
 #include <cstdint>
@@ -24,11 +25,11 @@ BEGIN_NAMESPACE(n19);
 /// this class does not represent the type itself.
 class EntityQualifierBase {
 public:
-  [[nodiscard]] auto is_constant() const -> bool;
-  [[nodiscard]] auto is_rvalue()   const -> bool;
-  [[nodiscard]] auto is_pointer()  const -> bool;
-  [[nodiscard]] auto is_array()    const -> bool;
-  [[nodiscard]] auto is_matrice()  const -> bool;
+  NODISCARD_ auto is_constant() const -> bool;
+  NODISCARD_ auto is_rvalue()   const -> bool;
+  NODISCARD_ auto is_pointer()  const -> bool;
+  NODISCARD_ auto is_array()    const -> bool;
+  NODISCARD_ auto is_matrice()  const -> bool;
 
   enum Flags : uint8_t {
   #define X(NAME, VALUE) NAME = VALUE,
@@ -50,13 +51,13 @@ public:
 class EntityQualifier final
   : public EntityQualifierBase {
 public:
-  [[nodiscard]] auto to_string(
+  NODISCARD_ auto to_string(
     const EntityTable& tbl,
     bool include_qualifiers = true,
     bool include_postfixes = true
   ) const -> std::string;
 
-  [[nodiscard]] auto format() const -> std::string;
+  NODISCARD_ auto format() const -> std::string;
   static auto get_const_bool() -> EntityQualifier;
   static auto get_const_f64()  -> EntityQualifier;
   static auto get_const_ptr()  -> EntityQualifier;
@@ -74,11 +75,11 @@ public:
 class EntityQualifierThunk final
   : public EntityQualifierBase {
 public:
-  [[nodiscard]] auto to_string(
+  NODISCARD_ auto to_string(
     bool include_qualifiers = true,
     bool include_postfixes = true
   ) const -> std::string;
-  [[nodiscard]] auto format() const -> std::string;
+  NODISCARD_ auto format() const -> std::string;
 
   std::vector<std::string> name_;
 

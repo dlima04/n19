@@ -52,7 +52,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T> template<CallableWith<T> ...Args>
-N19_FORCEINLINE auto Callback<T>::operator()(Args&&... args) -> decltype(auto) {
+FORCEINLINE_ auto Callback<T>::operator()(Args&&... args) -> decltype(auto) {
   return obj_( std::forward<Args>(args)... );
 }
 

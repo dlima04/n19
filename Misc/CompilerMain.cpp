@@ -27,17 +27,17 @@ struct MyArgs : argp::Parser {
 
 int main(int argc, char** argv){
 
-  //  const auto time = sys::SystemTime::from_utc();
-  //  if(!time) {
-  //    return 1;
-  //  }
-  //
-  //  std::cout << std::boolalpha;
-  //  std::cout << IsVoid<int> << std::endl;
-  //  std::cout << IsVoid<void> << std::endl;
-  //
-  // static_assert(std::is_default_constructible_v<FileRef>, "AAA");
-  //  std::cout << time->strings().format() << std::endl;
+   const auto time = sys::SystemTime::from_utc();
+   if(!time) {
+     return 1;
+   }
+
+   std::cout << std::boolalpha;
+   std::cout << IsVoid<int> << std::endl;
+   std::cout << IsVoid<void> << std::endl;
+
+  static_assert(std::is_default_constructible_v<FileRef>, "AAA");
+  std::cout << time->strings().format() << std::endl;
 
    //std::vector<sys::String> strs = { "--num-jobs=42069", "--verbose=true", "-b=one,two,three" };
 //
@@ -67,12 +67,7 @@ int main(int argc, char** argv){
       return 1;
     }
 
-    auto peeked = lxr->get()->batched_peek<10>();
-    for(const auto& elem : peeked) {
-      outs() << elem.format(**lxr);
-    }
-
-    outs() << lxr->get()->current().format(**lxr);
+    lxr->get()->dump(outs());
 
   } catch(const std::exception& e) {
     std::cerr << "EXCEPTION: " << e.what() << std::endl;

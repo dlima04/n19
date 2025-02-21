@@ -5,6 +5,7 @@
 
 #ifndef SYS_TIME_HPP
 #define SYS_TIME_HPP
+#include <Core/Platform.hpp>
 #include <Core/Result.hpp>
 #include <Core/ClassTraits.hpp>
 #include <string>
@@ -19,9 +20,9 @@ BEGIN_NAMESPACE(n19::sys);
 
 struct STFormatter_ {
   const class SystemTime& time_;
-  [[nodiscard]] auto format()  const -> std::string;
-  [[nodiscard]] auto month()   const -> std::string;
-  [[nodiscard]] auto weekday() const -> std::string;
+  NODISCARD_ auto format()  const -> std::string;
+  NODISCARD_ auto month()   const -> std::string;
+  NODISCARD_ auto weekday() const -> std::string;
   STFormatter_(const SystemTime& t) : time_(t) {}
 };
 

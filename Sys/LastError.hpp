@@ -6,9 +6,10 @@
 #ifndef SYS_LASTERROR_HPP
 #define SYS_LASTERROR_HPP
 #include <Sys/String.hpp>
+#include <Core/Platform.hpp>
 
 namespace n19::sys {
-  [[nodiscard]] auto last_error() -> String;
+  NODISCARD_ auto last_error() -> String;
 }
 
 #endif //SYS_LASTERROR_HPP

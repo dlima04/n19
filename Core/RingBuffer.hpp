@@ -48,7 +48,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T, size_t size_> template<typename ... Args>
-N19_FORCEINLINE auto RingBuffer<T, size_>::write(Args&&... args) -> bool {
+FORCEINLINE_ auto RingBuffer<T, size_>::write(Args&&... args) -> bool {
   static_assert(std::constructible_from<T, Args...>);
   if(this->is_full()) {
     return false;
@@ -60,7 +60,7 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::write(Args&&... args) -> bool {
 }
 
 template<typename T, size_t size_> template<typename ... Args>
-N19_FORCEINLINE auto RingBuffer<T, size_>::overwrite(Args&&... args) -> void {
+FORCEINLINE_ auto RingBuffer<T, size_>::overwrite(Args&&... args) -> void {
   static_assert(std::constructible_from<T, Args...>);
   if(this->is_full()) {
     tail_.fetch_add(1, std::memory_order::release);
@@ -71,7 +71,7 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::overwrite(Args&&... args) -> void {
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingBuffer<T, size_>::read() -> Maybe<ValueType> {
+FORCEINLINE_ auto RingBuffer<T, size_>::read() -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
   if(lhead == ltail) {    // buffer is empty.
@@ -84,7 +84,7 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::read() -> Maybe<ValueType> {
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingBuffer<T, size_>::try_current() const -> Maybe<ValueType> {
+FORCEINLINE_ auto RingBuffer<T, size_>::try_current() const -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 
@@ -96,7 +96,7 @@ N19_FORCEINLINE auto RingBuffer<T, size_>::try_current() const -> Maybe<ValueTyp
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingBuffer<T, size_>::current() const -> ValueType {
+FORCEINLINE_ auto RingBuffer<T, size_>::current() const -> ValueType {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 

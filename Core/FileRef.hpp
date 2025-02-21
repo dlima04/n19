@@ -6,6 +6,7 @@
 #ifndef FILEREF_HPP
 #define FILEREF_HPP
 #include <Core/Result.hpp>
+#include <Core/Platform.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Bytes.hpp>
 #include <Sys/String.hpp>
@@ -32,8 +33,8 @@ public:
   auto write(const Bytes& bytes, bool app = false) const -> Result<void>;
   auto read_into(const WritableBytes& bytes) const -> Result<void>;
 
-  [[nodiscard]] auto nstr() const -> sys::String;
-  [[nodiscard]] auto size() const -> Result<uintmax_t>;
+  NODISCARD_ auto nstr() const -> sys::String;
+  NODISCARD_ auto size() const -> Result<uintmax_t>;
 
   auto operator->(this auto&& self) -> auto*;
   auto path(this auto&& self)       -> auto&;
@@ -95,15 +96,15 @@ inline auto FileRef::nstr() const -> sys::String {
 #endif
 }
 
-N19_FORCEINLINE auto FileRef::operator*(this auto &&self) -> auto& {
+FORCEINLINE_ auto FileRef::operator*(this auto &&self) -> auto& {
   return std::forward<decltype(self)>(self).path_;
 }
 
-N19_FORCEINLINE auto FileRef::operator->(this auto &&self) -> auto* {
+FORCEINLINE_ auto FileRef::operator->(this auto &&self) -> auto* {
   return &(std::forward<decltype(self)>(self).path_);
 }
 
-N19_FORCEINLINE auto FileRef::path(this auto &&self) -> auto& {
+FORCEINLINE_ auto FileRef::path(this auto &&self) -> auto& {
   return std::forward<decltype(self)>(self).path_;
 }
 

@@ -131,7 +131,7 @@ auto n19::ErrorCollector::display_error(
   }
 
   IGNORE_EXCEPT(
-   for(size_t i = pos - 1; buff.at(i) != '\n'; i--) {
+    for(size_t i = pos - 1; buff.at(i) != '\n'; i--) {
       const char ch = buff.at(i);
       if(!std::isprint(static_cast<uint8_t>(ch)))
         continue;
@@ -156,15 +156,8 @@ auto n19::ErrorCollector::display_error(
   }
 
   stream
-    << Con::Bold     /// Set console to bold.
-    << _nstr("In ")  ///
-    << fname         /// Display file name in bold.
-    << ':'           /// File : line number
-    << line          /// display line number.
-    << '\n'          ///
-    << Con::Reset    /// Reset console
-    << before        /// Display full line.
-    << '\n'          ///
+    << Con::Bold  << _nstr("In ") << fname << ':' << line
+    << '\n'  << Con::Reset << before << '\n'
     << filler        /// Filler contents, tildes below line.
     << '\n'          ///
     << (is_warn ? Con::YellowFG : Con::RedFG)

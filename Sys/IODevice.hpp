@@ -106,11 +106,11 @@ inline auto IODevice::close() -> void {
   invalidate();
 }
 
-N19_FORCEINLINE auto IODevice::is_invalid() -> bool {
+FORCEINLINE_ auto IODevice::is_invalid() -> bool {
   return value_ == -1;
 }
 
-N19_FORCEINLINE auto IODevice::flush_handle() const -> void {
+FORCEINLINE_ auto IODevice::flush_handle() const -> void {
   ::fsync(value_); // sync the file descriptor.
 }
 
@@ -125,11 +125,11 @@ inline auto IODevice::close() -> void {
   invalidate();
 }
 
-N19_FORCEINLINE auto IODevice::is_invalid() -> bool {
+FORCEINLINE_ auto IODevice::is_invalid() -> bool {
   return value_ == (::HANDLE)nullptr;
 }
 
-N19_FORCEINLINE auto IODevice::flush_handle() const -> void {
+FORCEINLINE_ auto IODevice::flush_handle() const -> void {
   ::FlushFileBuffers(value_); // Flush Win32 file buff.
 }
 

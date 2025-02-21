@@ -56,59 +56,65 @@ constexpr auto ALIGN_AVOID_FALSESHARE = std::hardware_destructive_interference_s
 /// platforms permit under certain circumstances) on the platform we're
 /// building for.
 #if defined(N19_WIN32)
-#  define PLATFORM_PAGE_SIZE 4096
+#  define PLATFORM_PAGE_SIZE_ 4096
 #else
 #  include <unistd.h>
-#  define PLATFORM_PAGE_SIZE sysconf(_SC_PAGESIZE)
+#  define PLATFORM_PAGE_SIZE_ sysconf(_SC_PAGESIZE)
 #endif
 
 ///
 /// Portable macros for forcing/preventing function inlining.
 #if N19_CLANG || N19_GCC
-#  define N19_NOINLINE    __attribute__((noinline))
-#  define N19_FORCEINLINE __attribute__((always_inline)) inline
+#  define NOINLINE_    __attribute__((noinline))
+#  define FORCEINLINE_ __attribute__((always_inline)) inline
 #elif N19_MSVC
-#  define N19_NOINLINE    __declspec(noinline)
-#  define N19_FORCEINLINE __forceinline inline
+#  define NOINLINE_    __declspec(noinline)
+#  define FORCEINLINE_ __forceinline inline
 #else
-#  define N19_NOINLINE
-#  define N19_FORCEINLINE
+#  define NOINLINE_
+#  define FORCEINLINE_
 #endif
 
 ///
 /// Portable macro for specifying packed structures.
 #if N19_CLANG || N19_GCC
-#  define N19_PACKED_IMPL(KIND, NAME, BODY) \
+#  define N19_PACKED_IMPL_(KIND, NAME, BODY) \
     KIND __attribute__((packed)) NAME BODY;
 #elif N19_MSVC
-#  define N19_PACKED_IMPL(KIND, NAME, BODY) \
-  __pragma(pack(push, 1))                   \
-    KIND NAME BODY;                         \
+#  define N19_PACKED_IMPL_(KIND, NAME, BODY) \
+  __pragma(pack(push, 1))                    \
+    KIND NAME BODY;                          \
   __pragma(pack(pop))
 #else
-#  define N19_PACKED_IMPL(KIND, NAME, BODY) \
-    KIND NAME BODY
+#  define N19_PACKED_IMPL_(KIND, NAME, BODY) \
+    KIND NAME BODY;
 #endif
 
-#define PACKED_STRUCT(NAME, BODY) N19_PACKED_IMPL(struct, NAME, BODY)
-#define PACKED_CLASS(NAME, BODY)  N19_PACKED_IMPL(class, NAME, BODY)
+#define PACKED_STRUCT_(NAME, BODY) N19_PACKED_IMPL_(struct, NAME, BODY)
+#define PACKED_CLASS_(NAME, BODY)  N19_PACKED_IMPL_(class, NAME, BODY)
 
 ///
 /// Note: it seems like MSVC doesn't have an equivalent attribute
 /// for this. will need to find a workaround at some point.
 #if N19_CLANG || N19_GCC
-#  define N19_USED __attribute__((used))
+#  define USED_ __attribute__((used))
 #else
-#  define N19_USED
+#  define USED_
 #endif
 
 ///
 /// Portable macro for specifying naked functions,
 /// i.e. ones that don't have prologues/epilogues in their generated code.
 #if N19_CLANG || N19_GCC
-#  define N19_NAKED __attribute__((naked))
+#  define NAKED_ __attribute__((naked))
 #elif N19_MSVC
-#  define N19_NAKED __declspec(naked)
+#  define NAKED_ __declspec(naked)
 #endif
+
+///
+/// Attribute macros that aren't compiler specific.
+#define NODISCARD_   [[nodiscard]]
+#define FALLTHROUGH_ [[fallthrough]]
+#define NORETURN_    [[noreturn]]
 
 #endif //PLATFORM_HPP

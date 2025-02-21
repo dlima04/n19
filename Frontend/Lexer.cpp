@@ -7,7 +7,6 @@
 #include <Core/Murmur3.hpp>
 #include <Frontend/Lexer.hpp>
 #include <Frontend/ErrorCollector.hpp>
-#include <Core/ConIO.hpp>
 #include <filesystem>
 #include <algorithm>
 #include <limits>
@@ -445,7 +444,7 @@ inline auto Lexer::token_lthan_() -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_null_()  -> Token {
+FORCEINLINE_ auto Lexer::token_null_()  -> Token {
   Token curr_tok;
   curr_tok.type_ = TokenType::EndOfFile;
   curr_tok.cat_  = TokenCategory::NonCategorical;
@@ -454,7 +453,7 @@ N19_FORCEINLINE auto Lexer::token_null_()  -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_tilde_() -> Token {
+FORCEINLINE_ auto Lexer::token_tilde_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::BitwiseNot;
@@ -465,7 +464,7 @@ N19_FORCEINLINE auto Lexer::token_tilde_() -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_at_() -> Token {
+FORCEINLINE_ auto Lexer::token_at_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::At;
@@ -476,7 +475,7 @@ N19_FORCEINLINE auto Lexer::token_at_() -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_money_() -> Token {
+FORCEINLINE_ auto Lexer::token_money_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::Money;
@@ -487,7 +486,7 @@ N19_FORCEINLINE auto Lexer::token_money_() -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_lsqbrckt_() -> Token {
+FORCEINLINE_ auto Lexer::token_lsqbrckt_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::LeftSqBracket;
@@ -498,7 +497,7 @@ N19_FORCEINLINE auto Lexer::token_lsqbrckt_() -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_rsqbrckt_() -> Token {
+FORCEINLINE_ auto Lexer::token_rsqbrckt_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::RightSqBracket;
@@ -509,7 +508,7 @@ N19_FORCEINLINE auto Lexer::token_rsqbrckt_() -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_semicolon_() -> Token {
+FORCEINLINE_ auto Lexer::token_semicolon_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::Semicolon;
@@ -520,7 +519,7 @@ N19_FORCEINLINE auto Lexer::token_semicolon_() -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_lparen_() -> Token {
+FORCEINLINE_ auto Lexer::token_lparen_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::LeftParen;
@@ -531,7 +530,7 @@ N19_FORCEINLINE auto Lexer::token_lparen_() -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_rparen_() -> Token {
+FORCEINLINE_ auto Lexer::token_rparen_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::RightParen;
@@ -542,7 +541,7 @@ N19_FORCEINLINE auto Lexer::token_rparen_() -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_lbrace_() -> Token {
+FORCEINLINE_ auto Lexer::token_lbrace_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::LeftBrace;
@@ -553,7 +552,7 @@ N19_FORCEINLINE auto Lexer::token_lbrace_() -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_rbrace_() -> Token {
+FORCEINLINE_ auto Lexer::token_rbrace_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::RightBrace;
@@ -564,7 +563,7 @@ N19_FORCEINLINE auto Lexer::token_rbrace_() -> Token {
   return curr_tok;
 }
 
-N19_FORCEINLINE auto Lexer::token_comma_() -> Token {
+FORCEINLINE_ auto Lexer::token_comma_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::Comma;
@@ -1095,14 +1094,14 @@ auto Lexer::consume(const uint32_t amnt) -> const Token& {
   return curr_;
 }
 
-auto Lexer::dump() -> void {
+auto Lexer::dump(OStream& stream) -> void {
   do {
-    outs() << curr_.format(*this);
+    stream << curr_.format(*this);
     consume(1);
   } while(curr_ != TokenType::EndOfFile && curr_ != TokenType::Illegal);
 
   if(curr_ == TokenType::Illegal)
-    ErrorCollector::display_error("Illegal token!", *this, curr_, outs());
+    ErrorCollector::display_error("Illegal token!", *this, curr_, stream);
 }
 
 END_NAMESPACE(n19);

@@ -45,7 +45,7 @@ public:
   using NameType_ = std::string_view;
   using FuncType_ = void(*)(ExecutionContext&);
 
-  N19_FORCEINLINE auto operator()(ExecutionContext& ctx) -> void {
+  FORCEINLINE_ auto operator()(ExecutionContext& ctx) -> void {
     try { this->fn_(ctx); } catch(...) { ctx.result = Result::Exception; }
   }
                          ///

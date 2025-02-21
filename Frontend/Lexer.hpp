@@ -11,6 +11,7 @@
 #include <Core/FileRef.hpp>
 #include <Core/Result.hpp>
 #include <Core/Maybe.hpp>
+#include <Core/Stream.hpp>
 #include <Frontend/Token.hpp>
 #include <Sys/String.hpp>
 #include <memory>
@@ -39,7 +40,7 @@ public:
   auto current() const        -> const Token&;
   auto consume(uint32_t amnt) -> const Token&;
   auto get_bytes() const      -> Bytes;
-  auto dump()                 -> void;
+  auto dump(OStream& stream)  -> void;
   auto revert(const Token&)   -> void;
 
   template<size_t sz_>
@@ -111,7 +112,7 @@ struct Keyword {              /// Only used for Lexer::get_keyword().
   TokenCategory cat;          /// The category of the keyword.
 };
 
-N19_FORCEINLINE auto Lexer::peek(const uint32_t amnt) -> Token {
+FORCEINLINE_ auto Lexer::peek(const uint32_t amnt) -> Token {
   const uint32_t line_tmp  = this->line_;
   const size_t   index_tmp = this->index_;
   const Token    tok_tmp   = this->curr_;
@@ -126,7 +127,7 @@ N19_FORCEINLINE auto Lexer::peek(const uint32_t amnt) -> Token {
 }
 
 template<size_t sz_>
-N19_FORCEINLINE auto Lexer::batched_peek() -> std::array<Token, sz_> {
+FORCEINLINE_ auto Lexer::batched_peek() -> std::array<Token, sz_> {
   const uint32_t line_tmp  = this->line_;
   const size_t   index_tmp = this->index_;
   const Token    tok_tmp   = this->curr_;

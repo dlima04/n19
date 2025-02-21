@@ -19,31 +19,31 @@ public:
   using ReferenceType = T&;
   using ValueType     = T;
 
-  N19_FORCEINLINE auto operator*(this auto&& self) -> auto&& {
+  FORCEINLINE_ auto operator*(this auto&& self) -> auto&& {
     return *std::forward<decltype(self)>(self).ptr_;
   }
 
-  N19_FORCEINLINE auto operator->(this auto&& self) -> auto* {
+  FORCEINLINE_ auto operator->(this auto&& self) -> auto* {
     return std::forward<decltype(self)>(self).ptr_;
   }
 
-  N19_FORCEINLINE auto operator++() -> BasicIterator& {
+  FORCEINLINE_ auto operator++() -> BasicIterator& {
     ++ptr_;        /// Simply increment the internal pointer
     return *this;  /// and return self.
   }
 
-  N19_FORCEINLINE auto operator++(int) -> BasicIterator {
+  FORCEINLINE_ auto operator++(int) -> BasicIterator {
     BasicIterator temp = *this;
     ++(*this);     /// Modify self, return the previous
     return temp;   /// incremented value.
   }
 
-  N19_FORCEINLINE auto operator--() -> BasicIterator& {
+  FORCEINLINE_ auto operator--() -> BasicIterator& {
     --ptr_;        /// Simply decrement the internal pointer
     return *this;  /// and return self.
   }
 
-  N19_FORCEINLINE auto operator--(int) -> BasicIterator {
+  FORCEINLINE_ auto operator--(int) -> BasicIterator {
     BasicIterator temp = *this;
     --(*this);     /// Modify self, return the previous
     return temp;   /// incremented value.

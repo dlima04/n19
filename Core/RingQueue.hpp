@@ -64,7 +64,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingQueue<T, size_>::dequeue() -> ValueType {
+FORCEINLINE_ auto RingQueue<T, size_>::dequeue() -> ValueType {
   constexpr auto read_order  = std::memory_order::acquire;
   constexpr auto write_order = std::memory_order::release;
   const size_t lhead = head_.load(read_order);
@@ -81,7 +81,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::dequeue() -> ValueType {
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingQueue<T, size_>::try_dequeue() -> Maybe<ValueType> {
+FORCEINLINE_ auto RingQueue<T, size_>::try_dequeue() -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
   if(lhead == ltail) {   // the buffer is empty.
@@ -94,7 +94,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::try_dequeue() -> Maybe<ValueType> {
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingQueue<T, size_>::can_peek(const size_t amnt) -> bool {
+FORCEINLINE_ auto RingQueue<T, size_>::can_peek(const size_t amnt) -> bool {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
 
@@ -106,7 +106,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::can_peek(const size_t amnt) -> bool {
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingQueue<T, size_>::try_peek(const size_t amnt) -> Maybe<ValueType> {
+FORCEINLINE_ auto RingQueue<T, size_>::try_peek(const size_t amnt) -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
 
@@ -122,7 +122,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::try_peek(const size_t amnt) -> Maybe<V
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingQueue<T, size_>::peek(const size_t amnt) -> ValueType {
+FORCEINLINE_ auto RingQueue<T, size_>::peek(const size_t amnt) -> ValueType {
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
   while(!can_peek(amnt)) { // spin.
     head_.wait(head_.load(std::memory_order::acquire));
@@ -132,7 +132,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::peek(const size_t amnt) -> ValueType {
 }
 
 template<typename T, size_t size_> template<typename ... Args>
-N19_FORCEINLINE auto RingQueue<T, size_>::enqueue(Args&&... args) -> void {
+FORCEINLINE_ auto RingQueue<T, size_>::enqueue(Args&&... args) -> void {
   static_assert(std::constructible_from<T, Args...>);
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
@@ -147,7 +147,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::enqueue(Args&&... args) -> void {
 }
 
 template<typename T, size_t size_> template<typename ... Args>
-N19_FORCEINLINE auto RingQueue<T, size_>::try_enqueue(Args&&... args) -> bool {
+FORCEINLINE_ auto RingQueue<T, size_>::try_enqueue(Args&&... args) -> bool {
   static_assert(std::constructible_from<T, Args...>);
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
@@ -163,13 +163,13 @@ N19_FORCEINLINE auto RingQueue<T, size_>::try_enqueue(Args&&... args) -> bool {
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingQueue<T, size_>::wake_all() -> void {
+FORCEINLINE_ auto RingQueue<T, size_>::wake_all() -> void {
   head_.notify_all();
   tail_.notify_all();
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingQueue<T, size_>::current() const -> ValueType {
+FORCEINLINE_ auto RingQueue<T, size_>::current() const -> ValueType {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 
@@ -181,7 +181,7 @@ N19_FORCEINLINE auto RingQueue<T, size_>::current() const -> ValueType {
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingQueue<T, size_>::try_current() const -> Maybe<ValueType> {
+FORCEINLINE_ auto RingQueue<T, size_>::try_current() const -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire);
   const size_t ltail = tail_.load(std::memory_order::acquire);
 

@@ -20,19 +20,19 @@ public:
   virtual auto is_invalid() -> bool = 0;
   virtual ~Handle() = default;
 
-  [[nodiscard]] auto value() const -> Value;
+  NODISCARD_ auto value() const -> Value;
   explicit operator bool() const;
 protected:
   Value value_{};
 };
 
 template<typename Value>
-N19_FORCEINLINE auto Handle<Value>::value() const -> Value {
+FORCEINLINE_ auto Handle<Value>::value() const -> Value {
   return value_;
 }
 
 template<typename Value>
-N19_FORCEINLINE Handle<Value>::operator bool() const {
+FORCEINLINE_ Handle<Value>::operator bool() const {
   return !is_invalid();
 }
 

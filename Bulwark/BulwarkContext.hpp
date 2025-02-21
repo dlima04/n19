@@ -26,19 +26,19 @@ public:
     Colours  = 0x01 << 3, /// Pretty colours!
   };
 
-  N19_FORCEINLINE auto should_skip(const sys::StringView& s) -> bool {
+  FORCEINLINE_ auto should_skip(const sys::StringView& s) -> bool {
     return std::ranges::find_if(suites_to_skip_, [s](const auto& o) {
       return o == s;
     }) != suites_to_skip_.end();
   }
 
-  N19_FORCEINLINE auto should_run(const sys::StringView& s) -> bool {
+  FORCEINLINE_ auto should_run(const sys::StringView& s) -> bool {
     return std::ranges::find_if(suites_to_run_, [s](const auto& o) {
       return o == s;
     }) != suites_to_skip_.end();
   }
 
-  N19_FORCEINLINE static auto the() -> Context& {
+  FORCEINLINE_ static auto the() -> Context& {
     static Context ctx_;  /// TODO:
     return ctx_;          /// maybe just make this a static global?
   }

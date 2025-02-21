@@ -50,22 +50,22 @@ public:
   using PointerType = T*;
   using Variant_    = std::variant<T, E> ;
 
-  [[nodiscard]] N19_FORCEINLINE auto value() const -> const T& {
+  NODISCARD_ FORCEINLINE_ auto value() const -> const T& {
     ASSERT(has_value() == true, "Result contains an error!");
     return std::get<T>( value_ );
   }
 
-  [[nodiscard]] N19_FORCEINLINE auto value() -> T& {
+  NODISCARD_ FORCEINLINE_ auto value() -> T& {
     ASSERT(has_value() == true, "Result contains an error!");
     return std::get<T>( value_ );
   }
 
-  [[nodiscard]] N19_FORCEINLINE auto error() const -> const E& {
+  NODISCARD_ FORCEINLINE_ auto error() const -> const E& {
     ASSERT(has_value() == false, "Result contains a value!");
     return std::get<E>( value_ );
   }
 
-  [[nodiscard]] N19_FORCEINLINE auto error() -> E& {
+  NODISCARD_ FORCEINLINE_ auto error() -> E& {
     ASSERT(has_value() == false, "Result contains a value!");
     return std::get<E>( value_ );
   }
@@ -106,11 +106,11 @@ public:
     return self;
   }
 
-  [[nodiscard]] auto has_value() const -> bool {
+  NODISCARD_ auto has_value() const -> bool {
     return std::holds_alternative<T>( value_ );
   }
 
-  [[nodiscard]] explicit operator bool() const {
+  NODISCARD_ explicit operator bool() const {
     return std::holds_alternative<T>( value_ );
   }
 
@@ -158,7 +158,7 @@ inline ErrorT make_error(const ErrC code, std::string&& msg) {
 // Utility function for constructing result types.
 
 template<typename T, typename ...Args>
-[[nodiscard]] Result<T> make_result(Args&&... args) {
+NODISCARD_ Result<T> make_result(Args&&... args) {
   if constexpr(IsVoid<T>)
     return Result<Nothing_>{Nothing_{}};
   else

@@ -139,8 +139,8 @@ public:
   };
   #undef X
 
-  [[nodiscard]] auto string_repr() const -> std::string;
-  [[nodiscard]] auto to_string() const -> std::string;
+  NODISCARD_ auto string_repr() const -> std::string;
+  NODISCARD_ auto to_string() const -> std::string;
 
   Value value  = None;
   constexpr TokenType() = default;
@@ -156,8 +156,8 @@ public:
   };
   #undef X
 
-  [[nodiscard]] auto to_string() const -> std::string;
-  [[nodiscard]] auto isa(Value val) const -> bool;
+  NODISCARD_ auto to_string() const -> std::string;
+  NODISCARD_ auto isa(Value val) const -> bool;
 
   constexpr auto operator|=(const TokenCategory &other) -> void;
   constexpr auto operator|=(Value other) -> void;
@@ -177,8 +177,8 @@ public:
   TokenCategory cat_;   /// It's flags or modifiers.
   TokenType type_;      /// The type of token.
 
-  [[nodiscard]] auto value(const class Lexer&) const -> Maybe<std::string>;
-  [[nodiscard]] auto format(const class Lexer&) const -> std::string;
+  NODISCARD_ auto value(const class Lexer&) const -> Maybe<std::string>;
+  NODISCARD_ auto format(const class Lexer&) const -> std::string;
 
   static auto eof(uint32_t pos, uint32_t line) -> Token;
   static auto illegal(uint32_t pos, uint32_t length, uint32_t line) -> Token;
@@ -188,19 +188,19 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Begin inlined methods.
 
-N19_FORCEINLINE constexpr auto TokenCategory::operator|=(
+FORCEINLINE_ constexpr auto TokenCategory::operator|=(
   const TokenCategory &other ) -> void
 {
   value |= other.value;
 }
 
-N19_FORCEINLINE constexpr auto TokenCategory::operator|=(
+FORCEINLINE_ constexpr auto TokenCategory::operator|=(
   const Value other ) -> void
 {
   value |= other;
 }
 
-N19_FORCEINLINE auto TokenCategory::isa(const Value val) const -> bool {
+FORCEINLINE_ auto TokenCategory::isa(const Value val) const -> bool {
   return this->value & val;
 }
 

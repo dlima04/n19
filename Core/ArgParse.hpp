@@ -21,20 +21,6 @@
 BEGIN_NAMESPACE(n19::argp);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This header file contains definitions for n19's command line argument parsing
-// library. An example usecase is as follows:
-//
-// struct MyArgs : public n19::argp::Parser {
-//   int64_t& num_jobs  = arg<int64_t>("--num-jobs", "-j", 6);
-//   sys::String& input = arg<sys::String>("--input, "-i");
-// };
-//
-// arguments should be passed to the "arg" method in the following order:
-// long form flag name, short form, default value (optional).
-// Afterwards, arguments can be parsed using the parse() method. If no errors
-// occurred, the values can be retrieved directly using the object's members.
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Begin Value Classes:
 // Each class here is a polymorphic wrapper around a value
 // that can be set by the user when passing command line arguments.
@@ -60,7 +46,7 @@ class Value<int64_t> final : public ValueBase {
 N19_MAKE_COMPARABLE_ON(int64_t, value_);
 public:
   auto convert(const sys::String&) -> Result<void> override;
-  N19_FORCEINLINE auto value() -> int64_t& { return value_; }
+  FORCEINLINE_ auto value() -> int64_t& { return value_; }
 
   Value() = default;
  ~Value() override = default;
@@ -73,7 +59,7 @@ class Value<bool> final : public ValueBase {
 N19_MAKE_COMPARABLE_ON(bool, value_);
 public:
   auto convert(const sys::String&)  -> Result<void> override;
-  N19_FORCEINLINE auto value() -> bool& { return value_; }
+  FORCEINLINE_ auto value() -> bool& { return value_; }
 
   Value() = default;
  ~Value() override = default;
@@ -86,7 +72,7 @@ class Value<double> final : public ValueBase {
 N19_MAKE_COMPARABLE_ON(double, value_);
 public:
   auto convert(const sys::String&) -> Result<void> override;
-  N19_FORCEINLINE auto value() -> double& { return value_; }
+  FORCEINLINE_ auto value() -> double& { return value_; }
 
   Value() = default;
  ~Value() override = default;
@@ -99,7 +85,7 @@ class Value<sys::String> final : public ValueBase {
 N19_MAKE_COMPARABLE_ON(sys::String, value_);
 public:
   auto convert(const std::string &) -> Result<void> override;
-  N19_FORCEINLINE auto value() -> sys::String& { return value_; }
+  FORCEINLINE_ auto value() -> sys::String& { return value_; }
 
   Value() = default;
  ~Value() override = default;
@@ -113,7 +99,7 @@ template<>
 class Value<PackType> final : public ValueBase {
 public:
   auto convert(const sys::String &) -> Result<void> override;
-  N19_FORCEINLINE auto value() -> PackType& { return value_; }
+  FORCEINLINE_ auto value() -> PackType& { return value_; }
 
   Value() = default;
  ~Value() = default;
@@ -145,7 +131,7 @@ N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(Parser);
 N19_MAKE_NONCOPYABLE(Parser);
 public:
   template<typename T>
-  [[nodiscard]] inline auto arg(
+  NODISCARD_ auto arg(
     const sys::StringView& longf,        /// Long form flag name
     const sys::StringView& shortf,       /// Short form flag name
     const sys::StringView& desc = "",    /// Optional description

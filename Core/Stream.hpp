@@ -57,12 +57,12 @@ public:
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Begin inline class methods
 
-  N19_FORCEINLINE auto operator<<(const Flush_&) -> OStream& {
+  FORCEINLINE_ auto operator<<(const Flush_&) -> OStream& {
     this->flush();   /// Flush but don't add a newline
     return *this;    /// return this stream
   }
 
-  N19_FORCEINLINE auto operator<<(const Endl_&) -> OStream& {
+  FORCEINLINE_ auto operator<<(const Endl_&) -> OStream& {
     *this << '\n';   /// add a new line
     this->flush();   /// Flush
     return *this;    /// return this stream
@@ -205,7 +205,7 @@ public:
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Begin inline class methods
 
-  N19_FORCEINLINE auto to_buffer(const Span_& buff) -> OStream& {
+  FORCEINLINE_ auto to_buffer(const Span_& buff) -> OStream& {
     ASSERT(curr_ <= len_, "Invalid current buffer index.");
     ASSERT(buff.size_bytes() <= (len_ - curr_), "Buffer overrun!");
     ASSERT(buff.size_bytes() != 0, "to_buffer: empty span!");
@@ -215,7 +215,7 @@ public:
     return *this;
   }
 
-  N19_FORCEINLINE auto flush() -> OStream& override {
+  FORCEINLINE_ auto flush() -> OStream& override {
     ASSERT(curr_ <= len_, "Buffer overrun!");
     if(curr_ > begin_) {
       fd_.write(Bytes{&buff_[begin_], curr_});
@@ -267,8 +267,8 @@ public:
   static auto from_stdin() -> IStream;
   static auto from(const sys::IODevice&) -> IStream;
 
-  N19_FORCEINLINE ~IStream() { fd_.flush_handle(); }
-  N19_FORCEINLINE IStream()  { /* ... */ }
+  FORCEINLINE_ ~IStream() { fd_.flush_handle(); }
+  FORCEINLINE_ IStream()  { /* ... */ }
 private:
   sys::IODevice fd_;
 };

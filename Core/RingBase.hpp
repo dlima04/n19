@@ -40,8 +40,8 @@ public:
   /// Define some iterator methods. These aren't really all that
   /// important for a ring buffer but migh still come in handy.
   using IteratorType = BasicIterator<T>;
-  [[nodiscard]] auto end()   -> IteratorType;
-  [[nodiscard]] auto begin() -> IteratorType;
+  NODISCARD_ auto end()   -> IteratorType;
+  NODISCARD_ auto begin() -> IteratorType;
 
   ~RingBase() = default;
   RingBase()  = default;
@@ -54,7 +54,7 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingBase<T, size_>::is_full() const -> bool {
+FORCEINLINE_ auto RingBase<T, size_>::is_full() const -> bool {
   constexpr auto order  = std::memory_order::acquire;
   const size_t lhead    = (head_.load(order) + 1) & size_mask_;
   const size_t ltail    = tail_.load(order) & size_mask_;
@@ -62,7 +62,7 @@ N19_FORCEINLINE auto RingBase<T, size_>::is_full() const -> bool {
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingBase<T, size_>::is_empty() const -> bool {
+FORCEINLINE_ auto RingBase<T, size_>::is_empty() const -> bool {
   constexpr auto order  = std::memory_order::acquire;
   const size_t lhead    = head_.load(order) & size_mask_;
   const size_t ltail    = tail_.load(order) & size_mask_;
@@ -70,17 +70,17 @@ N19_FORCEINLINE auto RingBase<T, size_>::is_empty() const -> bool {
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingBase<T, size_>::data() const -> T* {
+FORCEINLINE_ auto RingBase<T, size_>::data() const -> T* {
   return buff_;
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingBase<T, size_>::begin() -> IteratorType {
+FORCEINLINE_ auto RingBase<T, size_>::begin() -> IteratorType {
   return buff_;
 }
 
 template<typename T, size_t size_>
-N19_FORCEINLINE auto RingBase<T, size_>::end() -> IteratorType {
+FORCEINLINE_ auto RingBase<T, size_>::end() -> IteratorType {
   return buff_ + (sizeof(buff_) / sizeof(T));
 }
 

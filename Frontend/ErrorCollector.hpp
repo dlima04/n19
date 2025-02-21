@@ -98,7 +98,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-N19_FORCEINLINE auto ErrorCollector::has_errors() const -> bool {
+FORCEINLINE_ auto ErrorCollector::has_errors() const -> bool {
   return error_count_ > 0;
 }
 
