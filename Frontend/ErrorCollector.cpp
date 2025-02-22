@@ -188,5 +188,5 @@ auto n19::ErrorCollector::emit(OStream& stream) const -> Result<void> {
         err.is_warning);
   }
 
-  return make_result<void>();
+  return Result<void>::create();
 }

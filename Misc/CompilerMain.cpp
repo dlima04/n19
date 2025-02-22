@@ -14,6 +14,7 @@
 #include <Core/ArgParse.hpp>
 #include <Core/TypeTraits.hpp>
 #include <Core/RingQueue.hpp>
+#include <source_location>
 #include <type_traits>
 
 using namespace n19;
@@ -26,13 +27,12 @@ struct MyArgs : argp::Parser {
 };
 
 int main(int argc, char** argv){
-
    const auto time = sys::SystemTime::from_utc();
    if(!time) {
      return 1;
    }
 
-   std::cout << std::boolalpha;
+  std::cout << std::boolalpha;
    std::cout << IsVoid<int> << std::endl;
    std::cout << IsVoid<void> << std::endl;
 

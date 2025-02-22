@@ -20,9 +20,6 @@ BEGIN_NAMESPACE(n19);
   ::n19::DeferImpl N19_UNIQUE_NAME(__n19defer)     \
   { [&]{ __VA_ARGS__; } }                          \
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Begin invocable utility classes.
-
 template<typename T>
 class Callback {
 N19_MAKE_NONCOPYABLE(Callback);
@@ -48,8 +45,6 @@ public:
   DeferImpl(const T& obj) : Callback<T>(obj) {}
   DeferImpl(T&& obj     ) : Callback<T>(obj) {}
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T> template<CallableWith<T> ...Args>
 FORCEINLINE_ auto Callback<T>::operator()(Args&&... args) -> decltype(auto) {

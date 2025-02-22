@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 project(n19)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(N19_ENUMERATE_GLOBAL_SOURCES
   Frontend/ErrorCollector.cpp
@@ -42,7 +43,7 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Core/RingBase.hpp
   Core/Bytes.hpp
   Core/Platform.hpp
-        Core/Iterator.hpp
+  Core/Iterator.hpp
   Core/ClassTraits.hpp
   Core/RingBuffer.hpp
   Core/RingQueue.hpp

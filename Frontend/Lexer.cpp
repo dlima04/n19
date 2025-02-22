@@ -1041,14 +1041,14 @@ auto Lexer::create_shared(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> 
   /// Check against maximum allowed file size.
   /// No way this is ever true tbh.
   if(fsize >= std::numeric_limits<uint32_t>::max()) {
-    return make_error(ErrC::InvalidArg, "File is too large");
+    return Error(ErrC::InvalidArg, "File is too large");
   }
 
   /// Check for an empty file.
   /// TODO: should we really error on this? I don't know if
   /// this even makes sense.
   if(fsize == 0) {
-    return make_error(ErrC::InvalidArg, "File is empty.");
+    return Error(ErrC::InvalidArg, "File is empty.");
   }
 
   auto lxr = std::make_shared<Lexer>();
@@ -1057,29 +1057,29 @@ auto Lexer::create_shared(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> 
 
   TRY(ref.read_into(as_writable_bytes(lxr->src_)));
   lxr->curr_ = lxr->produce_impl_();
-  return make_result<std::shared_ptr<Lexer>>(lxr);
+  return lxr;
 }
 
 auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<void> {
   if(current().cat_ != cat) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token of kind \"{}\".", cat.to_string());
-    return make_error(errc, std::cref(msg));
+    return Error(errc, std::cref(msg));
   }
 
   if(cons) consume(1);
-  return make_result<void>();
+  return Result<void>::create();
 }
 
 auto Lexer::expect(const TokenType type, const bool cons) -> Result<void> {
   if(current().type_ != type) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token \"{}\".", type.to_string());
-    return make_error(errc, std::cref(msg));
+    return Error(errc, std::cref(msg));
   }
 
   if(cons) consume(1);
-  return make_result<void>();
+  return Result<void>::create();
 }
 
 auto Lexer::consume(const uint32_t amnt) -> const Token& {

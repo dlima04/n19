@@ -53,13 +53,6 @@ public:
     return self.value();
   }
 
-  FORCEINLINE_ auto clear() -> void {
-    if(has_value_)          /// Manually call the destructor
-      value().~T();         ///
-
-    has_value_ = false;
-  }
-
   FORCEINLINE_ auto value_or(T&& other) const -> ValueType {
     if(has_value_) return value();
     return other;
@@ -92,6 +85,11 @@ public:
     clear();
     ::new (&value_) T(std::forward<Args>(args)...);
     has_value_ = true;
+  }
+
+  FORCEINLINE_ auto clear() -> void {
+    if(has_value_) value().~T();
+    has_value_ = false;
   }
 
   template<typename ...Args>

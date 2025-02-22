@@ -14,20 +14,17 @@ auto panic_impl_(
   const int line,
   const std::string &msg ) -> void
 {
-  auto stream = OStream::from_stderr();
+  auto stream = OStream::from_stdout();
   stream
-    << Con::RedFG
-    << Con::Bold
-    << "PANIC :: "
-    << msg
-    << Con::Reset
-    << fmt("In file \"{}\" at line {}.", file, line)
+    << Con::RedFG  << Con::Bold
+    << "PANIC :: " << msg
+    << Con::Reset  << fmt("In file \"{}\" at line {}.", file, line)
     << Endl;
   ::exit(1); /// For now, just die.
 }
 
 auto fatal_impl_(const std::string &msg) -> void {
-  auto stream = OStream::from_stderr();
+  auto stream = OStream::from_stdout();
   stream << Con::RedFG << Con::Bold;
   stream << "FATAL :: " << msg << Endl;
   ::exit(1);

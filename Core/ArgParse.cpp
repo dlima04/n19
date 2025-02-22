@@ -16,22 +16,22 @@ auto Value<int64_t>::convert(const sys::String& str) -> Result<void> {
     const auto val = std::stoll(str);     /// Try conversion of "str".
     value_ = static_cast<int64_t>(val);   /// store it.
   } catch(const std::invalid_argument&) { ///
-    return make_error(ErrC::Conversion);  /// handle conversion error.
+    return Error{ErrC::Conversion};       /// handle conversion error.
   } catch(const std::exception& e) {      /// If it's some other exception, panic.
     PANIC(e.what());                      ///
   }
 
-  return make_result<void>();
+  return Result<void>::create();
 }
 
 auto Value<bool>::convert(const sys::String& str) -> Result<void> {
   if(str.empty() || str == _nstr("true")) {
     value_ = true;                        /// "true" and an empty string are truthy.
   } else if(str != _nstr("false")){       ///
-    return make_error(ErrC::Conversion);  /// If not true/false/"", error.
+    return Error{ErrC::Conversion};       /// If not true/false/"", error.
   }                                       ///
 
-  return make_result<void>();
+  return Result<void>::create();
 }
 
 auto Value<double>::convert(const sys::String& str) -> Result<void> {
@@ -39,25 +39,26 @@ auto Value<double>::convert(const sys::String& str) -> Result<void> {
     const auto val = std::stod(str);      /// Try conversion of "str".
     value_ = static_cast<double>(val);    /// store it.
   } catch(const std::invalid_argument&) { ///
-    return make_error(ErrC::Conversion);  /// handle conversion error.
+    return Error{ErrC::Conversion};       /// handle conversion error.
   } catch(const std::exception& e) {      /// If it's some other exception, panic.
     PANIC(e.what());                      ///
   }
 
-  return make_result<void>();
+  return Result<void>::create();
 }
 
 auto Value<sys::String>::convert(const sys::String& str) -> Result<void> {
   value_ = str;                           /// Nothing to do for this one.
-  return make_result<void>();             /// just store the string and leave...
+  return Result<void>::create();          /// just store the string and leave...
 }
 
 auto Value<PackType>::convert(const sys::String& str) -> Result<void> {
   auto split_views = str | std::ranges::views::split(_nchr(','));
-  for(auto&& view : split_views)
+  for(auto&& view : split_views) {
     value_.emplace_back(sys::String{ view.begin(), view.end() });
+  }
 
-  return make_result<void>();
+  return Result<void>::create();
 }
 
 auto Parser::already_passed_(const size_t index ) const -> bool {
@@ -148,7 +149,7 @@ auto Parser::parse(OStream& stream) -> Result<void> {
   for(size_t i = 0; i < args_.size(); i++) {
     if(!is_flag_begin_(args_[i])) {
       print_chunk_error_(i, stream, "Invalid flag format.");
-      return make_error(ErrC::InvalidArg);
+      return Error{ErrC::InvalidArg};
     }
 
     sys::String the_flag;
@@ -182,30 +183,22 @@ auto Parser::parse(OStream& stream) -> Result<void> {
 
     if(param_ptr == params_.end()) {
       print_chunk_error_(i, stream, "Flag does not exist.");
-      return make_error(ErrC::InvalidArg);
-    }
-    
-    if(the_value == "=") {
+      return Error(ErrC::InvalidArg);
+    } if(the_value == "=") {
       print_chunk_error_(i, stream, "Expected a value after \"=\"");
-      return make_error(ErrC::InvalidArg);
-    }
-
-    if(already_passed_(flag_pos)) {
+      return Error(ErrC::InvalidArg);
+    } if(already_passed_(flag_pos)) {
       print_chunk_error_(flag_pos, stream, "Flag was passed more than once.");
-      return make_error(ErrC::InvalidArg);
-    }
-    
-    if(the_value.starts_with("=")) {
+      return Error(ErrC::InvalidArg);
+    } if(the_value.starts_with("=")) {
       the_value.erase(0, 1);
-    }
-
-    if(!param_ptr->val_->convert(the_value).has_value()) {
+    } if(!param_ptr->val_->convert(the_value).has_value()) {
       print_chunk_error_(i, stream, "Invalid type for this value.");
-      return make_error(ErrC::InvalidArg);
+      return Error(ErrC::InvalidArg);
     }
   }
 
-  return make_result<void>();
+  return Result<void>::create();
 }
 
 

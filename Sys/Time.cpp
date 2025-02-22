@@ -104,7 +104,7 @@ auto SystemTime::from_utc() -> Result<SystemTime> {
 
   ::time(&epoch);
   if(::gmtime_r(&epoch, &repr) == nullptr) {
-    return make_error(ErrC::Native, sys::last_error());
+    return Error(ErrC::Native, sys::last_error());
   }
 
   time.second_  = repr.tm_sec;
@@ -124,7 +124,7 @@ auto SystemTime::from_local() -> Result<SystemTime> {
 
   ::time(&epoch);
   if(::localtime_r(&epoch, &repr) == nullptr) {
-    return make_error(ErrC::Native, sys::last_error());
+    return Error(ErrC::Native, sys::last_error());
   }
 
   time.second_  = repr.tm_sec;

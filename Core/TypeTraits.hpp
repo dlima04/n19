@@ -10,9 +10,6 @@ BEGIN_NAMESPACE(n19);
 template<typename...>
 using VoidType = void;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Type traits for adding qualifiers
-
 template<typename T, typename = void>
 struct AddReference_ {
   using LvalueType = T;
@@ -120,14 +117,8 @@ using AddLvalueReference = typename AddReference_<T>::LvalueType;
 template<typename T>
 using AddRvalueReference = typename AddReference_<T>::RvalueType;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// declval: "simulate" an ephemeral construction of type T
-
 template<typename T>
 typename AddReference_<T>::RvalueType declval();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Type traits for removing qualifiers
 
 template<typename T>
 struct RemoveReference_ {
@@ -165,6 +156,21 @@ struct RemoveConst_<T const> {
 };
 
 template<typename T>
+struct FunctorTraits {
+  static_assert("Could not deduce FunctorTraits_ of T.");
+};
+
+template<typename T, typename... Args>
+struct FunctorTraits<T(Args...)> {
+  using ReturnType = T;
+};
+
+template<typename T, typename C, typename... Args>
+struct FunctorTraits<T(C::*)(Args...)> {
+  using ReturnType = T;
+};
+
+template<typename T>
 using RemoveConst = typename RemoveConst_<T>::Type;
 
 template<typename T>
@@ -192,9 +198,6 @@ using RemoveCV = RemoveVolatile<RemoveConst<T>>;
 template<typename T>
 using DecayT = RemoveReference<RemoveCV<T>>;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// IsIntegral
-
 template<typename T>
 inline constexpr bool IsIntegral_ = false; //base
 
@@ -219,9 +222,6 @@ template<typename T> inline constexpr bool IsReference            = false;
 template<typename T> inline constexpr bool IsReference<T&>        = true;
 template<typename T> inline constexpr bool IsReference<T&&>       = true;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// IsFloatingPoint
-
 template<typename T>
 inline constexpr bool IsFloatingPoint_ = false; //base
 
@@ -231,9 +231,6 @@ template<> inline constexpr bool IsFloatingPoint_<float>          = true;
 
 template<typename T>
 inline constexpr bool IsFloatingPoint = IsFloatingPoint_<DecayT<T>>;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// IsCharacter
 
 template<typename T>
 inline constexpr bool IsCharacter_ = false; //base
@@ -247,26 +244,17 @@ template<> inline constexpr bool IsCharacter_<wchar_t>            = true;
 template<typename T>
 inline constexpr bool IsCharacter = IsCharacter_<DecayT<T>>;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// IsPointer
-
 template<typename T> inline constexpr bool IsPointer_             = false;
 template<typename T> inline constexpr bool IsPointer_<T*>         = true;
 
 template<typename T>
 inline constexpr bool IsPointer = IsPointer_<RemoveCV<T>>;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// IsConstructible, IsInvocableWith
-
 template<typename T, typename... Args>
 inline constexpr bool IsConstructible = requires { ::new T(declval<Args>()...); };
 
 template<typename T, typename ...Us>
 inline constexpr bool IsInvocableWith = requires { T(declval<Us>()...); };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// IsSame, IsVoid
 
 template<typename T>
 inline constexpr bool IsVoid = false;

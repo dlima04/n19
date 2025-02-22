@@ -5,6 +5,7 @@
 
 #include <Sys/IODevice.hpp>
 #include <Sys/LastError.hpp>
+#include <utility>
 
 BEGIN_NAMESPACE(n19::sys);
 #if defined(N19_POSIX)
@@ -16,12 +17,12 @@ auto IODevice::write(const Bytes& bytes) const -> Result<void> {
   fds[0].events = POLLOUT;
 
   if(::poll(fds, 1, -1) == -1 || !(fds[0].revents & POLLOUT)) {
-    return make_error(ErrC::Native, last_error());
+    return Error(ErrC::Native, last_error());
   } if(::write(value_, bytes.data(), bytes.size_bytes()) == -1) {
-    return make_error(ErrC::Native, last_error());
+    return Error(ErrC::Native, last_error());
   }
 
-  return make_result<void>();
+  return Result<void>::create();
 }
 
 auto IODevice::read_into(WritableBytes& bytes) const -> Result<void> {
@@ -31,19 +32,19 @@ auto IODevice::read_into(WritableBytes& bytes) const -> Result<void> {
   fds[0].events = POLLIN;
 
   if(::poll(fds, 1, -1) == -1 || !(fds[0].revents & POLLIN)) {
-    return make_error(ErrC::Native, last_error());
+    return Error(ErrC::Native, last_error());
   } if(::read(value_, bytes.data(), bytes.size_bytes()) == -1) {
-    return make_error(ErrC::Native, last_error());
+    return Error(ErrC::Native, last_error());
   }
 
-  return make_result<void>();
+  return Result<void>::create();
 }
 
 auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
   int pipefds[ 2 ] = { 0 };
   std::array<IODevice, 2> arr = { };
   if(::pipe(pipefds) == -1) {
-    return make_error(ErrC::Native, last_error());
+    return Error(ErrC::Native, last_error());
   }
 
   arr[ 0 ].value_ = pipefds[ 0 ];
@@ -51,7 +52,7 @@ auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
   arr[ 0 ].perms_ = Read;
   arr[ 1 ].perms_ = Write;
 
-  return make_result<decltype(arr)>(arr);
+  return Result<decltype(arr)>{ std::move(arr) };
 }
 
 auto IODevice::from_stderr() -> IODevice {
@@ -86,10 +87,10 @@ auto IODevice::write(const Bytes &bytes) const -> Result<void> {
     nullptr,                    /// Number of bytes written (optional)
     nullptr                     /// OVERLAPPED struct (optional)
   )) {
-    return make_error(ErrC::Native, last_error());
+    return Error(ErrC::Native, last_error());
   }
 
-  return make_result<void>();
+  return Result<void>::create();
 }
 
 auto IODevice::read_into(WritableBytes& bytes) const -> Result<void> {
@@ -101,10 +102,10 @@ auto IODevice::read_into(WritableBytes& bytes) const -> Result<void> {
     nullptr,                    /// Number of bytes read from the file (optional)
     nullptr                     /// OVERLAPPED struct (optional)
   )) {
-    return make_error(ErrC::Native, last_error());
+    return Error(ErrC::Native, last_error());
   }
 
-  return make_result<void>();
+  return Result<void>::create();
 }
 
 auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
@@ -115,12 +116,12 @@ auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
 
   std::array<IODevice, 2> arr{};
   if(!CreatePipe(&arr[0].value_, &arr[1].value_, &sa, 0)) {
-    return make_error(ErrC::Native, last_error());
+    return Error(ErrC::Native, last_error());
   }
 
   arr[ 0 ].perms_ = Read;
   arr[ 1 ].perms_ = Write;
-  return arr;
+  return Result<decltype(arr)>{ std::move(arr) };
 }
 
 auto IODevice::from_stderr() -> IODevice {

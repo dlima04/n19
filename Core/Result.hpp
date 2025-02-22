@@ -36,6 +36,11 @@ N19_MAKE_COMPARABLE_MEMBER(ErrC_, value);
 struct ErrorType_ {    /// n19's default error type.
   std::string msg;
   ErrC_ code = ErrC_::None;
+
+  constexpr ErrorType_(ErrC_ c) : code(c) {}
+  constexpr ErrorType_() = default;
+  constexpr ErrorType_(ErrC_ c, const std::string& m)
+  : msg(m) , code(c) {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +54,11 @@ public:
   using ValueType   = T;
   using PointerType = T*;
   using Variant_    = std::variant<T, E> ;
+
+  template<typename ...Args>
+  FORCEINLINE_ static auto create(Args&&... args) -> Result_ {
+    return T{std::forward<Args>(args)...};
+  }
 
   NODISCARD_ FORCEINLINE_ auto value() const -> const T& {
     ASSERT(has_value() == true, "Result contains an error!");
@@ -81,16 +91,14 @@ public:
   }
 
   template<typename ...Args>
-  auto value_or(this auto&& self, Args&&... args) -> T {
-    if(self.has_value())    /// return the error if it exists.
-      return self.value();  /// else:
+  FORCEINLINE_ auto value_or(this auto&& self, Args&&... args) -> T {
+    if(self.has_value()) return self.value();
     return T{std::forward<Args>(args)...};
   }
 
   template<typename ...Args>
-  auto error_or(this auto&& self, Args&&... args) -> E {
-    if(!self.has_value())   /// return the error if it exists.
-      return self.error();  /// else:
+  FORCEINLINE_ auto error_or(this auto&& self, Args&&... args) -> E {
+    if(!self.has_value()) return self.error();
     return E{std::forward<Args>(args)...};
   }
 
@@ -105,6 +113,10 @@ public:
     if(self.has_value()) cb( std::forward<decltype(self)>(self) );
     return self;
   }
+
+  template<typename ...Args> requires std::constructible_from<T, Args...>
+  FORCEINLINE_ Result_(Args&&... args)
+  : value_(std::forward<Args>(args)...){}
 
   NODISCARD_ auto has_value() const -> bool {
     return std::holds_alternative<T>( value_ );
@@ -137,33 +149,7 @@ struct Result_Dispatch_<void> {
 template<typename T>
 using Result = typename Result_Dispatch_<T>::Type;
 using ErrC   = ErrC_;
-using ErrorT = ErrorType_;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Begin error type helper functions
-
-inline ErrorT make_error(const ErrC code) {
-  return ErrorT{.msg = "", .code = code};
-}
-
-inline ErrorT make_error(const ErrC code, const std::string& msg) {
-  return ErrorT{.msg = msg, .code = code};
-}
-
-inline ErrorT make_error(const ErrC code, std::string&& msg) {
-  return ErrorT{.msg = msg, .code = code};
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Utility function for constructing result types.
-
-template<typename T, typename ...Args>
-NODISCARD_ Result<T> make_result(Args&&... args) {
-  if constexpr(IsVoid<T>)
-    return Result<Nothing_>{Nothing_{}};
-  else
-    return T{ std::forward<Args>(args)... };
-}
+using Error  = ErrorType_;
 
 END_NAMESPACE(n19);
 #endif //RESULT_HPP
