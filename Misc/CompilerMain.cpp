@@ -14,7 +14,7 @@
 #include <Core/ArgParse.hpp>
 #include <Core/TypeTraits.hpp>
 #include <Core/RingQueue.hpp>
-#include <source_location>
+#include <Frontend/ErrorCollector.hpp>
 #include <type_traits>
 
 using namespace n19;
@@ -68,10 +68,13 @@ int main(int argc, char** argv){
     }
 
     lxr->get()->dump(outs());
-
+    outs() << "\n\n";
   } catch(const std::exception& e) {
     std::cerr << "EXCEPTION: " << e.what() << std::endl;
   }
+
+   auto ref = MUST(FileRef::open(CURRENT_TEST));
+   ErrorCollector::display_error("this is a test", ref, outs(), 43, 420, true);
 
   outs().flush();
   errs().flush();

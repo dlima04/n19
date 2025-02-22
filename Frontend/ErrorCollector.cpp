@@ -4,6 +4,7 @@
 */
 
 #include <Core/FileRef.hpp>
+#include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
 #include <Core/Bytes.hpp>
 #include <Core/Try.hpp>
@@ -130,28 +131,33 @@ auto n19::ErrorCollector::display_error(
     pos = buff.size() - 1;   ///
   }
 
-  IGNORE_EXCEPT(
-    for(size_t i = pos - 1; buff.at(i) != '\n'; i--) {
-      const char ch = buff.at(i);
-      if(!std::isprint(static_cast<uint8_t>(ch)))
-        continue;
-      before += ch;
-      filler += '~';
-  });
+  Maybe<char> ch = '\0';
+  auto access = [&buff](size_t index) -> Maybe<char> {
+    if(index < buff.size()) return buff[index];
+    return Nothing;
+  };
 
-  IGNORE_EXCEPT(
-    for(size_t i = pos; buff.at(i) != '\n'; i++) {
-      const char ch = buff.at(i);
-      if(!std::isprint(static_cast<uint8_t>(ch)))
-        continue;
-      after += ch;
-      filler += i == pos ? '^' : '~';
-  });
+  for(size_t i = pos - 1; ch && *ch != '\n'; i--) {
+    ch = access(i);
+    if(!ch.has_value()) break;
+    if(std::iscntrl(static_cast<uint8_t>(*ch))) continue;
+    before += ch.value();
+    filler += '~';
+  }
+
+  ch = '\0';
+  for(size_t i = pos; ch && *ch != '\n'; i++) {
+    ch = access(i);
+    if(!ch.has_value()) break;
+    if(std::iscntrl(static_cast<uint8_t>(*ch))) continue;
+    after += ch.value();
+    filler += i == pos ? '^' : '~';
+  }
 
   std::ranges::reverse(before);
   before += after;
-  for(const auto ch : filler) {
-    if(ch == '^') break;
+  for(const auto character : filler) {
+    if(character == '^') break;
     spaces += ' ';
   }
 

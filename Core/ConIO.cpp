@@ -29,8 +29,8 @@ auto win32_enable_vsequences() -> void {
 }
 
 auto win32_init_console() -> void {
-  ::SetConsoleOutputCP(CP_UTF8); /// change cp for stdin.
-  ::SetConsoleCP(CP_UTF8);       /// change cp for stdout.
+  ::SetConsoleOutputCP(CP_UTF8); /// change cp for stdout.
+  ::SetConsoleCP(CP_UTF8);       /// change cp for stdin.
   win32_enable_vsequences();     /// enable ASCII escapes.
 }
 
