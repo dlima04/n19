@@ -8,9 +8,9 @@
 #include <Sys/String.hpp>
 #include <Core/Concepts.hpp>
 #include <Core/Maybe.hpp>
-#include <Core/ConIO.hpp>
+#include <IO/Console.hpp>
 #include <Core/ClassTraits.hpp>
-#include <Core/Stream.hpp>
+#include <IO/Stream.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Result.hpp>
 #include <string>
@@ -107,9 +107,6 @@ private:
   PackType value_{};
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Additional helper structures and enumerations.
-
 struct Parameter {
   sys::String long_;
   sys::String short_;
@@ -118,13 +115,10 @@ struct Parameter {
 };
 
 enum class ArgStyle : uint8_t {
-  UNIX = 0, /// long form args begin with "--", short form uses "-".
-  DOS  = 1, /// Both long and short form begin with "/".
-  Masq = 2  /// Long form: "//", short form: "/" (I made this one :D).
+  UNIX = 0,
+  DOS  = 1,
+  Masq = 2,
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// The main Parser class that can be inherited from
 
 class Parser {
 N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(Parser);
@@ -157,17 +151,17 @@ private:
   auto is_flag_begin_(const sys::StringView&) const -> bool;
 
 public:
-  auto style(const ArgStyle s = ArgStyle::UNIX) -> Parser& {
+  FORCEINLINE_ auto style(const ArgStyle s = ArgStyle::UNIX) -> Parser& {
     arg_style_ = s;       /// set flag name style
     return *this;         ///
   }
 
-  auto take_argv(std::vector<sys::String>&& a) -> Parser& {
+  FORCEINLINE_ auto take_argv(std::vector<sys::String>&& a) -> Parser& {
     args_ = std::move(a); /// take ownership
     return *this;         ///
   }
 
-  auto take_argv(const int argc, sys::Char** argv) -> Parser& {
+  FORCEINLINE_ auto take_argv(const int argc, sys::Char** argv) -> Parser& {
     for(int i = 1; i < argc; i++) args_.emplace_back(argv[i]);
     return *this;
   }
@@ -177,6 +171,7 @@ public:
 
  ~Parser() = default;
   Parser() = default;
+
 protected:
   bool print_errors_ = false;
   ArgStyle arg_style_ = ArgStyle::UNIX;

@@ -4,7 +4,7 @@
 */
 
 #include <Frontend/EntityQualifier.hpp>
-#include <Core/ConIO.hpp>
+#include <IO/Console.hpp>
 
 auto n19::EntityQualifier::format() const -> std::string {
   std::string buff;

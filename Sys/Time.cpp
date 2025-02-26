@@ -5,12 +5,12 @@
 
 #include <Sys/Time.hpp>
 #include <Sys/LastError.hpp>
-#include <Core/Fmt.hpp>
+#include <IO/Fmt.hpp>
 BEGIN_NAMESPACE(n19::sys);
 
 auto STFormatter_::weekday() const -> std::string {
   switch(time_.weekday_) {
-    case 7  : [[fallthrough]];
+    case 7  : FALLTHROUGH_;
     case 0  : return "Sun";
     case 1  : return "Mon";
     case 2  : return "Tue";
@@ -21,7 +21,7 @@ auto STFormatter_::weekday() const -> std::string {
     default : return "???";
   }
 
-  UNREACHABLE;
+  UNREACHABLE_ASSERTION;
 }
 
 auto STFormatter_::month() const -> std::string {
@@ -47,7 +47,7 @@ auto STFormatter_::month() const -> std::string {
     default : return "???";
   }
 
-  UNREACHABLE;
+  UNREACHABLE_ASSERTION;
 }
 
 auto STFormatter_::format() const -> std::string {

@@ -10,6 +10,7 @@
 #include <Core/ClassTraits.hpp>
 #include <Core/TypeTraits.hpp>
 #include <Core/Nothing.hpp>
+#include <Core/Ref.hpp>
 #include <string>
 #include <utility>
 #include <variant>
@@ -48,8 +49,8 @@ struct ErrorType_ {    /// n19's default error type.
 
 template<typename T, typename E = ErrorType_>
 class Result_ {
-N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(Result_);
-N19_MAKE_DEFAULT_COPY_CONSTRUCTIBLE(Result_);
+N19_MAKE_DEFAULT_CONSTRUCTIBLE(Result_);
+N19_MAKE_DEFAULT_ASSIGNABLE(Result_);
 public:
   using ValueType   = T;
   using PointerType = T*;
@@ -116,7 +117,7 @@ public:
 
   template<typename ...Args> requires std::constructible_from<T, Args...>
   FORCEINLINE_ Result_(Args&&... args)
-  : value_(std::forward<Args>(args)...){}
+  : value_(T{std::forward<Args>(args)...}){}
 
   NODISCARD_ auto has_value() const -> bool {
     return std::holds_alternative<T>( value_ );
@@ -133,9 +134,6 @@ protected:
   Variant_ value_;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Begin type aliases
-
 template<typename T>
 struct Result_Dispatch_ {
   using Type = Result_<T>;
@@ -144,6 +142,11 @@ struct Result_Dispatch_ {
 template<>
 struct Result_Dispatch_<void> {
   using Type = Result_<Nothing_>;
+};
+
+template<typename T>
+struct Result_Dispatch_<T&> {
+  using Type = Result_<Ref<T>>;
 };
 
 template<typename T>

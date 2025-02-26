@@ -6,7 +6,7 @@
 #ifndef TRY_HPP
 #define TRY_HPP
 #include <Core/Result.hpp>
-#include <Core/Fmt.hpp>
+#include <IO/Fmt.hpp>
 #include <Core/Panic.hpp>
 #include <Core/TypeTraits.hpp>
 #include <string>

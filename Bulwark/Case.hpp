@@ -6,7 +6,7 @@
 #ifndef N19_TEST_CASE_HPP
 #define N19_TEST_CASE_HPP
 #include <Core/ClassTraits.hpp>
-#include <Core/ConIO.hpp>
+#include <IO/Console.hpp>
 #include <string_view>
 #include <string>
 #include <functional>
@@ -55,9 +55,6 @@ public:
  ~Case() = default;
   Case(const FuncType_& fn, const NameType_ &name) : fn_(fn), name_(name) {}
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Begin stream operators
 
 inline auto operator<<(OStream& stream, const Result& r) -> OStream& {
   stream << r.to_string();

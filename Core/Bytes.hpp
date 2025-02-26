@@ -23,9 +23,6 @@ using Byte           = std::byte;
 using Bytes          = std::span<const Byte>;
 using WritableBytes  = std::span<Byte>;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Class that stores a byte buffer representation of a given object
-
 template<Concrete T>
 class ByteCopy final {
 static_assert(!std::is_array_v<T>);
@@ -132,9 +129,6 @@ private:
   bool is_active_{false};
   alignas(T) uint8_t value_[ sizeof(T) ]{};
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Utility functions:
 
 template<typename T>
 FORCEINLINE_ auto as_writable_bytes(T& val) -> WritableBytes {

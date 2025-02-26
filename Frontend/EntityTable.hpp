@@ -7,7 +7,7 @@
 #define ENTITYTABLE_HPP
 #include <Frontend/Entity.hpp>
 #include <Core/ClassTraits.hpp>
-#include <Core/Fmt.hpp>
+#include <IO/Fmt.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Result.hpp>
 #include <unordered_map>

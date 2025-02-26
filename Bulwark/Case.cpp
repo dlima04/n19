@@ -16,7 +16,7 @@ auto Result::to_colour() const -> Con {
     default: break;
   }
 
-  UNREACHABLE;
+  UNREACHABLE_ASSERTION;
 }
 
 auto Result::to_string() const -> std::string {
@@ -28,7 +28,7 @@ auto Result::to_string() const -> std::string {
     default: break;
   }
 
-  UNREACHABLE;
+  UNREACHABLE_ASSERTION;
 }
 
 END_NAMESPACE(n19::test);

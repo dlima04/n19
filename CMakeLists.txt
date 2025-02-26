@@ -15,11 +15,11 @@ set(N19_ENUMERATE_GLOBAL_SOURCES
   Sys/LastError.cpp
   Sys/IODevice.cpp
   Sys/Time.cpp
-  Core/ConIO.cpp
-  Core/FileRef.cpp
   Core/Panic.cpp
-  Core/Stream.cpp
   Core/ArgParse.cpp
+  IO/Console.cpp
+  IO/FileRef.cpp
+  IO/Stream.cpp
 )
 
 set(N19_ENUMERATE_GLOBAL_HEADERS
@@ -36,9 +36,9 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Frontend/Entity.hpp
   Frontend/Lexer.hpp
   Misc/Global.hpp
+  Misc/Macros.hpp
   Core/Panic.hpp
-  Core/Fmt.hpp
-  Core/FileRef.hpp
+  Core/Ref.hpp
   Core/Concepts.hpp
   Core/RingBase.hpp
   Core/Bytes.hpp
@@ -52,12 +52,13 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Core/Callback.hpp
   Core/Result.hpp
   Core/Maybe.hpp
-  Core/ConIO.hpp
   Core/Nothing.hpp
   Core/Try.hpp
-  Core/Stream.hpp
   Core/ArgParse.hpp
-  Core/MacroUtil.hpp
+  IO/Console.hpp
+  IO/FileRef.hpp
+  IO/Fmt.hpp
+  IO/Stream.hpp
 )
 
 set(N19_ENUMERATE_PRIMARY_EXECUTABLES
@@ -104,6 +105,8 @@ add_executable(bulwark
   Bulwark/Suite.hpp
   Bulwark/Reporting.hpp
   Bulwark/Bulwark.hpp
+  Bulwark/Suites/Core/SuiteMaybe.cpp
+  Bulwark/Suites/Core/SuiteResult.cpp
   ${N19_ENUMERATE_GLOBAL_SOURCES}
   ${N19_ENUMERATE_GLOBAL_HEADERS}
 )

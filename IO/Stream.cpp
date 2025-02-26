@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Core/Stream.hpp>
+#include <IO/Stream.hpp>
 BEGIN_NAMESPACE(n19);
 
 auto OStream::from_stderr() -> OStream {

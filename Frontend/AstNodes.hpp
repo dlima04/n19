@@ -9,53 +9,53 @@
 #include <Frontend/EntityQualifier.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
-#include <Core/ConIO.hpp>
+#include <IO/Console.hpp>
 #include <Core/Concepts.hpp>
 #include <vector>
 #include <memory>
 
-#define N19_ASTNODE_TYPE_LIST \
-  X(Node)             \
-  X(Vardecl)          \
-  X(ProcDecl)         \
-  X(EntityRef)        \
-  X(EntityRefThunk)   \
-  X(TypeRef)          \
-  X(TypeRefThunk)     \
-  X(ScalarLiteral)    \
-  X(AggregateLiteral) \
-  X(BinExpr)          \
-  X(UnaryExpr)        \
-  X(Branch)           \
-  X(If)               \
-  X(Else)             \
-  X(Switch)           \
-  X(Case)             \
-  X(Default)          \
-  X(For)              \
-  X(While)            \
-  X(ConstBranch)      \
-  X(Where)            \
-  X(Otherwise)        \
-  X(ScopeBlock)       \
-  X(Namespace)        \
-  X(Call)             \
-  X(Break)            \
-  X(Continue)         \
-  X(Return)           \
-  X(Defer)            \
-  X(DeferIf)          \
-  X(Subscript)        \
+#define N19_ASTNODE_TYPE_LIST  \
+  ASTNODE_X(Node)              \
+  ASTNODE_X(Vardecl)           \
+  ASTNODE_X(ProcDecl)          \
+  ASTNODE_X(EntityRef)         \
+  ASTNODE_X(EntityRefThunk)    \
+  ASTNODE_X(TypeRef)           \
+  ASTNODE_X(TypeRefThunk)      \
+  ASTNODE_X(ScalarLiteral)     \
+  ASTNODE_X(AggregateLiteral)  \
+  ASTNODE_X(BinExpr)           \
+  ASTNODE_X(UnaryExpr)         \
+  ASTNODE_X(Branch)            \
+  ASTNODE_X(If)                \
+  ASTNODE_X(Else)              \
+  ASTNODE_X(Switch)            \
+  ASTNODE_X(Case)              \
+  ASTNODE_X(Default)           \
+  ASTNODE_X(For)               \
+  ASTNODE_X(While)             \
+  ASTNODE_X(ConstBranch)       \
+  ASTNODE_X(Where)             \
+  ASTNODE_X(Otherwise)         \
+  ASTNODE_X(ScopeBlock)        \
+  ASTNODE_X(Namespace)         \
+  ASTNODE_X(Call)              \
+  ASTNODE_X(Break)             \
+  ASTNODE_X(Continue)          \
+  ASTNODE_X(Return)            \
+  ASTNODE_X(Defer)             \
+  ASTNODE_X(DeferIf)           \
+  ASTNODE_X(Subscript)         \
 
 BEGIN_NAMESPACE(n19);
 
 class AstNode {
 public:
-  #define X(NAME) NAME,
+  #define ASTNODE_X(NAME) NAME,
   enum class Type : uint16_t {
     N19_ASTNODE_TYPE_LIST
   };
-  #undef X
+  #undef ASTNODE_X
 
   // Type aliases //
   //////////////////////////////////////////
@@ -529,13 +529,13 @@ auto AstNode::create(
   ptr->line_   = line;
   ptr->file_   = file;
 
-  #define X(NAME)                      \
+  #define ASTNODE_X(NAME)              \
   if constexpr(IsSame<T, Ast##NAME>) { \
     ptr->type_ = Type::NAME;           \
   }
 
   N19_ASTNODE_TYPE_LIST
-  #undef X
+  #undef ASTNODE_X
 
   if(parent != nullptr) ptr->parent_ = parent;
   return ptr;

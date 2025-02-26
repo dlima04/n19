@@ -16,4 +16,8 @@
 #   define N19_UNIQUE_NAME(X)
 #endif
 
+#define EXPAND(...) __VA_ARGS__
+#define STRINGIFY_IMPL(EXPR) #EXPR
+#define STRINGIFY(EXPR) STRINGIFY_IMPL(EXPR)
+
 #endif //CORE_MACRO_UTIL_HPP

@@ -8,9 +8,10 @@
 #include <Core/Try.hpp>
 #include <Frontend/Lexer.hpp>
 #include <Core/Bytes.hpp>
-#include <Core/ConIO.hpp>
+#include <IO/Console.hpp>
 #include <Sys/Time.hpp>
 #include <iostream>
+#include <Core/Panic.hpp>
 #include <Core/ArgParse.hpp>
 #include <Core/TypeTraits.hpp>
 #include <Core/RingQueue.hpp>
@@ -32,12 +33,12 @@ int main(int argc, char** argv){
      return 1;
    }
 
-  std::cout << std::boolalpha;
+   std::cout << std::boolalpha;
    std::cout << IsVoid<int> << std::endl;
    std::cout << IsVoid<void> << std::endl;
 
-  static_assert(std::is_default_constructible_v<FileRef>, "AAA");
-  std::cout << time->strings().format() << std::endl;
+   static_assert(std::is_default_constructible_v<FileRef>, "AAA");
+   std::cout << time->strings().format() << std::endl;
 
    //std::vector<sys::String> strs = { "--num-jobs=42069", "--verbose=true", "-b=one,two,three" };
 //
@@ -60,6 +61,8 @@ int main(int argc, char** argv){
 //
    //args.help(outs());
 
+
+
   try {
     const auto file = MUST(FileRef::open(CURRENT_TEST));
     auto lxr = Lexer::create_shared(file);
@@ -68,7 +71,6 @@ int main(int argc, char** argv){
     }
 
     lxr->get()->dump(outs());
-    outs() << "\n\n";
   } catch(const std::exception& e) {
     std::cerr << "EXCEPTION: " << e.what() << std::endl;
   }

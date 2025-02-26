@@ -3,13 +3,13 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Core/FileRef.hpp>
+#include <IO/FileRef.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
 #include <Core/Bytes.hpp>
 #include <Core/Try.hpp>
 #include <Core/Panic.hpp>
-#include <Core/ConIO.hpp>
+#include <IO/Console.hpp>
 #include <Frontend/ErrorCollector.hpp>
 #include <Frontend/Lexer.hpp>
 #include <algorithm>
@@ -170,7 +170,7 @@ auto n19::ErrorCollector::display_error(
     << spaces        ///
     << msg           /// Display user-provided message in red or yellow.
     << Con::Reset    /// Reset console.
-    << Endl;         ///
+    << "\n\n";       ///
 }
 
 auto n19::ErrorCollector::emit(OStream& stream) const -> Result<void> {

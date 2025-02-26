@@ -8,10 +8,10 @@
 #include <Core/Bytes.hpp>
 #include <Core/Platform.hpp>
 #include <Core/ClassTraits.hpp>
-#include <Core/FileRef.hpp>
+#include <IO/FileRef.hpp>
 #include <Core/Result.hpp>
 #include <Core/Maybe.hpp>
-#include <Core/Stream.hpp>
+#include <IO/Stream.hpp>
 #include <Frontend/Token.hpp>
 #include <Sys/String.hpp>
 #include <memory>
@@ -100,16 +100,16 @@ private:
   auto token_num_lit_()   -> Token;
   auto token_oct_lit_()   -> Token;
 public:
-  std::vector<char8_t> src_;  /// Source file buffer.
-  Token curr_;                /// The one we're sitting on.
-  sys::String file_name_;     /// For error handling.
-  uint32_t index_  = 0;       /// Current source index.
-  uint32_t line_   = 1;       /// current line number.
+  std::vector<char8_t> src_; /// Source file buffer.
+  Token curr_;               /// The one we're sitting on.
+  sys::String file_name_;    /// For error handling.
+  uint32_t index_  = 0;      /// Current source index.
+  uint32_t line_   = 1;      /// current line number.
 };
 
-struct Keyword {              /// Only used for Lexer::get_keyword().
-  TokenType type;             /// The TokenType of the keyword.
-  TokenCategory cat;          /// The category of the keyword.
+struct Keyword {             /// Only used for Lexer::get_keyword().
+  TokenType type;            /// The TokenType of the keyword.
+  TokenCategory cat;         /// The category of the keyword.
 };
 
 FORCEINLINE_ auto Lexer::peek(const uint32_t amnt) -> Token {
@@ -120,10 +120,10 @@ FORCEINLINE_ auto Lexer::peek(const uint32_t amnt) -> Token {
   consume(amnt);
   const Token peeked = curr_;
 
-  this->line_  = line_tmp;    /// Restore line
-  this->index_ = index_tmp;   /// Restore index
-  this->curr_  = tok_tmp;     /// Restore current token
-  return peeked;              ///
+  this->line_  = line_tmp;   /// Restore line
+  this->index_ = index_tmp;  /// Restore index
+  this->curr_  = tok_tmp;    /// Restore current token
+  return peeked;             ///
 }
 
 template<size_t sz_>
@@ -137,10 +137,10 @@ FORCEINLINE_ auto Lexer::batched_peek() -> std::array<Token, sz_> {
     toks[i] = consume(1);
   }
 
-  this->line_  = line_tmp;    /// Restore line
-  this->index_ = index_tmp;   /// Restore index
-  this->curr_  = tok_tmp;     /// Restore current token
-  return toks;                /// possibly expensive copy
+  this->line_  = line_tmp;   /// Restore line
+  this->index_ = index_tmp;  /// Restore index
+  this->curr_  = tok_tmp;    /// Restore current token
+  return toks;               /// possibly expensive copy
 }
 
 inline auto Lexer::revert(const Token& tok) -> void {

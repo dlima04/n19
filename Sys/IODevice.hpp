@@ -13,22 +13,20 @@
 #include <span>
 
 #if defined(N19_WIN32)
-#  include <windows.h>
+#    include <windows.h>
 #else // POSIX
-#  include <unistd.h>
-#  include <poll.h>
+#    include <unistd.h>
+#    include <poll.h>
 #endif
 
 BEGIN_NAMESPACE(n19::sys);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#if defined(N19_WIN32)
+using IODeviceBase_ = Handle<::HANDLE>;
+#else
+using IODeviceBase_ = Handle<int>;
+#endif
 
-class IODevice final
-  #if defined(N19_WIN32)
-  : public Handle<::HANDLE>
-  #else
-  : public Handle<int>
-  #endif
-{
+class IODevice final : public IODeviceBase_ {
 public:
   enum Permissions : uint8_t {
     NoAccess = 0,
@@ -37,9 +35,6 @@ public:
     Execute  = 1 << 2,
   };
 
-  // Overridden base class members.
-  // Usually we can implement these in-header,
-  // since they're only a couple lines.
   auto close()      -> void override;
   auto invalidate() -> void override;
   auto is_invalid() -> bool override;
@@ -69,8 +64,6 @@ public:
   uint8_t perms_ = NoAccess;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 template<typename T>
 auto IODevice::operator<<(const T& val) -> IODevice& {
   if constexpr(std::ranges::contiguous_range<T>) {
@@ -97,11 +90,11 @@ auto IODevice::operator>>(T& val) -> IODevice & {
 }
 
 #if defined(N19_POSIX)
-inline auto IODevice::invalidate() -> void {
+FORCEINLINE_ auto IODevice::invalidate() -> void {
   value_ = -1;
 }
 
-inline auto IODevice::close() -> void {
+FORCEINLINE_ auto IODevice::close() -> void {
   ::close(value_);
   invalidate();
 }
@@ -111,15 +104,15 @@ FORCEINLINE_ auto IODevice::is_invalid() -> bool {
 }
 
 FORCEINLINE_ auto IODevice::flush_handle() const -> void {
-  ::fsync(value_); // sync the file descriptor.
+  ::fsync(value_);
 }
 
 #else // IF WINDOWS
-inline auto IODevice::invalidate() -> void {
+FORCEINLINE_ auto IODevice::invalidate() -> void {
   value_ = (::HANDLE)nullptr;
 }
 
-inline auto IODevice::close() -> void {
+FORCEINLINE_ auto IODevice::close() -> void {
   ::CancelIoEx(value_, nullptr);
   ::CloseHandle(value_);
   invalidate();

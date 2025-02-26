@@ -5,7 +5,7 @@
 
 #include <Core/ArgParse.hpp>
 #include <Core/Panic.hpp>
-#include <Core/Fmt.hpp>
+#include <IO/Fmt.hpp>
 #include <string>
 #include <algorithm>
 #include <ranges>
@@ -27,9 +27,11 @@ auto Value<int64_t>::convert(const sys::String& str) -> Result<void> {
 auto Value<bool>::convert(const sys::String& str) -> Result<void> {
   if(str.empty() || str == _nstr("true")) {
     value_ = true;                        /// "true" and an empty string are truthy.
-  } else if(str != _nstr("false")){       ///
-    return Error{ErrC::Conversion};       /// If not true/false/"", error.
-  }                                       ///
+  } else if(str == _nstr("false")){       ///
+    value_ = false;                       /// If not true/false/"", error.
+  } else {                                ///
+    return Error{ErrC::Conversion};
+  }
 
   return Result<void>::create();
 }
@@ -126,19 +128,15 @@ auto Parser::is_flag_begin_(const sys::StringView& str) const -> bool {
     default: break;
   }
 
-  UNREACHABLE;
+  UNREACHABLE_ASSERTION;
 }
 
 auto Parser::help(OStream& stream) const -> void {
-  stream << Con::WhiteFG  << Con::Bold;
-  stream << "-- Flags:\n" << Con::Reset;
-
+  stream << "\n";
   for(const auto& param : params_) {
-    stream << fmt("{}{:<18} {:<4}{} :: {}\n",
-       manip_string(Con::MagentaFG),
+    stream << fmt("{:<18} {:<13} {}\n",
        param.long_,
        param.short_,
-       manip_string(Con::Reset),
        param.desc_);
   }
 

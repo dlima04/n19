@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Core/ConIO.hpp>
+#include <IO/Console.hpp>
 BEGIN_NAMESPACE(n19);
 
 #if defined(N19_WIN32)

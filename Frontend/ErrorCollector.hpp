@@ -7,8 +7,8 @@
 #define ERRORCOLLECTOR_HPP
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
-#include <Core/FileRef.hpp>
-#include <Core/Stream.hpp>
+#include <IO/FileRef.hpp>
+#include <IO/Stream.hpp>
 #include <Core/Bytes.hpp>
 #include <Sys/String.hpp>
 #include <string>

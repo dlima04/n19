@@ -5,7 +5,7 @@
 
 #ifndef N19_TEST_ALL_HPP
 #define N19_TEST_ALL_HPP
-#include <Core/MacroUtil.hpp>
+#include <Misc/Macros.hpp>
 #include <Core/Panic.hpp>
 #include <Bulwark/Registry.hpp>
 #include <Bulwark/Reporting.hpp>
@@ -30,15 +30,16 @@
   static struct TESTCASE_TYPE_(SUITE, NAME) N19_UNIQUE_NAME(TESTCASE_TYPE_(SUITE, NAME));   \
   static void TESTCASE_FUNC_(SUITE, NAME)(::n19::test::ExecutionContext& TESTCASE_CTX_)     \
 
-#define REQUIRE(EXPR)                                                                       \
-  do{ if( !(EXPR) ) {                                                                       \
+#define REQUIRE(EXPR) do {                                                                  \
+  auto is_verbose_ = ::n19::test::Context::the().flags_ & ::n19::test::Context::Verbose;    \
+  if( !(EXPR) ) {                                                                           \
     TESTCASE_CTX_.result = ::n19::test::Result::Failed;                                     \
-    if(::n19::test::Context::the().flags_ & ::n19::test::Context::Verbose) {                \
+    if(is_verbose_) {                                                                       \
       ::n19::test::report(#EXPR, ::n19::test::Result::Failed, TESTCASE_CTX_.out);           \
     }                                                                                       \
-  } else if(::n19::test::Context::the().flags_ & ::n19::test::Context::Verbose) {           \
+  } else if(is_verbose_) {                                                                  \
     ::n19::test::report(#EXPR, ::n19::test::Result::Passed, TESTCASE_CTX_.out);             \
-  }} while(false);                                                                          \
+  }} while(0);                                                                              \
 
 #define SECTION(NAME, ...)                                                                  \
   ASSERT(TESTCASE_CTX_.section.empty(), "Nested case sections are not allowed!");           \

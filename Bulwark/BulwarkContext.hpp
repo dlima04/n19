@@ -16,7 +16,8 @@
 BEGIN_NAMESPACE(n19::test);
 
 class Context {
-  Context() = default;
+N19_MAKE_NONMOVABLE(Context);
+N19_MAKE_NONCOPYABLE(Context);
 public:
   enum Flags : uint16_t {
     None     = 0x00,      /// Default flag value.
@@ -44,8 +45,10 @@ public:
   }
 
   std::underlying_type_t<Flags> flags_ = None;
-  std::vector<sys::String> suites_to_run_;
-  std::vector<sys::String> suites_to_skip_;
+  argp::PackType suites_to_run_;
+  argp::PackType suites_to_skip_;
+private:
+  Context() = default;
 };
 
 END_NAMESPACE(n19::test);

@@ -5,7 +5,7 @@
 
 #include <algorithm>
 #include <Frontend/Lexer.hpp>
-#include <Core/Fmt.hpp>
+#include <IO/Fmt.hpp>
 #include <Core/Panic.hpp>
 BEGIN_NAMESPACE(n19);
 

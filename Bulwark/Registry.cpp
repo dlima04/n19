@@ -15,9 +15,6 @@ BEGIN_NAMESPACE(n19::test);
 
 constinit Registry g_registry;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Begin methods
-
 auto Registry::add_case(
   const Case::FuncType_& case_func,
   const Case::NameType_& case_name,

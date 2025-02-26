@@ -7,7 +7,7 @@
 #define N19_TEST_REGISTRY_HPP
 #include <Bulwark/Case.hpp>
 #include <Bulwark/Suite.hpp>
-#include <vector>
+#include <deque>
 #include <string_view>
 #include <cstdint>
 BEGIN_NAMESPACE(n19::test);

@@ -5,6 +5,7 @@
 
 #ifndef MURMUR3_HPP
 #define MURMUR3_HPP
+#include <Core/Platform.hpp>
 #include <cstdint>
 #include <string_view>
 
@@ -73,8 +74,8 @@ constexpr auto murmur3_x86_32(
 
   chnk = 0;
   switch(len_bytes & 3) {
-    case 3: chnk ^= p_tail[2] << 16; [[fallthrough]];
-    case 2: chnk ^= p_tail[1] << 8;  [[fallthrough]];
+    case 3: chnk ^= p_tail[2] << 16; FALLTHROUGH_;
+    case 2: chnk ^= p_tail[1] << 8;  FALLTHROUGH_;
     case 1: chnk ^= p_tail[0];
     chnk *= c1;
     chnk = std::rotl(chnk, 15);

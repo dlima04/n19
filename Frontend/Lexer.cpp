@@ -579,17 +579,17 @@ auto Lexer::produce_impl_() -> Token {
     return Token::eof(src_.size() - 1, line_);
   }
 
-  SWITCH_BEGIN:
+SWITCH_BEGIN:
   switch(current_char_()) {
-    case u8'\\' : [[fallthrough]]; // illegal character! fallthrough.
+    case u8'\\' : FALLTHROUGH_; // illegal character! fallthrough.
     case u8'?'  : return Token::illegal(index_, 1, line_);
     case u8'#'  : skip_comment_();         goto SWITCH_BEGIN;
     case u8'\n' : advance_consume_line_(); goto SWITCH_BEGIN;
-    case u8' '  : [[fallthrough]]; // skip character.
-    case u8'\r' : [[fallthrough]]; // skip character.
-    case u8'\b' : [[fallthrough]]; // skip character.
-    case u8'\a' : [[fallthrough]]; // skip character.
-    case u8'\v' : [[fallthrough]]; // skip character.
+    case u8' '  : FALLTHROUGH_; // skip character.
+    case u8'\r' : FALLTHROUGH_; // skip character.
+    case u8'\b' : FALLTHROUGH_; // skip character.
+    case u8'\a' : FALLTHROUGH_; // skip character.
+    case u8'\v' : FALLTHROUGH_; // skip character.
     case u8'\t' : consume_char_(1);        goto SWITCH_BEGIN;
     case u8'/'  : return token_fwdslash_();
     case u8'\0' : return token_null_();
@@ -623,7 +623,7 @@ auto Lexer::produce_impl_() -> Token {
     default     : return token_ambiguous_();
   }
 
-  UNREACHABLE; // assertion
+  UNREACHABLE_ASSERTION; // assertion
 }
 
 inline auto Lexer::token_fwdslash_() -> Token {
@@ -1064,7 +1064,7 @@ auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<void> {
   if(current().cat_ != cat) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token of kind \"{}\".", cat.to_string());
-    return Error(errc, std::cref(msg));
+    return Error(errc, msg);
   }
 
   if(cons) consume(1);
@@ -1075,7 +1075,7 @@ auto Lexer::expect(const TokenType type, const bool cons) -> Result<void> {
   if(current().type_ != type) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token \"{}\".", type.to_string());
-    return Error(errc, std::cref(msg));
+    return Error(errc, msg);
   }
 
   if(cons) consume(1);

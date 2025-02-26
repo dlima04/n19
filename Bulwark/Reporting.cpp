@@ -5,12 +5,9 @@
 
 #include <Bulwark/Reporting.hpp>
 #include <Bulwark/BulwarkContext.hpp>
-#include <Core/Fmt.hpp>
+#include <IO/Fmt.hpp>
 #include <Core/Panic.hpp>
 BEGIN_NAMESPACE(n19::test);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Global counters for total passed/failed cases.
 
 constinit size_t g_total_passed  = 0;
 constinit size_t g_total_failed  = 0;
@@ -60,26 +57,26 @@ auto report(const std::string_view& s, OStream& stream, size_t indent) -> void {
 
 auto Diagnostic::to_string() const -> std::string {
   switch(val_) {
-    case Warn:  return "WARN";
-    case Info:  return "INFO";
-    case Fatal: return "FATAL";
-    case Debug: return "DEBUG";
-    default: break;
+  case Warn:  return "WARN";
+  case Info:  return "INFO";
+  case Fatal: return "FATAL";
+  case Debug: return "DEBUG";
+  default: break;
   }
 
-  UNREACHABLE;
+  UNREACHABLE_ASSERTION;
 }
 
 auto Diagnostic::to_colour() const -> Con {
   switch(val_) {
-    case Info:  return Con::CyanFG;
-    case Fatal: return Con::RedFG;
-    case Warn:  return Con::YellowFG;
-    case Debug: return Con::BlueFG;
-    default: break;
+  case Info:  return Con::CyanFG;
+  case Fatal: return Con::RedFG;
+  case Warn:  return Con::YellowFG;
+  case Debug: return Con::BlueFG;
+  default: break;
   }
 
-  UNREACHABLE;
+  UNREACHABLE_ASSERTION;
 }
 
 END_NAMESPACE(n19::test);

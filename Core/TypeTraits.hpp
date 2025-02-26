@@ -157,7 +157,7 @@ struct RemoveConst_<T const> {
 
 template<typename T>
 struct FunctorTraits {
-  static_assert("Could not deduce FunctorTraits_ of T.");
+  static_assert("Could not deduce FunctorTraits of T.");
 };
 
 template<typename T, typename... Args>

@@ -5,8 +5,8 @@
 
 #ifndef CORE_CONIO_HPP
 #define CORE_CONIO_HPP
-#include <Core/Stream.hpp>
-#include <Core/Fmt.hpp>
+#include <IO/Stream.hpp>
+#include <IO/Fmt.hpp>
 BEGIN_NAMESPACE(n19);
 
 #if defined(N19_WIN32)

@@ -26,14 +26,14 @@ auto Suite::run_all(OStream& s) -> void {
     case Result::Passed:    ++g_total_passed;  break;
     case Result::Exception: ++g_total_exc;     break;
     case Result::Skipped:   ++g_total_skipped; break;
-    default: UNREACHABLE;
+    default: UNREACHABLE_ASSERTION;
     }
 
     if(stopfail && ctx.result.val_ != Result::Passed)
       break;
   }
 
-  s << ' ' << Flush;
+  s << Flush;
 }
 
 END_NAMESPACE(n19::test);

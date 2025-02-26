@@ -8,7 +8,7 @@
 #include <Core/Concepts.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
-#include <Core/MacroUtil.hpp>
+#include <Misc/Macros.hpp>
 #include <utility>
 BEGIN_NAMESPACE(n19);
 
@@ -28,7 +28,7 @@ public:
   auto operator()(Args&&... args) -> decltype(auto);
 
   Callback(const T& obj) : obj_(obj) {}
-  Callback(T&& obj     ) : obj_(obj) {}
+  Callback(T&& obj     ) : obj_(std::move(obj)) {}
 protected:
   T obj_;
 };
@@ -43,7 +43,7 @@ public:
 
  ~DeferImpl() { obj_(); }
   DeferImpl(const T& obj) : Callback<T>(obj) {}
-  DeferImpl(T&& obj     ) : Callback<T>(obj) {}
+  DeferImpl(T&& obj     ) : Callback<T>(std::move(obj)) {}
 };
 
 template<typename T> template<CallableWith<T> ...Args>
