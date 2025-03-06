@@ -16,7 +16,7 @@ inline thread_local auto n19_last_errc_ = n19::ErrC::None;
 inline thread_local auto n19_last_msg_  = std::string{};
 
 #define ERROR_IF(EXPR, ...) do {                               \
-    if((EXPR)) { return ::n19::Error(__VA_ARGS__); }      \
+    if((EXPR)) { return ::n19::Error(__VA_ARGS__); }           \
   } while(0)                                                   \
 
 #define N19_TRANSFORM_RESULT_IMPL_(EXPR)                       \
@@ -30,7 +30,7 @@ inline thread_local auto n19_last_msg_  = std::string{};
   if(::n19_last_errc_ != ::n19::ErrC::None) {                  \
     auto tmpe_ = ::n19_last_errc_;                             \
     ::n19_last_errc_ = ::n19::ErrC::None;                      \
-    return ::n19::Error(tmpe_, ::n19_last_msg_);          \
+    return ::n19::Error(tmpe_, ::n19_last_msg_);               \
   }                                                            \
 
 #define MUST(EXPR)                                             \

@@ -31,6 +31,14 @@ public:
     return std::forward<decltype(self)>(self).ptr_;
   }
 
+  FORCEINLINE_ operator ValueType(this auto&& self) {
+    return *std::forward<decltype(self)>(self).ptr_;
+  }
+
+  FORCEINLINE_ operator ReferenceType(this auto&& self) {
+    return *std::forward<decltype(self)>(self).ptr_;
+  }
+
   Ref() = delete;
   Ref(ReferenceType ref) : ptr_(&ref) {}
  ~Ref() = default;

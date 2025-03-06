@@ -17,6 +17,8 @@
 #include <Core/RingQueue.hpp>
 #include <Frontend/ErrorCollector.hpp>
 #include <type_traits>
+#include <Core/Ref.hpp>
+#include <Core/Tuple.hpp>
 
 using namespace n19;
 
@@ -27,56 +29,27 @@ struct MyArgs : argp::Parser {
   argp::PackType& arr = arg<argp::PackType>("--blabla", "-b", "idk lol");
 };
 
+auto test() -> Tuple<std::string, double> {
+  auto z = n19::make_tuple(std::string("lololol"), 314);
+  return z;
+}
+
 int main(int argc, char** argv){
-   const auto time = sys::SystemTime::from_utc();
-   if(!time) {
-     return 1;
-   }
 
-   std::cout << std::boolalpha;
-   std::cout << IsVoid<int> << std::endl;
-   std::cout << IsVoid<void> << std::endl;
+  auto res = test();
+  outs() << res.at<0>() << '\n';
 
-   static_assert(std::is_default_constructible_v<FileRef>, "AAA");
-   std::cout << time->strings().format() << std::endl;
-
-   //std::vector<sys::String> strs = { "--num-jobs=42069", "--verbose=true", "-b=one,two,three" };
-//
-   //MyArgs args;
-   //auto res = args.style(argp::ArgStyle::UNIX)
-   //  .take_argv(std::move(strs))
-   //  .parse(outs());
-//
-   //if(!res) {
-   //  return 1;
-   //}
-//
-   //std::cout << "num_jobs=" << args.num_jobs << '\n';
-   //std::cout << "name=" << args.name << '\n';
-   //std::cout << std::boolalpha << "verbose=" << args.verbose << std::endl;
-//
-   //for(const auto& str : args.arr) {
-   //  std::cout << str << std::endl;
-   //}
-//
-   //args.help(outs());
-
-
-
-  try {
-    const auto file = MUST(FileRef::open(CURRENT_TEST));
-    auto lxr = Lexer::create_shared(file);
-    if(!lxr) {
-      return 1;
-    }
-
-    lxr->get()->dump(outs());
-  } catch(const std::exception& e) {
-    std::cerr << "EXCEPTION: " << e.what() << std::endl;
-  }
-
-   auto ref = MUST(FileRef::open(CURRENT_TEST));
-   ErrorCollector::display_error("this is a test", ref, outs(), 43, 420, true);
+  // try {
+  //   const auto file = MUST(FileRef::open(CURRENT_TEST));
+  //   auto lxr = Lexer::create_shared(file);
+  //   if(!lxr) {
+  //     return 1;
+  //   }
+  //
+  //   lxr->get()->dump(outs());
+  // } catch(const std::exception& e) {
+  //   std::cerr << "EXCEPTION: " << e.what() << std::endl;
+  // }
 
   outs().flush();
   errs().flush();

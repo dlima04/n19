@@ -41,6 +41,7 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Core/Ref.hpp
   Core/Concepts.hpp
   Core/RingBase.hpp
+  Core/Tuple.hpp
   Core/Bytes.hpp
   Core/Platform.hpp
   Core/Iterator.hpp
