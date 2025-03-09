@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <IO/FileRef.hpp>
+#include <Sys/File.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
 #include <Core/Bytes.hpp>
@@ -90,12 +90,13 @@ auto n19::ErrorCollector::display_error(
 
 auto n19::ErrorCollector::display_error(
   const std::string& msg,
-  const FileRef& file,
+  const sys::File& file,
   OStream& stream,
   const size_t pos,
   const uint32_t line,
   const bool is_warn ) -> void
 {
+  file.seek(0, sys::FSeek::Beg);
   const auto fsize = file.size();
   if(!fsize) return;
 
@@ -104,7 +105,7 @@ auto n19::ErrorCollector::display_error(
 
   if(file.read_into(view))
     display_error(
-      msg,file.nstr(),
+      msg, file.name_,
       buff,
       stream,
       pos,
@@ -176,11 +177,14 @@ auto n19::ErrorCollector::display_error(
 auto n19::ErrorCollector::emit(OStream& stream) const -> Result<void> {
   std::vector<char8_t> buff;
   for(const auto &[file_name, errs] : errs_) {
-    const auto file = TRY(FileRef::open(file_name));
-    const auto size = TRY(file.size());
+    auto file = TRY(sys::File::open(file_name));
+    file.seek(0, sys::FSeek::Beg);
+    auto size = TRY(file.size());
 
     buff.resize(size);
-    TRY(file.read_into(as_writable_bytes(buff)));
+    auto wbytes = as_writable_bytes(buff);
+    TRY(file.read_into(wbytes));
+    file.close();
 
     /// Emit the error using the file buffer
     for(const auto& err : errs)

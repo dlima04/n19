@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Sys/LastError.hpp>
+#include <Sys/Error.hpp>
 
 #if defined(N19_WIN32)
 #   include <windows.h>

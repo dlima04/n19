@@ -11,6 +11,8 @@
 #include <Core/TypeTraits.hpp>
 #include <Core/Nothing.hpp>
 #include <Core/Ref.hpp>
+#include <Sys/Error.hpp>
+#include <IO/Fmt.hpp>
 #include <string>
 #include <utility>
 #include <variant>
@@ -27,6 +29,7 @@ N19_MAKE_COMPARABLE_MEMBER(ErrC_, value);
     BadToken   = 0x05, /// For lexing usually.
     Native     = 0x06, /// Generic native / OS error.
     Conversion = 0x07, /// No valid conversion available.
+    Overflow   = 0x08, /// Buffer overrun, or some other kind of overflow.
   };
                        ///
   Value value = None;  /// Underlying error value
@@ -37,6 +40,10 @@ N19_MAKE_COMPARABLE_MEMBER(ErrC_, value);
 struct ErrorType_ {    /// n19's default error type.
   std::string msg;
   ErrC_ code = ErrC_::None;
+
+  static auto from_native()   -> ErrorType_;
+  static auto from_errno(int) -> ErrorType_;
+  static auto from_win_gle(uint32_t) -> ErrorType_;
 
   constexpr ErrorType_(ErrC_ c) : code(c) {}
   constexpr ErrorType_() = default;
@@ -153,6 +160,18 @@ template<typename T>
 using Result = typename Result_Dispatch_<T>::Type;
 using ErrC   = ErrC_;
 using Error  = ErrorType_;
+
+FORCEINLINE_ auto ErrorType_::from_native() -> ErrorType_ {
+  return ErrorType_{ErrC::Native, sys::last_error()};
+}
+
+FORCEINLINE_ auto ErrorType_::from_errno(int e) -> ErrorType_ {
+  return ErrorType_{ErrC::Native, fmt("POSIX errno={}", e)};
+}
+
+FORCEINLINE_ auto ErrorType_::from_win_gle(uint32_t e) -> ErrorType_ {
+  return ErrorType_{ErrC::Native, fmt("Win32 GLE={}", e)};
+}
 
 END_NAMESPACE(n19);
 #endif //RESULT_HPP

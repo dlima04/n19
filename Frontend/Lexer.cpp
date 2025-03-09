@@ -1035,8 +1035,9 @@ inline auto Lexer::skip_utf8_sequence_() -> bool {
   return index_ - 1 < src_.size();
 }
 
-auto Lexer::create_shared(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> {
-  const auto fsize = TRY( ref.size() );
+auto Lexer::create_shared(const sys::File& ref) -> Result<std::shared_ptr<Lexer>> {
+  ref.seek(0, sys::FSeek::Beg);
+  const auto fsize = TRY(ref.size());
 
   /// Check against maximum allowed file size.
   /// No way this is ever true tbh.
@@ -1052,10 +1053,11 @@ auto Lexer::create_shared(const FileRef& ref) -> Result<std::shared_ptr<Lexer>> 
   }
 
   auto lxr = std::make_shared<Lexer>();
-  lxr->file_name_ = fs::absolute(*ref).string();
+  lxr->file_name_ = std::filesystem::absolute(ref.name_).string();
   lxr->src_.resize(fsize);
 
-  TRY(ref.read_into(as_writable_bytes(lxr->src_)));
+  auto wbytes = as_writable_bytes(lxr->src_);
+  TRY(ref.read_into(wbytes));
   lxr->curr_ = lxr->produce_impl_();
   return lxr;
 }

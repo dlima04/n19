@@ -4,7 +4,7 @@
 */
 
 #include <Sys/Time.hpp>
-#include <Sys/LastError.hpp>
+#include <Sys/Error.hpp>
 #include <IO/Fmt.hpp>
 BEGIN_NAMESPACE(n19::sys);
 

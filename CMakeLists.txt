@@ -12,22 +12,24 @@ set(N19_ENUMERATE_GLOBAL_SOURCES
   Frontend/DumpAst.cpp
   Frontend/Lexer.cpp
   Frontend/Token.cpp
-  Sys/LastError.cpp
+  Sys/Error.cpp
   Sys/IODevice.cpp
   Sys/Time.cpp
+  Sys/BackTrace.cpp
   Core/Panic.cpp
   Core/ArgParse.cpp
   IO/Console.cpp
-  IO/FileRef.cpp
   IO/Stream.cpp
+  Sys/File.cpp
 )
 
 set(N19_ENUMERATE_GLOBAL_HEADERS
   Sys/String.hpp
-  Sys/LastError.hpp
+  Sys/Error.hpp
   Sys/IODevice.hpp
   Sys/Handle.hpp
   Sys/Time.hpp
+  Sys/BackTrace.hpp
   Frontend/Token.hpp
   Frontend/ErrorCollector.hpp
   Frontend/AstNodes.hpp
@@ -57,9 +59,9 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Core/Try.hpp
   Core/ArgParse.hpp
   IO/Console.hpp
-  IO/FileRef.hpp
   IO/Fmt.hpp
   IO/Stream.hpp
+  Sys/File.hpp
 )
 
 set(N19_ENUMERATE_PRIMARY_EXECUTABLES

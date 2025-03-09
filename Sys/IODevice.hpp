@@ -6,6 +6,7 @@
 #ifndef NATIVE_IODEVICE_HPP
 #define NATIVE_IODEVICE_HPP
 #include <Sys/Handle.hpp>
+#include <Sys/String.hpp>
 #include <Core/Bytes.hpp>
 #include <Core/Result.hpp>
 #include <array>
@@ -13,10 +14,11 @@
 #include <span>
 
 #if defined(N19_WIN32)
-#    include <windows.h>
+#   include <windows.h>
 #else // POSIX
-#    include <unistd.h>
-#    include <poll.h>
+#   include <unistd.h>
+#   include <fcntl.h>
+#   include <poll.h>
 #endif
 
 BEGIN_NAMESPACE(n19::sys);
@@ -26,37 +28,30 @@ using IODeviceBase_ = Handle<::HANDLE>;
 using IODeviceBase_ = Handle<int>;
 #endif
 
-class IODevice final : public IODeviceBase_ {
+class IODevice : public IODeviceBase_ {
 public:
   enum Permissions : uint8_t {
-    NoAccess = 0,
-    Read     = 1,
-    Write    = 1 << 1,
-    Execute  = 1 << 2,
+    NoAccess = 0x00,
+    Read     = 0x01,
+    Write    = 0x01 << 1,
+    Execute  = 0x01 << 2,
   };
 
   auto close()      -> void override;
   auto invalidate() -> void override;
   auto is_invalid() -> bool override;
 
-  // public methods for reading to,
-  // writing to, and flushing the device.
   auto write(const Bytes& bytes) const -> Result<void>;
   auto read_into(WritableBytes& bytes) const -> Result<void>;
   auto flush_handle() const -> void;
 
-  // Some operator overloads to simplify
-  // reading/writing to the IODevice.
-  template<typename T> auto operator<<(const T& val) -> IODevice&;
-  template<typename T> auto operator>>(T& val)       -> IODevice&;
+  template<typename T> auto operator<<(const T&) -> IODevice&;
+  template<typename T> auto operator>>(T& val)   -> IODevice&;
 
-  // Static methods / factories.
-  // These can be called to gain access
-  // to common native I/O handles.
-  static auto from_stdout() -> IODevice;
-  static auto from_stderr() -> IODevice;
-  static auto from_stdin()  -> IODevice;
-  static auto create_pipe() -> Result<std::array<IODevice, 2>>;
+  NODISCARD_ static auto from_stdout() -> IODevice;
+  NODISCARD_ static auto from_stderr() -> IODevice;
+  NODISCARD_ static auto from_stdin()  -> IODevice;
+  NODISCARD_ static auto create_pipe() -> Result<std::array<IODevice, 2>>;
 
   IODevice() = default;
  ~IODevice() override = default;
@@ -92,6 +87,7 @@ auto IODevice::operator>>(T& val) -> IODevice & {
 #if defined(N19_POSIX)
 FORCEINLINE_ auto IODevice::invalidate() -> void {
   value_ = -1;
+  perms_ = IODevice::NoAccess;
 }
 
 FORCEINLINE_ auto IODevice::close() -> void {
@@ -109,7 +105,8 @@ FORCEINLINE_ auto IODevice::flush_handle() const -> void {
 
 #else // IF WINDOWS
 FORCEINLINE_ auto IODevice::invalidate() -> void {
-  value_ = (::HANDLE)nullptr;
+  value_ = (::HANDLE)0x00;
+  perms_ = IODevice::NoAccess;
 }
 
 FORCEINLINE_ auto IODevice::close() -> void {

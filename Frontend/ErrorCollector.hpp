@@ -7,7 +7,7 @@
 #define ERRORCOLLECTOR_HPP
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
-#include <IO/FileRef.hpp>
+#include <Sys/File.hpp>
 #include <IO/Stream.hpp>
 #include <Core/Bytes.hpp>
 #include <Sys/String.hpp>
@@ -31,7 +31,7 @@ N19_MAKE_NONCOPYABLE(ErrorCollector);
 public:
   static auto display_error(
     const std::string &msg,
-    const FileRef &file,
+    const sys::File &file,
     OStream& stream,
     const size_t pos,
     const uint32_t line,

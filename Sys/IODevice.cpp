@@ -4,12 +4,12 @@
 */
 
 #include <Sys/IODevice.hpp>
-#include <Sys/LastError.hpp>
+#include <Sys/Error.hpp>
+#include <Core/Try.hpp>
 #include <utility>
-
 BEGIN_NAMESPACE(n19::sys);
-#if defined(N19_POSIX)
 
+#if defined(N19_POSIX)
 auto IODevice::write(const Bytes& bytes) const -> Result<void> {
   ASSERT(!bytes.empty());
   pollfd fds[1] = { 0 };
@@ -17,7 +17,7 @@ auto IODevice::write(const Bytes& bytes) const -> Result<void> {
   fds[0].events = POLLOUT;
 
   if(::poll(fds, 1, -1) == -1 || !(fds[0].revents & POLLOUT)) {
-    return Error(ErrC::Native, last_error());
+    return Error(ErrC::Native, "There is no data to be read");
   } if(::write(value_, bytes.data(), bytes.size_bytes()) == -1) {
     return Error(ErrC::Native, last_error());
   }
@@ -32,7 +32,7 @@ auto IODevice::read_into(WritableBytes& bytes) const -> Result<void> {
   fds[0].events = POLLIN;
 
   if(::poll(fds, 1, -1) == -1 || !(fds[0].revents & POLLIN)) {
-    return Error(ErrC::Native, last_error());
+    return Error(ErrC::Native, "There is no data to be read");
   } if(::read(value_, bytes.data(), bytes.size_bytes()) == -1) {
     return Error(ErrC::Native, last_error());
   }

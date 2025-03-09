@@ -8,9 +8,13 @@
 #include <IO/Fmt.hpp>
 #include <cstdlib>
 #include <utility>
+#include <mutex>
+
+static std::mutex s_mtx_;
 BEGIN_NAMESPACE(n19);
 
 auto PanicHandler::add_callback(Callback&& callback) -> bool {
+  std::lock_guard<std::mutex> lock(s_mtx_);
   if(index_ >= callbacks_.size()) return false;
   callbacks_[index_++] = std::move(callback);
   return true;
@@ -22,6 +26,7 @@ auto PanicHandler::get() -> PanicHandler& {
 }
 
 auto PanicHandler::fatal(Message &msg) -> void {
+  s_mtx_.lock();
   auto stream = OStream::from_stdout();
   stream << Con::RedFG  << Con::Bold;
   stream << "FATAL :: " << msg << Endl;
@@ -30,10 +35,11 @@ auto PanicHandler::fatal(Message &msg) -> void {
     callbacks_[i]( *this );
   }
 
-  ::exit(1);
+  ::exit(1); /// For now, just die. TODO: make better
 }
 
 auto PanicHandler::panic(Message &file, int line, Message &msg) -> void {
+  s_mtx_.lock();
   auto stream = OStream::from_stdout();
   stream
     << Con::RedFG  << Con::Bold
@@ -45,7 +51,7 @@ auto PanicHandler::panic(Message &file, int line, Message &msg) -> void {
     callbacks_[i]( *this );
   }
 
-  ::exit(1); /// For now, just die.
+  ::exit(1); /// For now, just die. TODO: make better
 }
 
 END_NAMESPACE(n19);
