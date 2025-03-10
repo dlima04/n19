@@ -62,6 +62,7 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   IO/Fmt.hpp
   IO/Stream.hpp
   Sys/File.hpp
+  Frontend/Keywords.hpp
 )
 
 set(N19_ENUMERATE_PRIMARY_EXECUTABLES

@@ -27,12 +27,8 @@
 #define CH_IS_CTRL(CH)   (std::iscntrl((uint8_t)CH))
 #define CH_IS_SPACE(CH)  (std::isspace((uint8_t)CH))
 #define CH_IS_DIGIT(CH)  (std::isdigit((uint8_t)CH))
+
 BEGIN_NAMESPACE(n19);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// n19::Lexer is the main lexer implementation. This is a lazy lexer,
-// sometimes referred to as a "one-at-a-time" (OAAT) lexer.
-
 class Lexer final : public std::enable_shared_from_this<Lexer> {
 N19_MAKE_NONCOPYABLE(Lexer);
 N19_MAKE_COMPARABLE_MEMBER(Lexer, file_name_);
@@ -100,16 +96,16 @@ private:
   auto token_num_lit_()   -> Token;
   auto token_oct_lit_()   -> Token;
 public:
-  std::vector<char8_t> src_; /// Source file buffer.
-  Token curr_;               /// The one we're sitting on.
-  sys::String file_name_;    /// For error handling.
-  uint32_t index_  = 0;      /// Current source index.
-  uint32_t line_   = 1;      /// current line number.
+  std::vector<char8_t> src_;
+  Token curr_;
+  sys::String file_name_;
+  uint32_t index_  = 0;
+  uint32_t line_   = 1;
 };
 
-struct Keyword {             /// Only used for Lexer::get_keyword().
-  TokenType type;            /// The TokenType of the keyword.
-  TokenCategory cat;         /// The category of the keyword.
+struct Keyword {
+  TokenType type;
+  TokenCategory cat;
 };
 
 FORCEINLINE_ auto Lexer::peek(const uint32_t amnt) -> Token {

@@ -8,6 +8,8 @@
 #include <Core/ClassTraits.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Platform.hpp>
+#include <Frontend/Keywords.hpp>
+#include <string_view>
 #include <string>
 #include <cstdint>
 #include <vector>
@@ -141,6 +143,7 @@ public:
 
   NODISCARD_ auto string_repr() const -> std::string;
   NODISCARD_ auto to_string() const -> std::string;
+  NODISCARD_ static auto from_keyword(const std::u8string_view&) -> Maybe<TokenType>;
 
   Value value  = None;
   constexpr TokenType() = default;
@@ -158,6 +161,7 @@ public:
 
   NODISCARD_ auto to_string() const -> std::string;
   NODISCARD_ auto isa(Value val) const -> bool;
+  NODISCARD_ static auto from_keyword(const std::u8string_view&) -> Maybe<TokenCategory>;
 
   constexpr auto operator|=(const TokenCategory &other) -> void;
   constexpr auto operator|=(Value other) -> void;

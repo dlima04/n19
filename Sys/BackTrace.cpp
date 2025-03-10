@@ -67,21 +67,23 @@ auto BackTrace::dump_to(OStream& stream) -> Result<void> {
 auto BackTrace::dump_to(File& file) -> Result<void> {
   constexpr int maxframes = N19_BACKTRACE_MAX_FRAMES;
   void* f_[maxframes]{};
-  constexpr std::string_view at_ = "At ";
-  constexpr std::string_view lf_ = "\n";
+  auto stream = OStream::from(file);
 
   const int res = backtrace(f_, maxframes);
-  if(res > maxframes) return Error{ErrC::Internal};
+  if(res == 0 || res > maxframes) return Error{ErrC::Internal};
 
   char** syms = backtrace_symbols(f_, res);
   if(syms == nullptr) return Error{ErrC::Internal};
 
   for(int i = 0; i < res; i++) {
     const std::string_view sym = syms[i];
-    file << at_ << sym << lf_;
+    stream << "At " << sym << "\n";
   }
 
+  stream << "\nTraced " << res << " frames,\n";
+  stream << "Out of " << maxframes << " max." << Endl;
   free(syms);
+
   return Result<void>::create();
 }
 

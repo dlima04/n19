@@ -3,15 +3,15 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <algorithm>
 #include <Frontend/Lexer.hpp>
 #include <IO/Fmt.hpp>
 #include <Core/Panic.hpp>
+#include <Core/Murmur3.hpp>
+#include <algorithm>
 BEGIN_NAMESPACE(n19);
 
 auto Token::eof(
-  const uint32_t pos,
-  const uint32_t line ) -> Token
+  const uint32_t pos, const uint32_t line ) -> Token
 {
   Token token;
   token.pos_   = pos;
@@ -23,8 +23,7 @@ auto Token::eof(
 
 auto Token::illegal(
   const uint32_t pos,
-  const uint32_t length,
-  const uint32_t line ) -> Token
+  const uint32_t length, const uint32_t line ) -> Token
 {
   Token token;
   token.len_   = length;
@@ -78,6 +77,24 @@ auto TokenCategory::to_string() const -> std::string {
   return buff;
 }
 
+// Retrieves a TokenCategory value, using a given string
+// which represents a keyword. The keyword may or may not exist.
+// returns the category if it exists, or Nothing otherwise.
+auto TokenCategory::from_keyword(const std::u8string_view& str)
+-> Maybe<TokenCategory>
+{
+  constexpr uint32_t seed = 0xbeef;
+  if(str.size() > 15) [[unlikely]] return Nothing;
+
+  switch(murmur3_x86_32(str, seed)) {
+#define KEYWORD_X(NAME, UNUSED, CAT) case u8##NAME##_mm32: return CAT;
+    N19_HIR_KEYWORDS; default: break;
+#undef KEYWORD_X
+  }
+
+  return Nothing;
+}
+
 // Gets a given token's "value". This is the exact
 // way in which it appears in a source file. For example,
 // an identifier of "foo" would be returned as such,
@@ -99,6 +116,24 @@ auto Token::format(const Lexer& lxr) const -> std::string {
   buffer += fmt("LINE={},POS={} -- ", line_, pos_);
   buffer += fmt("{}\n", cat_.to_string());
   return buffer;
+}
+
+// Retrieves a TokenType value, using a given string
+// which represents a keyword. The keyword may or may not exist.
+// returns the type if it exists, or Nothing otherwise.
+auto TokenType::from_keyword(const std::u8string_view& keyword)
+-> Maybe<TokenType>
+{
+  constexpr uint32_t seed = 0xbeef;
+  if(keyword.size() > 15) [[unlikely]] return Nothing;
+
+  switch(murmur3_x86_32(keyword, seed)) {
+#define KEYWORD_X(NAME, TYPE, UNUSED) case u8##NAME##_mm32: return TYPE;
+  N19_HIR_KEYWORDS; default: break;
+#undef KEYWORD_X
+  }
+
+  return Nothing;
 }
 
 END_NAMESPACE(n19);
