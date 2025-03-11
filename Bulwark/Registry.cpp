@@ -49,6 +49,7 @@ auto Registry::run_all(OStream &stream) -> void {
       continue;
     }
 
+    ++g_total_suites;
     report(suite, stream);         /// Report current suite if not skipped.
     suite.run_all(stream);         ///
   }
@@ -58,7 +59,7 @@ auto Registry::run_all(OStream &stream) -> void {
     + g_total_passed
     + g_total_skipped;
 
-  stream << "\nRan " << suites_.size() << " suites.\n";
+  stream << "\nRan " << g_total_suites << " out of " << suites_.size() << " suites.\n";
   stream << total << " cases total,\n";
   stream << "  "  << g_total_passed  << " passed,\n";
   stream << "  "  << g_total_failed  << " failed,\n";

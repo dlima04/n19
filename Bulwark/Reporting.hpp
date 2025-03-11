@@ -68,6 +68,7 @@ constinit extern size_t g_total_passed;
 constinit extern size_t g_total_failed;
 constinit extern size_t g_total_exc;
 constinit extern size_t g_total_skipped;
+constinit extern size_t g_total_suites;
 
 END_NAMESPACE(n19::test);
 #endif //N19_TEST_REPORTING_HPP

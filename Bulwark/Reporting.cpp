@@ -13,6 +13,7 @@ constinit size_t g_total_passed  = 0;
 constinit size_t g_total_failed  = 0;
 constinit size_t g_total_exc     = 0;
 constinit size_t g_total_skipped = 0;
+constinit size_t g_total_suites  = 0;
 
 auto report(const std::string_view& e, Result r, OStream& stream, size_t indent) -> void {
   auto should_use_colours = Context::the().flags_ & Context::Colours;
@@ -45,7 +46,7 @@ auto report(const Case &c, Result r, OStream &stream, size_t indent) -> void {
 }
 
 auto report(const Suite& suite, OStream& stream) -> void {
-  stream << fmt("{:=^70}\n", fmt("  {}  ", suite.name_));
+  stream << fmt("{:-^70}\n", fmt("  {}  ", suite.name_));
 }
 
 auto report(const std::string_view& s, OStream& stream, size_t indent) -> void {

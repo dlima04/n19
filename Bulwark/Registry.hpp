@@ -12,11 +12,6 @@
 #include <cstdint>
 BEGIN_NAMESPACE(n19::test);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Global singleton for holding test suites.
-// constructor MUST be kept constexpr so constinit semantics are possible,
-// avoiding the static initialization order "fiasco".
-
 class Registry {
 public:
   auto add_case(
@@ -32,9 +27,6 @@ public:
   constexpr Registry() = default;
   ~Registry() = default;
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Global registry object
 
 constinit extern Registry g_registry;
 
