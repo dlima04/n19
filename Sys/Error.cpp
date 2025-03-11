@@ -6,24 +6,17 @@
 #include <Sys/Error.hpp>
 
 #if defined(N19_WIN32)
-#   include <windows.h>
-#else
-#   include <string.h>
-#   include <errno.h>
-#endif
-
+#include <windows.h>
 BEGIN_NAMESPACE(n19::sys);
-#if defined(N19_WIN32)
 
-auto last_error() -> String {
-  DWORD err_code = GetLastError();  ///
-  DWORD result   = 0;               /// Unused.
-  LPWSTR outbuf  = nullptr;         /// Output buffer for the formatted string.
+NODISCARD_ auto last_error() -> String {
+  DWORD err_code = GetLastError();
+  DWORD result   = 0;
+  LPWSTR outbuf  = nullptr;
 
   if(!FormatMessageW(
     FORMAT_MESSAGE_ALLOCATE_BUFFER
-     | FORMAT_MESSAGE_FROM_SYSTEM
-     | FORMAT_MESSAGE_IGNORE_INSERTS,
+      | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
     nullptr,
     err_code,
     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
@@ -39,9 +32,36 @@ auto last_error() -> String {
   return out;
 }
 
+NODISCARD_ auto translate_native_error(ErrorCode err) -> String {
+  DWORD result  = 0;
+  LPWSTR outbuf = nullptr;
+
+  if(!FormatMessageW(
+    FORMAT_MESSAGE_ALLOCATE_BUFFER
+      | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+    nullptr,
+    err,
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+    reinterpret_cast<LPWSTR>(&outbuf),
+    0,
+    nullptr
+  )){
+    return L"";
+  }
+
+  std::wstring out(outbuf);
+  LocalFree(outbuf);
+  return out;
+}
+
+END_NAMESPACE(n19::sys);
 #else // POSIX
 
-auto last_error() -> String {
+#include <string.h>
+#include <errno.h>
+BEGIN_NAMESPACE(n19::sys);
+
+NODISCARD_ auto last_error() -> String {
   Char buffer[256] = { 0 };
   if(strerror_r(errno, buffer, sizeof(buffer) - 2) == 0) {
     return String{ buffer };
@@ -50,5 +70,14 @@ auto last_error() -> String {
   return _nstr("");
 }
 
-#endif
+NODISCARD_ auto translate_native_error(ErrorCode err) -> String {
+  Char buffer[256] = { 0 };
+  if(strerror_r(err, buffer, sizeof(buffer) - 2) == 0) {
+    return String{ buffer };
+  }
+
+  return _nstr("");
+}
+
 END_NAMESPACE(n19::sys);
+#endif

@@ -21,38 +21,35 @@ BEGIN_NAMESPACE(n19);
 struct ErrC_ final {
 N19_MAKE_COMPARABLE_MEMBER(ErrC_, value);
   enum Value : uint16_t {
-    None       = 0x00, /// No error has occurred.
-    InvalidArg = 0x01, /// A provided argument is incorrect.
-    FileIO     = 0x02, /// Filesystem error of some kind.
-    Internal   = 0x03, /// Internal, shouldn't be exposed user side
-    NotFound   = 0x04, /// Couldn't find what you're looking for.
-    BadToken   = 0x05, /// For lexing usually.
-    Native     = 0x06, /// Generic native / OS error.
-    Conversion = 0x07, /// No valid conversion available.
-    Overflow   = 0x08, /// Buffer overrun, or some other kind of overflow.
+    None       = 0x00,
+    InvalidArg = 0x01,
+    FileIO     = 0x02,
+    Internal   = 0x03,
+    NotFound   = 0x04,
+    BadToken   = 0x05,
+    Native     = 0x06,
+    Conversion = 0x07,
+    Overflow   = 0x08,
+    NotImplimented = 0x09,
   };
-                       ///
-  Value value = None;  /// Underlying error value
+
+  Value value = None;
   constexpr ErrC_(const Value v) : value(v) {}
   constexpr ErrC_() = default;
 };
-                       ///
-struct ErrorType_ {    /// n19's default error type.
+
+struct ErrorType_ {
   std::string msg;
   ErrC_ code = ErrC_::None;
 
-  static auto from_native()   -> ErrorType_;
-  static auto from_errno(int) -> ErrorType_;
-  static auto from_win_gle(uint32_t) -> ErrorType_;
+  static auto from_native() -> ErrorType_;
+  static auto from_error_code(sys::ErrorCode) -> ErrorType_;
 
   constexpr ErrorType_(ErrC_ c) : code(c) {}
   constexpr ErrorType_() = default;
   constexpr ErrorType_(ErrC_ c, const std::string& m)
   : msg(m) , code(c) {}
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Begin default result type.
 
 template<typename T, typename E = ErrorType_>
 class Result_ {
@@ -161,16 +158,16 @@ using Result = typename Result_Dispatch_<T>::Type;
 using ErrC   = ErrC_;
 using Error  = ErrorType_;
 
-FORCEINLINE_ auto ErrorType_::from_native() -> ErrorType_ {
-  return ErrorType_{ErrC::Native, sys::last_error()};
+inline auto ErrorType_::from_native() -> ErrorType_ {
+  return ErrorType_{
+    ErrC::Native,
+    sys::last_error()};
 }
 
-FORCEINLINE_ auto ErrorType_::from_errno(int e) -> ErrorType_ {
-  return ErrorType_{ErrC::Native, fmt("POSIX errno={}", e)};
-}
-
-FORCEINLINE_ auto ErrorType_::from_win_gle(uint32_t e) -> ErrorType_ {
-  return ErrorType_{ErrC::Native, fmt("Win32 GLE={}", e)};
+inline auto ErrorType_::from_error_code(sys::ErrorCode e) -> ErrorType_ {
+  return ErrorType_{
+    ErrC::Native,
+    sys::translate_native_error(e)};
 }
 
 END_NAMESPACE(n19);

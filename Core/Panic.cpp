@@ -6,6 +6,7 @@
 #include <Core/Panic.hpp>
 #include <IO/Console.hpp>
 #include <IO/Fmt.hpp>
+#include <Sys/BackTrace.hpp>
 #include <cstdlib>
 #include <utility>
 #include <mutex>
@@ -29,12 +30,14 @@ auto PanicHandler::fatal(Message &msg) -> void {
   s_mtx_.lock();
   auto stream = OStream::from_stdout();
   stream << Con::RedFG  << Con::Bold;
-  stream << "FATAL :: " << msg << Endl;
+  stream << "FATAL :: " << msg << '\n';
 
   for(size_t i = 0; i < callbacks_.size() && i < index_; ++i) {
     callbacks_[i]( *this );
   }
 
+  sys::BackTrace::dump_to(stream);
+  stream.flush();
   ::exit(1); /// For now, just die. TODO: make better
 }
 
@@ -45,12 +48,14 @@ auto PanicHandler::panic(Message &file, int line, Message &msg) -> void {
     << Con::RedFG  << Con::Bold
     << "PANIC :: " << msg
     << Con::Reset  << fmt(" In file \"{}\" at line {}.", file, line)
-    << Endl;
+    << '\n';
 
   for(size_t i = 0; i < callbacks_.size() && i < index_; ++i) {
     callbacks_[i]( *this );
   }
 
+  sys::BackTrace::dump_to(stream);
+  stream.flush();
   ::exit(1); /// For now, just die. TODO: make better
 }
 

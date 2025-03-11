@@ -7,38 +7,53 @@
 #include <Core/Try.hpp>
 #include <string_view>
 
+#ifdef __has_include
+#if __has_include(<cxxabi.h>)
+#include <cxxabi.h>
+#else
+#define HAS_NO_CXXABI_H_
+#endif
+#else
+#define HAS_NO_CXXABI_H_
+#endif
+
 #if defined(N19_WIN32)
 #include <windows.h>
 #include <DbgHelp.h>
 BEGIN_NAMESPACE(n19::sys);
 
+auto BackTrace::get() -> Result<void> {
+  return Error{ErrC::NotImplimented, "No backtraces on Windows yet."};
+}
 
+auto BackTrace::dump_to(OStream& stream) -> Result<void> {
+  return Error{ErrC::NotImplimented, "No backtraces on Windows yet."};
+}
+
+auto BackTrace::dump_to(File& file) -> Result<void> {
+  return Error{ErrC::NotImplimented, "No backtraces on Windows yet."};
+}
 
 END_NAMESPACE(n19::sys);
-
 #else /// POSIX
 #include <execinfo.h>
 #include <stdlib.h>
-BEGIN_NAMESPACE(n19::sys);
 
+BEGIN_NAMESPACE(n19::sys);
 auto BackTrace::get() -> Result<void> {
   constexpr int maxframes = N19_BACKTRACE_MAX_FRAMES;
   void* f_[maxframes]{};
 
   const int res = backtrace(f_, maxframes);
-  if(res == 0 || res > maxframes) {
-    return Error{ErrC::Internal}; /// Shouldn't happen tbh.
-  }
+  if(res == 0 || res > maxframes)
+    return Error{ErrC::Internal, "Invalid number of returned frames"};
 
-  char** syms = backtrace_symbols(f_, res);
-  if(syms == nullptr) {
-    return Error{ErrC::Internal}; /// again, just a sanity check
-  }
+  char** syms = backtrace_symbols(f_, res); // TODO: demangle symbol names
+  if(syms == nullptr)
+    return Error{ErrC::Internal, "Failed to resolve symbol names"};
 
-  for(int i = 0; i < res; i++) {
-    frames_[i].addr_ = f_[i];
-    frames_[i].name_ = syms[i];
-  }
+  for(int i = 0; i < res; i++)
+    frames_[i] = BacktraceFrame{ .name_ = syms[i], .addr_ = f_[i] };
 
   free(syms);
   return Result<void>::create();
@@ -49,10 +64,12 @@ auto BackTrace::dump_to(OStream& stream) -> Result<void> {
   void* f_[maxframes]{};
 
   const int res = backtrace(f_, maxframes);
-  if(res == 0 || res > maxframes) return Error{ErrC::Internal};
+  if(res == 0 || res > maxframes) {
+    return Error{ErrC::Internal, "bad retrieved frame count."};
+  }
 
   char** syms = backtrace_symbols(f_, res);
-  if(syms == nullptr) return Error{ErrC::Internal};
+  if(syms == nullptr) return Error::from_native();
 
   for(int i = 0; i < res; i++)
     stream << "At " << syms[i] << "\n";
@@ -60,7 +77,6 @@ auto BackTrace::dump_to(OStream& stream) -> Result<void> {
   stream << "\nTraced " << res << " frames,\n";
   stream << "Out of " << maxframes << " max." << Endl;
   free(syms);
-
   return Result<void>::create();
 }
 
@@ -72,18 +88,7 @@ auto BackTrace::dump_to(File& file) -> Result<void> {
   const int res = backtrace(f_, maxframes);
   if(res == 0 || res > maxframes) return Error{ErrC::Internal};
 
-  char** syms = backtrace_symbols(f_, res);
-  if(syms == nullptr) return Error{ErrC::Internal};
-
-  for(int i = 0; i < res; i++) {
-    const std::string_view sym = syms[i];
-    stream << "At " << sym << "\n";
-  }
-
-  stream << "\nTraced " << res << " frames,\n";
-  stream << "Out of " << maxframes << " max." << Endl;
-  free(syms);
-
+  backtrace_symbols_fd(f_, res, file.value());
   return Result<void>::create();
 }
 

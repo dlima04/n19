@@ -44,8 +44,6 @@ int main(int argc, char** argv){
 
     lxr->get()->dump(outs());
 
-    ErrorCollector::display_error("idk lol", file, outs(), 12, 2, true );
-
     // auto file2 = MUST(sys::File::open(CURRENT_TEST));
     //
     // ErrorCollector::display_error("idk lol", file2, outs(), 12, 2, true );
@@ -54,6 +52,10 @@ int main(int argc, char** argv){
   } catch(const std::exception& e) {
     std::cerr << "EXCEPTION: " << e.what() << std::endl;
   }
+
+  sys::BackTrace::dump_to(outs());
+
+  ins().clear();
 
   outs().flush();
   errs().flush();

@@ -9,7 +9,13 @@
 #include <Core/Platform.hpp>
 
 namespace n19::sys {
+#ifdef N19_WIN32
+  using ErrorCode = DWORD;
+#else
+  using ErrorCode = int;
+#endif
   NODISCARD_ auto last_error() -> String;
+  NODISCARD_ auto translate_native_error(ErrorCode) -> String;
 }
 
 #endif //SYS_LASTERROR_HPP

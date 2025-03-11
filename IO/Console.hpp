@@ -9,12 +9,16 @@
 #include <IO/Fmt.hpp>
 BEGIN_NAMESPACE(n19);
 
+///
+/// Windows specific initialization.
 #if defined(N19_WIN32)
 auto win32_init_console()            -> void;
 auto win32_are_vsequences_enabled()  -> bool;
 auto win32_enable_vsequences()       -> void;
 #endif
 
+///
+/// Ascii colour values
 enum class Con : uint16_t {
   Reset      = 0,
   Bold       = 1,

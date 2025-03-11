@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef FMT_HPP
-#define FMT_HPP
+#ifndef N19_FMT_HPP
+#define N19_FMT_HPP
 #include <string>
 #include <format>
 BEGIN_NAMESPACE(n19);
@@ -36,4 +36,4 @@ auto fmt(const std::wformat_string<Args...> fmt, Args&&... args) -> std::wstring
 }
 
 END_NAMESPACE(n19);
-#endif //FMT_HPP
+#endif //N19_FMT_HPP

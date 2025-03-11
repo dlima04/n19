@@ -5,6 +5,7 @@
 
 #ifndef STREAM_HPP
 #define STREAM_HPP
+#include <Sys/String.hpp>
 #include <Sys/IODevice.hpp>
 #include <Core/Bytes.hpp>
 #include <Core/Platform.hpp>
@@ -14,6 +15,7 @@
 #include <cstring>
 #include <system_error>
 #include <charconv>
+#include <cctype>
 #include <limits>
 
 #if defined(N19_WIN32)
@@ -62,6 +64,11 @@ public:
     return *this;    /// return this stream
   }
 
+  FORCEINLINE_ auto write_boolean(const bool value) -> OStream& {
+    if(value) return *this << "true";
+    return *this << "false";
+  }
+
   template<Character T>
   auto operator<<(const T value) -> OStream& {
     T buffer[ 2 ];
@@ -72,11 +79,14 @@ public:
 
   template<IntOrFloat T> requires(!IsCharacter<T>)
   auto operator<<(const T value) -> OStream& {
-    char buff[ 40 ] = { 0 };
-    auto [ptr, ec]  = std::to_chars(buff, buff + sizeof(buff) - 1, value);
-
-    buff[39] = '\0';
-    if(ec == std::errc()) *this << std::string_view{buff};
+    if constexpr(Is<T, bool>) {
+      write_boolean(value);
+    } else {
+      char buff[ 40 ] = { 0 };
+      auto [ptr, ec]  = std::to_chars(buff, buff + sizeof(buff) - 1, value);
+      buff[39] = '\0';
+      if(ec == std::errc()) *this << std::string_view{buff};
+    }
     return *this;
   }
 
@@ -227,7 +237,7 @@ public:
 
  ~BufferedOStream() override = default;
   BufferedOStream() = default;
-public:
+private:
   Buffer_ buff_{};
   Index_ curr_ {begin_};
 };
@@ -246,9 +256,122 @@ public:
   static auto from_stdin() -> IStream;
   static auto from(const sys::IODevice&) -> IStream;
 
-  FORCEINLINE_ ~IStream() { fd_.flush_handle(); }
-  FORCEINLINE_ IStream()  { /* ... */ }
+  using Index_ = size_t;
+  using Char_  = char;
+  using Span_  = std::span<const char>;
+
+  template<IntOrFloat T> requires(!Is<T, Char_>)
+  auto operator>>(T& value) -> IStream& {
+    if(in_failstate_) return *this;
+    std::string word;
+    size_t size = readword(word);
+    if(!word.empty() && size) {
+      ASSERT(size <= word.size());
+      auto conv = std::from_chars(word.data(), word.data() + size, value);
+      if(conv.ec != std::errc()) in_failstate_ = true;
+    }
+    return *this;
+  }
+
+  template<Pointer T> requires(!IsCharacter<RemovePointer<T>>)
+  auto operator>>(T& value) -> IStream& {
+    if(in_failstate_) return *this;
+    std::string word;
+    size_t size = readword(word);
+    if(!word.empty() && size) {
+      ASSERT(size <= word.size());
+      uintptr_t int_ = 0;
+      auto conv = std::from_chars(word.data(), word.data() + size, int_, 16);
+      if(conv.ec != std::errc()) in_failstate_ = true;
+      else value = reinterpret_cast<T>(int_);
+    }
+    return *this;
+  }
+
+  FORCEINLINE_ auto operator>>(std::u8string& str) -> IStream& {
+    if(in_failstate_) return *this;
+    str.clear();
+    for(size_t i = 0; i < max_read_length_; i++) {
+      const char8_t ch = (char8_t)read_one();
+      const auto bt = (uint8_t)ch;
+#   ifdef N19_WIN32
+      if(std::isspace(bt)){              break;}
+      if(ch == u8'\r'){(void)read_one(); break;}
+      if(std::iscntrl(bt)){              break;}
+#   else // POSIX
+      if(std::isspace(bt) || std::iscntrl(bt)) break;
+#   endif
+      str += ch;
+    }
+    return *this;
+  }
+
+  FORCEINLINE_ auto readln(std::string& str) const -> size_t {
+    if(in_failstate_) return 0;
+    str.clear();
+    size_t written = 0;
+    for(size_t i = 0; i < max_read_length_; i++, written++) {
+      const char ch = read_one();
+      const auto bt = (uint8_t)ch;
+#   ifdef N19_WIN32
+      if(ch == '\r'){(void)read_one();    break;}
+      if(std::iscntrl(bt) && ch != '\t'){ break;}
+#   else // POSIX
+      if(std::iscntrl(bt) && ch != '\t'){ break;}
+#   endif
+      str += ch;
+    }
+    return written;
+  }
+
+  FORCEINLINE_ auto readword(std::string& str) const -> size_t {
+    if(in_failstate_) return 0;
+    str.clear();
+    size_t written = 0;
+    for(size_t i = 0; i < max_read_length_; i++, written++) {
+      const char ch = read_one();
+      const auto bt = (uint8_t)ch;
+#   ifdef N19_WIN32
+      if(std::isspace(bt)){             break;}
+      if(ch == '\r'){ (void)read_one(); break;}
+      if(std::iscntrl(bt)){             break;}
+#   else // POSIX
+      if(std::isspace(bt) || std::iscntrl(bt)) break;
+#   endif
+      str += ch;
+    }
+    return written;
+  }
+
+  FORCEINLINE_ auto read_one() const -> Char_ {
+    if(in_failstate_) return '\0';
+    Char_ buff[1]{};
+    auto wspan = n19::as_writable_bytes(buff);
+    return fd_.read_into(wspan) ? buff[0] : '\0';
+  }
+
+  FORCEINLINE_ auto operator>>(std::string& str) -> IStream& {
+    readword(str);
+    return *this;
+  }
+
+  FORCEINLINE_ auto operator>>(Char_& value) -> IStream& {
+    if(!in_failstate_) value = read_one();
+    return *this;
+  }
+
+  auto read_into(WritableBytes& bytes) const -> Result<void> {
+    return fd_.read_into(bytes);
+  }
+
+  auto failed() const -> bool { return in_failstate_; }
+  auto clear() -> void { in_failstate_ = false; }
+
+ ~IStream() = default;
+  IStream() = default;
 private:
+  bool in_failstate_ = false;
+  size_t max_read_length_ = 120;
   sys::IODevice fd_;
 };
 

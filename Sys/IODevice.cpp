@@ -12,13 +12,7 @@ BEGIN_NAMESPACE(n19::sys);
 #if defined(N19_POSIX)
 auto IODevice::write(const Bytes& bytes) const -> Result<void> {
   ASSERT(!bytes.empty());
-  pollfd fds[1] = { 0 };
-  fds[0].fd     = value_;
-  fds[0].events = POLLOUT;
-
-  if(::poll(fds, 1, -1) == -1 || !(fds[0].revents & POLLOUT)) {
-    return Error(ErrC::Native, "There is no data to be read");
-  } if(::write(value_, bytes.data(), bytes.size_bytes()) == -1) {
+  if(::write(value_, bytes.data(), bytes.size_bytes()) == -1) {
     return Error(ErrC::Native, last_error());
   }
 
@@ -27,13 +21,7 @@ auto IODevice::write(const Bytes& bytes) const -> Result<void> {
 
 auto IODevice::read_into(WritableBytes& bytes) const -> Result<void> {
   ASSERT(!bytes.empty());
-  pollfd fds[1] = { 0 };
-  fds[0].fd     = value_;
-  fds[0].events = POLLIN;
-
-  if(::poll(fds, 1, -1) == -1 || !(fds[0].revents & POLLIN)) {
-    return Error(ErrC::Native, "There is no data to be read");
-  } if(::read(value_, bytes.data(), bytes.size_bytes()) == -1) {
+  if(::read(value_, bytes.data(), bytes.size_bytes()) == -1) {
     return Error(ErrC::Native, last_error());
   }
 
@@ -80,12 +68,12 @@ auto IODevice::from_stdin() -> IODevice {
 
 auto IODevice::write(const Bytes &bytes) const -> Result<void> {
   ASSERT(!bytes.empty());
-  if(!WriteFile(                ///
-    value_,                     /// The output file handle.
-    (void*)bytes.data(),        /// Output buffer.
-    (DWORD)bytes.size_bytes(),  /// Size of the input buffer.
-    nullptr,                    /// Number of bytes written (optional)
-    nullptr                     /// OVERLAPPED struct (optional)
+  if(!WriteFile(               ///
+    value_,                    /// The output file handle.
+    (void*)bytes.data(),       /// Output buffer.
+    (DWORD)bytes.size_bytes(), /// Size of the input buffer.
+    nullptr,                   /// Number of bytes written (optional)
+    nullptr                    /// OVERLAPPED struct (optional)
   )) {
     return Error(ErrC::Native, last_error());
   }
@@ -95,12 +83,12 @@ auto IODevice::write(const Bytes &bytes) const -> Result<void> {
 
 auto IODevice::read_into(WritableBytes& bytes) const -> Result<void> {
   ASSERT(!bytes.empty());
-  if(!ReadFile(                 ///
-    value_,                     /// The input file handle.
-    (void*)bytes.data(),        /// The input buffer.
-    (DWORD)bytes.size_bytes(),  /// Size of our buffer.
-    nullptr,                    /// Number of bytes read from the file (optional)
-    nullptr                     /// OVERLAPPED struct (optional)
+  if(!ReadFile(                ///
+    value_,                    /// The input file handle.
+    (void*)bytes.data(),       /// The input buffer.
+    (DWORD)bytes.size_bytes(), /// Size of our buffer.
+    nullptr,                   /// Number of bytes read from the file (optional)
+    nullptr                    /// OVERLAPPED struct (optional)
   )) {
     return Error(ErrC::Native, last_error());
   }
