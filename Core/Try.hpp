@@ -5,42 +5,40 @@
 
 #ifndef TRY_HPP
 #define TRY_HPP
-#include <Core/Result.hpp>
-#include <IO/Fmt.hpp>
 #include <Core/Panic.hpp>
 #include <Core/TypeTraits.hpp>
-#include <string>
-#include <type_traits>
+#include <Core/Platform.hpp>
 
-inline thread_local auto n19_last_errc_ = n19::ErrC::None;
-inline thread_local auto n19_last_msg_  = std::string{};
+#ifndef RESULT_HPP
+#include <Core/Result.hpp>
+#endif
 
-#define ERROR_IF(EXPR, ...) do {                               \
-    if((EXPR)) { return ::n19::Error(__VA_ARGS__); }           \
-  } while(0)                                                   \
+#if N19_MSVC
+#error "MSVC does not support statement expressions."
+#endif
 
-#define N19_TRANSFORM_RESULT_IMPL_(EXPR)                       \
-  (EXPR).call_if_error([](auto&& value){                       \
-    ::n19_last_errc_ = value.error().code.value;               \
-    ::n19_last_msg_  = value.error().msg;                      \
-  }).value_or();                                               \
+#define TRY(EXPR)                                                                  \
+  ({                                                                               \
+    auto&& temp_result_ = (EXPR);                                                  \
+    static_assert(!::n19::IsLvalueReference<decltype((EXPR).release_value())>);    \
+    if(!temp_result_.has_value()) return temp_result_.release_error();             \
+    temp_result_.release_value();                                                  \
+  })                                                                               \
 
-#define TRY(EXPR)                                              \
-  N19_TRANSFORM_RESULT_IMPL_(EXPR)                             \
-  if(::n19_last_errc_ != ::n19::ErrC::None) {                  \
-    auto tmpe_ = ::n19_last_errc_;                             \
-    ::n19_last_errc_ = ::n19::ErrC::None;                      \
-    return ::n19::Error(tmpe_, ::n19_last_msg_);               \
-  }                                                            \
+#define MUST(EXPR)                                                                 \
+  ({                                                                               \
+    auto&& temp_result_ = (EXPR);                                                  \
+    static_assert(!::n19::IsLvalueReference<decltype((EXPR).release_value())>);    \
+    ASSERT(temp_result_.has_value(), "MUST() expression evaluated to an error!");  \
+    temp_result_.release_value();                                                  \
+  })                                                                               \
 
-#define MUST(EXPR)                                             \
-  N19_TRANSFORM_RESULT_IMPL_(EXPR)                             \
-  if(::n19_last_errc_ != ::n19::ErrC::None) {                  \
-    PANIC(::n19::fmt(                                          \
-      "The expression \"" #EXPR                                \
-      "\" Evaluated to an error in a \"MUST\" context. \n"     \
-      "Error message = {} ",                                   \
-    ::n19_last_msg_ ));                                        \
-  }                                                            \
+#define ERROR_IF(EXPR, ...) do {                                                   \
+    if((EXPR)) { return ::n19::Error{ __VA_ARGS__ }; }                             \
+  } while(0)                                                                       \
+
+#define ERROR_IF_NOT(EXPR, ...) do {                                               \
+    if(!(EXPR)) { return ::n19::Error{ __VA_ARGS__ }; }                            \
+  } while(0)                                                                       \
 
 #endif //TRY_HPP

@@ -85,6 +85,16 @@ public:
     return std::get<E>( value_ );
   }
 
+  NODISCARD_ FORCEINLINE_ auto release_value() -> T {
+    ASSERT(has_value() == true, "Result contains an error!");
+    return T(std::move(std::get<T>( value_ )));
+  }
+
+  NODISCARD_ FORCEINLINE_ auto release_error() -> E {
+    ASSERT(has_value() == false, "Result contains a value!");
+    return E(std::move(std::get<E>( value_ )));
+  }
+
   auto operator->(this auto&& self) -> decltype(auto) {
     ASSERT(self.has_value() == true, "Result contains an error!");
     return &(std::forward<decltype(self)>(self).value());
