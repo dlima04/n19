@@ -117,7 +117,7 @@ auto Parser::print_chunk_error_(
   //             This is not a valid flag!
 
   stream << msg;
-  stream << Flush;
+  stream << Endl;
 }
 
 auto Parser::is_flag_begin_(const sys::StringView& str) const -> bool {

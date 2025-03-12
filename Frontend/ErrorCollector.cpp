@@ -164,9 +164,9 @@ auto n19::ErrorCollector::display_error(
 
   stream
     << Con::Bold  << _nstr("In ") << fname << ':' << line
-    << '\n'  << Con::Reset << before << '\n'
+    << ":\n  |\t" << Con::Reset << before << "\n  |\t"
     << filler        /// Filler contents, tildes below line.
-    << '\n'          ///
+    << "\n  |\t"       ///
     << (is_warn ? Con::YellowFG : Con::RedFG)
     << spaces        ///
     << msg           /// Display user-provided message in red or yellow.

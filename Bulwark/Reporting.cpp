@@ -22,7 +22,7 @@ auto report(const std::string_view& e, Result r, OStream& stream, size_t indent)
     expr.insert(0, "  ");              ///
 
   expr += " ";                         ///
-  stream << fmt("{:.<65} ", expr);     /// Display expression with padding
+  stream << fmt("{:.<75} ", expr);     /// Display expression with padding
   if(should_use_colours) stream << r.to_colour();
   stream << r.to_string() << '\n';
   if(should_use_colours) stream << Con::Reset;
@@ -35,7 +35,7 @@ auto diagnostic(const std::string_view& m, Diagnostic diag, OStream& stream, siz
     message.insert(0, "  ");
 
   message += " ";                      ///
-  stream << fmt("{:.<65} ", message);  /// Pad diagnostic, check if we need colours.
+  stream << fmt("{:.<75} ", message);  /// Pad diagnostic, check if we need colours.
   if(should_use_colours) stream << diag.to_colour();
   stream << diag.to_string() << '\n';
   if(should_use_colours) stream << Con::Reset;
@@ -46,14 +46,17 @@ auto report(const Case &c, Result r, OStream &stream, size_t indent) -> void {
 }
 
 auto report(const Suite& suite, OStream& stream) -> void {
-  stream << fmt("{:-^70}\n", fmt("  {}  ", suite.name_));
+  auto should_use_colours = Context::the().flags_ & Context::Colours;
+  if(should_use_colours) stream << Con::Bold;
+  stream << "Suite \"" << suite.name_ << "\":\n";
+  if(should_use_colours) stream << Con::Reset;
 }
 
 auto report(const std::string_view& s, OStream& stream, size_t indent) -> void {
   auto section = std::string{ s };
   for(size_t i = 0; i < indent; i++) section.insert(0, "  ");
   section += " ";
-  stream << fmt("{:.<65} SECTION\n", section);
+  stream << fmt("{:.<75} SECTION\n", section);
 }
 
 auto Diagnostic::to_string() const -> std::string {
