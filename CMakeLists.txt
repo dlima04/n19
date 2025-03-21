@@ -40,7 +40,6 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Misc/Global.hpp
   Misc/Macros.hpp
   Core/Panic.hpp
-  Core/Ref.hpp
   Core/Concepts.hpp
   Core/RingBase.hpp
   Core/Tuple.hpp
@@ -52,7 +51,7 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Core/RingQueue.hpp
   Core/Murmur3.hpp
   Core/TypeTraits.hpp
-  Core/Callback.hpp
+  Core/Defer.hpp
   Core/Result.hpp
   Core/Maybe.hpp
   Core/Nothing.hpp

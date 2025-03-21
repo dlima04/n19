@@ -11,44 +11,50 @@ BEGIN_NAMESPACE(n19::sys);
 
 NODISCARD_ auto last_error() -> String {
   DWORD err_code = GetLastError();
-  DWORD result   = 0;
-  LPWSTR outbuf  = nullptr;
+  DWORD result = 0, flags = 0;
 
+  /// Error message formatting flags
+  flags |= FORMAT_MESSAGE_ALLOCATE_BUFFER;
+  flags |= FORMAT_MESSAGE_FROM_SYSTEM;
+  flags |= FORMAT_MESSAGE_IGNORE_INSERTS;
+
+  LPWSTR outbuf  = nullptr;
   if(!FormatMessageW(
-    FORMAT_MESSAGE_ALLOCATE_BUFFER
-      | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+    flags,
     nullptr,
     err_code,
     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
     reinterpret_cast<LPWSTR>(&outbuf),
-    0,
-    nullptr
+    0, nullptr
   )){
     return L"";
   }
 
+  /// Copy the returned string and free the buffer
   std::wstring out(outbuf);
   LocalFree(outbuf);
   return out;
 }
 
 NODISCARD_ auto translate_native_error(ErrorCode err) -> String {
-  DWORD result  = 0;
-  LPWSTR outbuf = nullptr;
+  DWORD flags = 0;
+  flags |= FORMAT_MESSAGE_ALLOCATE_BUFFER;
+  flags |= FORMAT_MESSAGE_FROM_SYSTEM;
+  flags |= FORMAT_MESSAGE_IGNORE_INSERTS;
 
+  LPWSTR outbuf  = nullptr;
   if(!FormatMessageW(
-    FORMAT_MESSAGE_ALLOCATE_BUFFER
-      | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+    flags,
     nullptr,
     err,
     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
     reinterpret_cast<LPWSTR>(&outbuf),
-    0,
-    nullptr
+    0, nullptr
   )){
     return L"";
   }
 
+  /// Copy the returned string and free the buffer
   std::wstring out(outbuf);
   LocalFree(outbuf);
   return out;

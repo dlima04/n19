@@ -10,11 +10,11 @@
 #include <Core/ClassTraits.hpp>
 #include <Core/TypeTraits.hpp>
 #include <Core/Nothing.hpp>
-#include <Core/Ref.hpp>
 #include <Sys/Error.hpp>
 #include <IO/Fmt.hpp>
 #include <string>
 #include <utility>
+#include <functional>
 #include <variant>
 BEGIN_NAMESPACE(n19);
 
@@ -160,7 +160,7 @@ struct Result_Dispatch_<void> {
 
 template<typename T>
 struct Result_Dispatch_<T&> {
-  using Type = Result_<Ref<T>>;
+  using Type = Result_<std::reference_wrapper<T>>;
 };
 
 template<typename T>

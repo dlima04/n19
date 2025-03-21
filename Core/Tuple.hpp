@@ -13,6 +13,9 @@
 #include <cstdint>
 BEGIN_NAMESPACE(n19);
 
+///
+/// NthTypeAccessor --
+/// Access the nth type from a given pack Types as NthTypeAccessor::Type.
 template<size_t n, typename ...Types>
 struct NthTypeAccessor;
 
@@ -26,9 +29,15 @@ struct NthTypeAccessor<0, T, Types...> {
   using Type = T;
 };
 
+///
+/// Helper type alias for NthTypeAccessor
 template<size_t n, typename ...Types>
 using NthType = typename NthTypeAccessor<n, Types...>::Type;
 
+///
+/// TupleStorage -- recursive storage helper for the main Tuple class.
+/// Tuple uses this to recursively define data fields with a
+/// user-provided pack of types.
 template<typename ...Tail>
 struct TupleStorage;
 
@@ -61,6 +70,10 @@ struct TupleStorage<> {
   ~TupleStorage() = default;
 };
 
+///
+/// NthItemAccessor --
+/// Access the nth item inside of a TupleStorage with a given
+/// pack of types Types.
 template<size_t n, typename ...Types>
 struct NthItemAccessor;
 
@@ -87,7 +100,7 @@ struct NthItemAccessor<0, T, Types...> {
 };
 
 template<typename ...Types>
-class Tuple /*Impl*/ {
+class Tuple /* Tuple Implementation -- */ {
 public:
   template<typename ...OTs>
   friend class Tuple;
@@ -136,7 +149,7 @@ private:
 };
 
 template<typename T>
-class Tuple<T> /*Single*/ {
+class Tuple<T> /* Single */ {
 public:
   template<typename ...OTs>
   friend class Tuple;
@@ -152,6 +165,8 @@ public:
   T value_;
 };
 
+///
+/// Helper functions for creating and manipulating tuples.
 template<typename ...Args>
 auto make_tuple(Args&&... args) -> Tuple<RemoveReference<Args>...> {
   return Tuple<RemoveReference<Args>...>{ std::forward<Args>(args)... };

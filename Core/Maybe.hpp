@@ -9,9 +9,9 @@
 #include <Core/Panic.hpp>
 #include <Core/Nothing.hpp>
 #include <Core/Concepts.hpp>
-#include <Core/Ref.hpp>
 #include <utility>
 #include <new>
+#include <functional>
 BEGIN_NAMESPACE(n19)
 
 template<Concrete T>
@@ -139,7 +139,7 @@ struct MaybeDispatch_<void> {
 
 template<typename T>
 struct MaybeDispatch_<T&> {
-  using Type = Maybe_<Ref<T>>;
+  using Type = Maybe_<std::reference_wrapper<T>>;
 };
 
 template<typename T>

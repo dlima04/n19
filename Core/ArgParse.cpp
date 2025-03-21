@@ -77,7 +77,6 @@ auto Parser::print_chunk_error_(
 {
   sys::String filler;                     /// String for filler characters
   filler.reserve(50);                     ///
-  
   for(size_t i = 0; i < args_.size(); ++i) {
     if(i != at) {                         /// Regular chunk.
       stream << args_[i] << _nchr(' ');   /// Don't use any colour.
@@ -111,11 +110,6 @@ auto Parser::print_chunk_error_(
     ++i;
   }
 
-  // Example of what this should look like:
-  // --foo value --my-flag otherval
-  // ~~~~~ ~~~~~ ^^^^^^^^^ ~~~~~~~~
-  //             This is not a valid flag!
-
   stream << msg;
   stream << Endl;
 }
@@ -134,10 +128,7 @@ auto Parser::is_flag_begin_(const sys::StringView& str) const -> bool {
 auto Parser::help(OStream& stream) const -> void {
   stream << "\n";
   for(const auto& param : params_) {
-    stream << fmt("{:<18} {:<13} {}\n",
-       param.long_,
-       param.short_,
-       param.desc_);
+    stream << fmt("{:<18} {:<13} {}\n", param.long_, param.short_, param.desc_);
   }
 
   outs() << Endl;

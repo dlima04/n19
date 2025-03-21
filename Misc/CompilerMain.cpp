@@ -12,7 +12,7 @@
 #include <Sys/BackTrace.hpp>
 #include <iostream>
 #include <Core/Panic.hpp>
-#include <Core/Callback.hpp>
+#include <Core/Defer.hpp>
 #include <Core/ArgParse.hpp>
 #include <Core/Tuple.hpp>
 #include <Sys/File.hpp>
@@ -34,7 +34,6 @@ auto test() -> Tuple<std::string, double> {
 }
 
 int main(int argc, char** argv){
-
   try {
     auto file = MUST(sys::File::open(CURRENT_TEST));
     auto lxr = Lexer::create_shared(file);
@@ -56,7 +55,6 @@ int main(int argc, char** argv){
   sys::BackTrace::dump_to(outs());
 
   ins().clear();
-
   outs().flush();
   errs().flush();
   return 0;

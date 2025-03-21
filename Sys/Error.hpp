@@ -10,7 +10,7 @@
 
 namespace n19::sys {
 #ifdef N19_WIN32
-  using ErrorCode = DWORD;
+  using ErrorCode = ::DWORD;
 #else
   using ErrorCode = int;
 #endif

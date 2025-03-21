@@ -83,7 +83,7 @@ NODISCARD_ auto File::path() const -> stdfs::path {
 }
 
 Result<SeekDist> File::seek(SeekDist dist, FSeek method) const {
-  int whence;
+  int whence;          ///
   switch(method) {     /// Determine posix positioning method.
   case FSeek::Beg:
     whence = SEEK_SET; /// Start from the beginning of the file.
@@ -108,8 +108,8 @@ END_NAMESPACE(n19::sys);
 BEGIN_NAMESPACE(n19::sys);
 
 Result<SeekDist> File::seek(SeekDist dist, FSeek method) const {
-  DWORD whence;
-  switch(method) {
+  DWORD whence;        ///
+  switch(method) {     /// Determine positioning method.
   case FSeek::Beg:
     whence = FILE_BEGIN;
     break;
@@ -153,6 +153,7 @@ NODISCARD_ auto File::create_or_open(
   File the_device;
   the_device.perms_ = perms;
   the_device.name_  = name;
+
   the_device.value_ = ::CreateFileW(
     name.c_str(), the_perms,
     shareperm, nullptr,

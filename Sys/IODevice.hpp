@@ -48,10 +48,10 @@ public:
   template<typename T> auto operator<<(const T&) -> IODevice&;
   template<typename T> auto operator>>(T& val)   -> IODevice&;
 
-  NODISCARD_ static auto from_stdout() -> IODevice;
-  NODISCARD_ static auto from_stderr() -> IODevice;
-  NODISCARD_ static auto from_stdin()  -> IODevice;
-  NODISCARD_ static auto create_pipe() -> Result<std::array<IODevice, 2>>;
+  static auto from_stdout() -> IODevice;
+  static auto from_stderr() -> IODevice;
+  static auto from_stdin()  -> IODevice;
+  static auto create_pipe() -> Result<std::array<IODevice, 2>>;
 
   IODevice() = default;
  ~IODevice() override = default;

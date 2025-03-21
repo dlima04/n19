@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef CALLBACK_HPP
-#define CALLBACK_HPP
+#ifndef DEFER_HPP
+#define DEFER_HPP
 #include <Core/Concepts.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
@@ -21,35 +21,35 @@ BEGIN_NAMESPACE(n19);
   { [&]{ __VA_ARGS__; } }                          \
 
 template<typename T>
-class Callback {
-N19_MAKE_NONCOPYABLE(Callback);
+class DeferBase_ {
+N19_MAKE_NONCOPYABLE(DeferBase_);
 public:
   template<CallableWith<T> ...Args>
   auto operator()(Args&&... args) -> decltype(auto);
 
-  Callback(const T& obj) : obj_(obj) {}
-  Callback(T&& obj     ) : obj_(std::move(obj)) {}
+  DeferBase_(const T& obj) : obj_(obj) {}
+  DeferBase_(T&& obj     ) : obj_(std::move(obj)) {}
 protected:
   T obj_;
 };
 
 template<CallableWith T>
-class DeferImpl final : public Callback<T> {
+class DeferImpl final : public DeferBase_<T> {
   N19_MAKE_NONMOVABLE(DeferImpl);
   N19_MAKE_NONCOPYABLE(DeferImpl);
 public:
-  using Callback<T>::obj_;
-  using Callback<T>::operator();
+  using DeferBase_<T>::obj_;
+  using DeferBase_<T>::operator();
 
  ~DeferImpl() { obj_(); }
-  DeferImpl(const T& obj) : Callback<T>(obj) {}
-  DeferImpl(T&& obj     ) : Callback<T>(std::move(obj)) {}
+  DeferImpl(const T& obj) : DeferBase_<T>(obj) {}
+  DeferImpl(T&& obj     ) : DeferBase_<T>(std::move(obj)) {}
 };
 
 template<typename T> template<CallableWith<T> ...Args>
-FORCEINLINE_ auto Callback<T>::operator()(Args&&... args) -> decltype(auto) {
+FORCEINLINE_ auto DeferBase_<T>::operator()(Args&&... args) -> decltype(auto) {
   return obj_( std::forward<Args>(args)... );
 }
 
 END_NAMESPACE(n19);
-#endif //CALLBACK_HPP
+#endif //DEFER_HPP
