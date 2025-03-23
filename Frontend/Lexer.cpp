@@ -287,7 +287,7 @@ inline auto Lexer::token_asterisk_() -> Token {
     curr_tok.cat_ |= TokenCategory::ArithmeticOp;
     curr_tok.len_ = 2;
     consume_char_(2);
-  } else [[likely]] { // '*'
+  } else { // '*'
     curr_tok.type_ = TokenType::Mul;
     curr_tok.cat_  = TokenCategory::BinaryOp;
     curr_tok.cat_ |= TokenCategory::UnaryOp;
@@ -580,48 +580,48 @@ auto Lexer::produce_impl_() -> Token {
     return Token::eof(src_.size() - 1, line_);
   }
 
-SWITCH_BEGIN:
+  SWITCH_BEGIN:
   switch(current_char_()) {
-    case u8'\\': FALLTHROUGH_; // illegal character! fallthrough.
-    case u8'?' : return Token::illegal(index_, 1, line_);
-    case u8'#' : skip_comment_();         goto SWITCH_BEGIN;
-    case u8'\n': advance_consume_line_(); goto SWITCH_BEGIN;
-    case u8' ' : FALLTHROUGH_; // skip character.
-    case u8'\r': FALLTHROUGH_; // skip character.
-    case u8'\b': FALLTHROUGH_; // skip character.
-    case u8'\a': FALLTHROUGH_; // skip character.
-    case u8'\v': FALLTHROUGH_; // skip character.
-    case u8'\t': consume_char_(1);        goto SWITCH_BEGIN;
-    case u8'/' : return token_fwdslash_();
-    case u8'\0': return token_null_();
-    case u8'~' : return token_tilde_();
-    case u8'@' : return token_at_();
-    case u8'$' : return token_money_();
-    case u8'[' : return token_lsqbrckt_();
-    case u8']' : return token_rsqbrckt_();
-    case u8';' : return token_semicolon_();
-    case u8'(' : return token_lparen_();
-    case u8')' : return token_rparen_();
-    case u8'{' : return token_lbrace_();
-    case u8'}' : return token_rbrace_();
-    case u8',' : return token_comma_();
-    case u8'-' : return token_hyphen_();
-    case u8'&' : return token_ampersand_();
-    case u8'.' : return token_dot_();
-    case u8'!' : return token_bang_();
-    case u8'<' : return token_lthan_();
-    case u8'>' : return token_gthan_();
-    case u8'+' : return token_plus_();
-    case u8'*' : return token_asterisk_();
-    case u8'%' : return token_percent_();
-    case u8'=' : return token_equals_();
-    case u8'|' : return token_pipe_();
-    case u8'^' : return token_uparrow_();
-    case u8'\'': return token_squote_();
-    case u8'"' : return token_quote_();
-    case u8'`' : return token_quote_();
-    case u8':' : return token_colon_();
-    default    : return token_ambiguous_();
+    case u8'\\'  : FALLTHROUGH_; // illegal character! fallthrough.
+    case u8'?'   : return Token::illegal(index_, 1, line_);
+    case u8'#'   : skip_comment_();         goto SWITCH_BEGIN;
+    case u8'\n'  : advance_consume_line_(); goto SWITCH_BEGIN;
+    case u8' '   : FALLTHROUGH_; // skip character.
+    case u8'\r'  : FALLTHROUGH_; // skip character.
+    case u8'\b'  : FALLTHROUGH_; // skip character.
+    case u8'\a'  : FALLTHROUGH_; // skip character.
+    case u8'\v'  : FALLTHROUGH_; // skip character.
+    case u8'\t'  : consume_char_(1);        goto SWITCH_BEGIN;
+    case u8'/'   : return token_fwdslash_();
+    case u8'\0'  : return token_null_();
+    case u8'~'   : return token_tilde_();
+    case u8'@'   : return token_at_();
+    case u8'$'   : return token_money_();
+    case u8'['   : return token_lsqbrckt_();
+    case u8']'   : return token_rsqbrckt_();
+    case u8';'   : return token_semicolon_();
+    case u8'('   : return token_lparen_();
+    case u8')'   : return token_rparen_();
+    case u8'{'   : return token_lbrace_();
+    case u8'}'   : return token_rbrace_();
+    case u8','   : return token_comma_();
+    case u8'-'   : return token_hyphen_();
+    case u8'&'   : return token_ampersand_();
+    case u8'.'   : return token_dot_();
+    case u8'!'   : return token_bang_();
+    case u8'<'   : return token_lthan_();
+    case u8'>'   : return token_gthan_();
+    case u8'+'   : return token_plus_();
+    case u8'*'   : return token_asterisk_();
+    case u8'%'   : return token_percent_();
+    case u8'='   : return token_equals_();
+    case u8'|'   : return token_pipe_();
+    case u8'^'   : return token_uparrow_();
+    case u8'\''  : return token_squote_();
+    case u8'"'   : return token_quote_();
+    case u8'`'   : return token_quote_();
+    case u8':'   : return token_colon_();
+    default      : return token_ambiguous_();
   }
 
   UNREACHABLE_ASSERTION; // assertion

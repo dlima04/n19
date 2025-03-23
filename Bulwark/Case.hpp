@@ -14,7 +14,7 @@
 BEGIN_NAMESPACE(n19::test);
 
 struct Result {
-N19_MAKE_COMPARABLE_MEMBER(Result, val_);
+  N19_MAKE_COMPARABLE_MEMBER(Result, val_);
   enum Value_ : uint8_t {
     Failed    = 0x00,    /// The test has failed.
     Passed    = 0x01,    /// The test passed.

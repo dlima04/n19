@@ -30,8 +30,8 @@
 
 BEGIN_NAMESPACE(n19);
 class Lexer final : public std::enable_shared_from_this<Lexer> {
-N19_MAKE_NONCOPYABLE(Lexer);
-N19_MAKE_COMPARABLE_MEMBER(Lexer, file_name_);
+  N19_MAKE_NONCOPYABLE(Lexer);
+  N19_MAKE_COMPARABLE_MEMBER(Lexer, file_name_);
 public:
   auto current() const        -> const Token&;
   auto consume(uint32_t amnt) -> const Token&;

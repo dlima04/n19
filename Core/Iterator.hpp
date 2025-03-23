@@ -12,8 +12,8 @@ BEGIN_NAMESPACE(n19);
 
 template<typename T>
 class BasicIterator {
-N19_MAKE_DEFAULT_CONSTRUCTIBLE(BasicIterator);
-N19_MAKE_SPACESHIP(BasicIterator);
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(BasicIterator);
+  N19_MAKE_SPACESHIP(BasicIterator);
 public:
   using PointerType   = T*;
   using ReferenceType = T&;

@@ -23,20 +23,16 @@ BEGIN_NAMESPACE(n19);
 template<typename T, size_t size_>
 class RingQueue : public RingBase<T, size_> {
 public:
-  using ValueType     = T;
-  using ReferenceType = T&;
-  using PointerType   = T*;
-
   using RingBase<T, size_>::head_;
   using RingBase<T, size_>::tail_;
   using RingBase<T, size_>::buff_;
   using RingBase<T, size_>::can_mod_opt_;
   using RingBase<T, size_>::size_mask_;
 
-  // enqueue() is a blocking operation. If the
-  // queue is full, the call will block until
-  // another thread dequeues an object. try_enqueue()
-  // is non-blocking, if an object cannot be queued the call will fail.
+  using ValueType     = T;
+  using ReferenceType = T&;
+  using PointerType   = T*;
+
   template<typename ...Args> auto enqueue(Args&&... args) -> void;
   template<typename ...Args> auto try_enqueue(Args&&... args) -> bool;
 
@@ -85,7 +81,7 @@ FORCEINLINE_ auto RingQueue<T, size_>::try_dequeue() -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
   if(lhead == ltail) {   // the buffer is empty.
-    return Nothing; // we can't read anything.
+    return Nothing;      // we can't read anything.
   }
   const ValueType val = buff_[ ltail ];
   tail_.fetch_add(1, std::memory_order::release);
@@ -124,7 +120,7 @@ FORCEINLINE_ auto RingQueue<T, size_>::try_peek(const size_t amnt) -> Maybe<Valu
 template<typename T, size_t size_>
 FORCEINLINE_ auto RingQueue<T, size_>::peek(const size_t amnt) -> ValueType {
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
-  while(!can_peek(amnt)) { // spin.
+  while(!can_peek(amnt)) {
     head_.wait(head_.load(std::memory_order::acquire));
   }
 

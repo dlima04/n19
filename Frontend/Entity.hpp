@@ -11,9 +11,10 @@
 #include <vector>
 #include <memory>
 
-// Some constants:
-// The root entity ID begins at 1.
-// a value of 0 is an invalid ID.
+///
+/// Some constants:
+/// The root entity ID begins at 1.
+/// a value of 0 is an invalid ID.
 #define N19_ROOT_ENTITY_ID 1
 #define N19_INVALID_ENTITY_ID 0
 
@@ -46,9 +47,9 @@
   X(BuiltinType) /* Builtin, e.g. "int" */ \
 
 BEGIN_NAMESPACE(n19);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Begin macro cancer aids fuckery.
 
+///
+/// Expand macros.
 #define X(NAME) class NAME;
   N19_ENTITY_TYPE_LIST
 #undef X
@@ -60,8 +61,8 @@ enum class EntityType : uint16_t {
 #undef X
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Begin class definitions
+///
+/// Class definitions
 
 class Entity {
 public:

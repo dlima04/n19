@@ -121,8 +121,8 @@ enum class ArgStyle : uint8_t {
 };
 
 class Parser {
-N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(Parser);
-N19_MAKE_NONCOPYABLE(Parser);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(Parser);
+  N19_MAKE_NONCOPYABLE(Parser);
 public:
   template<typename T>
   NODISCARD_ auto arg(

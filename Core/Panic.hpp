@@ -29,8 +29,8 @@ BEGIN_NAMESPACE(n19);
 ///
 /// Panic handler singleton class
 class PanicHandler {
-N19_MAKE_NONMOVABLE(PanicHandler);
-N19_MAKE_NONCOPYABLE(PanicHandler);
+  N19_MAKE_NONMOVABLE(PanicHandler);
+  N19_MAKE_NONCOPYABLE(PanicHandler);
 public:
   using Callback = std::function<void(PanicHandler&)>;
   using Message  = const std::string;

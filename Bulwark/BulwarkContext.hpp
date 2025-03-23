@@ -16,8 +16,8 @@
 BEGIN_NAMESPACE(n19::test);
 
 class Context {
-N19_MAKE_NONMOVABLE(Context);
-N19_MAKE_NONCOPYABLE(Context);
+  N19_MAKE_NONMOVABLE(Context);
+  N19_MAKE_NONCOPYABLE(Context);
 public:
   enum Flags : uint16_t {
     None     = 0x00,      /// Default flag value.

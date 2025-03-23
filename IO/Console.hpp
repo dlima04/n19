@@ -34,6 +34,8 @@ enum class Con : uint16_t {
   RedFG      = 91,
 };
 
+///
+/// Global stream objects
 inline auto outs() -> OStream& {
   static auto outs_ = BufferedOStream<>::from_stdout();
   return outs_;

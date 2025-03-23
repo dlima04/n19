@@ -173,15 +173,19 @@ auto Parser::parse(OStream& stream) -> Result<void> {
     if(param_ptr == params_.end()) {
       print_chunk_error_(i, stream, "Flag does not exist.");
       return Error(ErrC::InvalidArg);
-    } if(the_value == "=") {
+    }
+    if(the_value == "=") {
       print_chunk_error_(i, stream, "Expected a value after \"=\"");
       return Error(ErrC::InvalidArg);
-    } if(already_passed_(flag_pos)) {
+    }
+    if(already_passed_(flag_pos)) {
       print_chunk_error_(flag_pos, stream, "Flag was passed more than once.");
       return Error(ErrC::InvalidArg);
-    } if(the_value.starts_with("=")) {
+    }
+    if(the_value.starts_with("=")) {
       the_value.erase(0, 1);
-    } if(!param_ptr->val_->convert(the_value).has_value()) {
+    }
+    if(!param_ptr->val_->convert(the_value).has_value()) {
       print_chunk_error_(i, stream, "Invalid type for this value.");
       return Error(ErrC::InvalidArg);
     }

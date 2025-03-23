@@ -27,7 +27,7 @@ struct ErrorLocation {
 };
 
 class ErrorCollector {
-N19_MAKE_NONCOPYABLE(ErrorCollector);
+  N19_MAKE_NONCOPYABLE(ErrorCollector);
 public:
   static auto display_error(
     const std::string &msg,

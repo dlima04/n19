@@ -15,14 +15,16 @@ BEGIN_NAMESPACE(n19);
 // Base class for n19::RingBuffer and n19::RingQueue.
 // Implements basic shared functionality like head and tail indices,
 // checking if the buffer is full/empty, etc.
+//
+// NOTE:
+// The size of the buffer should be a power of 2, always.
+// This allows us to eliminate modulo, which not only makes code
+// faster but also simpler to reason about, since 0 % N
+// is technically undefined behaviour and can potentially cause crashes.
 
 template<typename T, size_t size_>
 class RingBase {
 public:
-  /// The size of the buffer should be a power of 2, always.
-  /// This allows us to eliminate modulo, which not only makes code
-  /// faster but also simpler to reason about, since 0 % N
-  /// is technically undefined behaviour and can potentially cause crashes.
   constexpr static bool can_mod_opt_ = (size_ & (size_ - 1)) == 0;
   constexpr static size_t size_mask_ = size_ - 1;
 
@@ -30,9 +32,6 @@ public:
   static_assert( can_mod_opt_, "size must be a power of 2!" );
   static_assert( size_ > 1, "Size must be greater than 1!" );
 
-  /// The public methods inherited by n19::RingBuffer
-  /// and n19::RingQueue. Implements basic functionality shared
-  /// across these classes.
   auto is_full()  const -> bool;
   auto is_empty() const -> bool;
   auto data()     const -> T*;
@@ -51,7 +50,8 @@ protected:
   alignas(ALIGN_AVOID_FALSESHARE) std::atomic<size_t> tail_{ 0 };  // read index.
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///
+/// Methods
 
 template<typename T, size_t size_>
 FORCEINLINE_ auto RingBase<T, size_>::is_full() const -> bool {

@@ -18,8 +18,8 @@ namespace n19 {
 }
 
 class n19::EntityTable {
-N19_MAKE_NONCOPYABLE(EntityTable);
-N19_MAKE_NONMOVABLE(EntityTable);
+  N19_MAKE_NONCOPYABLE(EntityTable);
+  N19_MAKE_NONMOVABLE(EntityTable);
 public:
   template<typename T, typename ...Args>
   auto insert(

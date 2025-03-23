@@ -19,7 +19,7 @@
 BEGIN_NAMESPACE(n19);
 
 struct ErrC_ final {
-N19_MAKE_COMPARABLE_MEMBER(ErrC_, value);
+  N19_MAKE_COMPARABLE_MEMBER(ErrC_, value);
   enum Value : uint16_t {
     None       = 0x00,
     InvalidArg = 0x01,
@@ -53,8 +53,8 @@ struct ErrorType_ {
 
 template<typename T, typename E = ErrorType_>
 class Result_ {
-N19_MAKE_DEFAULT_CONSTRUCTIBLE(Result_);
-N19_MAKE_DEFAULT_ASSIGNABLE(Result_);
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(Result_);
+  N19_MAKE_DEFAULT_ASSIGNABLE(Result_);
 public:
   using ValueType   = T;
   using PointerType = T*;
@@ -65,32 +65,38 @@ public:
     return T{std::forward<Args>(args)...};
   }
 
-  NODISCARD_ FORCEINLINE_ auto value() const -> const T& {
+  NODISCARD_ FORCEINLINE_
+  auto value() const -> const T& {
     ASSERT(has_value() == true, "Result contains an error!");
     return std::get<T>( value_ );
   }
 
-  NODISCARD_ FORCEINLINE_ auto value() -> T& {
+  NODISCARD_ FORCEINLINE_
+  auto value() -> T& {
     ASSERT(has_value() == true, "Result contains an error!");
     return std::get<T>( value_ );
   }
 
-  NODISCARD_ FORCEINLINE_ auto error() const -> const E& {
+  NODISCARD_ FORCEINLINE_
+  auto error() const -> const E& {
     ASSERT(has_value() == false, "Result contains a value!");
     return std::get<E>( value_ );
   }
 
-  NODISCARD_ FORCEINLINE_ auto error() -> E& {
+  NODISCARD_ FORCEINLINE_
+  auto error() -> E& {
     ASSERT(has_value() == false, "Result contains a value!");
     return std::get<E>( value_ );
   }
 
-  NODISCARD_ FORCEINLINE_ auto release_value() -> T {
+  NODISCARD_ FORCEINLINE_
+  auto release_value() -> T {
     ASSERT(has_value() == true, "Result contains an error!");
     return T(std::move(std::get<T>( value_ )));
   }
 
-  NODISCARD_ FORCEINLINE_ auto release_error() -> E {
+  NODISCARD_ FORCEINLINE_
+  auto release_error() -> E {
     ASSERT(has_value() == false, "Result contains a value!");
     return E(std::move(std::get<E>( value_ )));
   }
@@ -169,15 +175,11 @@ using ErrC   = ErrC_;
 using Error  = ErrorType_;
 
 inline auto ErrorType_::from_native() -> ErrorType_ {
-  return ErrorType_{
-    ErrC::Native,
-    sys::last_error()};
+  return ErrorType_{ErrC::Native, sys::last_error()};
 }
 
 inline auto ErrorType_::from_error_code(sys::ErrorCode e) -> ErrorType_ {
-  return ErrorType_{
-    ErrC::Native,
-    sys::translate_native_error(e)};
+  return ErrorType_{ErrC::Native, sys::translate_native_error(e)};
 }
 
 END_NAMESPACE(n19);

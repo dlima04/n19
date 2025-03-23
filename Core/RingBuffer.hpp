@@ -28,15 +28,15 @@ public:
   using RingBase<T, size_>::can_mod_opt_;
   using RingBase<T, size_>::size_mask_;
 
-  // write() and overwrite() will attempt to construct
-  // an object of type T directly at the head indice using the
-  // parameter pack Args.
+  /// write() and overwrite() will attempt to construct
+  /// an object of type T directly at the head indice using the
+  /// parameter pack Args.
   template<typename ...Args> auto write(Args&&... args) -> bool;
   template<typename ...Args> auto overwrite(Args&&... args) -> void;
 
-  // For reading values from the ringbuffer.
-  // note that current() and try_current retrieve the value at
-  // tail_ without incrementing it.
+  /// For reading values from the ringbuffer.
+  /// note that current() and try_current retrieve the value at
+  /// tail_ without incrementing it.
   auto read() -> Maybe<ValueType>;
   auto try_current() const -> Maybe<ValueType>;
   auto current() const -> ValueType;
@@ -74,8 +74,8 @@ template<typename T, size_t size_>
 FORCEINLINE_ auto RingBuffer<T, size_>::read() -> Maybe<ValueType> {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
-  if(lhead == ltail) {    // buffer is empty.
-    return Nothing;       // we can't read anything.
+  if(lhead == ltail) {    /// buffer is empty.
+    return Nothing;       /// we can't read anything.
   }
 
   const ValueType val = buff_[ ltail ];

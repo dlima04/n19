@@ -12,7 +12,7 @@
 BEGIN_NAMESPACE(n19::test);
 
 struct Diagnostic final {
-N19_MAKE_COMPARABLE_MEMBER(Diagnostic, val_);
+  N19_MAKE_COMPARABLE_MEMBER(Diagnostic, val_);
   enum Value_ : uint8_t {
     Warn   = 0x00,           /// Warning diagnostic.
     Info   = 0x01,           /// Info only.

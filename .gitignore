@@ -20,6 +20,7 @@
 *.crt
 *.vs
 **/.DS_STORE
+build
 cmake-build-*/
 **/.idea/
 **/.vscode/

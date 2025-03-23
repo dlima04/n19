@@ -25,7 +25,7 @@ using WritableBytes  = std::span<Byte>;
 
 template<Concrete T>
 class ByteCopy final {
-static_assert(!std::is_array_v<T>);
+  static_assert(!std::is_array_v<T>);
 public:
   using ValueType      = T;
   using ReferenceType  = T&;

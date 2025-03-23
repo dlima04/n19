@@ -22,7 +22,7 @@ BEGIN_NAMESPACE(n19);
 
 template<typename T>
 class DeferBase_ {
-N19_MAKE_NONCOPYABLE(DeferBase_);
+  N19_MAKE_NONCOPYABLE(DeferBase_);
 public:
   template<CallableWith<T> ...Args>
   auto operator()(Args&&... args) -> decltype(auto);

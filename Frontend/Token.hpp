@@ -133,7 +133,7 @@ BEGIN_NAMESPACE(n19);
 // Begin class definitions.
 
 class TokenType {
-N19_MAKE_COMPARABLE_MEMBER(TokenType, value);
+  N19_MAKE_COMPARABLE_MEMBER(TokenType, value);
 public:
   #define X(TOKEN_TYPE, STR_UNUSED) TOKEN_TYPE,
   enum Value : uint16_t {
@@ -151,7 +151,7 @@ public:
 };
 
 class TokenCategory {
-N19_MAKE_COMPARABLE_MEMBER(TokenCategory, value);
+  N19_MAKE_COMPARABLE_MEMBER(TokenCategory, value);
 public:
   #define X(CAT, MASK) CAT = MASK,
   enum Value : size_t {
@@ -172,8 +172,8 @@ public:
 };
 
 class Token {
-N19_MAKE_COMPARABLE_ON(TokenType, type_);
-N19_MAKE_COMPARABLE_MEMBER(Token, type_);
+  N19_MAKE_COMPARABLE_ON(TokenType, type_);
+  N19_MAKE_COMPARABLE_MEMBER(Token, type_);
 public:
   uint32_t pos_  = 0;   /// File offset.
   uint32_t len_  = 0;   /// Length of the token.
