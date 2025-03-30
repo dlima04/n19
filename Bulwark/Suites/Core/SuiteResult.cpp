@@ -10,7 +10,7 @@ using namespace n19;
 
 /// Note: for this test suite we don't need to be
 /// very rigorous, because n19::Result relies on the stable and
-/// tested std::variant for a lot of the heavy lifting.
+/// tested std::variant for most of its functionality.
 
 struct CTORHelper {
   int x_{};
