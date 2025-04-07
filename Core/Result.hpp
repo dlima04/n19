@@ -16,6 +16,7 @@
 #include <utility>
 #include <functional>
 #include <variant>
+#include <concepts>
 BEGIN_NAMESPACE(n19);
 
 struct ErrC_ final {

@@ -896,6 +896,15 @@ inline auto Lexer::skip_utf8_sequence_() -> bool {
   return index_ - 1 < src_.size();
 }
 
+auto Lexer::create_shared(std::vector<char8_t>&& buf) -> Result<std::shared_ptr<Lexer>> {
+  ASSERT(!buf.empty());
+  auto lxr   = std::make_shared<Lexer>();
+  lxr->src_  = std::move(buf);
+  lxr->curr_ = lxr->produce_impl_();
+  lxr->file_name_ = _nstr("<buffer>");
+  return lxr;
+}
+
 auto Lexer::create_shared(const sys::File& ref) -> Result<std::shared_ptr<Lexer>> {
   ref.seek(0, sys::FSeek::Beg);
   const auto fsize = TRY(ref.size());
@@ -914,9 +923,13 @@ auto Lexer::create_shared(const sys::File& ref) -> Result<std::shared_ptr<Lexer>
   }
 
   auto lxr = std::make_shared<Lexer>();
+#ifdef N19_WIN32
+  lxr->file_name_ = std::filesystem::absolute(ref.name_).wstring();
+#else
   lxr->file_name_ = std::filesystem::absolute(ref.name_).string();
-  lxr->src_.resize(fsize);
+#endif
 
+  lxr->src_.resize(fsize);
   auto wbytes = as_writable_bytes(lxr->src_);
   TRY(ref.read_into(wbytes));
   lxr->curr_ = lxr->produce_impl_();
@@ -924,7 +937,7 @@ auto Lexer::create_shared(const sys::File& ref) -> Result<std::shared_ptr<Lexer>
 }
 
 auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<void> {
-  if(current().cat_ != cat) {
+  if(!current().cat_.isa(cat)) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token of kind \"{}\".", cat.to_string());
     return Error(errc, msg);

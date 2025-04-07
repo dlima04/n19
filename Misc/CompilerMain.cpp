@@ -16,6 +16,8 @@
 #include <Core/ArgParse.hpp>
 #include <Core/Tuple.hpp>
 #include <Sys/File.hpp>
+#include <Core/Defer.hpp>
+#include <Core/Murmur3.hpp>
 
 #include "Frontend/ErrorCollector.hpp"
 
@@ -34,6 +36,8 @@ auto test() -> Tuple<std::string, double> {
 }
 
 int main(int argc, char** argv){
+  auto tup = n19::make_tuple(std::string("lololol"), 314);
+
   try {
     auto file = MUST(sys::File::open(CURRENT_TEST));
     auto lxr = Lexer::create_shared(file);
@@ -51,8 +55,6 @@ int main(int argc, char** argv){
   } catch(const std::exception& e) {
     std::cerr << "EXCEPTION: " << e.what() << std::endl;
   }
-
-  sys::BackTrace::dump_to(outs());
 
   ins().clear();
   outs().flush();

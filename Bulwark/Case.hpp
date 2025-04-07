@@ -41,6 +41,8 @@ struct ExecutionContext {
 };
                          ///
 class Case final {       /// Test case implementation class
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(Case);
+  N19_MAKE_DEFAULT_ASSIGNABLE(Case);
 public:
   using NameType_ = std::string_view;
   using FuncType_ = void(*)(ExecutionContext&);

@@ -45,9 +45,9 @@ public:
   ~RingBase() = default;
   RingBase()  = default;
 protected:
-  alignas(ALIGN_PROMOTE_LOCALITY) T buff_[ size_ ];                // data buffer.
-  alignas(ALIGN_AVOID_FALSESHARE) std::atomic<size_t> head_{ 0 };  // write index.
-  alignas(ALIGN_AVOID_FALSESHARE) std::atomic<size_t> tail_{ 0 };  // read index.
+  alignas(ALIGN_PROMOTE_LOCALITY) T buff_[ size_ ];
+  alignas(ALIGN_AVOID_FALSESHARE) std::atomic<size_t> head_{ 0 };
+  alignas(ALIGN_AVOID_FALSESHARE) std::atomic<size_t> tail_{ 0 };
 };
 
 ///

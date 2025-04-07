@@ -90,7 +90,7 @@ public:
     return *this;
   }
 
-  template<typename ... Args>
+  template<typename ...Args> requires std::constructible_from<T, Args...>
   FORCEINLINE_ ByteCopy(Args&&... args) {
     std::construct_at<T>( reinterpret_cast<T*>(&value_), std::forward<Args>(args)... );
     is_active_ = true;

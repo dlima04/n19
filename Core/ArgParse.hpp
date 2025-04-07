@@ -157,11 +157,13 @@ public:
   }
 
   FORCEINLINE_ auto take_argv(std::vector<sys::String>&& a) -> Parser& {
+    args_.clear();
     args_ = std::move(a); /// take ownership
     return *this;         ///
   }
 
   FORCEINLINE_ auto take_argv(const int argc, sys::Char** argv) -> Parser& {
+    args_.clear();
     for(int i = 1; i < argc; i++) args_.emplace_back(argv[i]);
     return *this;
   }

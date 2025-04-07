@@ -11,6 +11,7 @@
 #include <Core/Concepts.hpp>
 #include <utility>
 #include <new>
+#include <concepts>
 #include <functional>
 BEGIN_NAMESPACE(n19)
 

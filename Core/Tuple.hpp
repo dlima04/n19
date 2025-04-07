@@ -119,13 +119,13 @@ public:
   };
 
   template<size_t i> NODISCARD_
-  typename NthTypeAccessor<i, Types...>::Type& at() {
+  typename NthTypeAccessor<i, Types...>::Type& get() {
     static_assert(i < sizeof...(Types), "Out of bounds tuple access!");
     return NthItemAccessor<i, Types...>::access(store_);
   }
 
   template<size_t i> NODISCARD_
-  const typename NthTypeAccessor<i, Types...>::Type& at() const {
+  const typename NthTypeAccessor<i, Types...>::Type& get() const {
     static_assert(i < sizeof...(Types), "Out of bounds tuple access!");
     return NthItemAccessor<i, Types...>::access(store_);
   }
@@ -139,30 +139,13 @@ public:
   Tuple(Tuple<OTs...>&& other) noexcept : store_(std::move(other.store_)) {}
 
   template<typename ...OTs>
-    requires ConstructibleWith_<sizeof...(OTs) - 1, OTs...>::value
+    requires (sizeof...(OTs) > 0 && ConstructibleWith_<sizeof...(OTs) - 1, OTs...>::value)
   Tuple(OTs&&... args) : store_(std::forward<OTs>(args)...) {}
 
  ~Tuple() = default;
   Tuple() = default;
 private:
   TupleStorage<Types...> store_;
-};
-
-template<typename T>
-class Tuple<T> /* Single */ {
-public:
-  template<typename ...OTs>
-  friend class Tuple;
-
-  Tuple(const Tuple& other) : value_(other.value_) {}
-  Tuple(Tuple&& other) noexcept : value_(other.value_) {}
-
-  Tuple(const T& val) : value_(val) {}
-  Tuple(T&& val) : value_(std::move(val)) {}
-
- ~Tuple() = default;
-  Tuple() = default;
-  T value_;
 };
 
 ///
@@ -174,13 +157,28 @@ auto make_tuple(Args&&... args) -> Tuple<RemoveReference<Args>...> {
 
 template<size_t n, typename ...Args>
 auto tuple_accessor(const Tuple<Args...>& tup) -> const NthType<n, Args...>& {
-  return tup. template at<n>();
+  return tup. template get<n>();
 }
 
 template<size_t n, typename ...Args>
 auto tuple_accessor(Tuple<Args...>&& tup) -> NthType<n, Args...>&& {
-  return tup. template at<n>();
+  return std::move(tup. template get<n>());
 }
 
 END_NAMESPACE(n19);
+
+///
+/// For structured bindings
+namespace std {
+  template<typename ...Types>
+  struct tuple_size<::n19::Tuple<Types...>> {
+    static constexpr size_t value = sizeof...(Types);
+  };
+
+  template<size_t index_, typename ...Types>
+  struct tuple_element<index_, ::n19::Tuple<Types...>> {
+    using type = typename ::n19::NthTypeAccessor<index_, Types...>::Type;
+  };
+}
+
 #endif //N19_TUPLE_HPP

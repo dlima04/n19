@@ -55,7 +55,9 @@ auto Value<sys::String>::convert(const sys::String& str) -> Result<void> {
 }
 
 auto Value<PackType>::convert(const sys::String& str) -> Result<void> {
+  value_.clear();
   auto split_views = str | std::ranges::views::split(_nchr(','));
+
   for(auto&& view : split_views) {
     value_.emplace_back(sys::String{ view.begin(), view.end() });
   }

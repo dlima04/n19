@@ -24,14 +24,18 @@ auto Registry::add_case(
   ASSERT(!case_name.empty());
   ASSERT(!suite_name.empty());
 
-  auto exists = std::ranges::find_if(suites_, [&](const Suite& s) {
+  if(suites_ == nullptr) {
+    suites_ = std::make_unique<std::list<Suite>>();
+  }
+
+  auto exists = std::ranges::find_if(*suites_, [&](const Suite& s) {
     return s.name_ == suite_name;
   });
 
-  if(exists != suites_.end()) {
+  if(exists != suites_->end()) {
     exists->cases_.emplace_back(case_func, case_name);
   } else {
-    auto& new_suite = suites_.emplace_back();
+    auto& new_suite = suites_->emplace_back();
     new_suite.name_ = suite_name;
     new_suite.cases_.emplace_back(case_func, case_name);
   }
@@ -40,7 +44,11 @@ auto Registry::add_case(
 }
 
 auto Registry::run_all(OStream &stream) -> void {
-  for(Suite& suite : suites_) {
+  if(suites_ == nullptr) {
+    suites_ = std::make_unique<std::list<Suite>>();
+  }
+
+  for(Suite& suite : *suites_) {
     if(Context::the().should_skip(suite.name_)) {
       g_total_skipped += suite.cases_.size();
       continue;
@@ -59,7 +67,7 @@ auto Registry::run_all(OStream &stream) -> void {
     + g_total_passed
     + g_total_skipped;
 
-  stream << "\nRan " << g_total_suites << " out of " << suites_.size() << " suites.\n";
+  stream << "\nRan " << g_total_suites << " out of " << suites_->size() << " suites.\n";
   stream << total << " cases total,\n";
   stream << "  "  << g_total_passed  << " passed,\n";
   stream << "  "  << g_total_failed  << " failed,\n";
@@ -68,7 +76,7 @@ auto Registry::run_all(OStream &stream) -> void {
 }
 
 auto Registry::find(const sys::StringView& sv) -> Suite* {
-  for(Suite& suite : suites_) {
+  for(Suite& suite : *suites_) {
     if(suite.name_ == sv) return &suite;
   }
   return nullptr;

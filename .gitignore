@@ -21,6 +21,7 @@
 *.vs
 **/.DS_STORE
 build
+temp
 cmake-build-*/
 **/.idea/
 **/.vscode/

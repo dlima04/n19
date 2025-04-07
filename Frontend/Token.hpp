@@ -160,8 +160,8 @@ public:
   #undef X
 
   NODISCARD_ auto to_string() const -> std::string;
-  NODISCARD_ auto isa(Value val) const -> bool;
   NODISCARD_ static auto from_keyword(const std::u8string_view&) -> Maybe<TokenCategory>;
+  NODISCARD_ auto isa(TokenCategory val) const -> bool;
 
   constexpr auto operator|=(const TokenCategory &other) -> void;
   constexpr auto operator|=(Value other) -> void;
@@ -204,8 +204,8 @@ FORCEINLINE_ constexpr auto TokenCategory::operator|=(
   value |= other;
 }
 
-FORCEINLINE_ auto TokenCategory::isa(const Value val) const -> bool {
-  return this->value & val;
+FORCEINLINE_ auto TokenCategory::isa(const TokenCategory val) const -> bool {
+  return this->value & val.value;
 }
 
 END_NAMESPACE(n19);

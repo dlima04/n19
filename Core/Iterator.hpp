@@ -8,6 +8,8 @@
 #include <Core/Platform.hpp>
 #include <Core/ClassTraits.hpp>
 #include <utility>
+#include <iterator>
+#include <cstdint>
 BEGIN_NAMESPACE(n19);
 
 template<typename T>
@@ -15,9 +17,11 @@ class BasicIterator {
   N19_MAKE_DEFAULT_CONSTRUCTIBLE(BasicIterator);
   N19_MAKE_SPACESHIP(BasicIterator);
 public:
-  using PointerType   = T*;
-  using ReferenceType = T&;
-  using ValueType     = T;
+  using iterator_category = std::bidirectional_iterator_tag;
+  using value_type        = T;
+  using difference_type   = std::ptrdiff_t;
+  using pointer           = T*;
+  using reference         = T&;
 
   FORCEINLINE_ auto operator*(this auto&& self) -> auto&& {
     return *std::forward<decltype(self)>(self).ptr_;
@@ -49,11 +53,11 @@ public:
     return temp;   /// incremented value.
   }
 
-  BasicIterator(PointerType ptr) : ptr_(ptr) {}
+  BasicIterator(BasicIterator::pointer ptr) : ptr_(ptr) {}
   BasicIterator() = default;
   ~BasicIterator() = default;
 protected:
-  PointerType ptr_{};
+  BasicIterator::pointer ptr_{};
 };
 
 END_NAMESPACE(n19);

@@ -8,6 +8,7 @@
 #include <Core/Panic.hpp>
 #include <Core/RingBase.hpp>
 #include <Core/Maybe.hpp>
+#include <concepts>
 #include <utility>
 BEGIN_NAMESPACE(n19);
 
@@ -94,7 +95,7 @@ FORCEINLINE_ auto RingQueue<T, size_>::can_peek(const size_t amnt) -> bool {
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
 
-  ASSERT(amnt < (size_ - 1)); // Should never happen.
+  ASSERT(amnt < size_); // Amount must be less than buffer size
   const size_t max_distance = lhead >= ltail
     ? lhead - ltail
     : (size_ - ltail) + lhead;
@@ -106,7 +107,6 @@ FORCEINLINE_ auto RingQueue<T, size_>::try_peek(const size_t amnt) -> Maybe<Valu
   const size_t lhead = head_.load(std::memory_order::acquire) & size_mask_;
   const size_t ltail = tail_.load(std::memory_order::acquire) & size_mask_;
 
-  ASSERT(amnt < (size_ - 1)); // Should never happen.
   const size_t max_distance = lhead >= ltail
     ? lhead - ltail
     : (size_ - ltail) + lhead;
@@ -114,6 +114,8 @@ FORCEINLINE_ auto RingQueue<T, size_>::try_peek(const size_t amnt) -> Maybe<Valu
     return Nothing;
   }
 
+  ASSERT(amnt < size_); // Amount must be less than buffer size
+  ASSERT(((ltail + amnt) & size_mask_) < size_); 
   return buff_[ (ltail + amnt) & size_mask_ ];
 }
 

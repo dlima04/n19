@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 project(n19)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 set(N19_ENUMERATE_GLOBAL_SOURCES
   Frontend/ErrorCollector.cpp
@@ -110,8 +110,16 @@ add_executable(bulwark
   Bulwark/Bulwark.hpp
   Bulwark/Suites/Core/SuiteMaybe.cpp
   Bulwark/Suites/Core/SuiteResult.cpp
+  Bulwark/Suites/Core/SuiteArgParse.cpp
+  Bulwark/Suites/Core/SuiteDefer.cpp
+  Bulwark/Suites/Core/SuiteNothing.cpp
+  Bulwark/Suites/Core/SuiteBytes.cpp
+  Bulwark/Suites/Core/SuiteMurmur3.cpp
   ${N19_ENUMERATE_GLOBAL_SOURCES}
   ${N19_ENUMERATE_GLOBAL_HEADERS}
+        Bulwark/Suites/Core/SuiteTuple.cpp
+        Bulwark/Suites/Core/SuiteRingStructures.cpp
+        Bulwark/Suites/Frontend/SuiteLexer.cpp
 )
 
 function(add_platform_macros target)
@@ -127,14 +135,15 @@ function(add_platform_macros target)
   endif()
 endfunction()
 
-function(enable_clang_asan target)
+function(enable_clang_sanitizer target) #, ...
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    message(STATUS "Build Target ${target} -- Clang Asan Enabled")
-    target_compile_options(${target} PRIVATE -fsanitize=address -g -fno-omit-frame-pointer)
-    target_link_libraries(${target} PRIVATE -fsanitize=address)
+    list(REMOVE_AT ARGV 0)
+    string(REPLACE ";" "," sanitizer "${ARGV}")
+    message(STATUS "Build Target ${target} -- Clang Sanitizer Enabled: ${sanitizer}")
+    target_compile_options(${target} PRIVATE -fsanitize=${sanitizer} -g -fno-omit-frame-pointer)
+    target_link_libraries(${target} PRIVATE -fsanitize=${sanitizer})
   else()
-    message(FATAL_ERROR "enable_clang_asan must be used on clang targets!")
-    message(FATAL_ERROR "CMAKE_CXX_COMPILER_ID = ${CMAKE_CXX_COMPILER_ID}")
+    message(FATAL_ERROR "enable_clang_sanitizer must be used with Clang!")
   endif()
 endfunction()
 
@@ -144,7 +153,7 @@ foreach(executable ${N19_ENUMERATE_PRIMARY_EXECUTABLES})
   add_platform_macros(${executable})
 
   # TODO: this is temporary.
-  enable_clang_asan(${executable})
+  enable_clang_sanitizer(${executable} address)
 
   if(MSVC)
     target_compile_options(${executable} PRIVATE /FI Misc/Global.hpp)

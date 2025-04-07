@@ -47,6 +47,7 @@ public:
   auto expect(TokenType type, bool = true)    -> Result<void>;
 
   static auto create_shared(const sys::File& ref)        -> Result<std::shared_ptr<Lexer>>;
+  static auto create_shared(std::vector<char8_t>&& buf)  -> Result<std::shared_ptr<Lexer>>;
   static auto get_keyword(const std::u8string_view& str) -> Maybe<struct Keyword>;
   static auto is_reserved_byte(char8_t c)                -> bool;
 

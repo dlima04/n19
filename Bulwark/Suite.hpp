@@ -7,13 +7,13 @@
 #define N19_TEST_SUITE_HPP
 #include <Sys/String.hpp>
 #include <Bulwark/Case.hpp>
-#include <deque>
+#include <vector>
 BEGIN_NAMESPACE(n19::test);
 
 class Suite {
 public:
   sys::StringView name_ = _nstr("<UNNAMED>");
-  std::deque<Case> cases_;
+  std::vector<Case> cases_;
 
   auto run_all(OStream& s) -> void;
  ~Suite() = default;

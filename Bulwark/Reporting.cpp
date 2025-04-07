@@ -42,7 +42,7 @@ auto diagnostic(const std::string_view& m, Diagnostic diag, OStream& stream, siz
 }
 
 auto report(const Case &c, Result r, OStream &stream, size_t indent) -> void {
-  report(fmt("Case \"{}\"",c.name_), r, stream, indent);
+  report(fmt("  Case \"{}\"", c.name_), r, stream, indent);
 }
 
 auto report(const Suite& suite, OStream& stream) -> void {
