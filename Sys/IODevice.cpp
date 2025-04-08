@@ -10,18 +10,18 @@
 BEGIN_NAMESPACE(n19::sys);
 
 #if defined(N19_POSIX)
-auto IODevice::write(const Bytes& bytes) const -> Result<void> {
+auto IODevice::write(const Bytes& bytes) -> Result<void> {
   ASSERT(!bytes.empty());
-  if(::write(value_, bytes.data(), bytes.size_bytes()) == -1) {
+  if(!is_invalid() && ::write(value_, bytes.data(), bytes.size_bytes()) == -1) {
     return Error(ErrC::Native, last_error());
   }
 
   return Result<void>::create();
 }
 
-auto IODevice::read_into(WritableBytes& bytes) const -> Result<void> {
+auto IODevice::read_into(WritableBytes& bytes) -> Result<void> {
   ASSERT(!bytes.empty());
-  if(::read(value_, bytes.data(), bytes.size_bytes()) == -1) {
+  if(!is_invalid() && ::read(value_, bytes.data(), bytes.size_bytes()) == -1) {
     return Error(ErrC::Native, last_error());
   }
 
@@ -66,7 +66,7 @@ auto IODevice::from_stdin() -> IODevice {
 
 #else // IF WINDOWS
 
-auto IODevice::write(const Bytes &bytes) const -> Result<void> {
+auto IODevice::write(const Bytes &bytes) -> Result<void> {
   ASSERT(!bytes.empty());
   if(!WriteFile(               ///
     value_,                    /// The output file handle.
@@ -81,7 +81,7 @@ auto IODevice::write(const Bytes &bytes) const -> Result<void> {
   return Result<void>::create();
 }
 
-auto IODevice::read_into(WritableBytes& bytes) const -> Result<void> {
+auto IODevice::read_into(WritableBytes& bytes) -> Result<void> {
   ASSERT(!bytes.empty());
   if(!ReadFile(                ///
     value_,                    /// The input file handle.

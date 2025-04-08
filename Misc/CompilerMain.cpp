@@ -18,8 +18,7 @@
 #include <Sys/File.hpp>
 #include <Core/Defer.hpp>
 #include <Core/Murmur3.hpp>
-
-#include "Frontend/ErrorCollector.hpp"
+#include <Frontend/EntityTable.hpp>
 
 using namespace n19;
 
@@ -36,8 +35,6 @@ auto test() -> Tuple<std::string, double> {
 }
 
 int main(int argc, char** argv){
-  auto tup = n19::make_tuple(std::string("lololol"), 314);
-
   try {
     auto file = MUST(sys::File::open(CURRENT_TEST));
     auto lxr = Lexer::create_shared(file);

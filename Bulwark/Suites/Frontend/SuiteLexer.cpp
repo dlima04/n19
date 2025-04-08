@@ -10,10 +10,6 @@
 #include <string>
 using namespace n19;
 
-/// Test suite for the HIR lexer class.
-/// TODO: add tests for UTF-8 and weird byte combinations!
-///       also possibly weird string/character sequences like 'aadad'
-
 static auto create_lexer(const std::string& source) -> std::shared_ptr<Lexer> {
   std::vector<char8_t> buffer;
   buffer.reserve(source.size());
@@ -474,17 +470,190 @@ TEST_CASE(Lexer, Expect) {
   });
 }
 
-TEST_CASE(Lexer, Revert) {
-  SECTION(RevertToPreviousToken, {
-    auto lexer = create_lexer("42 + 10");
+TEST_CASE(Lexer, Revert) {  
+  auto lexer = create_lexer("42 + 10");    
+  REQUIRE(lexer->current().type_ == TokenType::IntLiteral);
+  auto token = lexer->current();
+
+  lexer->consume(1);
+  REQUIRE(lexer->current().type_ == TokenType::Plus);
+
+  lexer->revert(token);
+  REQUIRE(lexer->current().type_ == TokenType::IntLiteral);
+}
+
+TEST_CASE(Lexer, UTF8Parsing) {
+  SECTION(UTF8Identifiers, {
+    // Create a lexer with UTF-8 encoded identifiers
+    std::u8string chinese = u8"世界";  // "World" in Chinese
+    std::u8string japanese = u8"こんにちは";  // "Hello" in Japanese
     
-    REQUIRE(lexer->current().type_ == TokenType::IntLiteral);
-    auto token = lexer->current();
+    std::vector<char8_t> buffer;
+    buffer.reserve(chinese.size() + japanese.size() + 1);  // +1 for space
     
+    // Copy Chinese identifier
+    buffer.insert(buffer.end(), chinese.begin(), chinese.end());
+    buffer.push_back(u8' ');  // Add space between identifiers
+    // Copy Japanese identifier
+    buffer.insert(buffer.end(), japanese.begin(), japanese.end());
+    
+    auto lexer = Lexer::create_shared(std::move(buffer)).value();
+    
+    // First identifier should be recognized
+    REQUIRE(lexer->current().type_ == TokenType::Identifier);
+    REQUIRE(lexer->current().value(*lexer).value().length() > 0);
     lexer->consume(1);
-    REQUIRE(lexer->current().type_ == TokenType::Plus);
     
-    lexer->revert(token);
+    // Second identifier should be recognized
+    REQUIRE(lexer->current().type_ == TokenType::Identifier);
+    REQUIRE(lexer->current().value(*lexer).value().length() > 0);
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
+  });
+
+  SECTION(UTF8InStringLiterals, {
+    // Create a lexer with UTF-8 encoded string literals
+    std::u8string chinese = u8"世界";  // "World" in Chinese
+    std::u8string japanese = u8"こんにちは";  // "Hello" in Japanese
+    
+    std::vector<char8_t> buffer;
+    buffer.reserve(chinese.size() + japanese.size() + 6);  // +6 for quotes and space
+    
+    // First string literal
+    buffer.push_back(u8'"');
+    buffer.insert(buffer.end(), chinese.begin(), chinese.end());
+    buffer.push_back(u8'"');
+    buffer.push_back(u8' ');
+    
+    // Second string literal
+    buffer.push_back(u8'"');
+    buffer.insert(buffer.end(), japanese.begin(), japanese.end());
+    buffer.push_back(u8'"');
+    
+    auto lexer = Lexer::create_shared(std::move(buffer)).value();
+    
+    // First string literal should be recognized
+    REQUIRE(lexer->current().type_ == TokenType::StringLiteral);
+    REQUIRE(lexer->current().value(*lexer).value().length() > 0);
+    lexer->consume(1);
+    
+    // Second string literal should be recognized
+    REQUIRE(lexer->current().type_ == TokenType::StringLiteral);
+    REQUIRE(lexer->current().value(*lexer).value().length() > 0);
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
+  });
+
+  SECTION(UTF8EscapedInStringLiterals, {
+    // Create a lexer with UTF-8 encoded string literals containing escaped characters
+    std::u8string chinese = u8"世界";  // "World" in Chinese
+    
+    std::vector<char8_t> buffer;
+    buffer.reserve(chinese.size() + 5);  // +5 for quotes, escaped newline, and space
+    
+    buffer.push_back(u8'"');
+    buffer.push_back(u8'\\');
+    buffer.push_back(u8'n');
+    buffer.push_back(u8' ');
+    buffer.insert(buffer.end(), chinese.begin(), chinese.end());
+    buffer.push_back(u8'"');
+    
+    auto lexer = Lexer::create_shared(std::move(buffer)).value();
+    
+    // String literal with escaped newline and UTF-8 should be recognized
+    REQUIRE(lexer->current().type_ == TokenType::StringLiteral);
+    REQUIRE(lexer->current().value(*lexer).value().length() > 0);
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
+  });
+}
+
+TEST_CASE(Lexer, CharacterLiterals) {
+  SECTION(ValidCharacterLiterals, {
+    auto lexer = create_lexer("'a' 'b' 'c' '\\n' '\\t' '\\r' '\\0'");
+    
+    REQUIRE(lexer->current().type_ == TokenType::ByteLiteral);
+    REQUIRE(lexer->current().value(*lexer).value() == "'a'");
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::ByteLiteral);
+    REQUIRE(lexer->current().value(*lexer).value() == "'b'");
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::ByteLiteral);
+    REQUIRE(lexer->current().value(*lexer).value() == "'c'");
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::ByteLiteral);
+    REQUIRE(lexer->current().value(*lexer).value() == "'\\n'");
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::ByteLiteral);
+    REQUIRE(lexer->current().value(*lexer).value() == "'\\t'");
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::ByteLiteral);
+    REQUIRE(lexer->current().value(*lexer).value() == "'\\r'");
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::ByteLiteral);
+    REQUIRE(lexer->current().value(*lexer).value() == "'\\0'");
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
+  });
+
+  SECTION(InvalidCharacterLiterals, {
+    // Multiple characters in single quotes should be illegal
+    auto lexer1 = create_lexer("'aa'");
+    REQUIRE(lexer1->current().type_ == TokenType::Illegal);
+    
+    // UTF-8 characters in single quotes should be illegal
+    std::u8string chinese = u8"世";  // Single Chinese character
+    
+    std::vector<char8_t> buffer;
+    buffer.reserve(chinese.size() + 2);  // +2 for quotes
+    
+    buffer.push_back(u8'\'');
+    buffer.insert(buffer.end(), chinese.begin(), chinese.end());
+    buffer.push_back(u8'\'');
+    
+    auto lexer2 = Lexer::create_shared(std::move(buffer)).value();
+    REQUIRE(lexer2->current().type_ == TokenType::Illegal);
+    
+    // Unterminated character literal
+    auto lexer3 = create_lexer("'a");
+    auto tok = lexer3->current();
+
+    REQUIRE(lexer3->current().type_ == TokenType::Illegal);
+  });
+}
+
+TEST_CASE(Lexer, InvalidTokens) {
+  SECTION(InvalidNumbers, {
+    // Invalid number formats
+    auto lexer1 = create_lexer("1.2.3");
+    auto lexer3 = create_lexer("091");
+    auto lexer2 = create_lexer("0xGG");
+
+    REQUIRE(lexer1->current() == TokenType::Illegal);
+    REQUIRE(lexer2->current() == TokenType::Illegal);
+    REQUIRE(lexer3->current() == TokenType::Illegal);
+  });
+
+  SECTION(InvalidIdentifiers, {
+    // Identifiers starting with numbers
+    auto lexer = create_lexer("123abc");
+    
     REQUIRE(lexer->current().type_ == TokenType::IntLiteral);
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::Identifier);
+    lexer->consume(1);
+    
+    REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
   });
 } 

@@ -185,6 +185,13 @@ public:
     return the_stream;
   }
 
+  /// Need this for unit tests.
+  static auto create_testable() -> BufferedOStream {
+    auto the_stream = BufferedOStream<size_>();
+    the_stream.fd_.invalidate();
+    return the_stream;
+  }
+
   static auto from(const sys::IODevice& dev) -> BufferedOStream {
     auto the_stream = BufferedOStream<size_>();
     the_stream.fd_  = dev;
@@ -234,6 +241,11 @@ public:
 
     return *this;
   }
+
+  NODISCARD_ auto buffer_data()      const -> const Char_* { return buff_; } 
+  NODISCARD_ auto buffer_max_size()  const -> size_t { return len_; }
+  NODISCARD_ auto buffer_remaining() const -> size_t { return len_ - curr_; }
+  NODISCARD_ auto buffer_current()   const -> size_t { return curr_; }
 
  ~BufferedOStream() override = default;
   BufferedOStream() = default;
@@ -306,7 +318,7 @@ public:
     return *this;
   }
 
-  FORCEINLINE_ auto readln(std::string& str) const -> size_t {
+  FORCEINLINE_ auto readln(std::string& str) -> size_t {
     if(in_failstate_) return 0;
     str.clear();
     size_t written = 0;
@@ -324,7 +336,7 @@ public:
     return written;
   }
 
-  FORCEINLINE_ auto readword(std::string& str) const -> size_t {
+  FORCEINLINE_ auto readword(std::string& str) -> size_t {
     if(in_failstate_) return 0;
     str.clear();
     size_t written = 0;
@@ -343,7 +355,7 @@ public:
     return written;
   }
 
-  FORCEINLINE_ auto read_one() const -> Char_ {
+  FORCEINLINE_ auto read_one() -> Char_ {
     if(in_failstate_) return '\0';
     Char_ buff[1]{};
     auto wspan = n19::as_writable_bytes(buff);
@@ -360,7 +372,7 @@ public:
     return *this;
   }
 
-  auto read_into(WritableBytes& bytes) const -> Result<void> {
+  auto read_into(WritableBytes& bytes) -> Result<void> {
     return fd_.read_into(bytes);
   }
 

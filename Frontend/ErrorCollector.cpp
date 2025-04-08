@@ -90,7 +90,7 @@ auto n19::ErrorCollector::display_error(
 
 auto n19::ErrorCollector::display_error(
   const std::string& msg,
-  const sys::File& file,
+  sys::File& file,
   OStream& stream,
   const size_t pos,
   const uint32_t line,

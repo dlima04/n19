@@ -225,13 +225,13 @@ inline auto Lexer::token_squote_() -> Token {
   curr_tok.line_ = line_;
   curr_tok.pos_  = index_;
 
-  //
-  // Check what's INSIDE the quotes first.
-  // TODO: not sure if this code is fully correct...
-  //
+  ///
+  /// Check what's INSIDE the quotes first.
+  /// TODO: not sure if this code is fully correct...
+  ///
 
   consume_char_(1);
-  if(current_char_() == '\\') {
+  if(current_char_() == u8'\\') {
     consume_char_(1);
     if(UTF8_LEADING(current_char_())) {
       curr_tok.len_  = index_ - curr_tok.pos_;
@@ -239,13 +239,13 @@ inline auto Lexer::token_squote_() -> Token {
       return curr_tok;
     }
     consume_char_(1);
-  } else if(current_char_() == '\'') {
+  } else if(current_char_() == u8'\'') {
     consume_char_(1);
     curr_tok.type_ = TokenType::ByteLiteral;
     curr_tok.cat_  = TokenCategory::Literal;
     curr_tok.len_  = index_ - curr_tok.pos_;
     return curr_tok;
-  } else if(UTF8_LEADING(current_char_()) || current_char_() == '\n') {
+  } else if(UTF8_LEADING(current_char_()) || current_char_() == u8'\n') {
     curr_tok.type_ = TokenType::Illegal;
     curr_tok.cat_  = TokenCategory::NonCategorical;
     curr_tok.len_  = index_ - curr_tok.pos_;
@@ -254,13 +254,12 @@ inline auto Lexer::token_squote_() -> Token {
     consume_char_(1);
   }
 
-  //
-  // Ensure the following character is a closing quote, token == illegal otherwise.
-  //
+  ///
+  /// Ensure the following character is a closing quote,
+  /// token == illegal otherwise.
+  ///
 
-  if(current_char_() == '\0') {
-    curr_tok = Token::eof(src_.size() - 1, line_);
-  } else if(current_char_() == '\'') [[likely]] {
+  if(current_char_() == u8'\'') {
     consume_char_(1);
     curr_tok.type_ = TokenType::ByteLiteral;
     curr_tok.cat_  = TokenCategory::Literal;
@@ -905,7 +904,7 @@ auto Lexer::create_shared(std::vector<char8_t>&& buf) -> Result<std::shared_ptr<
   return lxr;
 }
 
-auto Lexer::create_shared(const sys::File& ref) -> Result<std::shared_ptr<Lexer>> {
+auto Lexer::create_shared(sys::File& ref) -> Result<std::shared_ptr<Lexer>> {
   ref.seek(0, sys::FSeek::Beg);
   const auto fsize = TRY(ref.size());
 

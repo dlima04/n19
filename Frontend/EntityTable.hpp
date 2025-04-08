@@ -12,12 +12,10 @@
 #include <Core/Result.hpp>
 #include <unordered_map>
 #include <print>
+#include <utility>
+BEGIN_NAMESPACE(n19);
 
-namespace n19 {
-  class EntityTable;
-}
-
-class n19::EntityTable {
+class EntityTable {
   N19_MAKE_NONCOPYABLE(EntityTable);
   N19_MAKE_NONMOVABLE(EntityTable);
 public:
@@ -28,8 +26,8 @@ public:
     uint32_t line,
     const std::string& file,
     const std::string& lname,
-    Args... args
-  ) -> Entity::Ptr<>;
+    Args&&... args
+  ) -> Entity::Ptr<T>;
 
   template<typename T, typename ...Args>
   auto insert(
@@ -38,9 +36,10 @@ public:
     uint32_t line,
     const std::string& file,
     const std::string& lname,
-    Args... args
-  ) -> Entity::Ptr<>;
+    Args&&... args
+  ) -> Entity::Ptr<T>;
 
+  auto resolve_link(Entity::Ptr<SymLink> ptr) const -> Entity::Ptr<>;
   auto exists(Entity::ID id) const -> bool;
   auto find(Entity::ID id)   const -> Entity::Ptr<>;
 
@@ -56,26 +55,27 @@ private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T, typename ...Args>
-auto n19::EntityTable::insert(
+auto EntityTable::insert(
   const Entity::Ptr<> parent,
   const size_t pos,
   const uint32_t line,
   const std::string& file,
   const std::string& lname,
-  Args... args ) -> Entity::Ptr<>
+  Args&&... args ) -> Entity::Ptr<T>
 {
   ASSERT(parent != nullptr);
   ASSERT(line != 0);
 
   const auto id     = curr_id_;
-  map_[id]          = std::make_shared<T>(args...);
+  map_[id]          = std::make_shared<T>(std::forward(args)...);
   map_[id]->file_   = file;
   map_[id]->id_     = id;
   map_[id]->parent_ = parent->id_;
   map_[id]->lname_  = lname;
-  map_[id]->name_   = parent->name_ + fmt("::{}", lname);
   map_[id]->pos_    = pos;
   map_[id]->line_   = line;
+  map_[id]->name_   = parent->id_ == N19_ROOT_ENTITY_ID
+    ? fmt("::{}", lname) : parent->name_ + fmt("::{}", lname);
 
   #define X(NAME)                       \
   if constexpr(IsSame<T, NAME>) {       \
@@ -86,17 +86,17 @@ auto n19::EntityTable::insert(
   #undef X
 
   ++curr_id_;
-  return map_[id];
+  return Entity::cast<T>(map_[id]);
 }
 
 template<typename T, typename ...Args>
-auto n19::EntityTable::insert(
+auto EntityTable::insert(
   const Entity::ID parent_id,
   const size_t pos,
   const uint32_t line,
   const std::string& file,
   const std::string& lname,
-  Args... args ) -> Entity::Ptr<>
+  Args&&... args ) -> Entity::Ptr<T>
 {
   ASSERT(exists(parent_id));
   ASSERT(line != 0);
@@ -104,14 +104,15 @@ auto n19::EntityTable::insert(
   const auto id = curr_id_;
   const auto parent = find(parent_id);
 
-  map_[id]          = std::make_shared<T>(args...);
+  map_[id]          = std::make_shared<T>(std::forward(args)...);
   map_[id]->file_   = file;
   map_[id]->id_     = id;
   map_[id]->parent_ = parent->id_;
   map_[id]->lname_  = lname;
-  map_[id]->name_   = parent->name_ + fmt("::{}", lname);
   map_[id]->pos_    = pos;
   map_[id]->line_   = line;
+  map_[id]->name_   = parent->id_ == N19_ROOT_ENTITY_ID
+    ? fmt("::{}", lname) : parent->name_ + fmt("::{}", lname);
 
   #define X(NAME)                       \
   if constexpr(IsSame<T, NAME>) {       \
@@ -122,7 +123,8 @@ auto n19::EntityTable::insert(
   #undef X
 
   ++curr_id_;
-  return map_[id];
+  return Entity::cast<T>(map_[id]);
 }
 
+END_NAMESPACE(n19);
 #endif //ENTITYTABLE_HPP

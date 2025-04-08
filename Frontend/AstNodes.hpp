@@ -6,7 +6,7 @@
 #ifndef ASTNODES_HPP
 #define ASTNODES_HPP
 #include <Frontend/Token.hpp>
-#include <Frontend/EntityQualifier.hpp>
+#include <Frontend/Entity.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
 #include <IO/Console.hpp>

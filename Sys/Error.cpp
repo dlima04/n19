@@ -6,7 +6,6 @@
 #include <Sys/Error.hpp>
 
 #if defined(N19_WIN32)
-#include <windows.h>
 BEGIN_NAMESPACE(n19::sys);
 
 NODISCARD_ auto last_error() -> String {
@@ -64,7 +63,6 @@ END_NAMESPACE(n19::sys);
 #else // POSIX
 
 #include <string.h>
-#include <errno.h>
 BEGIN_NAMESPACE(n19::sys);
 
 NODISCARD_ auto last_error() -> String {

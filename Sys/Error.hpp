@@ -8,6 +8,12 @@
 #include <Sys/String.hpp>
 #include <Core/Platform.hpp>
 
+#ifdef N19_WIN32
+#include <windows.h>
+#else
+#include <errno.h>
+#endif
+
 namespace n19::sys {
 #ifdef N19_WIN32
   using ErrorCode = ::DWORD;

@@ -5,8 +5,9 @@
 
 #include <Frontend/EntityTable.hpp>
 #include <algorithm>
+BEGIN_NAMESPACE(n19);
 
-n19::EntityTable::EntityTable(const std::string& name) {
+EntityTable::EntityTable(const std::string& name) {
   // Initialize the root entity.
   root_         = std::make_shared<RootEntity>();
   root_->file_  = name;
@@ -39,12 +40,28 @@ n19::EntityTable::EntityTable(const std::string& name) {
   curr_id_ = BuiltinType::AfterLastID;
 }
 
-auto n19::EntityTable::exists(const Entity::ID id) const -> bool {
+auto EntityTable::resolve_link(Entity::Ptr<SymLink> ptr) const -> Entity::Ptr<> {
+  Entity::Ptr<> curr;
+  Entity::Ptr<SymLink> next = ptr;
+
+  do {
+    ASSERT(next->link_ != N19_INVALID_ENTITY_ID);
+    ASSERT(exists(next->link_));
+    curr = map_.at(next->link_);
+    next = Entity::try_cast<SymLink>(curr);
+  } while(next);
+
+  return curr;
+}
+
+auto EntityTable::exists(const Entity::ID id) const -> bool {
   ASSERT(id != N19_INVALID_ENTITY_ID);
   return map_.contains(id);
 }
 
-auto n19::EntityTable::find(const Entity::ID id) const -> Entity::Ptr<> {
+auto EntityTable::find(const Entity::ID id) const -> Entity::Ptr<> {
   ASSERT(exists(id));
   return map_.at(id);
 }
+
+END_NAMESPACE(n19);

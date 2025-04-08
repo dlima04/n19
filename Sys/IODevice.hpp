@@ -41,8 +41,8 @@ public:
   auto invalidate() -> void override;
   auto is_invalid() -> bool override;
 
-  auto write(const Bytes& bytes) const -> Result<void>;
-  auto read_into(WritableBytes& bytes) const -> Result<void>;
+  auto write(const Bytes& bytes) -> Result<void>;
+  auto read_into(WritableBytes& bytes) -> Result<void>;
   auto flush_handle() const -> void;
 
   template<typename T> auto operator<<(const T&) -> IODevice&;
@@ -105,7 +105,7 @@ FORCEINLINE_ auto IODevice::flush_handle() const -> void {
 
 #else // IF WINDOWS
 FORCEINLINE_ auto IODevice::invalidate() -> void {
-  value_ = (::HANDLE)0x00;
+  value_ = (::HANDLE)nullptr;
   perms_ = IODevice::NoAccess;
 }
 

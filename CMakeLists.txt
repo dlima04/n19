@@ -8,7 +8,6 @@ set(N19_ENUMERATE_GLOBAL_SOURCES
   Frontend/ErrorCollector.cpp
   Frontend/EntityTable.cpp
   Frontend/Entity.cpp
-  Frontend/EntityQualifier.cpp
   Frontend/DumpAst.cpp
   Frontend/Lexer.cpp
   Frontend/Token.cpp
@@ -33,7 +32,6 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Frontend/Token.hpp
   Frontend/ErrorCollector.hpp
   Frontend/AstNodes.hpp
-  Frontend/EntityQualifier.hpp
   Frontend/EntityTable.hpp
   Frontend/Entity.hpp
   Frontend/Lexer.hpp
@@ -115,11 +113,14 @@ add_executable(bulwark
   Bulwark/Suites/Core/SuiteNothing.cpp
   Bulwark/Suites/Core/SuiteBytes.cpp
   Bulwark/Suites/Core/SuiteMurmur3.cpp
+  Bulwark/Suites/Core/SuiteTuple.cpp
+  Bulwark/Suites/Core/SuiteRingStructures.cpp
+  Bulwark/Suites/Frontend/SuiteLexer.cpp
+  Bulwark/Suites/IO/SuiteStream.cpp
+  Bulwark/Suites/Sys/SuiteSystemError.cpp
+  Bulwark/Suites/Frontend/SuiteEntity.cpp
   ${N19_ENUMERATE_GLOBAL_SOURCES}
   ${N19_ENUMERATE_GLOBAL_HEADERS}
-        Bulwark/Suites/Core/SuiteTuple.cpp
-        Bulwark/Suites/Core/SuiteRingStructures.cpp
-        Bulwark/Suites/Frontend/SuiteLexer.cpp
 )
 
 function(add_platform_macros target)
@@ -131,7 +132,6 @@ function(add_platform_macros target)
     target_compile_definitions(${target} PRIVATE N19_MACOS)
   else()
     target_compile_definitions(${target} PRIVATE N19_WIN32)
-    target_compile_definitions(${target} PRIVATE N19_DOGSHIT_PLATFORM)
   endif()
 endfunction()
 
