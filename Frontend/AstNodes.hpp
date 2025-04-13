@@ -140,7 +140,7 @@ public:
     StringLit,
     U8Lit,
     FloatLit,
-  } type_ = None;
+  } scalar_type_ = None;
 
   auto print(uint32_t depth,
     OStream& stream,

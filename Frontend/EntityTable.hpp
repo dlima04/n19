@@ -42,6 +42,8 @@ public:
   auto resolve_link(Entity::Ptr<SymLink> ptr) const -> Entity::Ptr<>;
   auto exists(Entity::ID id) const -> bool;
   auto find(Entity::ID id)   const -> Entity::Ptr<>;
+  auto dump(OStream& stream = outs()) -> void;
+  auto dump_structures(OStream& stream = outs()) -> void;
 
   std::unordered_map<Entity::ID, Entity::Ptr<>> map_;
   std::shared_ptr<RootEntity> root_ = nullptr;
@@ -122,6 +124,7 @@ auto EntityTable::insert(
   N19_ENTITY_TYPE_LIST
   #undef X
 
+  parent->chldrn_.emplace_back(id);
   ++curr_id_;
   return Entity::cast<T>(map_[id]);
 }

@@ -5,20 +5,26 @@
 
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
+#include <Core/Maybe.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Concepts.hpp>
 #include <Core/Panic.hpp>
+#include <IO/Console.hpp>
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <memory>
 
-///
-/// Some constants:
-/// The root entity ID begins at 1.
-/// a value of 0 is an invalid ID.
 #define N19_ROOT_ENTITY_ID 1
 #define N19_INVALID_ENTITY_ID 0
+
+#define N19_EQ_FLAG_LIST                   \
+  X(None,      0ULL)                       \
+  X(Constant,  1ULL)                       \
+  X(Reference, 1ULL << 1)                  \
+  X(Rvalue,    1ULL << 2)                  \
+  X(Volatile,  1ULL << 3)                  \
+  X(Poison,    1ULL << 4)                  \
 
 #define N19_ENTITY_BUILTIN_LIST            \
   X(I8,   "i8",  N19_ROOT_ENTITY_ID + 1)   \
@@ -47,19 +53,9 @@
   X(AliasType)   /* Indirection, Type   */ \
   X(BuiltinType) /* Builtin, e.g. "int" */ \
 
-#define N19_EQ_FLAG_LIST                   \
-  X(None,      0ULL)                       \
-  X(Constant,  1ULL)                       \
-  X(Reference, 1ULL << 1)                  \
-  X(Rvalue,    1ULL << 2)                  \
-  X(Volatile,  1ULL << 3)                  \
-  X(Poison,    1ULL << 4)                  \
-
 BEGIN_NAMESPACE(n19);
 class EntityTable;
 
-///
-/// Expand macros.
 #define X(NAME) class NAME;
   N19_ENTITY_TYPE_LIST
 #undef X
@@ -71,8 +67,6 @@ enum class EntityType : uint16_t {
 #undef X
 };
 
-///
-/// Base Entity
 class Entity {
 public:
   template<typename T = Entity>
@@ -93,8 +87,8 @@ public:
   template<typename To, typename From>
   static auto cast(Entity::Ptr<From> p) -> Entity::Ptr<To> {
     auto out = std::dynamic_pointer_cast<To>(p);
-    ASSERT(out); /// Ensure the cast is possible.
-    return out;  ///
+    ASSERT(out);
+    return out;
   }
 
   template<typename To, typename From>
@@ -102,12 +96,34 @@ public:
     return std::dynamic_pointer_cast<To>(p);
   }
 
+  auto print_(
+    uint32_t depth,
+    OStream& stream
+  ) const -> void;
+
+  auto print_children_(
+    uint32_t depth,
+    OStream& stream,
+    EntityTable& table
+  ) const -> void;
+
+  virtual auto print(
+    uint32_t depth,
+    OStream& stream,
+    EntityTable& table
+  ) const -> void = 0;
+
   virtual ~Entity() = default;
   Entity() = default;
 };
 
 class RootEntity final : public Entity {
 public:
+  auto print(uint32_t depth,
+    OStream &stream,
+    EntityTable &table
+  ) const -> void override;
+
   RootEntity() = default;
  ~RootEntity() override = default;
 };
@@ -197,12 +213,22 @@ inline auto EntityQualifierBase::is_matrice()  const -> bool { return arr_length
 /// before the declaration).
 class PlaceHolder final : public Entity {
 public:
+  auto print(uint32_t depth,
+    OStream &stream,
+    EntityTable &table
+  ) const -> void override;
+
   PlaceHolder() = default;
  ~PlaceHolder() override = default;
 };
 
 class SymLink : public Entity {
 public:
+  auto print(uint32_t depth,
+    OStream &stream,
+    EntityTable &table
+  ) const -> void override;
+
   Entity::ID link_ = N19_INVALID_ENTITY_ID;
   SymLink() = default;
  ~SymLink() override = default;
@@ -210,6 +236,11 @@ public:
 
 class Variable final : public Entity {
 public:
+  auto print(uint32_t depth,
+    OStream &stream,
+    EntityTable &table
+  ) const -> void override;
+
   EntityQualifierBase quals_;
   Entity::ID type_ = N19_INVALID_ENTITY_ID;
 
@@ -217,16 +248,24 @@ public:
  ~Variable() override = default;
 };
 
-///
-/// Base class for entity.
 class Type : public Entity {
 public:
+  auto print(uint32_t depth,
+    OStream &stream,
+    EntityTable &table
+  ) const -> void override;
+
   Type() = default;
  ~Type() override = default;
 };
 
 class AliasType final : public SymLink {
 public:
+  auto print(uint32_t depth,
+    OStream &stream,
+    EntityTable &table
+  ) const -> void override;
+
   EntityQualifierBase quals_;
   AliasType() = default;
  ~AliasType() override = default;
@@ -234,6 +273,11 @@ public:
 
 class Static final : public Entity {
 public:
+  auto print(uint32_t depth,
+    OStream &stream,
+    EntityTable &table
+  ) const -> void override;
+
   Static() = default;
  ~Static() override = default;
 };
@@ -244,6 +288,11 @@ public:
 /// the return type is void.
 class Proc : public Entity {
 public:
+  auto print(uint32_t depth,
+    OStream &stream,
+    EntityTable &table
+  ) const -> void override;
+
   std::vector<Entity::ID> parameters_;
   Entity::ID return_type_ = N19_INVALID_ENTITY_ID;
 
@@ -253,6 +302,11 @@ public:
 
 class Struct : public Type {
 public:
+  auto print(uint32_t depth,
+    OStream &stream,
+    EntityTable &table
+  ) const -> void override;
+
   struct Member {
     std::string name_;
     EntityQualifierBase quals_;
@@ -275,8 +329,13 @@ public:
   enum Type : Entity::ID {
     N19_ENTITY_BUILTIN_LIST
     AfterLastID
-  } type_ = AfterLastID;
+  } builtin_type_ = AfterLastID;
 #undef X
+
+  auto print(uint32_t depth,
+    OStream &stream,
+    EntityTable &table
+  ) const -> void override;
 
   ~BuiltinType() override = default;
   explicit BuiltinType(Type type);

@@ -19,7 +19,7 @@ auto EntityQualifier::format() const -> std::string {
   std::string buff;
 
   #define X(EQ_FLAG, UNUSED)                      \
-  if(flags_ & n19::EntityQualifier::EQ_FLAG){     \
+  if(flags_ & n19::EntityQualifierBase::EQ_FLAG){ \
     buff += #EQ_FLAG " | ";                       \
   }
     N19_EQ_FLAG_LIST
@@ -52,7 +52,7 @@ auto EntityQualifierThunk::format() const -> std::string {
   std::string full_name; /// full entity name
 
   #define X(EQ_FLAG, UNUSED)                      \
-  if(flags_ & n19::EntityQualifier::EQ_FLAG){     \
+  if(flags_ & n19::EntityQualifierBase::EQ_FLAG){ \
     buff += #EQ_FLAG " | ";                       \
   }
     N19_EQ_FLAG_LIST
@@ -143,11 +143,215 @@ auto EntityQualifierThunk::to_string(
   }
 
   if(include_postfixes) {
-    for(const auto& len : arr_lengths_) buff.append(fmt("[{}]", len));
     for(int i = 0; i < ptr_depth_; i++) buff.append("*");
+    for(const auto& len : arr_lengths_) buff.append(fmt("[{}]", len));
   }
 
   return buff;
+}
+
+auto Entity::print_children_(
+  const uint32_t depth,
+  OStream &stream, EntityTable &table ) const -> void
+{
+  stream << "\n";
+  for(Entity::ID id : chldrn_) {
+    auto ptr = table.find(id);
+    ptr->print(depth + 1, stream, table);
+  }
+}
+
+auto Entity::print_(
+  const uint32_t depth,
+  OStream &stream ) const -> void
+{
+  for(uint32_t i = 0; i < depth; i++)
+    stream << "  |";
+  if(depth)
+    stream << "_ ";
+
+  /// Preamble
+  stream
+    << Con::Bold
+    << Con::MagentaFG
+    << this->name_
+    << Con::Reset;
+  stream
+    << " <"
+    << Con::YellowFG
+    << this->line_
+    << Con::Reset
+    << ','
+    << Con::YellowFG
+    << this->pos_
+    << Con::Reset
+    << "> -- ";
+
+  /// Display entity type
+#define X(TYPE)              \
+  case EntityType::TYPE:     \
+  stream                     \
+    << Con::GreenFG          \
+    << #TYPE                 \
+    << Con::Reset            \
+    << " with ";             \
+  break;
+
+  switch(type_) {
+    N19_ENTITY_TYPE_LIST
+    default: UNREACHABLE_ASSERTION;
+  }
+#undef X
+
+  /// Entity ID and other info
+  stream
+    << "ID="
+    << Con::GreenFG
+    << this->id_
+    << Con::Reset
+    << ", File="
+    << Con::GreenFG
+    << "\""
+    << this->file_
+    << "\""
+    << Con::Reset
+    << " ";
+}
+
+auto Type::print(
+  const uint32_t depth,
+  OStream &stream, EntityTable &table ) const -> void
+{
+  print_(depth, stream);
+  print_children_(depth, stream, table);
+}
+
+auto Struct::print(
+  const uint32_t depth,
+  OStream &stream, EntityTable &table ) const -> void
+{
+  print_(depth, stream);
+  print_children_(depth, stream, table);
+}
+
+auto BuiltinType::print(
+  const uint32_t depth,
+  OStream &stream, EntityTable &table) const -> void
+{
+  print_(depth, stream);
+  print_children_(depth, stream, table);
+}
+
+auto AliasType::print(
+  const uint32_t depth,
+  OStream &stream, EntityTable &table ) const -> void
+{
+  print_(depth, stream);
+  stream
+    << ", Link="
+    << Con::BlueFG
+    << this->link_
+    << Con::Reset
+    << Con::Bold
+    << ", Qualifiers: "
+    << Con::Reset;
+
+  std::string buff;
+
+  #define X(EQ_FLAG, UNUSED)                             \
+  if(quals_.flags_ & n19::EntityQualifierBase::EQ_FLAG){ \
+    buff += #EQ_FLAG " | ";                              \
+  }
+    N19_EQ_FLAG_LIST
+  #undef X
+
+  if(!buff.empty()) {
+    buff.erase(buff.size() - 3);
+    buff += ", ";
+  }
+
+  buff += fmt("ptr_depth = {}, ", quals_.ptr_depth_);
+  buff += quals_.arr_lengths_.empty() ? "array_lengths = N/A " : "array_lengths = ";
+
+  for(const auto& length : quals_.arr_lengths_) {
+    buff += fmt("{} ", length);
+  }
+
+  stream << "\n";
+  print_children_(depth, stream, table);
+}
+
+auto Static::print(
+  const uint32_t depth,
+  OStream& stream, EntityTable &table ) const -> void
+{
+  print_(depth, stream);
+  print_children_(depth, stream, table);
+}
+
+auto Proc::print(
+  const uint32_t depth,
+  OStream &stream, EntityTable &table) const -> void
+{
+  print_(depth, stream);
+  stream << "Parameters: { " << Con::BlueFG;
+  for(Entity::ID id : parameters_) {
+    stream << id << " ";
+  }
+
+  stream
+    << Con::Reset
+    << "}, "
+    << "ReturnType="
+    << Con::BlueFG
+    << return_type_
+    << Con::Reset;
+  print_children_(depth, stream, table);
+}
+
+auto PlaceHolder::print(
+  const uint32_t depth,
+  OStream &stream, EntityTable &table ) const -> void
+{
+  print_(depth, stream);
+  stream
+    << Con::RedFG
+    << "(PLACEHOLDER)"
+    << Con::Reset;
+  print_children_(depth, stream, table);
+}
+
+auto SymLink::print(
+  const uint32_t depth,
+  OStream &stream, EntityTable &table ) const -> void
+{
+  print_(depth, stream);
+  stream
+    << ", Link="
+    << Con::BlueFG
+    << this->link_
+    << Con::Reset;
+  print_children_(depth, stream, table);
+}
+
+auto Variable::print(
+  const uint32_t depth,
+  OStream &stream, EntityTable &table ) const -> void
+{
+  print_(depth, stream);
+  print_children_(depth, stream, table);
+}
+
+auto RootEntity::print(
+  const uint32_t depth,
+  OStream &stream, EntityTable &table ) const -> void
+{
+  print_(depth, stream);
+  stream
+    << Con::RedFG
+    << "(ROOT)"
+    << Con::Reset;
+  print_children_(depth, stream, table);
 }
 
 END_NAMESPACE(n19);

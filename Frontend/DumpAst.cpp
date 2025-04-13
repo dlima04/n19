@@ -478,6 +478,7 @@ auto AstUnaryExpr::print(
     << as_str
     << Con::Reset
     << Con::WhiteFG
+    << " is_postfix = "
     << (is_postfix ? "True\n" : "False\n")
     << Con::Reset;
 
