@@ -45,13 +45,11 @@ public:
   ~RingBase() = default;
   RingBase()  = default;
 protected:
-  alignas(ALIGN_PROMOTE_LOCALITY) T buff_[ size_ ];
-  alignas(ALIGN_AVOID_FALSESHARE) std::atomic<size_t> head_{ 0 };
-  alignas(ALIGN_AVOID_FALSESHARE) std::atomic<size_t> tail_{ 0 };
+  alignas(N19_CACHE_LINE_SIZE_GUESS) T buff_[ size_ ];
+  alignas(N19_CACHE_LINE_SIZE_GUESS) std::atomic<size_t> head_{ 0 };
+  alignas(N19_CACHE_LINE_SIZE_GUESS) std::atomic<size_t> tail_{ 0 };
 };
 
-///
-/// Methods
 
 template<typename T, size_t size_>
 FORCEINLINE_ auto RingBase<T, size_>::is_full() const -> bool {

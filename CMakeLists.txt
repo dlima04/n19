@@ -153,7 +153,10 @@ foreach(executable ${N19_ENUMERATE_PRIMARY_EXECUTABLES})
   add_platform_macros(${executable})
 
   # TODO: this is temporary.
-  enable_clang_sanitizer(${executable} address)
+  # Need to use a build option for this in the future.
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    enable_clang_sanitizer(${executable} address)
+  endif()
 
   if(MSVC)
     target_compile_options(${executable} PRIVATE /FI Misc/Global.hpp)

@@ -5,22 +5,17 @@
 
 #ifndef PLATFORM_HPP
 #define PLATFORM_HPP
-#include <new>
 
 ///
-/// NOTE: the following two alignment constants should basically always be the same!
-/// The prefetch unit size and the size of a cache line are identical on
-/// pretty much all modern architectures (64 bytes usually). Still, I'll make the distinction.
-
-///
-/// Encourages good cache locality for objects stored in contiguous memory regions,
-/// the maximum amount of memory that the prefetcher can gather in one go.
-constexpr auto ALIGN_PROMOTE_LOCALITY = std::hardware_constructive_interference_size;
-
-///
-/// The minimum offset between two elements that is required to prevent false sharing
-/// and cache invalidation issues. A common usecase might be to throw this alignment onto an atomic index/counter.
-constexpr auto ALIGN_AVOID_FALSESHARE = std::hardware_destructive_interference_size;
+/// Should be 64 on the vast majority of architectures...
+#if defined(__x86_64__) || defined(_M_X64)
+#  define N19_CACHE_LINE_SIZE_GUESS 64
+#elif defined(__aarch64__)
+#  define N19_CACHE_LINE_SIZE_GUESS 64
+#else
+#  warning "Cache line size guess -- could not determine arch"
+#  define N19_CACHE_LINE_SIZE_GUESS 64
+#endif
 
 ///
 /// Compiler definitions, for detecting which compiler is being used.
