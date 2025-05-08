@@ -4,10 +4,50 @@
 */
 
 #include <Frontend/Parser.hpp>
+#include <Core/StringUtil.hpp>
 #include <Sys/File.hpp>
 #include <algorithm>
 #include <filesystem>
 BEGIN_NAMESPACE(n19::detail_);
+
+auto is_node_toplevel_valid_(const AstNode::Ptr<> &ptr) -> bool {
+  switch (ptr->type_) {
+  case AstNode::Type::Namespace:        FALLTHROUGH_;
+  case AstNode::Type::Where:            FALLTHROUGH_;
+  case AstNode::Type::ProcDecl:         FALLTHROUGH_;
+  case AstNode::Type::Vardecl:          return true;
+  default:                              return false;
+  }
+}
+
+auto node_never_needs_terminal_(const AstNode::Ptr<>& ptr) -> bool {
+  switch(ptr->type_) {
+  case AstNode::Type::ProcDecl:         FALLTHROUGH_;
+  case AstNode::Type::Namespace:        FALLTHROUGH_;
+  case AstNode::Type::ScopeBlock:       FALLTHROUGH_;
+  case AstNode::Type::For:              FALLTHROUGH_;
+  case AstNode::Type::While:            FALLTHROUGH_;
+  case AstNode::Type::Branch:           FALLTHROUGH_;
+  case AstNode::Type::ConstBranch:      return true;
+  default:                              return false;
+  }
+}
+
+auto is_valid_subexpression_(const AstNode::Ptr<>& ptr) -> bool {
+  switch (ptr->type_) {
+  case AstNode::Type::Call:             FALLTHROUGH_;
+  case AstNode::Type::TypeRef:          FALLTHROUGH_;
+  case AstNode::Type::TypeRefThunk:     FALLTHROUGH_;
+  case AstNode::Type::EntityRef:        FALLTHROUGH_;
+  case AstNode::Type::EntityRefThunk:   FALLTHROUGH_;
+  case AstNode::Type::BinExpr:          FALLTHROUGH_;
+  case AstNode::Type::ScalarLiteral:    FALLTHROUGH_;
+  case AstNode::Type::AggregateLiteral: FALLTHROUGH_;
+  case AstNode::Type::UnaryExpr:        FALLTHROUGH_;
+  case AstNode::Type::Subscript:        return true;
+  default:                              return false;
+  }
+}
 
 auto parse_begin_(
   ParseContext &ctx,
@@ -26,7 +66,7 @@ auto parse_begin_(
   /// Check categories, recursive descent on da dih
   /// frm ts 🍆
   if(curr.cat_.isa(TokenCategory::Punctuator)) {
-    expr = TRY(parse_starting_punctuator_(ctx));
+    expr = TRY(parse_punctuator_(ctx));
   }
   else if(curr.cat_.isa(TokenCategory::Literal)) {
     expr = TRY(parse_scalar_lit_(ctx));
@@ -66,16 +106,8 @@ auto parse_begin_(
   ///
   /// Special exceptions: these expressions NEVER
   /// require a terminal character (';' or ',')
-  switch(expr->type_) {
-    case AstNode::Type::ProcDecl:
-    case AstNode::Type::Namespace:
-    case AstNode::Type::ScopeBlock:
-    case AstNode::Type::For:
-    case AstNode::Type::While:
-    case AstNode::Type::Branch:
-    case AstNode::Type::ConstBranch:
+  if(node_never_needs_terminal_(expr)) {
     return Result<AstNode::Ptr<>>(std::move(expr));
-    default: break;
   }
 
   ///
@@ -100,7 +132,7 @@ auto parse_begin_(
       || pfcurr == TokenType::NamespaceOperator
       || pfcurr == TokenType::SkinnyArrow) && !parse_single
     ){
-      expr = TRY(parse_binary_expression_(ctx, std::move(expr)));
+      expr = TRY(parse_binexpr_(ctx, std::move(expr)));
       continue;
     }
 
@@ -110,7 +142,7 @@ auto parse_begin_(
   ///
   /// Check if we're leaving a parenthesized expression
   if(ctx.lxr.current() == TokenType::RightParen) {
-    if(!ctx.paren_level_) {
+    if(!ctx.paren_level) {
       ErrorCollector::display_error(
         "Unexpected token",
         ctx.lxr,
@@ -120,7 +152,7 @@ auto parse_begin_(
     }
 
     if(!parse_single) {
-      --ctx.paren_level_;
+      --ctx.paren_level;
       ctx.lxr.consume(1);
     }
   }
@@ -130,7 +162,7 @@ auto parse_begin_(
   }
 
   if(ctx.lxr.current().is_terminator()) {
-    if(ctx.paren_level_) {
+    if(ctx.paren_level) {
       ErrorCollector::display_error(
         "Unexpected token inside of parenthesized expression",
         ctx.lxr,
@@ -158,6 +190,9 @@ auto parse_impl_(ParseContext &ctx) -> bool {
 
       /// An error has occurred. We're done.
       if (!toplevel_decl.has_value()) {
+        ErrorCollector::display_error(
+          toplevel_decl.error().msg,
+          ctx.lxr, ctx.errstream);
         break;
       }
 
@@ -195,7 +230,7 @@ auto parse_impl_(ParseContext &ctx) -> bool {
   return true;
 }
 
-auto parse_starting_punctuator_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
+auto parse_punctuator_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
   /// TODO: things like ';', '(', etc
   return Error{ErrC::NotImplimented};
 }
@@ -210,46 +245,62 @@ auto parse_scalar_lit_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
     nullptr,
     ctx.lxr.file_name_);
 
-  // std::string value_;
-  // enum : uint8_t {
-  //   None,
-  //   NullLit,
-  //   IntLit,
-  //   StringLit,
-  //   U8Lit,
-  //   FloatLit,
-  // } scalar_type_ = None;
-
   auto val_ = curr.value(ctx.lxr);
   ASSERT(val_.has_value());
-  node->value_ = std::move(*val_);
+  uint64_t converted = 0;
 
-  switch(curr.type_.value) {
-  case TokenType::FloatLiteral:
-    break;
-  case TokenType::IntLiteral:
-    break;
-  case TokenType::BooleanLiteral:
-    break;
-  case TokenType::NullLiteral:
-    break;
-  case TokenType::ByteLiteral:
-    break;
-  case TokenType::HexLiteral:
-    break;
-  case TokenType::OctalLiteral:
-    break;
-  case TokenType::StringLiteral:
-    break;
-  default:
-    break;
+  try {
+    switch(curr.type_.value) {
+    case TokenType::FloatLiteral:
+      node->scalar_type_ = AstScalarLiteral::FloatLit;
+      (void)std::stod(*val_);
+      node->value_       = std::move(*val_);
+      break;
+    case TokenType::IntLiteral:
+      node->scalar_type_ = AstScalarLiteral::IntLit;
+      (void)std::stoull(*val_);
+      node->value_       = std::move(*val_);
+      break;
+    case TokenType::BooleanLiteral:
+      node->scalar_type_ = AstScalarLiteral::BoolLit;
+      node->value_       = std::move(*val_);
+      break;
+    case TokenType::NullLiteral:
+      node->scalar_type_ = AstScalarLiteral::NullLit;
+      break;
+    case TokenType::ByteLiteral:
+      node->scalar_type_ = AstScalarLiteral::U8Lit;
+      node->value_       = TRY(unescape_quoted_string(*val_));
+      break;
+    case TokenType::HexLiteral:
+      node->scalar_type_ = AstScalarLiteral::IntLit;
+      converted          = std::stoull(*val_, nullptr, 16);
+      node->value_       = std::to_string(converted);
+      break;
+    case TokenType::OctalLiteral:
+      node->scalar_type_ = AstScalarLiteral::IntLit;
+      converted          = std::stoull(*val_, nullptr, 8);
+      node->value_       = std::to_string(converted);
+      break;
+    case TokenType::StringLiteral:
+      node->scalar_type_ = AstScalarLiteral::StringLit;
+      node->value_       = TRY(unescape_quoted_string(*val_));
+      break;
+    default:
+      PANIC("parse_scalar_lit_: unknown literal kind.");
+    }
+  }
+  catch(const std::out_of_range&) {
+    return Error(ErrC::BadToken, "Literal value is too large.");
+  }
+  catch(...) {
+    return Error(ErrC::BadToken, "Invalid literal token.");
   }
 
-  return Error{ErrC::NotImplimented};
+  return Result<AstNode::Ptr<>>::create(std::move(node));
 }
 
 auto parse_aggregate_lit_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
-  /// TODO: scalar literals
   return Error{ErrC::NotImplimented};
 }
 
@@ -263,37 +314,28 @@ auto parse_unary_prefix_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
   return Error{ErrC::NotImplimented};
 }
 
-auto parse_subscript_(
-  ParseContext &ctx, AstNode::Ptr<> &&operand) -> Result<AstNode::Ptr<>>
+auto parse_subscript_(ParseContext &ctx, AstNode::Ptr<> &&operand)
+-> Result<AstNode::Ptr<>>
 {
   return Error{ErrC::NotImplimented};
 }
 
-auto parse_call_(
-  ParseContext &ctx, AstNode::Ptr<> &&operand) -> Result<AstNode::Ptr<>>
+auto parse_call_(ParseContext &ctx, AstNode::Ptr<> &&operand)
+-> Result<AstNode::Ptr<>>
 {
   return Error{ErrC::NotImplimented};
 }
 
-auto parse_binary_expression_(
-  ParseContext &ctx, AstNode::Ptr<> &&operand) -> Result<AstNode::Ptr<>>
+auto parse_binexpr_(ParseContext &ctx, AstNode::Ptr<> &&operand)
+-> Result<AstNode::Ptr<>>
 {
   return Error{ErrC::NotImplimented};
 }
 
-auto parse_identifier_(
-  ParseContext &ctx, AstNode::Ptr<> &&operand) -> Result<AstNode::Ptr<>>
+auto parse_identifier_(ParseContext &ctx, AstNode::Ptr<> &&operand)
+-> Result<AstNode::Ptr<>>
 {
   return Error{ErrC::NotImplimented};
-}
-
-auto is_node_toplevel_valid_(const AstNode::Ptr<>& ptr) -> bool {
-  switch (ptr->type_) {
-    case AstNode::Type::Namespace:
-    case AstNode::Type::Where:
-    case AstNode::Type::Vardecl: return true;
-    default: return false;
-  }
 }
 
 auto get_next_include_(ParseContext& ctx) -> bool {
@@ -324,11 +366,7 @@ END_NAMESPACE(n19::detail_);
 BEGIN_NAMESPACE(n19);
 
 auto parse(ParseContext& ctx) -> bool {
-  if(!detail_::parse_impl_(ctx)) {
-    ctx.errors.emit(ctx.errstream);
-  }
-
-  return true;
+  return detail_::parse_impl_(ctx);
 }
 
 END_NAMESPACE(n19);

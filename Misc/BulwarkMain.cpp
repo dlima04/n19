@@ -14,13 +14,40 @@ using namespace n19;
 #define ARGNUM_HARD_LIMIT 40
 
 struct BulwarkArgParser : argp::Parser {
-  bool& verbose   = arg<bool>("--verbose", "-v", "Enable verbose output.");
-  bool& stopfail  = arg<bool>("--stop-on-failure", "-stop-fail", "Stop execution on the first failed case.");
-  bool& debug     = arg<bool>("--debug-messages", "-debug", "enabled debug output.");
-  bool& colours   = arg<bool>("--colours", "-colours", "Enables ASCII colour output.", true);
-  bool& show_help = arg<bool>("--help", "-h", "print this help message and exit.");
-  argp::PackType& to_skip = arg<argp::PackType>("--skip", "-skip", "Test suites to be skipped (optional)");
-  argp::PackType& to_run  = arg<argp::PackType>("--run", "-run", "Run only these test suites (optional)");
+  bool& verbose = arg<bool>(
+    _nstr("--verbose"),
+    _nstr("-v"),
+    _nstr("Enable verbose output."));
+
+  bool& stopfail = arg<bool>(
+    _nstr("--stop-on-failure"),
+    _nstr("-stop-fail"),
+    _nstr("Stop execution on the first failed case."));
+
+  bool& debug = arg<bool>(
+    _nstr("--debug-messages"),
+    _nstr("-debug"),
+    _nstr("enabled debug output."));
+
+  bool& colours = arg<bool>(
+    _nstr("--colours"),
+    _nstr("-colours"),
+    _nstr("Enables ASCII colour output."), true);
+
+  bool& show_help = arg<bool>(
+    _nstr("--help"),
+    _nstr("-h"),
+    _nstr("print this help message and exit."));
+
+  argp::PackType& to_skip = arg<argp::PackType>(
+    _nstr("--skip"),
+    _nstr("-skip"),
+    _nstr("Test suites to be skipped (optional)"));
+
+  argp::PackType& to_run  = arg<argp::PackType>(
+    _nstr("--run"),
+    _nstr("-run"),
+    _nstr("Run only these test suites (optional)"));
 };
 
 #ifdef N19_WIN32

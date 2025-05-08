@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef CLASSTRAITS_HPP
-#define CLASSTRAITS_HPP
+#ifndef N19_CLASSTRAITS_HPP
+#define N19_CLASSTRAITS_HPP
 #include <compare>
 
 #define N19_MAKE_COMPARABLE_IMPL_(OP, MB, CLASS)      \

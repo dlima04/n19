@@ -19,9 +19,9 @@ struct VersionInfo {
   uint16_t major{};
   uint16_t minor{};
   uint16_t patch{};
-  std::string_view msg;
-  std::string_view arch;
-  std::string_view os;
+  std::string msg;
+  std::string arch;
+  std::string os;
 };
 
 class Context {

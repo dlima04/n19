@@ -32,7 +32,7 @@ struct ParseContext {
   OStream&        errstream;
   ErrorCollector& errors;
   Lexer&          lxr;
-  uint16_t        paren_level_;
+  uint16_t        paren_level;
   EntityTable&    entities;
 
   std::vector<detail_::IncludedFile> includes_;
@@ -47,12 +47,15 @@ struct ParseContext {
     , errstream(errstream)
     , errors(errors)
     , lxr(lxr)
-    , paren_level_(0)
+    , paren_level(0)
     , entities(entities)
   {
     ASSERT(!lxr.src_.empty());
     ASSERT(!entities.map_.empty());
   }
+
+  bool on(TokenCategory cat) { return lxr.current().cat_.isa(cat); }
+  bool on_type(TokenType ty) { return lxr.current() == ty; }
 
   ~ParseContext() = default;
 };

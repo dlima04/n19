@@ -28,21 +28,23 @@ auto parse_begin_(
 
 /// Utility
 auto get_next_include_(ParseContext&) -> bool;
-auto is_node_toplevel_valid_(const AstNode::Ptr<>&) -> bool;
+auto is_node_toplevel_valid_(const AstNode::Ptr<>&)   -> bool;
+auto node_never_needs_terminal_(const AstNode::Ptr<>&) -> bool;
+auto is_valid_subexpression_(const AstNode::Ptr<>&)   -> bool;
 bool parse_impl_(ParseContext&);
 
 ///
 /// Node producers
-Result<AstNode::Ptr<>> parse_starting_punctuator_(ParseContext&);
-Result<AstNode::Ptr<>> parse_scalar_lit_(ParseContext&);
-Result<AstNode::Ptr<>> parse_aggregate_lit_(ParseContext&);
-Result<AstNode::Ptr<>> parse_keyword_(ParseContext&);
-Result<AstNode::Ptr<>> parse_unary_prefix_(ParseContext&);
+auto parse_punctuator_(ParseContext &)   -> Result<AstNode::Ptr<>>;
+auto parse_scalar_lit_(ParseContext &)   -> Result<AstNode::Ptr<>>;
+auto parse_aggregate_lit_(ParseContext&) -> Result<AstNode::Ptr<>>;
+auto parse_keyword_(ParseContext &)      -> Result<AstNode::Ptr<>>;
+auto parse_unary_prefix_(ParseContext&)  -> Result<AstNode::Ptr<>>;
 
-Result<AstNode::Ptr<>> parse_subscript_(ParseContext&, AstNode::Ptr<>&&);
-Result<AstNode::Ptr<>> parse_call_(ParseContext&, AstNode::Ptr<>&&);
-Result<AstNode::Ptr<>> parse_binary_expression_(ParseContext&, AstNode::Ptr<>&&);
-Result<AstNode::Ptr<>> parse_identifier_(ParseContext&, AstNode::Ptr<>&&);
+auto parse_subscript_(ParseContext &, AstNode::Ptr<> &&)  -> Result<AstNode::Ptr<>>;
+auto parse_call_(ParseContext &, AstNode::Ptr<> &&)       -> Result<AstNode::Ptr<>>;
+auto parse_binexpr_(ParseContext &, AstNode::Ptr<> &&)    -> Result<AstNode::Ptr<>>;
+auto parse_identifier_(ParseContext &, AstNode::Ptr<> &&) -> Result<AstNode::Ptr<>>;
 
 END_NAMESPACE(n19::detail_);
 #endif //N19_HIR_PARSER_HPP

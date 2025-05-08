@@ -14,6 +14,7 @@
 #include <utility>
 #include <Core/Result.hpp>
 #include <Core/Try.hpp>
+#include <Core/StringUtil.hpp>
 #include <iostream>
 
 #define ARGNUM_HARD_LIMIT 40
@@ -21,14 +22,45 @@
 using namespace n19;
 
 struct MainArgParser : argp::Parser {
-  argp::PackType& inputs  = arg<argp::PackType>("--input", "-i", "Input file(s).");
-  argp::PackType& outputs = arg<argp::PackType>("--output", "-o", "Output file(s).");
-  bool& verbose   = arg<bool>("--verbose", "-v", "Enable verbose output.");
-  bool& dump_ast  = arg<bool>("--dump-ast", "-dump-ast", "Dump the program's AST.");
-  bool& dump_ents = arg<bool>("--dump-entities", "-dump-entities", "Dump the entity table.");
-  bool& dump_ir   = arg<bool>("--dump-ir", "-dump-ir", "Dump the program's lowered IR.");
-  bool& show_help = arg<bool>("--help", "-h", "Show this help message and exit.");
-  bool& version   = arg<bool>("--version", "-v", "Display the n19 compiler version and exit.");
+  argp::PackType& inputs  = arg<argp::PackType>(
+    _nstr("--input"),
+    _nstr("-i"),
+    _nstr("Input file(s)."));
+
+  argp::PackType& outputs = arg<argp::PackType>(
+    _nstr("--output"),
+    _nstr("-o"),
+    _nstr("Output file(s)."));
+
+  bool& verbose = arg<bool>(
+    _nstr("--verbose"),
+    _nstr("-v"),
+    _nstr("Enable verbose output."));
+
+  bool& dump_ast = arg<bool>(
+    _nstr("--dump-ast"),
+    _nstr("-dump-ast"),
+    _nstr("Dump the program's AST."));
+
+  bool& dump_ents = arg<bool>(
+    _nstr("--dump-entities"),
+    _nstr("-dump-entities"),
+    _nstr("Dump the entity table."));
+
+  bool& dump_ir = arg<bool>(
+    _nstr("--dump-ir"),
+    _nstr("-dump-ir"),
+    _nstr("Dump the program's lowered IR."));
+
+  bool& show_help = arg<bool>(
+    _nstr("--help"),
+    _nstr("-h"),
+    _nstr("Show this help message and exit."));
+
+  bool& version = arg<bool>(
+    _nstr("--version"),
+    _nstr("-v"),
+    _nstr("Display the n19 compiler version and exit."));
 };
 
 #ifdef N19_WIN32
@@ -65,7 +97,7 @@ int main(int argc, char** argv){
     outs()
       << "n19 compiler -- version "
       << n19::fmt("{}.{}.{}\n", ver.major, ver.minor, ver.patch)
-      << n19::fmt("Target: {} ({})\n\n", ver.arch, ver.os)
+      << n19::fmt("Target: {} ({})\n", ver.arch, ver.os)
       << ver.msg
       << Endl;
     return EXIT_SUCCESS;

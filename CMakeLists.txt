@@ -13,12 +13,14 @@ set(N19_ENUMERATE_GLOBAL_SOURCES
   Frontend/Token.cpp
   Frontend/FrontendContext.cpp
   Frontend/Parser.cpp
+  Frontend/CompilationCycle.cpp
   Sys/Error.cpp
   Sys/IODevice.cpp
   Sys/Time.cpp
   Sys/BackTrace.cpp
   Core/Panic.cpp
   Core/ArgParse.cpp
+  Core/StringUtil.cpp
   IO/Console.cpp
   IO/Stream.cpp
   Sys/File.cpp
@@ -42,6 +44,7 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Frontend/ParseContext.hpp
   Frontend/Parser.hpp
   Frontend/FrontendContext.hpp
+  Frontend/CompilationCycle.hpp
   Misc/Global.hpp
   Misc/Macros.hpp
   Core/Panic.hpp
@@ -74,7 +77,7 @@ set(N19_ENUMERATE_PRIMARY_EXECUTABLES
 )
 
 set(N19_BUILD_PLATFORM ${CMAKE_HOST_SYSTEM_NAME})
-set(N19_IS_MACOS OFF)
+set(N19_IS_DARWIN OFF)
 set(N19_IS_LINUX OFF)
 set(N19_IS_POSIX OFF)
 set(N19_IS_WINDOWS OFF)
@@ -86,7 +89,7 @@ elseif(N19_BUILD_PLATFORM STREQUAL "Linux")
   set(N19_IS_LINUX ON)
   set(N19_IS_POSIX ON)
 elseif(N19_BUILD_PLATFORM STREQUAL "Darwin")
-  set(N19_IS_MACOS ON)
+  set(N19_IS_DARWIN ON)
   set(N19_IS_POSIX ON)
 else()
   message(FATAL_ERROR "Unsupported build platform.")
@@ -133,9 +136,9 @@ function(add_platform_macros target)
   if(N19_IS_LINUX)
     target_compile_definitions(${target} PRIVATE N19_POSIX)
     target_compile_definitions(${target} PRIVATE N19_LINUX)
-  elseif(N19_IS_MACOS)
+  elseif(N19_IS_DARWIN)
     target_compile_definitions(${target} PRIVATE N19_POSIX)
-    target_compile_definitions(${target} PRIVATE N19_MACOS)
+    target_compile_definitions(${target} PRIVATE N19_DARWIN)
   else()
     target_compile_definitions(${target} PRIVATE N19_WIN32)
   endif()
