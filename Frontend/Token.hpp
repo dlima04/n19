@@ -183,6 +183,7 @@ public:
 
   NODISCARD_ auto value(const class Lexer&) const -> Maybe<std::string>;
   NODISCARD_ auto format(const class Lexer&) const -> std::string;
+  NODISCARD_ auto is_terminator() const -> bool;
 
   static auto eof(uint32_t pos, uint32_t line) -> Token;
   static auto illegal(uint32_t pos, uint32_t length, uint32_t line) -> Token;

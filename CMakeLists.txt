@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 project(n19)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 set(N19_ENUMERATE_GLOBAL_SOURCES
   Frontend/ErrorCollector.cpp
@@ -11,6 +11,8 @@ set(N19_ENUMERATE_GLOBAL_SOURCES
   Frontend/DumpAst.cpp
   Frontend/Lexer.cpp
   Frontend/Token.cpp
+  Frontend/FrontendContext.cpp
+  Frontend/Parser.cpp
   Sys/Error.cpp
   Sys/IODevice.cpp
   Sys/Time.cpp
@@ -29,12 +31,17 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Sys/Handle.hpp
   Sys/Time.hpp
   Sys/BackTrace.hpp
+  Sys/File.hpp
   Frontend/Token.hpp
   Frontend/ErrorCollector.hpp
   Frontend/AstNodes.hpp
   Frontend/EntityTable.hpp
   Frontend/Entity.hpp
   Frontend/Lexer.hpp
+  Frontend/Keywords.hpp
+  Frontend/ParseContext.hpp
+  Frontend/Parser.hpp
+  Frontend/FrontendContext.hpp
   Misc/Global.hpp
   Misc/Macros.hpp
   Core/Panic.hpp
@@ -55,11 +62,10 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Core/Nothing.hpp
   Core/Try.hpp
   Core/ArgParse.hpp
+  Core/StringUtil.hpp
   IO/Console.hpp
   IO/Fmt.hpp
   IO/Stream.hpp
-  Sys/File.hpp
-  Frontend/Keywords.hpp
 )
 
 set(N19_ENUMERATE_PRIMARY_EXECUTABLES

@@ -9,7 +9,6 @@
 #include <Core/Platform.hpp>
 #include <Core/ArgParse.hpp>
 #include <vector>
-#include <string>
 #include <cstdint>
 #include <algorithm>
 #include <type_traits>

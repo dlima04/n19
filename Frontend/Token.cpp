@@ -8,6 +8,7 @@
 #include <Core/Panic.hpp>
 #include <Core/Murmur3.hpp>
 #include <algorithm>
+#include <new>
 BEGIN_NAMESPACE(n19);
 
 auto Token::eof(
@@ -84,7 +85,7 @@ auto TokenCategory::from_keyword(const std::u8string_view& str)
 -> Maybe<TokenCategory>
 {
   constexpr uint32_t seed = 0xbeef;
-  if(str.size() > 15) [[unlikely]] return Nothing;
+  if(str.size() > 15) return Nothing;
 
   switch(murmur3_x86_32(str, seed)) {
 #define KEYWORD_X(NAME, UNUSED, CAT) case u8##NAME##_mm32: return CAT;
@@ -104,12 +105,20 @@ auto Token::value(const Lexer& lxr) const -> Maybe<std::string> {
   const auto bytes = lxr.get_bytes();
   ASSERT(pos_ < bytes.size());
   ASSERT(pos_ + len_ - 1 < bytes.size());
-  return std::string((char*)&bytes[pos_], len_);
+
+  std::string ret;
+  ret.reserve(len_);
+
+  for(size_t i = pos_, j = 0; j < len_; i++, j++) {
+    auto ch = bytes[i];
+    ret += (static_cast<char>(ch));
+  }
+  return ret;
 }
 
 // Formats a token into a more readable representation.
 // For debugging/testing purposes only.
-auto Token::format(const Lexer& lxr) const -> std::string {
+auto Token::format(const Lexer &lxr) const -> std::string {
   std::string buffer;
   buffer += fmt("{:<12}: ", type_.to_string());
   buffer += fmt("\"{}\" -- ", value(lxr).value_or("N/A"));
@@ -125,7 +134,7 @@ auto TokenType::from_keyword(const std::u8string_view& keyword)
 -> Maybe<TokenType>
 {
   constexpr uint32_t seed = 0xbeef;
-  if(keyword.size() > 15) [[unlikely]] return Nothing;
+  if(keyword.size() > 15) return Nothing;
 
   switch(murmur3_x86_32(keyword, seed)) {
 #define KEYWORD_X(NAME, TYPE, UNUSED) case u8##NAME##_mm32: return TYPE;
@@ -134,6 +143,11 @@ auto TokenType::from_keyword(const std::u8string_view& keyword)
   }
 
   return Nothing;
+}
+
+// is this token a terminating token? (';', ',')
+auto Token::is_terminator() const -> bool {
+  return type_ == TokenType::Semicolon || type_ == TokenType::Comma;
 }
 
 END_NAMESPACE(n19);

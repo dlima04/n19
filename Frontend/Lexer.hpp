@@ -43,6 +43,7 @@ public:
   auto batched_peek()         -> std::array<Token, sz_>;
   auto peek(uint32_t amnt)    -> Token;
 
+  auto reset(sys::File& ref) -> Result<void>;
   auto expect(TokenCategory cat, bool = true) -> Result<void>;
   auto expect(TokenType type, bool = true)    -> Result<void>;
 

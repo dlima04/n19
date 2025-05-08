@@ -5,81 +5,95 @@
 
 #define CURRENT_TEST "/Users/Diago/Desktop/compiler_tests/test2.txt"
 
-#include <Core/Try.hpp>
 #include <Frontend/Lexer.hpp>
+#include <Frontend/FrontendContext.hpp>
 #include <IO/Console.hpp>
-#include <Sys/Time.hpp>
-#include <Sys/BackTrace.hpp>
-#include <iostream>
-#include <Core/Panic.hpp>
-#include <Core/Defer.hpp>
+#include <IO/Fmt.hpp>
 #include <Core/ArgParse.hpp>
-#include <Core/Tuple.hpp>
-#include <Sys/File.hpp>
-#include <Core/Defer.hpp>
-#include <Core/Murmur3.hpp>
-#include <Frontend/EntityTable.hpp>
-#include <Frontend/AstNodes.hpp>
+#include <cstdlib>
+#include <utility>
+#include <Core/Result.hpp>
+#include <Core/Try.hpp>
+#include <iostream>\
+
+#define ARGNUM_HARD_LIMIT 40
 
 using namespace n19;
 
-struct MyArgs : argp::Parser {
-  int64_t& num_jobs  = arg<int64_t>("--num-jobs", "-j", "numba of jobs");
-  sys::String& name  = arg<sys::String>("--input", "-i", "the input file.", "Default value!!!");
-  bool& verbose      = arg<bool>("--verbose", "-v", "verbose mode");
-  argp::PackType& arr = arg<argp::PackType>("--blabla", "-b", "idk lol");
+struct MainArgParser : argp::Parser {
+  argp::PackType& inputs  = arg<argp::PackType>("--input", "-i", "Input file(s).");
+  argp::PackType& outputs = arg<argp::PackType>("--output", "-o", "Output file(s).");
+  bool& verbose   = arg<bool>("--verbose", "-v", "Enable verbose output.");
+  bool& dump_ast  = arg<bool>("--dump-ast", "-dump-ast", "Dump the program's AST.");
+  bool& dump_ents = arg<bool>("--dump-entities", "-dump-entities", "Dump the entity table.");
+  bool& dump_ir   = arg<bool>("--dump-ir", "-dump-ir", "Dump the program's lowered IR.");
+  bool& show_help = arg<bool>("--help", "-h", "Show this help message and exit.");
+  bool& version   = arg<bool>("--version", "-v", "Display the n19 compiler version and exit.");
 };
 
-auto test() -> Tuple<std::string, double> {
-  auto z = n19::make_tuple(std::string("lololol"), 314);
-  return z;
-}
-
-int main(int argc, char** argv){
-
-  EntityTable tbl("MyTable");
-  auto ptr1 = tbl.insert<Variable>(N19_ROOT_ENTITY_ID, 12, 1, "MyFile.txt", "MyVar");
-  auto ptr2 = tbl.insert<Struct>(N19_ROOT_ENTITY_ID, 12, 1, "MyFile.txt", "MyStruct");
-  auto ptr3 = tbl.insert<Type>(ptr2->id_, 12, 1, "MyFile.txt", "MyAlias");
-  auto ptr4 = tbl.insert<Struct>(ptr2->id_, 12, 1, "MyFile.txt", "SecondStruct");
-
-  EntityQualifierBase crazyass_qualifier;
-  crazyass_qualifier.ptr_depth_ = 1;
-  crazyass_qualifier.flags_ |= EntityQualifierBase::Volatile;
-  crazyass_qualifier.arr_lengths_.emplace_back(10);
-
-  ptr4->members_.emplace_back("FirstMember", crazyass_qualifier, ptr3->id_);
-  ptr4->members_.emplace_back("SecondMember", crazyass_qualifier, ptr3->id_);
-
-  ptr2->members_.emplace_back("Idk", EntityQualifierBase{}, ptr3->id_);
-
-
-  tbl.dump();
-  outs() << "\n";
-  tbl.dump_structures();
-
-  // try {
-  //   auto file = MUST(sys::File::open(CURRENT_TEST));
-  //   auto lxr = Lexer::create_shared(file);
-  //   if(!lxr) {
-  //     return 1;
-  //   }
-  //
-  //   lxr->get()->dump(outs());
-  //
-  //   // auto file2 = MUST(sys::File::open(CURRENT_TEST));
-  //   //
-  //   // ErrorCollector::display_error("idk lol", file2, outs(), 12, 2, true );
-  //   // file2.close();
-  //   file.close();
-  // } catch(const std::exception& e) {
-  //   std::cerr << "EXCEPTION: " << e.what() << std::endl;
-  // }
+#ifdef N19_WIN32
+int main() {
+  win32_init_console();
 
   ins().clear();
   outs().flush();
   errs().flush();
-  return 0;
+  return EXIT_SUCCESS;
 }
 
+#else /// POSIX
+int main(int argc, char** argv){
+  if(argc > ARGNUM_HARD_LIMIT) {
+    outs() << "\nToo many command-line arguments passed.";
+    outs() << Endl;
+    return EXIT_FAILURE;
+  }
 
+  MainArgParser parser;
+  auto stream = OStream::from_stdout();
+  if(argc > 1 && argv && !parser.take_argv(argc, argv).parse(stream)) {
+    return EXIT_FAILURE;
+  }
+
+  if(parser.show_help) {
+    parser.help(stream);
+    return EXIT_SUCCESS;
+  }
+
+  if(parser.version) {
+    auto ver = Context::get_version_info();
+    outs()
+      << "n19 compiler -- version "
+      << n19::fmt("{}.{}.{}\n", ver.major, ver.minor, ver.patch)
+      << n19::fmt("Target: {} ({})\n\n", ver.arch, ver.os)
+      << ver.msg
+      << Endl;
+    return EXIT_SUCCESS;
+  }
+
+  if(parser.inputs.empty()) {
+    outs() << "\nNo input files provided. Exiting..." << Endl;
+    return EXIT_FAILURE;
+  }
+
+  if(parser.outputs.empty()) {
+    outs() << "\nNo output files provided. Exiting..." << Endl;
+    return EXIT_FAILURE;
+  }
+
+  auto& context = Context::the();
+  if(parser.dump_ast)  context.flags_ |= Context::DumpAST;
+  if(parser.dump_ents) context.flags_ |= Context::DumpEnts;
+  if(parser.dump_ir)   context.flags_ |= Context::DumpIR;
+  if(parser.verbose)   context.flags_ |= Context::Verbose;
+
+  Context::the().inputs_  = std::move(parser.inputs);
+  Context::the().outputs_ = std::move(parser.outputs);
+
+  ins().clear();
+  outs().flush();
+  errs().flush();
+  return EXIT_SUCCESS;
+}
+
+#endif

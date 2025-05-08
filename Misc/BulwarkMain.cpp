@@ -11,7 +11,7 @@
 #include <utility>
 using namespace n19;
 
-#define ARGNUM_HARD_LIMIT 50
+#define ARGNUM_HARD_LIMIT 40
 
 struct BulwarkArgParser : argp::Parser {
   bool& verbose   = arg<bool>("--verbose", "-v", "Enable verbose output.");
@@ -26,7 +26,11 @@ struct BulwarkArgParser : argp::Parser {
 #ifdef N19_WIN32
 int main() {
   win32_init_console();
-  return 0;
+
+  ins().clear();
+  outs().flush();
+  errs().flush();
+  return EXIT_SUCCESS;
 }
 
 #else //POSIX
@@ -50,10 +54,10 @@ int main(int argc, char** argv) {
   }
 
   auto& ctx = test::Context::the();
-  if(parser.verbose) ctx.flags_  |= test::Context::Verbose;
+  if(parser.verbose)  ctx.flags_ |= test::Context::Verbose;
   if(parser.stopfail) ctx.flags_ |= test::Context::StopFail;
-  if(parser.debug) ctx.flags_    |= test::Context::Debug;
-  if(parser.colours) ctx.flags_  |= test::Context::Colours;
+  if(parser.debug)    ctx.flags_ |= test::Context::Debug;
+  if(parser.colours)  ctx.flags_ |= test::Context::Colours;
 
   if(!parser.to_skip.empty()) {
     ctx.suites_to_skip_ = std::move(parser.to_skip);
@@ -63,6 +67,7 @@ int main(int argc, char** argv) {
 
   test::g_registry.run_all();
 
+  ins().clear();
   outs().flush();
   errs().flush();
   return EXIT_SUCCESS;

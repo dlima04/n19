@@ -5,12 +5,13 @@
 
 #ifndef ASTNODES_HPP
 #define ASTNODES_HPP
-#include <Frontend/Token.hpp>
-#include <Frontend/Entity.hpp>
+#include <Core/Platform.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
 #include <IO/Console.hpp>
 #include <Core/Concepts.hpp>
+#include <Frontend/Token.hpp>
+#include <Frontend/Entity.hpp>
 #include <vector>
 #include <memory>
 

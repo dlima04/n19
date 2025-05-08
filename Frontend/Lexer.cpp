@@ -123,7 +123,7 @@ inline auto Lexer::token_equals_() -> Token {
   curr_tok.pos_ = index_;
 
   switch(peek_char_()) {
-  case '=': // '=='
+  case u8'=': // '=='
     curr_tok.type_ = TokenType::Eq;
     curr_tok.cat_  = TokenCategory::BinaryOp;
     curr_tok.cat_ |= TokenCategory::LogicalOp;
@@ -131,7 +131,7 @@ inline auto Lexer::token_equals_() -> Token {
     curr_tok.len_  = 2;
     consume_char_(2);
     break;
-  case '>': // '=>'
+  case u8'>': // '=>'
     curr_tok.type_ = TokenType::FatArrow;
     curr_tok.cat_  = TokenCategory::NonCategorical;
     curr_tok.len_  = 2;
@@ -154,7 +154,7 @@ inline auto Lexer::token_plus_() -> Token {
   curr_tok.pos_ = index_;
 
   switch(peek_char_()) {
-  case '=': // '+='
+  case u8'=': // '+='
     curr_tok.type_ = TokenType::PlusEq;
     curr_tok.cat_  = TokenCategory::BinaryOp;
     curr_tok.cat_ |= TokenCategory::ArithAssignOp;
@@ -163,7 +163,7 @@ inline auto Lexer::token_plus_() -> Token {
     curr_tok.len_  = 2;
     consume_char_(2);
     break;
-  case '+': // '++'
+  case u8'+': // '++'
     curr_tok.type_ = TokenType::Inc;
     curr_tok.cat_  = TokenCategory::UnaryOp;
     curr_tok.cat_ |= TokenCategory::ArithAssignOp;
@@ -195,17 +195,17 @@ inline auto Lexer::token_gthan_() -> Token {
   curr_tok.line_ = line_;
   curr_tok.pos_  = index_;
 
-  if(peek_char_(1) == '=') { // '>='
+  if(peek_char_(1) == u8'=') { // '>='
     curr_tok.type_ = TokenType::Gte;
     curr_tok.cat_ |= TokenCategory::LogicalOp | TokenCategory::ComparisonOp;
     curr_tok.len_  = 2;
     consume_char_(2);
-  } else if(peek_char_(1) == '>' && peek_char_(2) == '=') { // '>>='
+  } else if(peek_char_(1) == u8'>' && peek_char_(2) == u8'=') { // '>>='
     curr_tok.type_ = TokenType::RshiftEq;
     curr_tok.cat_ |= TokenCategory::BitwiseOp | TokenCategory::BitwiseAssignOp;
     curr_tok.len_  = 3;
     consume_char_(3);
-  } else if(peek_char_(1) == '>') { // '>>'
+  } else if(peek_char_(1) == u8'>') { // '>>'
     curr_tok.type_ = TokenType::Rshift;
     curr_tok.cat_ |= TokenCategory::BitwiseOp;
     curr_tok.len_  = 2;
@@ -658,7 +658,7 @@ inline auto Lexer::token_quote_() -> Token {
 
   consume_char_(1);
   while(true) {
-    if(current_char_() == '\0' || current_char_() == '\n') {
+    if(current_char_() == u8'\0' || current_char_() == u8'\n') {
       curr_tok.type_ = TokenType::Illegal;
       curr_tok.cat_  = TokenCategory::NonCategorical;
       curr_tok.pos_  = string_start;
@@ -673,7 +673,7 @@ inline auto Lexer::token_quote_() -> Token {
     }
 
     /// skip escaped quote.
-    if(current_char_() == '\\' && peek_char_() == opening_quote) {
+    if(current_char_() == u8'\\' && peek_char_() == opening_quote) {
       consume_char_(2);
     } else if(UTF8_LEADING(current_char_())) {
       skip_utf8_sequence_();
@@ -686,8 +686,8 @@ inline auto Lexer::token_quote_() -> Token {
 }
 
 inline auto Lexer::token_hex_lit_() -> Token {
-  ASSERT(current_char_() == '0');
-  ASSERT(peek_char_() == 'x' || peek_char_() == 'X');
+  ASSERT(current_char_() == u8'0');
+  ASSERT(peek_char_() == u8'x' || peek_char_() == u8'X');
 
   const auto start = index_;
   consume_char_(2); // move past "0x"
@@ -780,7 +780,7 @@ inline auto Lexer::token_num_lit_() -> Token {
 }
 
 inline auto Lexer::token_oct_lit_() -> Token {
-  ASSERT(current_char_() == '0');
+  ASSERT(current_char_() == u8'0');
   ASSERT(CH_IS_DIGIT(peek_char_()));
 
   Token curr_tok;
@@ -790,7 +790,7 @@ inline auto Lexer::token_oct_lit_() -> Token {
   curr_tok.cat_  = TokenCategory::Literal;
 
   auto is_octal_digit = [](const char c) -> bool {
-    return c >= '0' && c <= '7';
+    return c >= u8'0' && c <= u8'7';
   };
 
   while(true) {
@@ -856,7 +856,7 @@ inline auto Lexer::get_keyword(const std::u8string_view& str) -> Maybe<Keyword> 
 }
 
 inline auto Lexer::skip_chars_until_(std::function<bool(char8_t)> cb) -> bool {
-  while(!cb(current_char_()) && current_char_() != '\0') {
+  while(!cb(current_char_()) && current_char_() != u8'\0') {
     const char8_t curr = current_char_();
 
     if(curr == '\n')            advance_consume_line_();  /// line feed
@@ -864,7 +864,7 @@ inline auto Lexer::skip_chars_until_(std::function<bool(char8_t)> cb) -> bool {
     else consume_char_(1);                                /// ASCII character
   }
 
-  return current_char_() != '\0';
+  return current_char_() != u8'\0';
 }
 
 auto Lexer::is_reserved_byte(const char8_t c) -> bool {
@@ -977,6 +977,35 @@ auto Lexer::dump(OStream& stream) -> void {
 
   if(curr_ == TokenType::Illegal)
     ErrorCollector::display_error("Illegal token!", *this, curr_, stream);
+}
+
+auto Lexer::reset(sys::File& ref) -> Result<void> {
+  src_.clear();
+  ref.seek(0, sys::FSeek::Beg);
+
+  const auto fsize = TRY(ref.size());
+  if(fsize >= std::numeric_limits<uint32_t>::max()) {
+    return Error(ErrC::InvalidArg, "File is too large");
+  } if(fsize == 0) {
+    return Error(ErrC::InvalidArg, "File is empty");
+  }
+
+  this->src_.resize(fsize);
+  auto wbytes = n19::as_writable_bytes(src_);
+
+#ifdef N19_WIN32
+  this->file_name_ = std::filesystem::absolute(ref.name_).wstring();
+#else
+  this->file_name_ = std::filesystem::absolute(ref.name_).string();
+#endif
+
+  this->curr_  = Token(); /// Reset data members
+  this->index_ = 0;       ///
+  this->line_  = 1;
+
+  TRY(ref.read_into(wbytes));
+  this->curr_ = produce_impl_();
+  return Result<void>::create();
 }
 
 END_NAMESPACE(n19);
