@@ -14,7 +14,7 @@
 #include <utility>
 #include <Core/Result.hpp>
 #include <Core/Try.hpp>
-#include <iostream>\
+#include <iostream>
 
 #define ARGNUM_HARD_LIMIT 40
 
