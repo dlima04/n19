@@ -147,7 +147,7 @@ auto unescape_raw_string(std::string_view input) -> Result<std::string> {
 
 auto unescape_quoted_string(std::string_view input) -> Result<std::string> {
   auto actual = unescape_string(input);
-  if (actual.has_value() && actual->size() >= 3) {
+  if (actual.has_value() && actual->size() >= 2) {
     actual->erase(0, 1);
     actual->pop_back();
   } else {
@@ -159,7 +159,7 @@ auto unescape_quoted_string(std::string_view input) -> Result<std::string> {
 
 auto unescape_raw_quoted_string(std::string_view input) -> Result<std::string> {
   auto actual = unescape_raw_string(input);
-  if (actual.has_value() && actual->size() >= 3) {
+  if (actual.has_value() && actual->size() >= 2) {
     actual->erase(0, 1);
     actual->pop_back();
   } else {

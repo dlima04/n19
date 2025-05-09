@@ -40,7 +40,7 @@
       ::n19::test::report(#EXPR, ::n19::test::Result::Failed, TESTCASE_CTX_.out);           \
     }                                                                                       \
     return;                                                                                 \
-  } else if(is_verbose_) {                                                                  \
+  } if(is_verbose_) {                                                                       \
     ::n19::test::report(#EXPR, ::n19::test::Result::Passed, TESTCASE_CTX_.out);             \
   }} while(0);                                                                              \
 

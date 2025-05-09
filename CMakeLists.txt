@@ -129,6 +129,7 @@ add_executable(bulwark
   Bulwark/Suites/Core/SuiteMurmur3.cpp
   Bulwark/Suites/Core/SuiteTuple.cpp
   Bulwark/Suites/Core/SuiteRingStructures.cpp
+  Bulwark/Suites/Core/SuiteStringUtil.cpp
   Bulwark/Suites/Frontend/SuiteLexer.cpp
   Bulwark/Suites/IO/SuiteStream.cpp
   Bulwark/Suites/Sys/SuiteSystemError.cpp
