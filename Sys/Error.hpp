@@ -9,12 +9,12 @@
 #include <Core/Platform.hpp>
 
 #ifdef N19_WIN32
-#   ifndef NOMINMAX
-#      define NOMINMAX
-#   endif
-#   include <windows.h>
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
 #else
-#   include <errno.h>
+#include <errno.h>
 #endif
 
 namespace n19::sys {
