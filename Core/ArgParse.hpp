@@ -84,7 +84,7 @@ template<>
 class Value<sys::String> final : public ValueBase {
 N19_MAKE_COMPARABLE_ON(sys::String, value_);
 public:
-  auto convert(const std::string &) -> Result<void> override;
+  auto convert(const sys::String&) -> Result<void> override;
   FORCEINLINE_ auto value() -> sys::String& { return value_; }
 
   Value() = default;
@@ -128,7 +128,7 @@ public:
   NODISCARD_ auto arg(
     const sys::StringView& longf,        /// Long form flag name
     const sys::StringView& shortf,       /// Short form flag name
-    const sys::StringView& desc = "",    /// Optional description
+    const sys::StringView& desc = _nstr(""),    /// Optional description
     const Maybe<T>& d = Nothing ) -> T&  /// Default value (optional)
   {
     Parameter param;

@@ -19,16 +19,19 @@
 #include <limits>
 
 #if defined(N19_WIN32)
-#   include <windows.h>
-#   include <vector>
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#include <vector>
 #else //POSIX
-#   include <locale.h>
+#include <locale.h>
 #endif
 
 #ifdef N19_LARGE_OSTREAM_BUFFERS
-#   define N19_OSTREAM_BUFFSIZE 2048
+#define N19_OSTREAM_BUFFSIZE 2048
 #else
-#   define N19_OSTREAM_BUFFSIZE 1024
+#define N19_OSTREAM_BUFFSIZE 1024
 #endif
 
 BEGIN_NAMESPACE(n19);
@@ -112,7 +115,7 @@ public:
   }
 
 #if defined(N19_WIN32)
-  auto operator<<(const std::wstring_view& str) -> COStream& {
+  auto operator<<(const std::wstring_view& str) -> OStream& {
     if(str.empty()) return *this;
 
     const int req_size = ::WideCharToMultiByte(
@@ -126,7 +129,7 @@ public:
     );
 
     if(req_size == 0) return *this;
-    std::vector<char> outbuf((size_t)req_size, '\0');
+    std::vector<char> outbuf(static_cast<size_t>(req_size), '\0');
 
     const int result = ::WideCharToMultiByte(
       CP_UTF8,          /// Code page: UTF-8
@@ -137,6 +140,10 @@ public:
       outbuf.size(),    /// Buffer size
       nullptr, nullptr  /// Default char mappings (unused for UTF-8)
     );
+
+    if (result == 0) {
+      return *this;
+    }
 
     std::string_view the_view{ outbuf.begin(), outbuf.end() };
     return *this << the_view;

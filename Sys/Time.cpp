@@ -66,7 +66,7 @@ auto SystemTime::strings() const -> STFormatter_ {
 }
 
 #ifdef N19_WIN32
-auto SystemTime::from_utc() -> Result<LocalTime> {
+auto SystemTime::from_utc() -> Result<SystemTime> {
   SystemTime time = {}; /// To return.
   SysRepr_ repr   = {}; /// Windows SYSTEMTIME.
 
@@ -81,7 +81,7 @@ auto SystemTime::from_utc() -> Result<LocalTime> {
   return time;
 }
 
-auto SystemTime::from_local() -> Result<LocalTime> {
+auto SystemTime::from_local() -> Result<SystemTime> {
   SystemTime time = {}; /// To return.
   SysRepr_ repr   = {}; /// Windows SYSTEMTIME.
 

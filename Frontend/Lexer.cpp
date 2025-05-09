@@ -946,7 +946,7 @@ auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<void> {
   return Result<void>::create();
 }
 
-auto Lexer::expect(const TokenType type, const bool cons) -> Result<void> {
+auto Lexer::expect_type(const TokenType type, const bool cons) -> Result<void> {
   if(current().type_ != type) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token \"{}\".", type.to_string());

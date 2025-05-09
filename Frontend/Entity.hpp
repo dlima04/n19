@@ -10,6 +10,7 @@
 #include <Core/Concepts.hpp>
 #include <Core/Panic.hpp>
 #include <IO/Console.hpp>
+#include <Sys/String.hpp>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -79,7 +80,7 @@ public:
   uint32_t    line_   = 0;
   size_t      pos_    = 0;
   EntityType  type_   = EntityType::None;
-  std::string file_;
+  sys::String file_;
   std::string lname_;
   std::string name_;
   Children    chldrn_;

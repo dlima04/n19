@@ -24,7 +24,7 @@ public:
     Entity::ID parent_id,
     size_t pos,
     uint32_t line,
-    const std::string& file,
+    const sys::String& file,
     const std::string& lname,
     Args&&... args
   ) -> Entity::Ptr<T>;
@@ -34,7 +34,7 @@ public:
     Entity::Ptr<> parent,
     size_t pos,
     uint32_t line,
-    const std::string& file,
+    const sys::String& file,
     const std::string& lname,
     Args&&... args
   ) -> Entity::Ptr<T>;
@@ -49,7 +49,7 @@ public:
   std::shared_ptr<RootEntity> root_ = nullptr;
 
   ~EntityTable() = default;
-  explicit EntityTable(const std::string& name);
+  explicit EntityTable(const sys::String& name);
 private:
   Entity::ID curr_id_ = 1;
 };
@@ -61,7 +61,7 @@ auto EntityTable::insert(
   const Entity::Ptr<> parent,
   const size_t pos,
   const uint32_t line,
-  const std::string& file,
+  const sys::String& file,
   const std::string& lname,
   Args&&... args ) -> Entity::Ptr<T>
 {
@@ -96,7 +96,7 @@ auto EntityTable::insert(
   const Entity::ID parent_id,
   const size_t pos,
   const uint32_t line,
-  const std::string& file,
+  const sys::String& file,
   const std::string& lname,
   Args&&... args ) -> Entity::Ptr<T>
 {

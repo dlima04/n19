@@ -9,9 +9,12 @@
 #include <Core/Platform.hpp>
 
 #ifdef N19_WIN32
-#include <windows.h>
+#   ifndef NOMINMAX
+#      define NOMINMAX
+#   endif
+#   include <windows.h>
 #else
-#include <errno.h>
+#   include <errno.h>
 #endif
 
 namespace n19::sys {
@@ -20,8 +23,8 @@ namespace n19::sys {
 #else
   using ErrorCode = int;
 #endif
-  NODISCARD_ auto last_error() -> String;
-  NODISCARD_ auto translate_native_error(ErrorCode) -> String;
+  NODISCARD_ auto last_error() -> std::string;
+  NODISCARD_ auto translate_native_error(ErrorCode) -> std::string;
 }
 
 #endif //SYS_LASTERROR_HPP

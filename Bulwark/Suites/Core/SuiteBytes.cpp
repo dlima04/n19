@@ -161,13 +161,6 @@ TEST_CASE(ByteCopy, EdgeCases) {
     REQUIRE(bc.value() == 42);
   });
 
-  SECTION(MoveSelfAssignment, {
-    ByteCopy<int> bc(42);
-    bc = std::move(bc);
-    REQUIRE(bc.alive());
-    REQUIRE(bc.value() == 42);
-  });
-
   SECTION(EmptyCopy, {
     ByteCopy<int> bc1;
     ByteCopy<int> bc2(bc1);

@@ -26,6 +26,9 @@
 #endif
 
 #if defined(N19_WIN32)
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <windows.h>
 #include <DbgHelp.h>
 BEGIN_NAMESPACE(n19::sys);

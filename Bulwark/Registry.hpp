@@ -7,6 +7,7 @@
 #define N19_TEST_REGISTRY_HPP
 #include <Bulwark/Case.hpp>
 #include <Bulwark/Suite.hpp>
+#include <Sys/String.hpp>
 #include <list>
 #include <memory>
 #include <string_view>
@@ -19,7 +20,7 @@ public:
   auto add_case(
     const Case::FuncType_& case_func,
     const Case::NameType_& case_name,
-    const std::string_view& suite_name
+    const sys::StringView& suite_name
   ) noexcept -> bool;
 
   auto run_all(OStream& stream = outs()) -> void;

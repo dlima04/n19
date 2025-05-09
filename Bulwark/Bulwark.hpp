@@ -10,6 +10,7 @@
 #include <Bulwark/Registry.hpp>
 #include <Bulwark/Reporting.hpp>
 #include <Bulwark/BulwarkContext.hpp>
+#include <Sys/String.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // This header includes all unit testing related functionality.
@@ -25,10 +26,11 @@
   static void TESTCASE_FUNC_(SUITE, NAME)(::n19::test::ExecutionContext& TESTCASE_CTX_);    \
   struct TESTCASE_TYPE_(SUITE, NAME) {                                                      \
     TESTCASE_TYPE_(SUITE, NAME)() {                                                         \
-      ::n19::test::g_registry.add_case(TESTCASE_FUNC_(SUITE, NAME), #NAME, #SUITE);         \
+      ::n19::test::g_registry.add_case(TESTCASE_FUNC_(SUITE, NAME), #NAME, _nstr(#SUITE));  \
   }};                                                                                       \
   static struct TESTCASE_TYPE_(SUITE, NAME) N19_UNIQUE_NAME(TESTCASE_TYPE_(SUITE, NAME));   \
-  static void TESTCASE_FUNC_(SUITE, NAME)(::n19::test::ExecutionContext& TESTCASE_CTX_)     \
+  static void TESTCASE_FUNC_(SUITE, NAME)                                                   \
+    ([[maybe_unused]] ::n19::test::ExecutionContext& TESTCASE_CTX_)                         \
 
 #define REQUIRE(EXPR) do {                                                                  \
   auto is_verbose_ = ::n19::test::Context::the().flags_ & ::n19::test::Context::Verbose;    \

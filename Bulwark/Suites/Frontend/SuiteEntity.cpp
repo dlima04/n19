@@ -9,11 +9,11 @@ using namespace n19;
 
 TEST_CASE(Entity, SymLinks) {
   SECTION(BasicResolution, {
-    EntityTable table("MyTable");
-    auto ptr1 = table.insert<SymLink>(N19_ROOT_ENTITY_ID, 1,  1, "file", "entity1");
+    EntityTable table(_nstr("MyTable"));
+    auto ptr1 = table.insert<SymLink>(N19_ROOT_ENTITY_ID, 1,  1, _nstr("file"), "entity1");
     REQUIRE(ptr1);
 
-    auto ptr2 = table.insert<Struct>(N19_ROOT_ENTITY_ID, 10,  10, "file", "entity2");
+    auto ptr2 = table.insert<Struct>(N19_ROOT_ENTITY_ID, 10,  10, _nstr("file"), "entity2");
     REQUIRE(ptr2);
 
     ptr1->link_ = ptr2->id_;
@@ -24,14 +24,14 @@ TEST_CASE(Entity, SymLinks) {
   });
 
   SECTION(MultiLevelResolution, {
-    EntityTable table("MyTable");
-    auto ptr1 = table.insert<SymLink>(N19_ROOT_ENTITY_ID, 1,  1, "file", "entity1");
+    EntityTable table(_nstr("MyTable"));
+    auto ptr1 = table.insert<SymLink>(N19_ROOT_ENTITY_ID, 1,  1, _nstr("file"), "entity1");
     REQUIRE(ptr1);
 
-    auto ptr2 = table.insert<AliasType>(N19_ROOT_ENTITY_ID, 10,  10, "file", "entity2");
+    auto ptr2 = table.insert<AliasType>(N19_ROOT_ENTITY_ID, 10,  10, _nstr("file"), "entity2");
     REQUIRE(ptr2);
 
-    auto ptr3 = table.insert<Struct>(N19_ROOT_ENTITY_ID, 20,  30, "file", "entity3");
+    auto ptr3 = table.insert<Struct>(N19_ROOT_ENTITY_ID, 20,  30, _nstr("file"), "entity3");
     REQUIRE(ptr3);
 
     ptr1->link_ = ptr2->id_;

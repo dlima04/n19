@@ -448,24 +448,24 @@ TEST_CASE(Lexer, Expect) {
   SECTION(ExpectTokenType, {
     auto lexer = create_lexer("42 + 10");
     
-    REQUIRE(lexer->expect(TokenType(TokenType::IntLiteral)).has_value());
-    REQUIRE(lexer->expect(TokenType(TokenType::Plus)).has_value());
-    REQUIRE(lexer->expect(TokenType(TokenType::IntLiteral)).has_value());
-    REQUIRE(lexer->expect(TokenType(TokenType::EndOfFile)).has_value());
+    REQUIRE(lexer->expect_type(n19::TokenType::IntLiteral).has_value());
+    REQUIRE(lexer->expect_type(n19::TokenType::Plus).has_value());
+    REQUIRE(lexer->expect_type(n19::TokenType::IntLiteral).has_value());
+    REQUIRE(lexer->expect_type(n19::TokenType::EndOfFile).has_value());
   });
 
   SECTION(ExpectTokenCategory, {
     auto lexer = create_lexer("42 + 10");
 
-    REQUIRE(lexer->expect(TokenCategory::Literal).has_value());
-    REQUIRE(lexer->expect(TokenCategory::ArithmeticOp).has_value());
-    REQUIRE(lexer->expect(TokenCategory::Literal).has_value());
+    REQUIRE(lexer->expect(n19::TokenCategory::Literal).has_value());
+    REQUIRE(lexer->expect(n19::TokenCategory::ArithmeticOp).has_value());
+    REQUIRE(lexer->expect(n19::TokenCategory::Literal).has_value());
     REQUIRE(lexer->current() == TokenType::EndOfFile);
   });
 
   SECTION(ExpectFailure, {
     auto lexer = create_lexer("42 + 10");
-    REQUIRE(!lexer->expect(TokenType(TokenType::Plus)).has_value());
+    REQUIRE(!lexer->expect_type(TokenType::Plus).has_value());
     /// TODO: add more here
   });
 }
@@ -626,7 +626,6 @@ TEST_CASE(Lexer, CharacterLiterals) {
     
     // Unterminated character literal
     auto lexer3 = create_lexer("'a");
-    auto tok = lexer3->current();
 
     REQUIRE(lexer3->current().type_ == TokenType::Illegal);
   });

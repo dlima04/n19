@@ -130,7 +130,7 @@ auto Parser::is_flag_begin_(const sys::StringView& str) const -> bool {
 auto Parser::help(OStream& stream) const -> void {
   stream << "\n";
   for(const auto& param : params_) {
-    stream << fmt("{:<18} {:<13} {}\n", param.long_, param.short_, param.desc_);
+    stream << fmt(_nstr("{:<18} {:<13} {}\n"), param.long_, param.short_, param.desc_);
   }
 
   outs() << Endl;
@@ -165,7 +165,7 @@ auto Parser::parse(OStream& stream) -> Result<void> {
       ++i;
     } else {
       the_flag  = args_[i];
-      the_value = "";
+      the_value = _nstr("");
     }
 
     auto param_ptr = std::ranges::find_if(params_, [&](const Parameter& p) {
@@ -176,7 +176,7 @@ auto Parser::parse(OStream& stream) -> Result<void> {
       print_chunk_error_(i, stream, "Flag does not exist.");
       return Error(ErrC::InvalidArg);
     }
-    if(the_value == "=") {
+    if(the_value == _nstr("=")) {
       print_chunk_error_(i, stream, "Expected a value after \"=\"");
       return Error(ErrC::InvalidArg);
     }
@@ -184,7 +184,7 @@ auto Parser::parse(OStream& stream) -> Result<void> {
       print_chunk_error_(flag_pos, stream, "Flag was passed more than once.");
       return Error(ErrC::InvalidArg);
     }
-    if(the_value.starts_with("=")) {
+    if(the_value.starts_with(_nstr("="))) {
       the_value.erase(0, 1);
     }
     if(!param_ptr->val_->convert(the_value).has_value()) {

@@ -18,12 +18,12 @@ constinit Registry g_registry;
 auto Registry::add_case(
   const Case::FuncType_& case_func,
   const Case::NameType_& case_name,
-  const std::string_view& suite_name ) noexcept -> bool
+  const sys::StringView& suite_name ) noexcept -> bool
 {
   ASSERT(case_func);
   ASSERT(!case_name.empty());
   ASSERT(!suite_name.empty());
-
+  
   if(suites_ == nullptr) {
     suites_ = std::make_unique<std::list<Suite>>();
   }

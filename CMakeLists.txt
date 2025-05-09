@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 3.28)
 project(n19)
+
+# Cmake Configurations
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
+
+# Build options
+option(ENABLE_ASAN "clang asan" ON)
 
 set(N19_ENUMERATE_GLOBAL_SOURCES
   Frontend/ErrorCollector.cpp
@@ -144,7 +149,7 @@ function(add_platform_macros target)
   endif()
 endfunction()
 
-function(enable_clang_sanitizer target) #, ...
+function(enable_clang_sanitizer target) 
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     list(REMOVE_AT ARGV 0)
     string(REPLACE ";" "," sanitizer "${ARGV}")
@@ -161,10 +166,11 @@ foreach(executable ${N19_ENUMERATE_PRIMARY_EXECUTABLES})
   target_include_directories(${executable} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
   add_platform_macros(${executable})
 
-  # TODO: this is temporary.
-  # Need to use a build option for this in the future.
+  # TODO: this is temporary, and can be done better.
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    enable_clang_sanitizer(${executable} address)
+    if(NOT N19_IS_WINDOWS AND ENABLE_ASAN)
+      enable_clang_sanitizer(${executable} address)
+    endif()
   endif()
 
   if(MSVC)

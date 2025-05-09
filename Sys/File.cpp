@@ -123,8 +123,8 @@ Result<SeekDist> File::seek(SeekDist dist, FSeek method) const {
     UNREACHABLE_ASSERTION;
   }
 
-  LARGE_INTEGER in_dist{ 0 };
-  LARGE_INTEGER out_dist{ 0 };
+  LARGE_INTEGER in_dist{};
+  LARGE_INTEGER out_dist{};
 
   in_dist.QuadPart = dist;
   if(!SetFilePointerEx(value_, in_dist, &out_dist, whence)) {
@@ -209,8 +209,6 @@ NODISCARD_ auto File::create_trunc(
   } if(perms & Write) {
     the_perms |= FILE_GENERIC_WRITE;
     shareperm |= FILE_SHARE_WRITE;
-  } if(append) {
-    the_perms |= FILE_APPEND_DATA;
   }
 
   File the_device;
@@ -229,9 +227,9 @@ NODISCARD_ auto File::create_trunc(
 }
 
 NODISCARD_ auto File::size() const -> Result<size_t> {
-  LARGE_INTEGER file_size{0};
+  LARGE_INTEGER file_size{};
   if(!GetFileSizeEx(value_, &file_size)) return Error::from_native();
-  return Result<size_t>::create(file_size.QuadPart);
+  return Result<size_t>::create(static_cast<size_t>(file_size.QuadPart));
 }
 
 NODISCARD_ auto File::path() const -> stdfs::path {

@@ -21,6 +21,8 @@ TEST_CASE(Nothing, BasicFunctionality) {
   });
 
   SECTION(ConstexprBehavior, {
+    (void)TESTCASE_CTX_; /// disable annoying warning
+    
     constexpr Nothing_ n1;
     constexpr auto n2 = Nothing;
     static_assert(n1.dummy_value_ == 0);

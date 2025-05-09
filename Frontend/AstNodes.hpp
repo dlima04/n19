@@ -12,6 +12,7 @@
 #include <Core/Concepts.hpp>
 #include <Frontend/Token.hpp>
 #include <Frontend/Entity.hpp>
+#include <Sys/String.hpp>
 #include <vector>
 #include <memory>
 
@@ -84,7 +85,7 @@ public:
     size_t pos,
     uint32_t line,
     AstNode* parent = nullptr,
-    const std::string& file = ""
+    const sys::String& file = _nstr("")
   ) -> Ptr<T>;
 
   // Public fields //
@@ -92,7 +93,7 @@ public:
   AstNode* parent_ = nullptr;
   size_t pos_      = 0;
   uint32_t line_   = 1;
-  std::string file_;
+  sys::String file_;
   Type type_;
   //////////////////////////////////////////
 
@@ -523,7 +524,7 @@ auto AstNode::create(
   const size_t pos,
   const uint32_t line,
   AstNode* parent,
-  const std::string& file ) -> Ptr<T>
+  const sys::String& file ) -> Ptr<T>
 {
   auto ptr     = std::make_unique<T>();
   ptr->parent_ = parent;

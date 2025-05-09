@@ -11,9 +11,12 @@
 #include <string>
 
 #ifdef N19_WIN32
-#  include <windows.h>
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
 #else // POSIX
-#  include <time.h>
+#include <time.h>
 #endif
 
 BEGIN_NAMESPACE(n19::sys);

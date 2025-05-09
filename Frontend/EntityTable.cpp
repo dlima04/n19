@@ -7,7 +7,7 @@
 #include <algorithm>
 BEGIN_NAMESPACE(n19);
 
-EntityTable::EntityTable(const std::string& name) {
+EntityTable::EntityTable(const sys::String& name) {
   /// Initialize the root entity.
   root_         = std::make_shared<RootEntity>();
   root_->file_  = name;

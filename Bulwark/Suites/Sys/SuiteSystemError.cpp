@@ -16,7 +16,7 @@ TEST_CASE(SystemError, LastError) {
   errno = ENOENT;
 #endif
   /// Test that last_error() returns a non-empty string
-  String error_msg = last_error();
+  std::string error_msg = last_error();
   REQUIRE(!error_msg.empty());  
 
 #ifdef N19_WIN32
@@ -33,17 +33,12 @@ TEST_CASE(SystemError, Translation) {
     /// On POSIX, this is ENOENT.
     ErrorCode error_code = 2;
     
-    String error_msg = translate_native_error(error_code);
+    std::string error_msg = translate_native_error(error_code);
     REQUIRE(!error_msg.empty());
     
     ///  Check that the error message contains expected text
-#ifdef N19_WIN32
-    REQUIRE(error_msg.find(L"file") != String::npos || 
-            error_msg.find(L"File") != String::npos);
-#else
-    REQUIRE(error_msg.find("file") != String::npos || 
-            error_msg.find("File") != String::npos);
-#endif
+    REQUIRE(error_msg.find("file") != std::string::npos ||
+            error_msg.find("File") != std::string::npos);
   });
 
   SECTION(CommonErrorCodes, {
@@ -59,7 +54,7 @@ TEST_CASE(SystemError, Translation) {
 #endif
     
     for (auto code : common_codes) {
-      String error_msg = translate_native_error(code);
+      std::string error_msg = translate_native_error(code);
       REQUIRE(!error_msg.empty());
     }
   });

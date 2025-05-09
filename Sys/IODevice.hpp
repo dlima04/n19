@@ -14,11 +14,14 @@
 #include <span>
 
 #if defined(N19_WIN32)
-#   include <windows.h>
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
 #else // POSIX
-#   include <unistd.h>
-#   include <fcntl.h>
-#   include <poll.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <poll.h>
 #endif
 
 BEGIN_NAMESPACE(n19::sys);

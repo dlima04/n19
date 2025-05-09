@@ -11,29 +11,73 @@ using namespace n19;
 
 /// UNIX style arguments
 struct DummyParser1 : public argp::Parser {
-  int64_t&     i64_param     = arg<int64_t>("--i64-arg", "-i64", "", 343);
-  bool&        bool_param    = arg<bool>("--bool-arg", "-bool", "",  true);
-  sys::String& str_param     = arg<sys::String>("--string-arg", "-string", "", _nstr("default value"));
-  double&      double_param  = arg<double>("--double-arg", "-double", "",  3.14);
-  argp::PackType& pack_param = arg<argp::PackType>("--pack-arg", "-pack", "", argp::PackType{_nstr("foo"), _nstr("bar"), _nstr("baz")});
+  int64_t& i64_param = arg<int64_t>(
+    _nstr("--i64-arg"), _nstr("-i64"),
+    _nstr(""), 343);
+  
+  bool& bool_param = arg<bool>(
+    _nstr("--bool-arg"), _nstr("-bool"),
+    _nstr(""),  true);
+
+  sys::String& str_param = arg<sys::String>(
+    _nstr("--string-arg"), _nstr("-string"), 
+    _nstr(""), _nstr("default value"));
+  
+  double& double_param = arg<double>(
+    _nstr("--double-arg"), _nstr("-double"),
+    _nstr(""), 3.14);
+
+  argp::PackType& pack_param = arg<argp::PackType>(
+    _nstr("--pack-arg"), 
+    _nstr("-pack"),
+    _nstr(""), 
+    argp::PackType{_nstr("foo"), _nstr("bar"), _nstr("baz")});
 };
 
 /// DOS style arguments
 struct DummyParser2 : public argp::Parser {
-  int64_t&      i64_param    = arg<int64_t>("/i64-arg", "/i64", "", 343);
-  bool&         bool_param   = arg<bool>("/bool-arg", "/bool", "",  true);
-  sys::String&  str_param    = arg<sys::String>("/string-arg", "/string", "", _nstr("default value"));
-  double&       double_param = arg<double>("/double-arg", "/double", "",  3.14);
-  argp::PackType& pack_param = arg<argp::PackType>("/pack-arg", "/pack");
+  int64_t& i64_param = arg<int64_t>(
+    _nstr("/i64-arg"), _nstr("/i64"),
+    _nstr(""), 343);
+
+  bool& bool_param = arg<bool>(
+    _nstr("/bool-arg"), _nstr("/bool"),
+    _nstr(""), true);
+
+  sys::String& str_param = arg<sys::String>(
+    _nstr("/string-arg"), _nstr("/string"),
+    _nstr(""), _nstr("default value"));
+
+  double& double_param = arg<double>(
+    _nstr("/double-arg"), _nstr("/double"),
+    _nstr(""), 3.14);
+
+  argp::PackType& pack_param = arg<argp::PackType>(
+    _nstr("/pack-arg"), _nstr("/pack"),
+    _nstr(""));
 };
 
-/// Whatever the fuck this is (why did I even add this argument style??)
+/// idk
 struct DummyParser3 : public argp::Parser {
-  int64_t&     i64_param     = arg<int64_t>(":i64-arg", ":i64", "", 343);
-  bool&        bool_param    = arg<bool>(":bool-arg", ":bool", "",  true);
-  sys::String& str_param     = arg<sys::String>(":string-arg", ":string", "", _nstr("default value"));
-  double&      double_param  = arg<double>(":double-arg", ":double", "",  3.14);
-  argp::PackType& pack_param = arg<argp::PackType>(":pack-arg", ":pack");
+  int64_t& i64_param = arg<int64_t>(
+    _nstr(":i64-arg"), _nstr(":i64"),
+    _nstr(""), 343);
+
+  bool& bool_param = arg<bool>(
+    _nstr(":bool-arg"), _nstr(":bool"),
+    _nstr(""), true);
+
+  sys::String& str_param = arg<sys::String>(
+    _nstr(":string-arg"), _nstr(":string"),
+    _nstr(""), _nstr("default value"));
+
+  double& double_param = arg<double>(
+    _nstr(":double-arg"), _nstr(":double"),
+    _nstr(""), 3.14);
+
+  argp::PackType& pack_param = arg<argp::PackType>(
+    _nstr(":pack-arg"), _nstr(":pack"),
+    _nstr(""));
 };
 
 TEST_CASE(ArgParse, Defaults) {
@@ -183,15 +227,15 @@ TEST_CASE(ArgParse, DosStyle) {
 ///
 /// For testing incorrect types
 struct JustI64 : public argp::Parser {
-  int64_t& arg_ = arg<int64_t>("--arg", "-a");
+  int64_t& arg_ = arg<int64_t>(_nstr("--arg"), _nstr("-a"));
 };
 
 struct JustDouble : public argp::Parser {
-  double& arg_ = arg<double>("--arg", "-a");
+  double& arg_ = arg<double>(_nstr("--arg"), _nstr("-a"));
 };
 
 struct JustBool : public argp::Parser {
-  bool& arg_ = arg<bool>("--arg", "-a", "", false);
+  bool& arg_ = arg<bool>(_nstr("--arg"), _nstr("-a"), _nstr(""), false);
 };
 
 TEST_CASE(ArgParse, BadTypes) {
