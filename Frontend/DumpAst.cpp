@@ -4,6 +4,7 @@
 */
 
 #include <Frontend/AstNodes.hpp>
+#include <cctype>
 BEGIN_NAMESPACE(n19);
 
 auto AstNode::print_(
@@ -497,32 +498,52 @@ auto AstScalarLiteral::print(
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  stream
-    << Con::BlueFG
-    << value_
-    << Con::Reset;
+  /// Btw we need to do this so it doesn't fuck the output.
+  auto get_ch = [](const char ch) -> Maybe<std::string_view> {
+    switch (ch) {
+    case '\v': return "\\v";
+    case '\n': return "\\n";
+    case '\t': return "\\t";
+    case '\b': return "\\b";
+    case '\a': return "\\a";
+    default: return Nothing;
+    }
+  };
+
+  stream << Con::BlueFG;
+  if(scalar_type_ == StringLit || scalar_type_ == U8Lit) {
+    for(const char ch : value_) {
+      auto val = get_ch(ch);
+      if(val) { stream << *val;}
+      else    { stream << ch;  }
+    }
+  }
+  else {
+    stream << value_;
+  }
 
   stream
+    << Con::Reset
     << " (Type="
     << Con::WhiteFG;
 
-  switch (this->scalar_type_) {
-  case AstScalarLiteral::IntLit:
+  switch (scalar_type_) {
+  case IntLit:
     stream << "IntLit";
     break;
-  case AstScalarLiteral::FloatLit:
+  case FloatLit:
     stream << "FloatLit";
     break;
-  case AstScalarLiteral::BoolLit:
+  case BoolLit:
     stream << "BoolLit";
     break;
-  case AstScalarLiteral::NullLit:
+  case NullLit:
     stream << "NullLit";
     break;
-  case AstScalarLiteral::StringLit:
+  case StringLit:
     stream << "StringLit";
     break;
-  case AstScalarLiteral::U8Lit:
+  case U8Lit:
     stream << "U8Lit";
     break;
   default:
