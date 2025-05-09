@@ -15,6 +15,7 @@ auto is_node_toplevel_valid_(const AstNode::Ptr<> &ptr) -> bool {
   case AstNode::Type::Namespace:        FALLTHROUGH_;
   case AstNode::Type::Where:            FALLTHROUGH_;
   case AstNode::Type::ProcDecl:         FALLTHROUGH_;
+  case AstNode::Type::ScalarLiteral:    FALLTHROUGH_;
   case AstNode::Type::Vardecl:          return true;
   default:                              return false;
   }
@@ -59,7 +60,7 @@ auto parse_begin_(
   ///
   /// Check if EOF has been reached.
   if(curr == TokenType::EndOfFile) {
-    return Result<AstNode::Ptr<>>(nullptr);
+    return Error(ErrC::None);
   }
 
   ///
@@ -84,23 +85,13 @@ auto parse_begin_(
   ///
   /// Illegal token, reject ts...
   else if(curr == TokenType::Illegal) {
-    ErrorCollector::display_error(
-      "Illegal token.",
-      ctx.lxr,
-      curr,
-      ctx.errstream);
-    return Error{ErrC::BadToken};
+    return Error{ErrC::BadToken, "Illegal token."};
   }
 
   ///
   /// gang wtf is this token ❓user tweaking 😭
   else {
-    ErrorCollector::display_error(
-      "Wtf is this shit bro",
-      ctx.lxr,
-      curr,
-      ctx.errstream);
-    return Error{ErrC::BadToken};
+    return Error{ErrC::BadToken, "Wtf is this shit bro"};
   }
 
   ///
@@ -143,12 +134,7 @@ auto parse_begin_(
   /// Check if we're leaving a parenthesized expression
   if(ctx.lxr.current() == TokenType::RightParen) {
     if(!ctx.paren_level) {
-      ErrorCollector::display_error(
-        "Unexpected token",
-        ctx.lxr,
-        ctx.lxr.current(),
-        ctx.errstream);
-      return Error{ErrC::BadToken};
+      return Error{ErrC::BadToken, "Unexpected token."};
     }
 
     if(!parse_single) {
@@ -163,24 +149,14 @@ auto parse_begin_(
 
   if(ctx.lxr.current().is_terminator()) {
     if(ctx.paren_level) {
-      ErrorCollector::display_error(
-        "Unexpected token inside of parenthesized expression",
-        ctx.lxr,
-        ctx.lxr.current(),
-        ctx.errstream);
-      return Error{ErrC::BadToken};
+      return Error{ErrC::BadToken, "Unexpected token inside parentheses."};
     }
 
     ctx.lxr.consume(1);
     return Result<AstNode::Ptr<>>(std::move(expr));
   }
 
-  ErrorCollector::display_error(
-    "Unexpected token",
-    ctx.lxr,
-    ctx.lxr.current(),
-    ctx.errstream);
-  return Error{ErrC::BadToken};
+  return Error{ErrC::BadToken, "Unexpected token."};
 }
 
 auto parse_impl_(ParseContext &ctx) -> bool {
@@ -188,11 +164,14 @@ auto parse_impl_(ParseContext &ctx) -> bool {
     while (true) {
       auto toplevel_decl = detail_::parse_begin_(ctx, false, false);
 
-      /// An error has occurred. We're done.
+      /// An error has occurred, or EOF was reached. We're done.
       if (!toplevel_decl.has_value()) {
-        ErrorCollector::display_error(
-          toplevel_decl.error().msg,
-          ctx.lxr, ctx.errstream);
+        if (ctx.lxr.current() != TokenType::EndOfFile) {
+          ErrorCollector::display_error(
+            toplevel_decl.error().msg,
+            ctx.lxr, 
+            ctx.errstream);
+        }
         break;
       }
 
@@ -207,10 +186,12 @@ auto parse_impl_(ParseContext &ctx) -> bool {
       /// Verify that the returned node is valid at the toplevel
       /// (i.e. can exist at the global scope).
       if (!detail_::is_node_toplevel_valid_(*toplevel_decl)) {
-        ctx.errors.store_error(
-          "Expression is invalid at the toplevel.",
-          ctx.lxr.file_name_,
-          (*toplevel_decl)->pos_,
+        ErrorCollector::display_error(
+          "Expression is invalid at the toplevel.", 
+          ctx.lxr.file_name_, 
+          ctx.lxr.src_, 
+          ctx.errstream, 
+          (*toplevel_decl)->pos_, 
           (*toplevel_decl)->line_);
         return false;
       }
@@ -297,6 +278,7 @@ auto parse_scalar_lit_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
     return Error(ErrC::BadToken, "Invalid literal token.");
   }
 
+  ctx.lxr.consume(1);
   return Result<AstNode::Ptr<>>::create(std::move(node));
 }
 
@@ -339,6 +321,10 @@ auto parse_identifier_(ParseContext &ctx, AstNode::Ptr<> &&operand)
 }
 
 auto get_next_include_(ParseContext& ctx) -> bool {
+  if (ctx.includes_.empty()) {
+    return false;
+  }
+  
   auto next = std::ranges::find_if(ctx.includes_, [](const IncludedFile& f) {
     return f.state_ == IncludeState::Pending;
   });

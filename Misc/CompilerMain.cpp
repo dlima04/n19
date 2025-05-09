@@ -7,6 +7,7 @@
 
 #include <Frontend/Lexer.hpp>
 #include <Frontend/FrontendContext.hpp>
+#include <Frontend/CompilationCycle.hpp>
 #include <IO/Console.hpp>
 #include <IO/Fmt.hpp>
 #include <Core/ArgParse.hpp>
@@ -15,6 +16,7 @@
 #include <Core/Result.hpp>
 #include <Core/Try.hpp>
 #include <Core/StringUtil.hpp>
+#include <Core/Defer.hpp>
 #include <iostream>
 
 #define ARGNUM_HARD_LIMIT 40
@@ -63,6 +65,67 @@ struct MainArgParser : argp::Parser {
     _nstr("Display the n19 compiler version and exit."));
 };
 
+static auto verify_args(MainArgParser& parser) -> bool {
+  auto stream = OStream::from_stdout();
+  if (parser.show_help) {
+    parser.help(stream);
+    return false;
+  }
+
+  if (parser.version) {
+    auto ver = Context::get_version_info();
+    outs()
+      << "n19 compiler -- version "
+      << n19::fmt("{}.{}.{}\n", ver.major, ver.minor, ver.patch)
+      << n19::fmt("Target: {} ({})\n", ver.arch, ver.os)
+      << ver.msg
+      << "\n";
+    return false;
+  }
+
+  if (parser.inputs.empty()) {
+    outs() 
+      << Con::RedFG 
+      << "No input files provided." 
+      << Con::Reset 
+      << " Exiting..."
+      << "\n";
+    return false;
+  }
+
+  if (parser.outputs.empty()) {
+    outs() 
+      << Con::RedFG 
+      << "No output files provided." 
+      << Con::Reset
+      << " Exiting..."
+      << "\n";
+    return false;
+  }
+
+  if (parser.inputs.size() != parser.outputs.size()) {
+    outs()
+      << Con::RedFG
+      << "Error:"
+      << Con::Reset
+      << " Number of output files does not match"
+      << " the number of inputs."
+      << "\n";
+    return false;
+  }
+
+  auto& context = Context::the();
+  if (parser.dump_ast)  context.flags_ |= Context::DumpAST;
+  if (parser.dump_ents) context.flags_ |= Context::DumpEnts;
+  if (parser.dump_ir)   context.flags_ |= Context::DumpIR;
+  if (parser.verbose)   context.flags_ |= Context::Verbose;
+
+  Context::the().inputs_ = std::move(parser.inputs);
+  Context::the().outputs_ = std::move(parser.outputs);
+
+  return true;
+}
+
 #ifdef N19_WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -73,6 +136,12 @@ struct MainArgParser : argp::Parser {
 int main() {
   win32_init_console();
 
+  DEFER({
+    ins().clear();
+    outs().flush();
+    errs().flush();
+  });
+
   MainArgParser parser;
   LPWSTR cmdline = ::GetCommandLineW();
 
@@ -82,13 +151,13 @@ int main() {
     outs()
       << "Could not retrieve win32 argv. Error code="
       << ::GetLastError()
-      << Endl;
+      << "\n";
     return EXIT_FAILURE;
   }
 
   if (arg_count > ARGNUM_HARD_LIMIT) {
     outs() << "Too many command-line arguments passed.";
-    outs() << Endl;
+    outs() << "\n";
     ::LocalFree(args);
     return EXIT_FAILURE;
   }
@@ -101,52 +170,30 @@ int main() {
   }
 
   ::LocalFree(args);
-  if (parser.show_help) {
-    parser.help(stream);
-    return EXIT_SUCCESS;
-  }
-
-  if (parser.version) {
-    auto ver = Context::get_version_info();
-    outs()
-      << "n19 compiler -- version "
-      << n19::fmt("{}.{}.{}\n", ver.major, ver.minor, ver.patch)
-      << n19::fmt("Target: {} ({})\n", ver.arch, ver.os)
-      << ver.msg
-      << Endl;
-    return EXIT_SUCCESS;
-  }
-
-  if (parser.inputs.empty()) {
-    outs() << "No input files provided. Exiting..." << Endl;
+  if (!verify_args(parser)) {
     return EXIT_FAILURE;
   }
 
-  if (parser.outputs.empty()) {
-    outs() << "No output files provided. Exiting..." << Endl;
+  if (!begin_global_compilation_cycles()) {
+    errs() << "Build failed.\n";
     return EXIT_FAILURE;
   }
 
-  auto& context = Context::the();
-  if (parser.dump_ast)  context.flags_ |= Context::DumpAST;
-  if (parser.dump_ents) context.flags_ |= Context::DumpEnts;
-  if (parser.dump_ir)   context.flags_ |= Context::DumpIR;
-  if (parser.verbose)   context.flags_ |= Context::Verbose;
-
-  Context::the().inputs_ = std::move(parser.inputs);
-  Context::the().outputs_ = std::move(parser.outputs);
-
-  ins().clear();
-  outs().flush();
-  errs().flush();
+  outs() << "Build complete.\n";
   return EXIT_SUCCESS;
 }
 
 #else /// POSIX
 int main(int argc, char** argv){
+  DEFER({
+    ins().clear();
+    outs().flush();
+    errs().flush();
+  });
+  
   if(argc > ARGNUM_HARD_LIMIT) {
     outs() << "Too many command-line arguments passed.";
-    outs() << Endl;
+    outs() << "\n";
     return EXIT_FAILURE;
   }
 
@@ -156,44 +203,16 @@ int main(int argc, char** argv){
     return EXIT_FAILURE;
   }
 
-  if(parser.show_help) {
-    parser.help(stream);
-    return EXIT_SUCCESS;
-  }
-
-  if(parser.version) {
-    auto ver = Context::get_version_info();
-    outs()
-      << "n19 compiler -- version "
-      << n19::fmt("{}.{}.{}\n", ver.major, ver.minor, ver.patch)
-      << n19::fmt("Target: {} ({})\n", ver.arch, ver.os)
-      << ver.msg
-      << Endl;
-    return EXIT_SUCCESS;
-  }
-
-  if(parser.inputs.empty()) {
-    outs() << "No input files provided. Exiting..." << Endl;
+  if (!verify_args(parser)) {
     return EXIT_FAILURE;
   }
 
-  if(parser.outputs.empty()) {
-    outs() << "No output files provided. Exiting..." << Endl;
+  if (!begin_global_compilation_cycles()) {
+    errs() << "Build failed.\n";
     return EXIT_FAILURE;
   }
 
-  auto& context = Context::the();
-  if(parser.dump_ast)  context.flags_ |= Context::DumpAST;
-  if(parser.dump_ents) context.flags_ |= Context::DumpEnts;
-  if(parser.dump_ir)   context.flags_ |= Context::DumpIR;
-  if(parser.verbose)   context.flags_ |= Context::Verbose;
-
-  Context::the().inputs_  = std::move(parser.inputs);
-  Context::the().outputs_ = std::move(parser.outputs);
-
-  ins().clear();
-  outs().flush();
-  errs().flush();
+  outs() << "Build complete.\n";
   return EXIT_SUCCESS;
 }
 

@@ -500,8 +500,37 @@ auto AstScalarLiteral::print(
   stream
     << Con::BlueFG
     << value_
-    << '\n'
     << Con::Reset;
+
+  stream
+    << " (Type="
+    << Con::WhiteFG;
+
+  switch (this->scalar_type_) {
+  case AstScalarLiteral::IntLit:
+    stream << "IntLit";
+    break;
+  case AstScalarLiteral::FloatLit:
+    stream << "FloatLit";
+    break;
+  case AstScalarLiteral::BoolLit:
+    stream << "BoolLit";
+    break;
+  case AstScalarLiteral::NullLit:
+    stream << "NullLit";
+    break;
+  case AstScalarLiteral::StringLit:
+    stream << "StringLit";
+    break;
+  case AstScalarLiteral::U8Lit:
+    stream << "U8Lit";
+    break;
+  default:
+    stream << "???";
+    break;
+  }
+
+  stream << Con::Reset << ")\n";
 }
 
 auto AstAggregateLiteral::print(

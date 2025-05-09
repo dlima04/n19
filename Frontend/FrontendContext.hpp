@@ -38,6 +38,7 @@ public:
   };
 
   static auto get_version_info() -> VersionInfo;
+  
   FORCEINLINE_ static auto the() -> Context& {
     static Context the_context;
     return the_context;
