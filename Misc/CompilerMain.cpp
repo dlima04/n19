@@ -64,8 +64,77 @@ struct MainArgParser : argp::Parser {
 };
 
 #ifdef N19_WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#include <windows.h>
+
 int main() {
   win32_init_console();
+
+  MainArgParser parser;
+  LPWSTR cmdline = ::GetCommandLineW();
+
+  int arg_count = 0;
+  LPWSTR* args = ::CommandLineToArgvW(cmdline, &arg_count);
+  if (args == nullptr) {
+    outs()
+      << "Could not retrieve win32 argv. Error code="
+      << ::GetLastError()
+      << Endl;
+    return EXIT_FAILURE;
+  }
+
+  if (arg_count > ARGNUM_HARD_LIMIT) {
+    outs() << "Too many command-line arguments passed.";
+    outs() << Endl;
+    ::LocalFree(args);
+    return EXIT_FAILURE;
+  }
+
+  /// Initialize context
+  auto stream = OStream::from_stdout();
+  if (arg_count > 1 && args && !parser.take_argv(arg_count, args).parse(stream)) {
+    ::LocalFree(args);
+    return EXIT_FAILURE;
+  }
+
+  ::LocalFree(args);
+  if (parser.show_help) {
+    parser.help(stream);
+    return EXIT_SUCCESS;
+  }
+
+  if (parser.version) {
+    auto ver = Context::get_version_info();
+    outs()
+      << "n19 compiler -- version "
+      << n19::fmt("{}.{}.{}\n", ver.major, ver.minor, ver.patch)
+      << n19::fmt("Target: {} ({})\n", ver.arch, ver.os)
+      << ver.msg
+      << Endl;
+    return EXIT_SUCCESS;
+  }
+
+  if (parser.inputs.empty()) {
+    outs() << "No input files provided. Exiting..." << Endl;
+    return EXIT_FAILURE;
+  }
+
+  if (parser.outputs.empty()) {
+    outs() << "No output files provided. Exiting..." << Endl;
+    return EXIT_FAILURE;
+  }
+
+  auto& context = Context::the();
+  if (parser.dump_ast)  context.flags_ |= Context::DumpAST;
+  if (parser.dump_ents) context.flags_ |= Context::DumpEnts;
+  if (parser.dump_ir)   context.flags_ |= Context::DumpIR;
+  if (parser.verbose)   context.flags_ |= Context::Verbose;
+
+  Context::the().inputs_ = std::move(parser.inputs);
+  Context::the().outputs_ = std::move(parser.outputs);
 
   ins().clear();
   outs().flush();
@@ -76,7 +145,7 @@ int main() {
 #else /// POSIX
 int main(int argc, char** argv){
   if(argc > ARGNUM_HARD_LIMIT) {
-    outs() << "\nToo many command-line arguments passed.";
+    outs() << "Too many command-line arguments passed.";
     outs() << Endl;
     return EXIT_FAILURE;
   }
@@ -104,12 +173,12 @@ int main(int argc, char** argv){
   }
 
   if(parser.inputs.empty()) {
-    outs() << "\nNo input files provided. Exiting..." << Endl;
+    outs() << "No input files provided. Exiting..." << Endl;
     return EXIT_FAILURE;
   }
 
   if(parser.outputs.empty()) {
-    outs() << "\nNo output files provided. Exiting..." << Endl;
+    outs() << "No output files provided. Exiting..." << Endl;
     return EXIT_FAILURE;
   }
 

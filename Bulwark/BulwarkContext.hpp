@@ -35,7 +35,7 @@ public:
   FORCEINLINE_ auto should_run(const sys::StringView& s) -> bool {
     return std::ranges::find_if(suites_to_run_, [s](const auto& o) {
       return o == s;
-    }) != suites_to_skip_.end();
+    }) != suites_to_run_.end();
   }
 
   FORCEINLINE_ static auto the() -> Context& {

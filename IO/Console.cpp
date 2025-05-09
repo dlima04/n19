@@ -11,14 +11,14 @@ auto win32_are_vsequences_enabled() -> bool {
   DWORD mode_stdout = 0, mode_stderr = 0;
   DWORD flag_value  = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
-  ::GetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), &mode_stdout);
-  ::GetConsoleMode(GetStdHandle(STD_ERROR_HANDLE), &mode_stderr);
+  ::GetConsoleMode(::GetStdHandle(STD_OUTPUT_HANDLE), &mode_stdout);
+  ::GetConsoleMode(::GetStdHandle(STD_ERROR_HANDLE), &mode_stderr);
   return (mode_stdout & flag_value) && (mode_stderr & flag_value);
 }
 
 auto win32_enable_vsequences() -> void {
-  HANDLE h_stdout    = GetStdHandle(STD_OUTPUT_HANDLE);
-  HANDLE h_stderr    = GetStdHandle(STD_ERROR_HANDLE);
+  HANDLE h_stdout    = ::GetStdHandle(STD_OUTPUT_HANDLE);
+  HANDLE h_stderr    = ::GetStdHandle(STD_ERROR_HANDLE);
   DWORD mode_stdout  = 0;
   DWORD mode_stderr  = 0;
 
