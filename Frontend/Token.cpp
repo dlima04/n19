@@ -152,44 +152,44 @@ auto Token::is_terminator() const -> bool {
 
 // TODO
 // operator precedence of a given token.
-auto Token::prec() const -> uint16_t {
-  switch(type_.value) {
-  case TokenType::ValueAssignment:
-  case TokenType::PlusEq:
-  case TokenType::SubEq:
-  case TokenType::MulEq:
-  case TokenType::DivEq:
-  case TokenType::ModEq:
-  case TokenType::LshiftEq:
-  case TokenType::RshiftEq:
-  case TokenType::BitwiseAndEq:
-  case TokenType::BitwiseOrEq:
-  case TokenType::XorEq:
-  case TokenType::LogicalAnd:
-  case TokenType::LogicalOr:
-  case TokenType::Mul:
-  case TokenType::NamespaceOperator:
-  case TokenType::Dot:
-  case TokenType::Eq:
-  case TokenType::Neq:
-  case TokenType::Lt:
-  case TokenType::Lte:
-  case TokenType::Gt:
-  case TokenType::Gte:
-  case TokenType::Plus:
-  case TokenType::Sub:
-  case TokenType::Div:
-  case TokenType::Mod:
-  case TokenType::BitwiseAnd:
-  case TokenType::BitwiseOr:
-  case TokenType::Xor:
-  case TokenType::Lshift:
-  case TokenType::Rshift:
-  case TokenType::SkinnyArrow:
+auto TokenType::prec() const -> Precedence::Value {
+  switch(this->value) {
+  case ValueAssignment:   return Precedence::max;
+  case PlusEq:
+  case SubEq:
+  case MulEq:
+  case DivEq:
+  case ModEq:
+  case LshiftEq:
+  case RshiftEq:
+  case BitwiseAndEq:
+  case BitwiseOrEq:
+  case XorEq:             return Precedence::max - 1;
+  case LogicalAnd:        return Precedence::max - 2;
+  case LogicalOr:         return Precedence::max - 3;
+  case Mul:
+  case Div:
+  case Mod:               return Precedence::max - 4;
+  case Plus:
+  case Sub:               return Precedence::max - 5;
+  case Lshift:
+  case Rshift:            return Precedence::max - 6;
+  case Lt:
+  case Lte:
+  case Gt:
+  case Gte:               return Precedence::max - 7;
+  case Eq:
+  case Neq:               return Precedence::max - 8;
+  case BitwiseAnd:        return Precedence::max - 9;
+  case Xor:               return Precedence::max - 10;
+  case BitwiseOr:         return Precedence::max - 11;
+  case Dot:
+  case SkinnyArrow:       return Precedence::max - 12;
+  case NamespaceOperator: return Precedence::max - 13;
   default: break;
   }
 
-  PANIC("Token::prec(): default assertion.");
+  PANIC("TokenType::prec(): default assertion.");
 }
 
 END_NAMESPACE(n19);

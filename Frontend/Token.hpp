@@ -141,9 +141,16 @@ public:
   };
   #undef X
 
+  struct Precedence {   /// Token precedence constants
+    using Value = uint16_t;
+    constexpr static Value max = 1000;
+    Precedence() = delete;
+  };
+
   NODISCARD_ auto string_repr() const -> std::string;
   NODISCARD_ auto to_string() const -> std::string;
   NODISCARD_ static auto from_keyword(const std::u8string_view&) -> Maybe<TokenType>;
+  NODISCARD_ auto prec() const -> Precedence::Value;
 
   Value value  = None;
   constexpr TokenType() = default;
@@ -183,7 +190,6 @@ public:
 
   NODISCARD_ auto value(const class Lexer&) const -> Maybe<std::string>;
   NODISCARD_ auto format(const class Lexer&) const -> std::string;
-  NODISCARD_ auto prec() const -> uint16_t;
   NODISCARD_ auto is_terminator() const -> bool;
 
   static auto eof(uint32_t pos, uint32_t line) -> Token;

@@ -456,8 +456,8 @@ auto AstBinExpr::print(
     << Con::Reset
     << '\n';
 
-  right_->print(depth + 1, stream, "Binexpr.Right");
   left_->print(depth + 1, stream, "Binexpr.Left");
+  right_->print(depth + 1, stream, "Binexpr.Right");
 }
 
 auto AstUnaryExpr::print(

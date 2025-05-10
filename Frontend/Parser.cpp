@@ -166,16 +166,16 @@ auto parse_impl_(ParseContext &ctx) -> bool {
 
       /// Verify that the returned node is valid at the toplevel
       /// (i.e. can exist at the global scope).
-      if (!detail_::is_node_toplevel_valid_(*toplevel_decl)) {
-        ErrorCollector::display_error(
-          "Expression is invalid at the toplevel.", 
-          ctx.lxr.file_name_, 
-          ctx.lxr.src_, 
-          ctx.errstream, 
-          (*toplevel_decl)->pos_, 
-          (*toplevel_decl)->line_);
-        return false;
-      }
+      // if (!detail_::is_node_toplevel_valid_(*toplevel_decl)) {
+      //   ErrorCollector::display_error(
+      //     "Expression is invalid at the toplevel.",
+      //     ctx.lxr.file_name_,
+      //     ctx.lxr.src_,
+      //     ctx.errstream,
+      //     (*toplevel_decl)->pos_,
+      //     (*toplevel_decl)->line_);
+      //   return false;
+      // }
 
       /// Store the toplevel node within the parsing context.
       ctx.toplevel_decls_.emplace_back(std::move(*toplevel_decl));
@@ -193,7 +193,7 @@ auto parse_impl_(ParseContext &ctx) -> bool {
 }
 
 auto parse_binexpr_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNode::Ptr<>> {
-  const auto curr = ctx.lxr.current();
+  auto curr = ctx.lxr.current();
   ASSERT(curr.cat_.isa(TokenCategory::BinaryOp));
 
   auto node = AstNode::create<AstBinExpr>(
@@ -216,12 +216,13 @@ auto parse_binexpr_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNo
     return Error{ErrC::BadExpr, "Invalid expression following binary operator."};
   }
 
-  return Error{ErrC::NotImplimented};
+  curr = ctx.lxr.current();
+  while(curr.cat_.isa(TokenCategory::BinaryOp) && curr.type_.prec() <= node->op_type_.prec()) {
+    node->right_ = TRY(parse_binexpr_(ctx, std::move(node->right_)));
+    curr = ctx.lxr.current();
+  }
 
-  // TODO: finish this
-  // while(ctx.lxr.current().cat_.isa(TokenCategory::BinaryOp)) {
-  //
-  // }
+  return Result<AstNode::Ptr<>>::create(std::move(node));
 }
 
 auto parse_scalar_lit_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
@@ -343,10 +344,10 @@ auto parse_punctuator_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
   case TokenType::At:        return parse_directive_(ctx);
   case TokenType::LeftBrace: return parse_aggregate_lit_(ctx);
   case TokenType::LeftParen: return parse_parens_(ctx);
-  default: return Error{ErrC::BadToken, "Unexpected token."};
+  default: break;
   }
 
-  return Error{ErrC::NotImplimented};
+  return Error{ErrC::BadToken, "Unexpected token."};
 }
 
 auto parse_directive_(ParseContext& ctx) -> Result<AstNode::Ptr<>>{
@@ -440,8 +441,11 @@ auto get_next_include_(ParseContext& ctx) -> bool {
     return false;
   }
 
+  next->state_       = IncludeState::Finished;
+  ctx.curr_namespace = N19_ROOT_ENTITY_ID;
+  ctx.paren_level    = 0;
+
   ASSERT(ctx.lxr.reset(*file));
-  next->state_ = IncludeState::Finished;
   return true;
 }
 
