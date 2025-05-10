@@ -166,16 +166,16 @@ auto parse_impl_(ParseContext &ctx) -> bool {
 
       /// Verify that the returned node is valid at the toplevel
       /// (i.e. can exist at the global scope).
-      // if (!detail_::is_node_toplevel_valid_(*toplevel_decl)) {
-      //   ErrorCollector::display_error(
-      //     "Expression is invalid at the toplevel.",
-      //     ctx.lxr.file_name_,
-      //     ctx.lxr.src_,
-      //     ctx.errstream,
-      //     (*toplevel_decl)->pos_,
-      //     (*toplevel_decl)->line_);
-      //   return false;
-      // }
+      if (!detail_::is_node_toplevel_valid_(*toplevel_decl)) {
+        ErrorCollector::display_error(
+          "Expression is invalid at the toplevel.",
+          ctx.lxr.file_name_,
+          ctx.lxr.src_,
+          ctx.errstream,
+          (*toplevel_decl)->pos_,
+          (*toplevel_decl)->line_);
+        return false;
+      }
 
       /// Store the toplevel node within the parsing context.
       ctx.toplevel_decls_.emplace_back(std::move(*toplevel_decl));
