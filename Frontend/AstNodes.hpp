@@ -103,7 +103,7 @@ public:
 class AstBinExpr final : public AstNode {
 public:
   TokenType op_type_    = TokenType::None;
-  TokenCategory op_cat_ = 0;
+  TokenCategory op_cat_ = TokenCategory::NonCategorical;
   AstNode::Ptr<> left_  = nullptr;
   AstNode::Ptr<> right_ = nullptr;
 
@@ -119,9 +119,9 @@ public:
 class AstUnaryExpr final : public AstNode {
 public:
   TokenType op_type_      = TokenType::None;
-  TokenCategory op_cat_   = 0;
+  TokenCategory op_cat_   = TokenCategory::NonCategorical;
   AstNode::Ptr<> operand_ = nullptr;
-  bool is_postfix         = false; // only relevant for '--' and '++'
+  bool is_postfix_        = false; // only relevant for '--' and '++'
 
   auto print(uint32_t depth,
     OStream& stream,

@@ -480,7 +480,7 @@ auto AstUnaryExpr::print(
     << Con::Reset
     << Con::WhiteFG
     << " is_postfix = "
-    << (is_postfix ? "True\n" : "False\n")
+    << (is_postfix_ ? "True\n" : "False\n")
     << Con::Reset;
 
   operand_->print(depth + 1, stream, "UnaryExpr.Operand");

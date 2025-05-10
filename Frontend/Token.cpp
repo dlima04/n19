@@ -150,4 +150,46 @@ auto Token::is_terminator() const -> bool {
   return type_ == TokenType::Semicolon || type_ == TokenType::Comma;
 }
 
+// TODO
+// operator precedence of a given token.
+auto Token::prec() const -> uint16_t {
+  switch(type_.value) {
+  case TokenType::ValueAssignment:
+  case TokenType::PlusEq:
+  case TokenType::SubEq:
+  case TokenType::MulEq:
+  case TokenType::DivEq:
+  case TokenType::ModEq:
+  case TokenType::LshiftEq:
+  case TokenType::RshiftEq:
+  case TokenType::BitwiseAndEq:
+  case TokenType::BitwiseOrEq:
+  case TokenType::XorEq:
+  case TokenType::LogicalAnd:
+  case TokenType::LogicalOr:
+  case TokenType::Mul:
+  case TokenType::NamespaceOperator:
+  case TokenType::Dot:
+  case TokenType::Eq:
+  case TokenType::Neq:
+  case TokenType::Lt:
+  case TokenType::Lte:
+  case TokenType::Gt:
+  case TokenType::Gte:
+  case TokenType::Plus:
+  case TokenType::Sub:
+  case TokenType::Div:
+  case TokenType::Mod:
+  case TokenType::BitwiseAnd:
+  case TokenType::BitwiseOr:
+  case TokenType::Xor:
+  case TokenType::Lshift:
+  case TokenType::Rshift:
+  case TokenType::SkinnyArrow:
+  default: break;
+  }
+
+  PANIC("Token::prec(): default assertion.");
+}
+
 END_NAMESPACE(n19);

@@ -7,6 +7,7 @@
 #include <Core/StringUtil.hpp>
 #include <Sys/File.hpp>
 #include <algorithm>
+#include <utility>
 #include <filesystem>
 BEGIN_NAMESPACE(n19::detail_);
 
@@ -15,7 +16,6 @@ auto is_node_toplevel_valid_(const AstNode::Ptr<> &ptr) -> bool {
   case AstNode::Type::Namespace:        FALLTHROUGH_;
   case AstNode::Type::Where:            FALLTHROUGH_;
   case AstNode::Type::ProcDecl:         FALLTHROUGH_;
-  case AstNode::Type::ScalarLiteral:    FALLTHROUGH_;
   case AstNode::Type::Vardecl:          return true;
   default:                              return false;
   }
@@ -102,32 +102,13 @@ auto parse_begin_(
   }
 
   ///
-  /// Check for postfixes (this is quite messy, pls refactor)
-  while(true) {
-    if(expr == nullptr) {
-      return Result<AstNode::Ptr<>>(std::move(expr));
-    }
+  /// Check for postfixes
+  while(ctx.lxr.current().cat_.isa(TokenCategory::ValidPostfix)) {
+    expr = TRY(parse_postfix_(ctx, std::move(expr)));
+  }
 
-    const auto pfcurr = ctx.lxr.current();
-    if(pfcurr == TokenType::LeftSqBracket) {
-      expr = TRY(parse_subscript_(ctx, std::move(expr)));
-      continue;
-    }
-
-    if(pfcurr == TokenType::LeftParen) {
-      expr = TRY(parse_call_(ctx, std::move(expr)));
-      continue;
-    }
-
-    if((pfcurr == TokenType::Dot
-      || pfcurr == TokenType::NamespaceOperator
-      || pfcurr == TokenType::SkinnyArrow) && !parse_single
-    ){
-      expr = TRY(parse_binexpr_(ctx, std::move(expr)));
-      continue;
-    }
-
-    break;
+  while(!parse_single && ctx.lxr.current().cat_.isa(TokenCategory::BinaryOp)) {
+    expr = TRY(parse_binexpr_(ctx, std::move(expr)));
   }
 
   ///
@@ -211,9 +192,36 @@ auto parse_impl_(ParseContext &ctx) -> bool {
   return true;
 }
 
-auto parse_punctuator_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
-  /// TODO: things like ';', '(', etc
+auto parse_binexpr_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNode::Ptr<>> {
+  const auto curr = ctx.lxr.current();
+  ASSERT(curr.cat_.isa(TokenCategory::BinaryOp));
+
+  auto node = AstNode::create<AstBinExpr>(
+    curr.pos_,
+    curr.line_,
+    nullptr,
+    ctx.lxr.file_name_);
+
+  node->op_type_ = curr.type_;
+  node->op_cat_  = curr.cat_;
+  node->left_    = std::move(operand);
+  node->left_->parent_ = node.get();
+
+  ctx.lxr.consume(1);
+  node->right_ = TRY(parse_begin_(ctx, true, true));
+  node->right_->parent_ = node.get();
+
+  if(!is_valid_subexpression_(node->right_)) {
+    ctx.lxr.revert_before(curr);
+    return Error{ErrC::BadExpr, "Invalid expression following binary operator."};
+  }
+
   return Error{ErrC::NotImplimented};
+
+  // TODO: finish this
+  // while(ctx.lxr.current().cat_.isa(TokenCategory::BinaryOp)) {
+  //
+  // }
 }
 
 auto parse_scalar_lit_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
@@ -283,17 +291,97 @@ auto parse_scalar_lit_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
 }
 
 auto parse_aggregate_lit_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
+  ASSERT(ctx.lxr.current() == TokenType::LeftBrace);
+
+  auto node = AstNode::create<AstAggregateLiteral>(
+    ctx.lxr.current().pos_,
+    ctx.lxr.current().line_,
+    nullptr,
+    ctx.lxr.file_name_
+  );
+
+  ctx.lxr.consume(1);
+  while(ctx.lxr.current() != TokenType::RightBrace) {
+    const auto curr = ctx.lxr.current();
+    auto child      = TRY(parse_begin_(ctx, true, false));
+    child->parent_  = node.get();
+
+    node->children_.emplace_back(std::move(child));
+    if(!is_valid_subexpression_(child)) {
+      ctx.lxr.revert_before(curr);
+      return Error{ErrC::BadExpr, "Invalid subexpression within aggregate literal."};
+    }
+
+    if(ctx.lxr.current() == TokenType::Comma)
+      ctx.lxr.consume(1);
+  }
+
+  ctx.lxr.consume(1);
+  return Result<AstNode::Ptr<>>::create(std::move(node));
+}
+
+auto parse_parens_(ParseContext& ctx) -> Result<AstNode::Ptr<>>{
+  ASSERT(ctx.lxr.current() == TokenType::LeftParen);
+  ++ctx.paren_level;
+  ctx.lxr.consume(1);
+
+  const auto curr = ctx.lxr.current();
+  auto expr = TRY(parse_begin_(ctx, true, false));
+
+  if(!is_valid_subexpression_(expr)) {
+    ctx.lxr.revert_before(curr);
+    return Error{ErrC::BadExpr, "Expression cannot be used inside of parentheses."};
+  }
+
+  return Result<AstNode::Ptr<>>::create(std::move(expr));
+}
+
+auto parse_punctuator_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
+  const auto curr = ctx.lxr.current();
+
+  switch(curr.type_.value) {
+  case TokenType::At:        return parse_directive_(ctx);
+  case TokenType::LeftBrace: return parse_aggregate_lit_(ctx);
+  case TokenType::LeftParen: return parse_parens_(ctx);
+  default: return Error{ErrC::BadToken, "Unexpected token."};
+  }
+
   return Error{ErrC::NotImplimented};
 }
 
-auto parse_keyword_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
+auto parse_directive_(ParseContext& ctx) -> Result<AstNode::Ptr<>>{
+  return Error{ErrC::NotImplimented};
+}
+
+auto parse_keyword_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
   /// TODO: keywords
   return Error{ErrC::NotImplimented};
 }
 
 auto parse_unary_prefix_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
-  /// TODO: unary expressions
-  return Error{ErrC::NotImplimented};
+  ASSERT(ctx.on(TokenCategory::UnaryOp));
+  const auto begin = ctx.lxr.current();
+  ctx.lxr.consume(1);
+
+  auto node = AstNode::create<AstUnaryExpr>(
+    begin.pos_,
+    begin.line_,
+    nullptr,
+    ctx.lxr.file_name_
+  );
+
+  node->op_type_    = begin.type_;
+  node->op_cat_     = begin.cat_;
+  node->is_postfix_ = false;
+  node->operand_    = TRY(parse_begin_(ctx, true, true));
+
+  node->operand_->parent_ = node.get();
+  if(!is_valid_subexpression_(node->operand_)) {
+    ctx.lxr.revert_before(begin);
+    return Error{ErrC::BadExpr, "Unexpected expression following unary operator."};
+  }
+
+  return Result<AstNode::Ptr<>>::create(std::move(node));
 }
 
 auto parse_subscript_(ParseContext &ctx, AstNode::Ptr<> &&operand)
@@ -302,13 +390,13 @@ auto parse_subscript_(ParseContext &ctx, AstNode::Ptr<> &&operand)
   return Error{ErrC::NotImplimented};
 }
 
-auto parse_call_(ParseContext &ctx, AstNode::Ptr<> &&operand)
+auto parse_postfix_(ParseContext &, AstNode::Ptr<> &&)
 -> Result<AstNode::Ptr<>>
 {
   return Error{ErrC::NotImplimented};
 }
 
-auto parse_binexpr_(ParseContext &ctx, AstNode::Ptr<> &&operand)
+auto parse_call_(ParseContext &ctx, AstNode::Ptr<> &&operand)
 -> Result<AstNode::Ptr<>>
 {
   return Error{ErrC::NotImplimented};
@@ -329,7 +417,7 @@ auto get_next_include_(ParseContext& ctx) -> bool {
     return f.state_ == IncludeState::Pending;
   });
 
-  if(next == ctx.includes_.end() || !std::filesystem::exists(next->name_))
+  if(next == ctx.includes_.end())
     return false;
 
   /// ts is so fucking retarded 🥀💔
@@ -341,9 +429,18 @@ auto get_next_include_(ParseContext& ctx) -> bool {
   auto file = sys::File::open(path.string());
 #endif
 
-  if(!file.has_value()) return false;
-  ASSERT(ctx.lxr.reset(*file));
+  if(!file.has_value()) {
+    ctx.errstream
+      << Con::RedFG
+      << "\nError:"
+      << Con::Reset
+      << " could not open included file "
+      << next->name_
+      << ".\n\n";
+    return false;
+  }
 
+  ASSERT(ctx.lxr.reset(*file));
   next->state_ = IncludeState::Finished;
   return true;
 }

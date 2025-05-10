@@ -478,7 +478,7 @@ TEST_CASE(Lexer, Revert) {
   lexer->consume(1);
   REQUIRE(lexer->current().type_ == TokenType::Plus);
 
-  lexer->revert(token);
+  lexer->revert_before(token);
   REQUIRE(lexer->current().type_ == TokenType::IntLiteral);
 }
 

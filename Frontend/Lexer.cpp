@@ -468,7 +468,7 @@ FORCEINLINE_ auto Lexer::token_at_() -> Token {
   Token curr_tok;
   curr_tok.pos_  = index_;
   curr_tok.type_ = TokenType::At;
-  curr_tok.cat_  = TokenCategory::NonCategorical;
+  curr_tok.cat_  = TokenCategory::Punctuator;
   curr_tok.line_ = line_;
   curr_tok.len_  = 1;
   consume_char_(1);

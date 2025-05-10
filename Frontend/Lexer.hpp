@@ -37,7 +37,7 @@ public:
   auto consume(uint32_t amnt) -> const Token&;
   auto get_bytes() const      -> Bytes;
   auto dump(OStream& stream)  -> void;
-  auto revert(const Token&)   -> void;
+  auto revert_before(const Token&) -> void;
 
   template<size_t sz_>
   auto batched_peek()         -> std::array<Token, sz_>;
@@ -141,9 +141,10 @@ FORCEINLINE_ auto Lexer::batched_peek() -> std::array<Token, sz_> {
   return toks;               /// possibly expensive copy
 }
 
-inline auto Lexer::revert(const Token& tok) -> void {
-  curr_ = tok;
-  index_ = tok.pos_ + tok.len_;
+inline auto Lexer::revert_before(const Token& tok) -> void {
+  this->curr_  = tok;
+  this->line_  = tok.line_;
+  this->index_ = tok.pos_;
 }
 
 inline auto Lexer::skip_comment_() -> void {

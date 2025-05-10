@@ -35,16 +35,19 @@ bool parse_impl_(ParseContext&);
 
 ///
 /// Node producers
-auto parse_punctuator_(ParseContext &)   -> Result<AstNode::Ptr<>>;
-auto parse_scalar_lit_(ParseContext &)   -> Result<AstNode::Ptr<>>;
+auto parse_punctuator_(ParseContext&)    -> Result<AstNode::Ptr<>>;
+auto parse_scalar_lit_(ParseContext&)    -> Result<AstNode::Ptr<>>;
 auto parse_aggregate_lit_(ParseContext&) -> Result<AstNode::Ptr<>>;
-auto parse_keyword_(ParseContext &)      -> Result<AstNode::Ptr<>>;
+auto parse_keyword_(ParseContext&)       -> Result<AstNode::Ptr<>>;
 auto parse_unary_prefix_(ParseContext&)  -> Result<AstNode::Ptr<>>;
+auto parse_parens_(ParseContext&)        -> Result<AstNode::Ptr<>>;
+auto parse_directive_(ParseContext&)     -> Result<AstNode::Ptr<>>;
 
-auto parse_subscript_(ParseContext &, AstNode::Ptr<> &&)  -> Result<AstNode::Ptr<>>;
-auto parse_call_(ParseContext &, AstNode::Ptr<> &&)       -> Result<AstNode::Ptr<>>;
-auto parse_binexpr_(ParseContext &, AstNode::Ptr<> &&)    -> Result<AstNode::Ptr<>>;
-auto parse_identifier_(ParseContext &, AstNode::Ptr<> &&) -> Result<AstNode::Ptr<>>;
+auto parse_postfix_(ParseContext&, AstNode::Ptr<>&&)    -> Result<AstNode::Ptr<>>;
+auto parse_subscript_(ParseContext&, AstNode::Ptr<> &&) -> Result<AstNode::Ptr<>>;
+auto parse_call_(ParseContext&, AstNode::Ptr<>&&)       -> Result<AstNode::Ptr<>>;
+auto parse_binexpr_(ParseContext&, AstNode::Ptr<>&&)    -> Result<AstNode::Ptr<>>;
+auto parse_identifier_(ParseContext&, AstNode::Ptr<>&&) -> Result<AstNode::Ptr<>>;
 
 END_NAMESPACE(n19::detail_);
 #endif //N19_HIR_PARSER_HPP

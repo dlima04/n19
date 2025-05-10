@@ -32,6 +32,7 @@ struct ErrC_ final {
     Conversion = 0x07,
     Overflow   = 0x08,
     NotImplimented = 0x09,
+    BadExpr    = 0x0A,
   };
 
   Value value = None;
