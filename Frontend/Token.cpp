@@ -155,35 +155,35 @@ auto Token::is_terminator() const -> bool {
 auto TokenType::prec() const -> Precedence::Value {
   switch(this->value) {
   case ValueAssignment:   return Precedence::max;
-  case PlusEq:
-  case SubEq:
-  case MulEq:
-  case DivEq:
-  case ModEq:
-  case LshiftEq:
-  case RshiftEq:
-  case BitwiseAndEq:
-  case BitwiseOrEq:
+  case PlusEq:            FALLTHROUGH_;
+  case SubEq:             FALLTHROUGH_;
+  case MulEq:             FALLTHROUGH_;
+  case DivEq:             FALLTHROUGH_;
+  case ModEq:             FALLTHROUGH_;
+  case LshiftEq:          FALLTHROUGH_;
+  case RshiftEq:          FALLTHROUGH_;
+  case BitwiseAndEq:      FALLTHROUGH_;
+  case BitwiseOrEq:       FALLTHROUGH_;
   case XorEq:             return Precedence::max - 1;
   case LogicalAnd:        return Precedence::max - 2;
   case LogicalOr:         return Precedence::max - 3;
-  case Mul:
-  case Div:
+  case Mul:               FALLTHROUGH_;
+  case Div:               FALLTHROUGH_;
   case Mod:               return Precedence::max - 4;
-  case Plus:
+  case Plus:              FALLTHROUGH_;
   case Sub:               return Precedence::max - 5;
-  case Lshift:
+  case Lshift:            FALLTHROUGH_;
   case Rshift:            return Precedence::max - 6;
-  case Lt:
-  case Lte:
-  case Gt:
+  case Lt:                FALLTHROUGH_;
+  case Lte:               FALLTHROUGH_;
+  case Gt:                FALLTHROUGH_;
   case Gte:               return Precedence::max - 7;
-  case Eq:
+  case Eq:                FALLTHROUGH_;
   case Neq:               return Precedence::max - 8;
   case BitwiseAnd:        return Precedence::max - 9;
   case Xor:               return Precedence::max - 10;
   case BitwiseOr:         return Precedence::max - 11;
-  case Dot:
+  case Dot:               FALLTHROUGH_;
   case SkinnyArrow:       return Precedence::max - 12;
   case NamespaceOperator: return Precedence::max - 13;
   default: break;

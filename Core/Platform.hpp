@@ -47,9 +47,7 @@
 #endif
 
 ///
-/// The size of "regular" page (i.e. not a huge page which many
-/// platforms permit under certain circumstances) on the platform we're
-/// building for.
+/// The page size of the platform we're building for.
 #if defined(N19_WIN32)
 #  define PLATFORM_PAGE_SIZE_ 4096
 #else
@@ -108,8 +106,25 @@
 
 ///
 /// Attribute macros that aren't compiler specific.
-#define NODISCARD_   [[nodiscard]]
-#define FALLTHROUGH_ [[fallthrough]]
-#define NORETURN_    [[noreturn]]
+#if __has_cpp_attribute(nodiscard)
+#  define NODISCARD_   [[nodiscard]]
+#else
+#  define NODISCARD_
+#  warning "No cpp attribute present -- [[nodiscard]]"
+#endif
+
+#if __has_cpp_attribute(fallthrough)
+#  define FALLTHROUGH_ [[fallthrough]]
+#else
+#  define FALLTHROUGH_
+#  warning "No cpp attribute present -- [[fallthrough]]"
+#endif
+
+#if __has_cpp_attribute(noreturn)
+#  define NORETURN_    [[noreturn]]
+#else
+#  define NORETURN_
+#  warning "No cpp attribute present -- [[noreturn]]"
+#endif
 
 #endif //PLATFORM_HPP

@@ -385,27 +385,84 @@ auto parse_unary_prefix_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
   return Result<AstNode::Ptr<>>::create(std::move(node));
 }
 
-auto parse_subscript_(ParseContext &ctx, AstNode::Ptr<> &&operand)
--> Result<AstNode::Ptr<>>
-{
+auto parse_subscript_(ParseContext &ctx, AstNode::Ptr<>&& operand) -> Result<AstNode::Ptr<>> {
   return Error{ErrC::NotImplimented};
 }
 
-auto parse_postfix_(ParseContext &, AstNode::Ptr<> &&)
--> Result<AstNode::Ptr<>>
-{
-  return Error{ErrC::NotImplimented};
+auto parse_postfix_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNode::Ptr<>> {
+  auto curr = ctx.lxr.current();
+
+  switch(curr.type_.value) {
+  case TokenType::LeftParen: return parse_call_(ctx, std::move(operand));
+  case TokenType::Dec: FALLTHROUGH_;
+  case TokenType::Inc: {
+    auto node = AstNode::create<AstUnaryExpr>(
+      curr.pos_,
+      curr.line_,
+      nullptr,
+      ctx.lxr.file_name_);
+
+    node->op_type_    = curr.type_;
+    node->op_cat_     = curr.cat_;
+    node->is_postfix_ = true;
+    node->operand_    = std::move(operand);
+    node->operand_->parent_ = node.get();
+
+    ctx.lxr.consume(1);
+    return Result<AstNode::Ptr<>>::create(std::move(node));
+  }
+
+  default: break; /// I might be forgetting some...
+  }
+
+  UNREACHABLE_ASSERTION;
 }
 
-auto parse_call_(ParseContext &ctx, AstNode::Ptr<> &&operand)
--> Result<AstNode::Ptr<>>
-{
-  return Error{ErrC::NotImplimented};
+auto parse_call_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNode::Ptr<>> {
+  auto curr = ctx.lxr.current();
+  ASSERT(curr == TokenType::LeftParen);
+
+  auto node = AstNode::create<AstCall>(
+    curr.pos_,
+    curr.line_,
+    nullptr,
+    ctx.lxr.file_name_);
+
+  node->target_ = std::move(operand);
+  ctx.lxr.consume(1);
+
+  if(ctx.lxr.current() == TokenType::RightParen) {
+    ctx.lxr.consume(1);
+    return Result<AstNode::Ptr<>>::create(std::move(node));
+  }
+
+  const uint16_t old_paren_lvl = ctx.paren_level++;
+  while(old_paren_lvl < ctx.paren_level) {
+    curr = ctx.lxr.current();
+    auto expr = TRY(parse_begin_(ctx, true, false));
+    if(!is_valid_subexpression_(expr)) {
+      ctx.lxr.revert_before(curr);
+      return Error{ErrC::BadExpr, "Invalid subexpression within call."};
+    }
+
+    node->arguments_.emplace_back(std::move(expr));
+    if(old_paren_lvl >= ctx.paren_level) {
+      break;
+    }
+
+    if(ctx.lxr.current().is_terminator()) {
+      ctx.lxr.consume(1);
+      if(ctx.lxr.current() == TokenType::RightParen) {
+        --ctx.paren_level;
+        ctx.lxr.consume(1);
+      }
+    }
+  }
+
+  return Result<AstNode::Ptr<>>::create(std::move(node));
 }
 
-auto parse_identifier_(ParseContext &ctx, AstNode::Ptr<> &&operand)
--> Result<AstNode::Ptr<>>
-{
+auto parse_identifier_(ParseContext &ctx, AstNode::Ptr<> &&operand) -> Result<AstNode::Ptr<>> {
   return Error{ErrC::NotImplimented};
 }
 

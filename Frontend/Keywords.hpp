@@ -31,7 +31,7 @@
   KEYWORD_X("proc", Proc, Keyword)                              \
   KEYWORD_X("let", Let, Keyword)                                \
   KEYWORD_X("const", Const, Keyword)                            \
-  KEYWORD_X("as", As, Keyword | UnaryOp | ValidPostfix)         \
+  KEYWORD_X("as", As, Keyword | BinaryOp)                       \
   KEYWORD_X("with", With, Keyword | UnaryOp | ValidPostfix)     \
   KEYWORD_X("true", BooleanLiteral, Literal)                    \
   KEYWORD_X("false", BooleanLiteral, Literal)                   \
