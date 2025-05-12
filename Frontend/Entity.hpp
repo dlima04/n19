@@ -191,7 +191,7 @@ public:
   ) const -> std::string;
   NODISCARD_ auto format() const -> std::string;
 
-  std::vector<std::string> name_;
+  std::string name_;
 
   ~EntityQualifierThunk() = default;
   EntityQualifierThunk()  = default;

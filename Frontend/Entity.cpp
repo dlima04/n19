@@ -48,8 +48,7 @@ auto EntityQualifier::format() const -> std::string {
 }
 
 auto EntityQualifierThunk::format() const -> std::string {
-  std::string buff;      /// the flags and qualifiers
-  std::string full_name; /// full entity name
+  std::string buff;
 
   #define X(EQ_FLAG, UNUSED)                      \
   if(flags_ & n19::EntityQualifierBase::EQ_FLAG){ \
@@ -68,14 +67,12 @@ auto EntityQualifierThunk::format() const -> std::string {
 
   for(const auto& length : arr_lengths_) {
     buff.append(fmt("{} ", length));
-  } for(const auto& chunk : name_) {
-    full_name.append(chunk);
   }
 
   return fmt(
     "{}{} {}{}{}{}",             /// Fmt string
     manip_string(Con::BlueFG),   /// ID color = blue
-    full_name,                   /// The ID
+    name_,                       /// The name
     manip_string(Con::Reset),    /// Reset console
     manip_string(Con::WhiteFG),  /// buff = white
     buff,                        /// The buff
@@ -132,16 +129,14 @@ auto EntityQualifierThunk::to_string(
   const bool include_postfixes ) const -> std::string
 {
   std::string buff;
+  buff.reserve(name_.size() + 6);
   if(include_qualifiers) {
     #define X(VAL, UNUSED) if(flags_ & VAL) buff.append(#VAL " ");
     N19_EQ_FLAG_LIST /* convert to string repr */
     #undef X
   }
 
-  for(const auto& chunk : name_) {
-    buff.append(chunk);
-  }
-
+  buff += name_;
   if(include_postfixes) {
     for(int i = 0; i < ptr_depth_; i++) buff.append("*");
     for(const auto& len : arr_lengths_) buff.append(fmt("[{}]", len));

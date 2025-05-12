@@ -22,8 +22,8 @@
   ASTNODE_X(ProcDecl)          \
   ASTNODE_X(EntityRef)         \
   ASTNODE_X(EntityRefThunk)    \
-  ASTNODE_X(TypeRef)           \
-  ASTNODE_X(TypeRefThunk)      \
+  ASTNODE_X(QualifiedRef)      \
+  ASTNODE_X(QualifiedRefThunk) \
   ASTNODE_X(ScalarLiteral)     \
   ASTNODE_X(AggregateLiteral)  \
   ASTNODE_X(BinExpr)           \
@@ -182,7 +182,7 @@ public:
 
 class AstEntityRefThunk final : public AstNode {
 public:
-  std::vector<std::string> name_;
+  std::string name_;
 
   auto print(uint32_t depth,
     OStream& stream,
@@ -193,20 +193,7 @@ public:
   AstEntityRefThunk() = default;
 };
 
-class AstTypeRef final : public AstNode {
-public:
-  EntityQualifier descriptor_;
-
-  auto print(uint32_t depth,
-    OStream& stream,
-    const Maybe<std::string> &alias
-  ) const -> void override;
-
-  ~AstTypeRef() override = default;
-  AstTypeRef() = default;
-};
-
-class AstTypeRefThunk final : public AstNode {
+class AstQualifiedRefThunk final : public AstNode {
 public:
   EntityQualifierThunk descriptor_;
 
@@ -215,8 +202,21 @@ public:
     const Maybe<std::string> &alias
   ) const -> void override;
 
-  ~AstTypeRefThunk() override = default;
-  AstTypeRefThunk() = default;
+  ~AstQualifiedRefThunk() override = default;
+  AstQualifiedRefThunk() = default;
+};
+
+class AstQualifiedRef final : public AstNode {
+public:
+  EntityQualifier descriptor_;
+
+  auto print(uint32_t depth,
+    OStream& stream,
+    const Maybe<std::string> &alias
+  ) const -> void override;
+
+  ~AstQualifiedRef() override = default;
+  AstQualifiedRef() = default;
 };
 
 class AstIf final : public AstNode {

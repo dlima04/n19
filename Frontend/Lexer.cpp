@@ -305,7 +305,9 @@ inline auto Lexer::token_colon_() -> Token {
 
   if(peek_char_() == u8':') { // '::'
     curr_tok.type_  = TokenType::NamespaceOperator;
-    curr_tok.cat_   = TokenCategory::ValidPrefix | TokenCategory::BinaryOp;
+    curr_tok.cat_  |= TokenCategory::UnaryOp;
+    curr_tok.cat_  |= TokenCategory::ValidPrefix;
+    curr_tok.cat_  |= TokenCategory::BinaryOp;
     curr_tok.len_   = 2;
     consume_char_(2);
   } else { // ':'

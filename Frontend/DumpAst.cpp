@@ -597,21 +597,18 @@ auto AstEntityRefThunk::print(
   const Maybe<std::string> &alias ) const -> void
 {
   print_(depth, stream, "EntityRefThunk");
-  if(alias.has_value()) 
+  if(alias.has_value())
     stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
   stream << Con::BlueFG;
-  for(const auto& str : name_) {
-    stream << str << ' ';
-  }
-
+  stream << this->name_;
   stream << Con::Reset << '\n';
 }
 
-auto AstTypeRef::print(
+auto AstQualifiedRef::print(
   const uint32_t depth,
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
@@ -627,7 +624,7 @@ auto AstTypeRef::print(
   stream << formatted << '\n';
 }
 
-auto AstTypeRefThunk::print(
+auto AstQualifiedRefThunk::print(
   const uint32_t depth,
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void

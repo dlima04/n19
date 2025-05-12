@@ -13,40 +13,40 @@ BEGIN_NAMESPACE(n19::detail_);
 
 auto is_node_toplevel_valid_(const AstNode::Ptr<> &ptr) -> bool {
   switch (ptr->type_) {
-  case AstNode::Type::Namespace:        FALLTHROUGH_;
-  case AstNode::Type::Where:            FALLTHROUGH_;
-  case AstNode::Type::ProcDecl:         FALLTHROUGH_;
-  case AstNode::Type::Vardecl:          return true;
-  default:                              return false;
-  }
-}
-
-auto node_never_needs_terminal_(const AstNode::Ptr<>& ptr) -> bool {
-  switch(ptr->type_) {
-  case AstNode::Type::ProcDecl:         FALLTHROUGH_;
-  case AstNode::Type::Namespace:        FALLTHROUGH_;
-  case AstNode::Type::ScopeBlock:       FALLTHROUGH_;
-  case AstNode::Type::For:              FALLTHROUGH_;
-  case AstNode::Type::While:            FALLTHROUGH_;
-  case AstNode::Type::Branch:           FALLTHROUGH_;
-  case AstNode::Type::ConstBranch:      return true;
-  default:                              return false;
+  case AstNode::Type::Namespace:         FALLTHROUGH_;
+  case AstNode::Type::Where:             FALLTHROUGH_;
+  case AstNode::Type::ProcDecl:          FALLTHROUGH_;
+  case AstNode::Type::Vardecl:           return true;
+  default:                               return false;
   }
 }
 
 auto is_valid_subexpression_(const AstNode::Ptr<>& ptr) -> bool {
   switch (ptr->type_) {
-  case AstNode::Type::Call:             FALLTHROUGH_;
-  case AstNode::Type::TypeRef:          FALLTHROUGH_;
-  case AstNode::Type::TypeRefThunk:     FALLTHROUGH_;
-  case AstNode::Type::EntityRef:        FALLTHROUGH_;
-  case AstNode::Type::EntityRefThunk:   FALLTHROUGH_;
-  case AstNode::Type::BinExpr:          FALLTHROUGH_;
-  case AstNode::Type::ScalarLiteral:    FALLTHROUGH_;
-  case AstNode::Type::AggregateLiteral: FALLTHROUGH_;
-  case AstNode::Type::UnaryExpr:        FALLTHROUGH_;
-  case AstNode::Type::Subscript:        return true;
-  default:                              return false;
+  case AstNode::Type::Call:              FALLTHROUGH_;
+  case AstNode::Type::QualifiedRef:      FALLTHROUGH_;
+  case AstNode::Type::QualifiedRefThunk: FALLTHROUGH_;
+  case AstNode::Type::EntityRef:         FALLTHROUGH_;
+  case AstNode::Type::EntityRefThunk:    FALLTHROUGH_;
+  case AstNode::Type::BinExpr:           FALLTHROUGH_;
+  case AstNode::Type::ScalarLiteral:     FALLTHROUGH_;
+  case AstNode::Type::AggregateLiteral:  FALLTHROUGH_;
+  case AstNode::Type::UnaryExpr:         FALLTHROUGH_;
+  case AstNode::Type::Subscript:         return true;
+  default:                               return false;
+  }
+}
+
+auto node_never_needs_terminal_(const AstNode::Ptr<>& ptr) -> bool {
+  switch(ptr->type_) {
+  case AstNode::Type::ProcDecl:          FALLTHROUGH_;
+  case AstNode::Type::Namespace:         FALLTHROUGH_;
+  case AstNode::Type::ScopeBlock:        FALLTHROUGH_;
+  case AstNode::Type::For:               FALLTHROUGH_;
+  case AstNode::Type::While:             FALLTHROUGH_;
+  case AstNode::Type::Branch:            FALLTHROUGH_;
+  case AstNode::Type::ConstBranch:       return true;
+  default:                               return false;
   }
 }
 
@@ -72,14 +72,14 @@ auto parse_begin_(
   else if(curr.cat_.isa(TokenCategory::Literal)) {
     expr = TRY(parse_scalar_lit_(ctx));
   }
+  else if(curr.type_ == TokenType::Identifier) {
+    expr = TRY(parse_identifier_(ctx));
+  }
   else if(curr.cat_.isa(TokenCategory::Keyword)) {
     expr = TRY(parse_keyword_(ctx));
   }
   else if(curr.cat_.isa(TokenCategory::UnaryOp | TokenCategory::ValidPrefix)) {
     expr = TRY(parse_unary_prefix_(ctx));
-  }
-  else if(curr.type_ == TokenType::Identifier) {
-    expr = TRY(parse_identifier_(ctx, std::move(expr)));
   }
 
   ///
@@ -462,8 +462,22 @@ auto parse_call_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNode:
   return Result<AstNode::Ptr<>>::create(std::move(node));
 }
 
-auto parse_identifier_(ParseContext &ctx, AstNode::Ptr<> &&operand) -> Result<AstNode::Ptr<>> {
-  return Error{ErrC::NotImplimented};
+auto parse_identifier_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
+  auto curr = ctx.lxr.current();
+  ASSERT(curr == TokenType::Identifier);
+
+  auto node = AstNode::create<AstEntityRefThunk>(
+    curr.pos_,
+    curr.line_,
+    nullptr,
+    ctx.lxr.file_name_);
+
+  auto val = curr.value(ctx.lxr);
+  ASSERT(val.has_value());
+
+  node->name_ = std::move(val.value());
+  ctx.lxr.consume(1);
+  return Result<AstNode::Ptr<>>::create(std::move(node));
 }
 
 auto get_next_include_(ParseContext& ctx) -> bool {
