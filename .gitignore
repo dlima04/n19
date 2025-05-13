@@ -20,6 +20,7 @@
 *.crt
 *.vs
 **/.DS_Store
+**/Thumbs.db
 build
 out
 .temp
