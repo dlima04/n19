@@ -19,7 +19,7 @@
 *.pem
 *.crt
 *.vs
-**/.DS_STORE
+**/.DS_Store
 build
 out
 .temp
