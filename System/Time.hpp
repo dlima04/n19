@@ -11,10 +11,7 @@
 #include <string>
 
 #ifdef N19_WIN32
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
+#include <System/MinWin.hpp>
 #else // POSIX
 #include <time.h>
 #endif

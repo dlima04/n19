@@ -10,7 +10,7 @@
 #include <Core/ClassTraits.hpp>
 #include <Core/TypeTraits.hpp>
 #include <Core/Nothing.hpp>
-#include <Sys/Error.hpp>
+#include <System/Error.hpp>
 #include <IO/Fmt.hpp>
 #include <string>
 #include <utility>

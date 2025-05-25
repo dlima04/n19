@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Sys/Error.hpp>
+#include <System/Error.hpp>
 
 #if defined(N19_WIN32)
 BEGIN_NAMESPACE(n19::sys);

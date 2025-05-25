@@ -7,7 +7,7 @@
 #define N19_STRINGUTIL_HPP
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
-#include <Sys/String.hpp>
+#include <System/String.hpp>
 BEGIN_NAMESPACE(n19);
 
 /// For strings that begin and end with ".

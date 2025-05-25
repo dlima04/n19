@@ -12,7 +12,7 @@
 #include <Core/Concepts.hpp>
 #include <Frontend/Token.hpp>
 #include <Frontend/Entity.hpp>
-#include <Sys/String.hpp>
+#include <System/String.hpp>
 #include <vector>
 #include <memory>
 

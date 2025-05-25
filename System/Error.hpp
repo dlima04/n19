@@ -5,14 +5,11 @@
 
 #ifndef SYS_LASTERROR_HPP
 #define SYS_LASTERROR_HPP
-#include <Sys/String.hpp>
+#include <System/String.hpp>
 #include <Core/Platform.hpp>
 
 #ifdef N19_WIN32
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
+#include <System/MinWin.hpp>
 #else
 #include <errno.h>
 #endif

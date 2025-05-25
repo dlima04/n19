@@ -6,10 +6,7 @@
 #include <Frontend/FrontendContext.hpp>
 
 #ifdef N19_WIN32
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
+#include <System/MinWin.hpp>
 #else
 #include <sys/utsname.h>
 #endif

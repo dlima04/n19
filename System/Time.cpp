@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Sys/Time.hpp>
-#include <Sys/Error.hpp>
+#include <System/Time.hpp>
+#include <System/Error.hpp>
 #include <IO/Fmt.hpp>
 BEGIN_NAMESPACE(n19::sys);
 

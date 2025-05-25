@@ -5,7 +5,7 @@
 
 #ifndef N19_TEST_SUITE_HPP
 #define N19_TEST_SUITE_HPP
-#include <Sys/String.hpp>
+#include <System/String.hpp>
 #include <Bulwark/Case.hpp>
 #include <vector>
 BEGIN_NAMESPACE(n19::test);

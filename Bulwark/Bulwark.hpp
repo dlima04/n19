@@ -10,7 +10,7 @@
 #include <Bulwark/Registry.hpp>
 #include <Bulwark/Reporting.hpp>
 #include <Bulwark/BulwarkContext.hpp>
-#include <Sys/String.hpp>
+#include <System/String.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // This header includes all unit testing related functionality.

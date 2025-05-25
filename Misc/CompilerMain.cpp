@@ -127,11 +127,7 @@ static auto verify_args(MainArgParser& parser) -> bool {
 }
 
 #ifdef N19_WIN32
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-#include <windows.h>
+#include <System/MinWin.hpp>
 
 int main() {
   win32_init_console();

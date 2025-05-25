@@ -8,12 +8,12 @@
 #include <Core/Bytes.hpp>
 #include <Core/Platform.hpp>
 #include <Core/ClassTraits.hpp>
-#include <Sys/File.hpp>
+#include <System/File.hpp>
 #include <Core/Result.hpp>
 #include <Core/Maybe.hpp>
 #include <IO/Stream.hpp>
 #include <Frontend/Token.hpp>
-#include <Sys/String.hpp>
+#include <System/String.hpp>
 #include <memory>
 #include <vector>
 #include <array>

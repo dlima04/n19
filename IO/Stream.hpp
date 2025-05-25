@@ -5,8 +5,8 @@
 
 #ifndef STREAM_HPP
 #define STREAM_HPP
-#include <Sys/String.hpp>
-#include <Sys/IODevice.hpp>
+#include <System/String.hpp>
+#include <System/IODevice.hpp>
 #include <Core/Bytes.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Concepts.hpp>
@@ -19,10 +19,7 @@
 #include <limits>
 
 #if defined(N19_WIN32)
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
+#include <System/MinWin.hpp>
 #include <vector>
 #else //POSIX
 #include <locale.h>

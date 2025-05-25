@@ -7,7 +7,7 @@
 #define N19_TEST_REGISTRY_HPP
 #include <Bulwark/Case.hpp>
 #include <Bulwark/Suite.hpp>
-#include <Sys/String.hpp>
+#include <System/String.hpp>
 #include <list>
 #include <memory>
 #include <string_view>

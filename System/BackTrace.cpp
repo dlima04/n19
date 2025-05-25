@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Sys/BackTrace.hpp>
+#include <System/BackTrace.hpp>
 #include <Core/Try.hpp>
 #include <string_view>
 
@@ -26,10 +26,7 @@
 #endif
 
 #if defined(N19_WIN32)
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
+#include <System/MinWin.hpp>
 #include <DbgHelp.h>
 BEGIN_NAMESPACE(n19::sys);
 

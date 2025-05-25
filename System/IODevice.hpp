@@ -5,8 +5,8 @@
 
 #ifndef NATIVE_IODEVICE_HPP
 #define NATIVE_IODEVICE_HPP
-#include <Sys/Handle.hpp>
-#include <Sys/String.hpp>
+#include <System/Handle.hpp>
+#include <System/String.hpp>
 #include <Core/Bytes.hpp>
 #include <Core/Result.hpp>
 #include <array>
@@ -14,10 +14,7 @@
 #include <span>
 
 #if defined(N19_WIN32)
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
+#include <System/MinWin.hpp>
 #else // POSIX
 #include <unistd.h>
 #include <fcntl.h>

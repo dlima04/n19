@@ -7,10 +7,10 @@
 #define ERRORCOLLECTOR_HPP
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
-#include <Sys/File.hpp>
+#include <System/File.hpp>
 #include <IO/Stream.hpp>
 #include <Core/Bytes.hpp>
-#include <Sys/String.hpp>
+#include <System/String.hpp>
 #include <string>
 #include <vector>
 #include <cstdint>

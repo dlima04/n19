@@ -19,26 +19,27 @@ set(N19_ENUMERATE_GLOBAL_SOURCES
   Frontend/FrontendContext.cpp
   Frontend/Parser.cpp
   Frontend/CompilationCycle.cpp
-  Sys/Error.cpp
-  Sys/IODevice.cpp
-  Sys/Time.cpp
-  Sys/BackTrace.cpp
+  System/Error.cpp
+  System/IODevice.cpp
+  System/Time.cpp
+  System/BackTrace.cpp
+  System/File.cpp
   Core/Panic.cpp
   Core/ArgParse.cpp
   Core/StringUtil.cpp
   IO/Console.cpp
   IO/Stream.cpp
-  Sys/File.cpp
 )
 
 set(N19_ENUMERATE_GLOBAL_HEADERS
-  Sys/String.hpp
-  Sys/Error.hpp
-  Sys/IODevice.hpp
-  Sys/Handle.hpp
-  Sys/Time.hpp
-  Sys/BackTrace.hpp
-  Sys/File.hpp
+  System/String.hpp
+  System/Error.hpp
+  System/IODevice.hpp
+  System/Handle.hpp
+  System/Time.hpp
+  System/BackTrace.hpp
+  System/File.hpp
+  System/MinWin.hpp
   Frontend/Token.hpp
   Frontend/ErrorCollector.hpp
   Frontend/AstNodes.hpp
@@ -132,7 +133,7 @@ add_executable(bulwark
   Bulwark/Suites/Core/SuiteStringUtil.cpp
   Bulwark/Suites/Frontend/SuiteLexer.cpp
   Bulwark/Suites/IO/SuiteStream.cpp
-  Bulwark/Suites/Sys/SuiteSystemError.cpp
+  Bulwark/Suites/System/SuiteSystemError.cpp
   Bulwark/Suites/Frontend/SuiteEntity.cpp
   ${N19_ENUMERATE_GLOBAL_SOURCES}
   ${N19_ENUMERATE_GLOBAL_HEADERS}

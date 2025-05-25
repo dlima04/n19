@@ -10,7 +10,7 @@
 #include <Core/Concepts.hpp>
 #include <Core/Panic.hpp>
 #include <IO/Console.hpp>
-#include <Sys/String.hpp>
+#include <System/String.hpp>
 #include <cstdint>
 #include <string>
 #include <vector>
