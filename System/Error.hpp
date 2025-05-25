@@ -9,7 +9,7 @@
 #include <Core/Platform.hpp>
 
 #ifdef N19_WIN32
-#include <System/MinWin.hpp>
+#include <System/Win32.hpp>
 #else
 #include <errno.h>
 #endif

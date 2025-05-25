@@ -69,6 +69,7 @@
 
 #include <windows.h>
 #include <windowsx.h>
+#include <shellapi.h>
 
 #endif //N19_WIN32
 #endif //N19_MINWIN_HPP

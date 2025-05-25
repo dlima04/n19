@@ -26,7 +26,7 @@
 #endif
 
 #if defined(N19_WIN32)
-#include <System/MinWin.hpp>
+#include <System/Win32.hpp>
 #include <DbgHelp.h>
 BEGIN_NAMESPACE(n19::sys);
 

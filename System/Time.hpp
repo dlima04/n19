@@ -11,7 +11,7 @@
 #include <string>
 
 #ifdef N19_WIN32
-#include <System/MinWin.hpp>
+#include <System/Win32.hpp>
 #else // POSIX
 #include <time.h>
 #endif

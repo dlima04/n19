@@ -14,7 +14,7 @@
 #include <span>
 
 #if defined(N19_WIN32)
-#include <System/MinWin.hpp>
+#include <System/Win32.hpp>
 #else // POSIX
 #include <unistd.h>
 #include <fcntl.h>

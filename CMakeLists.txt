@@ -39,7 +39,7 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   System/Time.hpp
   System/BackTrace.hpp
   System/File.hpp
-  System/MinWin.hpp
+  System/Win32.hpp
   Frontend/Token.hpp
   Frontend/ErrorCollector.hpp
   Frontend/AstNodes.hpp

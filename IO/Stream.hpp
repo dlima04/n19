@@ -19,7 +19,7 @@
 #include <limits>
 
 #if defined(N19_WIN32)
-#include <System/MinWin.hpp>
+#include <System/Win32.hpp>
 #include <vector>
 #else //POSIX
 #include <locale.h>

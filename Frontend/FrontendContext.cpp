@@ -6,7 +6,7 @@
 #include <Frontend/FrontendContext.hpp>
 
 #ifdef N19_WIN32
-#include <System/MinWin.hpp>
+#include <System/Win32.hpp>
 #else
 #include <sys/utsname.h>
 #endif

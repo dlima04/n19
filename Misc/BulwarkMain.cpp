@@ -51,7 +51,7 @@ struct BulwarkArgParser : argp::Parser {
 };
 
 #ifdef N19_WIN32
-#include <System/MinWin.hpp>
+#include <System/Win32.hpp>
 
 int main() {
   win32_init_console();
