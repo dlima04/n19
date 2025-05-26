@@ -19,7 +19,6 @@ struct VersionInfo {
   uint16_t major{};
   uint16_t minor{};
   uint16_t patch{};
-  std::string msg;
   std::string arch;
   std::string os;
 };

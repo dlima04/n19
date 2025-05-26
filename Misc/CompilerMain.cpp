@@ -77,9 +77,7 @@ static auto verify_args(MainArgParser& parser) -> bool {
     outs()
       << "n19 compiler -- version "
       << n19::fmt("{}.{}.{}\n", ver.major, ver.minor, ver.patch)
-      << n19::fmt("Target: {} ({})\n", ver.arch, ver.os)
-      << ver.msg
-      << "\n";
+      << n19::fmt("Target: {} ({})\n", ver.arch, ver.os);
     return false;
   }
 

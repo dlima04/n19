@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_MINWIN_HPP
-#define N19_MINWIN_HPP
+#ifndef N19_SYS_WIN32_HPP
+#define N19_SYS_WIN32_HPP
 #ifdef N19_WIN32
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -72,4 +72,4 @@
 #include <shellapi.h>
 
 #endif //N19_WIN32
-#endif //N19_MINWIN_HPP
+#endif //N19_SYS_WIN32_HPP

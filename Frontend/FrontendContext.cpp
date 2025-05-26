@@ -18,7 +18,6 @@ auto Context::get_version_info() -> VersionInfo {
   ver.major = 0;
   ver.minor = 0;
   ver.patch = 0;
-  ver.msg   = "The n19th song sings of life.";
 
 #ifdef N19_WIN32
   ::SYSTEM_INFO sysinfo{};
