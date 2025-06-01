@@ -77,6 +77,32 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   IO/Stream.hpp
 )
 
+set(N19_ENUMERATE_SUITES_CORE
+  Tests/Suites/Core/SuiteMaybe.cpp
+  Tests/Suites/Core/SuiteResult.cpp
+  Tests/Suites/Core/SuiteArgParse.cpp
+  Tests/Suites/Core/SuiteDefer.cpp
+  Tests/Suites/Core/SuiteNothing.cpp
+  Tests/Suites/Core/SuiteBytes.cpp
+  Tests/Suites/Core/SuiteMurmur3.cpp
+  Tests/Suites/Core/SuiteTuple.cpp
+  Tests/Suites/Core/SuiteRingStructures.cpp
+  Tests/Suites/Core/SuiteStringUtil.cpp
+)
+
+set(N19_ENUMERATE_SUITES_FRONTEND
+  Tests/Suites/Frontend/SuiteLexer.cpp
+  Tests/Suites/Frontend/SuiteEntity.cpp
+)
+
+set(N19_ENUMERATE_SUITES_IO
+  Tests/Suites/IO/SuiteStream.cpp
+)
+
+set(N19_ENUMERATE_SUITES_SYSTEM
+  Tests/Suites/System/SuiteSystemError.cpp
+)
+
 set(N19_ENUMERATE_PRIMARY_EXECUTABLES
   n19      # Main compiler executable
   bulwark  # The unit test executable
@@ -121,20 +147,10 @@ add_executable(bulwark
   Bulwark/Suite.hpp
   Bulwark/Reporting.hpp
   Bulwark/Bulwark.hpp
-  Bulwark/Suites/Core/SuiteMaybe.cpp
-  Bulwark/Suites/Core/SuiteResult.cpp
-  Bulwark/Suites/Core/SuiteArgParse.cpp
-  Bulwark/Suites/Core/SuiteDefer.cpp
-  Bulwark/Suites/Core/SuiteNothing.cpp
-  Bulwark/Suites/Core/SuiteBytes.cpp
-  Bulwark/Suites/Core/SuiteMurmur3.cpp
-  Bulwark/Suites/Core/SuiteTuple.cpp
-  Bulwark/Suites/Core/SuiteRingStructures.cpp
-  Bulwark/Suites/Core/SuiteStringUtil.cpp
-  Bulwark/Suites/Frontend/SuiteLexer.cpp
-  Bulwark/Suites/IO/SuiteStream.cpp
-  Bulwark/Suites/System/SuiteSystemError.cpp
-  Bulwark/Suites/Frontend/SuiteEntity.cpp
+  ${N19_ENUMERATE_SUITES_CORE}
+  ${N19_ENUMERATE_SUITES_FRONTEND}
+  ${N19_ENUMERATE_SUITES_IO}
+  ${N19_ENUMERATE_SUITES_SYSTEM}
   ${N19_ENUMERATE_GLOBAL_SOURCES}
   ${N19_ENUMERATE_GLOBAL_HEADERS}
 )
