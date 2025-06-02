@@ -247,7 +247,9 @@ public:
 };
 
 class AstNamespace final : public AstNode {
+public:
   AstNode::Children<> body_;
+  Entity::ID id_ = N19_INVALID_ENTITY_ID;
 
   auto print(uint32_t depth,
     OStream& stream,

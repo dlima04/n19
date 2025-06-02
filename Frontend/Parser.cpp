@@ -350,13 +350,97 @@ auto parse_punctuator_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
   return Error{ErrC::BadToken, "Unexpected token."};
 }
 
-auto parse_directive_(ParseContext& ctx) -> Result<AstNode::Ptr<>>{
+auto parse_directive_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
+  return Error{ErrC::NotImplimented};
+}
+
+auto parse_namespacedecl_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
+  const Token begin = MUST(ctx.lxr.expect_type(TokenType::Namespace));
+  const Token ident = TRY(ctx.lxr.expect_type(TokenType::Identifier, false));
+  const std::string name = MUST(ident.value(ctx.lxr));
+
+  const auto curr_ent = ctx.entities.find(ctx.curr_namespace);
+  bool existed_before = false;
+  Entity::ID old_id = ctx.curr_namespace;
+
+  /// Check if the entity already exists
+  for(const Entity::ID id : curr_ent->chldrn_) {
+    const auto child = ctx.entities.find(id);
+    if(child->lname_ == name) {
+      existed_before = true;
+      if(child->type_ == EntityType::PlaceHolder) {
+        TRY(ctx.entities.swap_placeholder<Static>(
+          child->id_,
+          ctx.curr_namespace,
+          begin.pos_,
+          begin.line_,
+          ctx.lxr.file_name_));
+      }
+
+      ctx.curr_namespace = child->id_;
+      break;
+    }
+  }
+
+  /// Create new namespace
+  if(!existed_before) {
+    const auto ns = ctx.entities.insert<Static>(
+      ctx.curr_namespace,
+      begin.pos_,
+      begin.line_,
+      ctx.lxr.file_name_,
+      name);
+    ctx.curr_namespace = ns->id_;
+  }
+
+  /// At this point, ctx.curr_namespace has been altered.
+  /// Create an AST node and parse the body of the namespace,
+  /// restore the old ctx.curr_namespace afterwards.
+
+  ctx.lxr.consume(1);
+  TRY(ctx.lxr.expect_type(TokenType::LeftBrace));
+
+  auto node = AstNode::create<AstNamespace>(
+    begin.pos_,
+    begin.line_,
+    nullptr,
+    ctx.lxr.file_name_);
+
+  node->id_ = ctx.curr_namespace;
+  while(!ctx.on_type(TokenType::RightBrace)) {
+    const auto curr = ctx.lxr.current();
+    auto child      = TRY(parse_begin_(ctx, false, false));
+    child->parent_  = node.get();
+
+    if(!is_node_toplevel_valid_(child)) {
+      ctx.lxr.revert_before(curr);
+      return Error{ErrC::BadExpr, "Expression is invalid at the toplevel."};
+    }
+
+    node->body_.emplace_back(std::move(child));
+  }
+
+  ctx.lxr.consume(1);
+  ctx.curr_namespace = old_id;
+  return Result<AstNode::Ptr<>>::create(std::move(node));
+}
+
+auto parse_procdecl_(ParseContext& ctx) -> Result<AstNode::Ptr<> > {
+  ASSERT(ctx.on_type(TokenType::Proc));
   return Error{ErrC::NotImplimented};
 }
 
 auto parse_keyword_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
-  /// TODO: keywords
-  return Error{ErrC::NotImplimented};
+  const auto curr = ctx.lxr.current();
+
+  ASSERT(ctx.on(TokenCategory::Keyword));
+  switch(curr.type_.value) {
+  case TokenType::Proc:      return parse_procdecl_(ctx);
+  case TokenType::Namespace: return parse_namespacedecl_(ctx);
+  default: /* TODO */ break;
+  }
+
+  UNREACHABLE_ASSERTION;
 }
 
 auto parse_unary_prefix_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {

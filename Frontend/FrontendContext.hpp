@@ -34,6 +34,7 @@ public:
     DumpIR   = 0x01 << 2, /// Dump internal IR repr
     DumpAST  = 0x01 << 3, /// Dump the AST
     DumpEnts = 0x01 << 4, /// Dump the entity table
+    DumpToks = 0x01 << 5, /// Dump tokens, do not compile.
   };
 
   static auto get_version_info() -> VersionInfo;

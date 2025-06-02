@@ -44,8 +44,8 @@ public:
   auto peek(uint32_t amnt)    -> Token;
 
   auto reset(sys::File& ref) -> Result<void>;
-  auto expect(TokenCategory cat, bool = true)   -> Result<void>;
-  auto expect_type(TokenType type, bool = true) -> Result<void>;
+  auto expect(TokenCategory cat, bool cons = true)   -> Result<Token>;
+  auto expect_type(TokenType type, bool cons = true) -> Result<Token>;
 
   static auto create_shared(sys::File& ref)              -> Result<std::shared_ptr<Lexer>>;
   static auto create_shared(std::vector<char8_t>&& buf)  -> Result<std::shared_ptr<Lexer>>;

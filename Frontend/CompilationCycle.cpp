@@ -57,13 +57,18 @@ bool begin_global_compilation_cycles() {
     return false;
   }
 
+  if(Context::the().flags_ & Context::DumpToks) {
+    (*lxr)->dump(outs());
+    return true;
+  }
+
   ErrorCollector errors;
 #ifdef N19_WIN32
   EntityTable tbl(std::filesystem::absolute(ref->path()).wstring());
 #else
   EntityTable tbl(std::filesystem::absolute(ref->path()).string());
 #endif
-  
+
   ParseContext ctx(errs(), errors, *(*lxr), tbl);
 
   if (!parse(ctx)) 

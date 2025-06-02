@@ -22,17 +22,18 @@ BEGIN_NAMESPACE(n19);
 struct ErrC_ final {
   N19_MAKE_COMPARABLE_MEMBER(ErrC_, value);
   enum Value : uint16_t {
-    None       = 0x00,
-    InvalidArg = 0x01,
-    FileIO     = 0x02,
-    Internal   = 0x03,
-    NotFound   = 0x04,
-    BadToken   = 0x05,
-    Native     = 0x06,
-    Conversion = 0x07,
-    Overflow   = 0x08,
-    NotImplimented = 0x09,
-    BadExpr    = 0x0A,
+    None       = 0,
+    InvalidArg = 1,
+    FileIO     = 2,
+    Internal   = 3,
+    NotFound   = 4,
+    BadToken   = 5,
+    Native     = 6,
+    Conversion = 7,
+    Overflow   = 8,
+    NotImplimented = 9,
+    BadExpr    = 10,
+    BadEnt     = 11,
   };
 
   Value value = None;
@@ -91,14 +92,12 @@ public:
     return std::get<E>( value_ );
   }
 
-  NODISCARD_ FORCEINLINE_
-  auto release_value() -> T {
+  FORCEINLINE_ auto release_value() -> T {
     ASSERT(has_value() == true, "Result contains an error!");
     return T(std::move(std::get<T>( value_ )));
   }
 
-  NODISCARD_ FORCEINLINE_
-  auto release_error() -> E {
+  FORCEINLINE_ auto release_error() -> E {
     ASSERT(has_value() == false, "Result contains a value!");
     return E(std::move(std::get<E>( value_ )));
   }

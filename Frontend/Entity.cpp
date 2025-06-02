@@ -192,7 +192,7 @@ auto Entity::print_(
     << " with ";             \
   break;
 
-  switch(type_) {
+  switch(type_.value) {
     N19_ENTITY_TYPE_LIST
     default: UNREACHABLE_ASSERTION;
   }
@@ -347,6 +347,17 @@ auto RootEntity::print(
     << "(ROOT)"
     << Con::Reset;
   print_children_(depth, stream, table);
+}
+
+auto EntityType::to_string() const -> std::string {
+  #define X(NAME) case EntityType::NAME: return #NAME;
+  switch(this->value) {
+    N19_ENTITY_TYPE_LIST
+    case EntityType::None: return "None";
+    default: break;
+  }
+  #undef X
+  UNREACHABLE_ASSERTION;
 }
 
 END_NAMESPACE(n19);

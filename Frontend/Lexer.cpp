@@ -13,6 +13,9 @@
 #include <limits>
 #include <functional>
 #include <array>
+
+#include <IO/Console.hpp>
+
 BEGIN_NAMESPACE(n19);
 
 inline auto Lexer::token_hyphen_() -> Token {
@@ -43,10 +46,10 @@ inline auto Lexer::token_hyphen_() -> Token {
     break;
   case u8'>': // '->'
     curr_tok.type_ = TokenType::SkinnyArrow;
-    curr_tok.cat_  = TokenCategory::ValidPostfix;
     curr_tok.cat_ |= TokenCategory::BinaryOp;
     curr_tok.len_  = 2;
     consume_char_(2);
+    break;
   default: // '-'
     curr_tok.type_ = TokenType::Sub;
     curr_tok.cat_  = TokenCategory::BinaryOp;
@@ -109,7 +112,7 @@ inline auto Lexer::token_dot_() -> Token {
     consume_char_(2);
   } else { // '.'
     curr_tok.type_ = TokenType::Dot;
-    curr_tok.cat_  = TokenCategory::ValidPostfix | TokenCategory::BinaryOp;
+    curr_tok.cat_  = TokenCategory::BinaryOp;
     curr_tok.len_  = 1;
     consume_char_(1);
   }
@@ -937,26 +940,28 @@ auto Lexer::create_shared(sys::File& ref) -> Result<std::shared_ptr<Lexer>> {
   return lxr;
 }
 
-auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<void> {
+auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<Token> {
   if(!current().cat_.isa(cat)) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token of kind \"{}\".", cat.to_string());
     return Error(errc, msg);
   }
 
+  const auto before = current();
   if(cons) consume(1);
-  return Result<void>::create();
+  return Result<Token>::create(before);
 }
 
-auto Lexer::expect_type(const TokenType type, const bool cons) -> Result<void> {
+auto Lexer::expect_type(const TokenType type, const bool cons) -> Result<Token> {
   if(current().type_ != type) {
     const auto errc = ErrC::BadToken;
     const auto msg  = fmt("Expected token \"{}\".", type.to_string());
     return Error(errc, msg);
   }
 
+  const auto before = current();
   if(cons) consume(1);
-  return Result<void>::create();
+  return Result<Token>::create(before);
 }
 
 auto Lexer::consume(const uint32_t amnt) -> const Token& {

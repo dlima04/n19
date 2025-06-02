@@ -61,11 +61,21 @@ class EntityTable;
   N19_ENTITY_TYPE_LIST
 #undef X
 
-enum class EntityType : uint16_t {
-#define X(NAME) NAME,
-  N19_ENTITY_TYPE_LIST
-  None,
-#undef X
+class EntityType {
+  N19_MAKE_COMPARABLE_MEMBER(EntityType, value);
+public:
+  #define X(NAME) NAME,
+  enum Value : uint16_t {
+    N19_ENTITY_TYPE_LIST
+    None,
+  };
+  #undef X
+
+  NODISCARD_ auto to_string() const -> std::string;
+
+  Value value = None;
+  constexpr EntityType() = default;
+  constexpr EntityType(const Value value) : value(value) {}
 };
 
 class Entity {
@@ -214,6 +224,7 @@ inline auto EntityQualifierBase::is_matrice()  const -> bool { return arr_length
 /// before the declaration).
 class PlaceHolder final : public Entity {
 public:
+  EntityType to_be_ = EntityType::None;
   auto print(uint32_t depth,
     OStream &stream,
     EntityTable &table

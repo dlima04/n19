@@ -55,6 +55,7 @@ struct BulwarkArgParser : argp::Parser {
 
 int main() {
   win32_init_console();
+  outs() << Con::Reset;
 
   BulwarkArgParser parser;
   LPWSTR cmdline = ::GetCommandLineW();
@@ -112,6 +113,7 @@ int main() {
 #else //POSIX
 
 int main(int argc, char** argv) {
+  outs() << Con::Reset;
   if(argc > ARGNUM_HARD_LIMIT) {
     outs() << "Too many command-line arguments passed.";
     outs() << Endl;

@@ -43,6 +43,8 @@ auto parse_unary_prefix_(ParseContext&)  -> Result<AstNode::Ptr<>>;
 auto parse_parens_(ParseContext&)        -> Result<AstNode::Ptr<>>;
 auto parse_directive_(ParseContext&)     -> Result<AstNode::Ptr<>>;
 auto parse_identifier_(ParseContext&)    -> Result<AstNode::Ptr<>>;
+auto parse_procdecl_(ParseContext&)      -> Result<AstNode::Ptr<>>;
+auto parse_namespacedecl_(ParseContext&) -> Result<AstNode::Ptr<>>;
 
 auto parse_postfix_(ParseContext&, AstNode::Ptr<>&&)    -> Result<AstNode::Ptr<>>;
 auto parse_subscript_(ParseContext&, AstNode::Ptr<> &&) -> Result<AstNode::Ptr<>>;

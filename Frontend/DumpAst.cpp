@@ -652,6 +652,12 @@ auto AstNamespace::print(
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
+  stream
+    << "ID="
+    << Con::BlueFG
+    << id_
+    << Con::Reset;
+
   stream << '\n';
   for(const auto& child : body_)
     child->print(depth + 1, stream, Nothing);

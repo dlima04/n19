@@ -19,6 +19,8 @@
 #include <Core/Defer.hpp>
 #include <iostream>
 
+#include "Frontend/EntityTable.hpp"
+
 #define ARGNUM_HARD_LIMIT 40
 
 using namespace n19;
@@ -43,6 +45,11 @@ struct MainArgParser : argp::Parser {
     _nstr("--dump-ast"),
     _nstr("-dump-ast"),
     _nstr("Dump the program's AST."));
+
+  bool& dump_toks = arg<bool>(
+    _nstr("--dump-tokens"),
+    _nstr("-dump-tokens"),
+    _nstr("Dump the program's tokens only, do not compile it."));
 
   bool& dump_ents = arg<bool>(
     _nstr("--dump-entities"),
@@ -115,6 +122,7 @@ static auto verify_args(MainArgParser& parser) -> bool {
   auto& context = Context::the();
   if (parser.dump_ast)  context.flags_ |= Context::DumpAST;
   if (parser.dump_ents) context.flags_ |= Context::DumpEnts;
+  if (parser.dump_toks) context.flags_ |= Context::DumpToks;
   if (parser.dump_ir)   context.flags_ |= Context::DumpIR;
   if (parser.verbose)   context.flags_ |= Context::Verbose;
 
@@ -129,6 +137,7 @@ static auto verify_args(MainArgParser& parser) -> bool {
 
 int main() {
   win32_init_console();
+  outs() << Con::Reset;
 
   DEFER({
     ins().clear();
@@ -179,12 +188,13 @@ int main() {
 
 #else /// POSIX
 int main(int argc, char** argv){
+  outs() << Con::Reset;
   DEFER({
     ins().clear();
     outs().flush();
     errs().flush();
   });
-  
+
   if(argc > ARGNUM_HARD_LIMIT) {
     outs() << "Too many command-line arguments passed.";
     outs() << "\n";
@@ -206,7 +216,6 @@ int main(int argc, char** argv){
     return EXIT_FAILURE;
   }
 
-  outs() << "Build complete.\n";
   return EXIT_SUCCESS;
 }
 
