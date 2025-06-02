@@ -56,7 +56,6 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Core/Panic.hpp
   Core/Concepts.hpp
   Core/RingBase.hpp
-  Core/Tuple.hpp
   Core/Bytes.hpp
   Core/Platform.hpp
   Core/Iterator.hpp
@@ -85,7 +84,6 @@ set(N19_ENUMERATE_SUITES_CORE
   Tests/Suites/Core/SuiteNothing.cpp
   Tests/Suites/Core/SuiteBytes.cpp
   Tests/Suites/Core/SuiteMurmur3.cpp
-  Tests/Suites/Core/SuiteTuple.cpp
   Tests/Suites/Core/SuiteRingStructures.cpp
   Tests/Suites/Core/SuiteStringUtil.cpp
 )
