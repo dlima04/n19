@@ -943,7 +943,10 @@ auto Lexer::create_shared(sys::File& ref) -> Result<std::shared_ptr<Lexer>> {
 auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<Token> {
   if(!current().cat_.isa(cat)) {
     const auto errc = ErrC::BadToken;
-    const auto msg  = fmt("Expected token of kind \"{}\".", cat.to_string());
+    const auto msg  = fmt(
+      "Expected token of kind {}, got {} instead.",
+      cat.to_string(),
+      current().cat_.to_string());
     return Error(errc, msg);
   }
 
@@ -955,7 +958,10 @@ auto Lexer::expect(const TokenCategory cat, const bool cons) -> Result<Token> {
 auto Lexer::expect_type(const TokenType type, const bool cons) -> Result<Token> {
   if(current().type_ != type) {
     const auto errc = ErrC::BadToken;
-    const auto msg  = fmt("Expected token \"{}\".", type.to_string());
+    const auto msg  = fmt(
+      "Expected token {}, got {} instead.",
+      type.to_string(),
+      current().type_.to_string());
     return Error(errc, msg);
   }
 

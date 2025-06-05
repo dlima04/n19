@@ -9,7 +9,13 @@
 #include <utility>
 
 namespace stdfs = std::filesystem;
+BEGIN_NAMESPACE(n19::sys);
 
+auto File::dev() const -> IODevice {
+  return IODevice::from(this->value_);
+}
+
+END_NAMESPACE(n19::sys);
 #if defined(N19_POSIX)
 #include <sys/stat.h>
 #include <sys/conf.h>

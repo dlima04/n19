@@ -5,6 +5,7 @@
 
 #include <System/BackTrace.hpp>
 #include <Core/Try.hpp>
+#include <Misc/Macros.hpp>
 #include <string_view>
 
 ///
@@ -49,52 +50,131 @@ END_NAMESPACE(n19::sys);
 #else /// POSIX
 #include <execinfo.h>
 #include <stdlib.h>
+#include <dlfcn.h>
 BEGIN_NAMESPACE(n19::sys);
 
 ///
 /// Retrieve the maximum amount of stack frames.
 /// Store them inside of the backtrace object.
 auto BackTrace::get() -> Result<void> {
-  constexpr int maxframes = N19_BACKTRACE_MAX_FRAMES;
-  void* f_[maxframes]{};
+  void *trace[N19_BACKTRACE_MAX_FRAMES]{ nullptr };
+  Dl_info dlinfo{ nullptr };
 
-  const int res = ::backtrace(f_, maxframes);
-  char** syms = ::backtrace_symbols(f_, res); // TODO: demangle symbol names
-  if(syms != nullptr) {
-    for(int i = 0; i < res; i++) {
-      frames_[i] = BacktraceFrame{ .name_ = syms[i], .addr_ = f_[i] };
+  int status = 0;
+  const char* symname = nullptr;
+  char* demangled = nullptr;
+
+  int trace_size = backtrace(trace, N19_BACKTRACE_MAX_FRAMES);
+  for(int i = 0; i < trace_size; i++) {
+    if(!dladdr(trace[i], &dlinfo))
+      continue;
+
+    symname = dlinfo.dli_sname;
+    demangled = abi::__cxa_demangle(symname, nullptr, nullptr, &status);
+
+    if(status == 0 && demangled) {
+      symname = demangled;
+    } else {
+      return Error(ErrC::Internal, "abi::__cxa_demangle");
     }
-    free(syms);
+
+    frames_[i] = BacktraceFrame{ .name_ = demangled, .addr_ = trace[i] };
+
+    if (demangled)
+      free(demangled);
   }
+
   return Result<void>::create();
 }
 
 auto BackTrace::dump_to(OStream& stream) -> Result<void> {
-  constexpr int maxframes = N19_BACKTRACE_MAX_FRAMES;
-  void* f_[maxframes]{};
+  void *trace[N19_BACKTRACE_MAX_FRAMES]{ nullptr };
+  Dl_info dlinfo{ nullptr };
 
-  const int res = ::backtrace(f_, maxframes);
-  char** syms = ::backtrace_symbols(f_, res);
-  if(syms != nullptr) {
-    for(int i = 0; i < res; i++)
-      stream << "At " << syms[i] << "\n";
+  int status = 0;
+  const char* symname = nullptr;
+  char* demangled = nullptr;
 
-    stream << "\nTraced " << res << " frames,\n";
-    stream << "Out of " << maxframes << " max." << Endl;
-    free(syms);
+  int trace_size = backtrace(trace, N19_BACKTRACE_MAX_FRAMES);
+  for(int i = 0; i < trace_size; i++) {
+    if(!dladdr(trace[i], &dlinfo))
+      continue;
+
+    symname = dlinfo.dli_sname;
+    demangled = abi::__cxa_demangle(symname, nullptr, nullptr, &status);
+
+    if(status == 0 && demangled) {
+      symname = demangled;
+    } else {
+      return Error(ErrC::Internal, "abi::__cxa_demangle");
+    }
+
+    stream << "At " << trace[i] << " " << symname << "\n";
+
+    if (demangled)
+      free(demangled);
   }
+
+  stream
+    << "\nTraced "
+    << trace_size
+    << " frames out of "
+    << N19_BACKTRACE_MAX_FRAMES
+    << " max.\n";
+
   return Result<void>::create();
 }
 
 ///
 /// For dumping backtrace output to a file.
 auto BackTrace::dump_to(File& file) -> Result<void> {
-  constexpr int maxframes = N19_BACKTRACE_MAX_FRAMES;
-  void* f_[maxframes]{};
-  auto stream = OStream::from(file);
+  using namespace std::string_view_literals;
 
-  const int res = ::backtrace(f_, maxframes);
-  ::backtrace_symbols_fd(f_, res, file.value());
+  void *trace[N19_BACKTRACE_MAX_FRAMES]{ nullptr };
+  Dl_info dlinfo{ nullptr };
+
+  int status = 0;
+  const char* symname = nullptr;
+  char* demangled = nullptr;
+
+  auto stream = OStream::from(file.dev());
+
+  int trace_size = backtrace(trace, N19_BACKTRACE_MAX_FRAMES);
+  for(int i = 0; i < trace_size; i++) {
+    if(!dladdr(trace[i], &dlinfo))
+      continue;
+
+    symname = dlinfo.dli_sname;
+    demangled = abi::__cxa_demangle(symname, nullptr, nullptr, &status);
+
+    if(status == 0 && demangled) {
+      symname = demangled;
+    } else {
+      if(demangled)
+        free(demangled);
+      continue;
+    }
+
+    /// Need to do it this way otherwise a null terminator
+    /// is written to the file
+    stream
+      << "At "
+      << trace[i]
+      << " "
+      << symname
+      << "\n";
+
+    if (demangled)
+      free(demangled);
+  }
+
+  /// Again, very stupid but necessary
+  stream
+    << "\nTraced "
+    << trace_size
+    << " frames out of "
+    << N19_BACKTRACE_MAX_FRAMES
+    << " max.\n";
   return Result<void>::create();
 }
 

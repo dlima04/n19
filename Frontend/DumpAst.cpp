@@ -273,15 +273,19 @@ auto AstProcDecl::print(
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  print_(depth, stream, "VarDecl");
+  print_(depth, stream, "ProcDecl");
   if(alias.has_value()) 
     stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
-  stream << '\n';
-  name_->print(depth + 1, stream, "ProcDecl.Name");
+  stream
+    << "ID="
+    << Con::BlueFG
+    << id_
+    << Con::Reset
+    << '\n';
 
   for(size_t i = 0; i < arg_decls_.size(); i++)
     arg_decls_.at(i)->print(depth + 1, stream, fmt("ProcDecl.Arg.{}", i + 1));

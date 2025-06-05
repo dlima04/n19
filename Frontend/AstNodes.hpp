@@ -428,7 +428,7 @@ public:
 
 class AstProcDecl final : public AstNode {
 public:
-  AstNode::Ptr<> name_ = nullptr; // EntityRef or EntityRefThunk
+  Entity::ID id_ = N19_INVALID_ENTITY_ID;
   AstNode::Children<> arg_decls_; // The parameter declarations (if any)
   AstNode::Children<> body_;      // The body of the procedure
 

@@ -9,6 +9,7 @@
 #include <Core/Try.hpp>
 #include <Frontend/ParseContext.hpp>
 #include <Frontend/AstNodes.hpp>
+#include <tuple>
 
 ///
 /// Public parsing functions
@@ -45,6 +46,7 @@ auto parse_directive_(ParseContext&)     -> Result<AstNode::Ptr<>>;
 auto parse_identifier_(ParseContext&)    -> Result<AstNode::Ptr<>>;
 auto parse_procdecl_(ParseContext&)      -> Result<AstNode::Ptr<>>;
 auto parse_namespacedecl_(ParseContext&) -> Result<AstNode::Ptr<>>;
+auto parse_deep_ident_(ParseContext&)    -> Result<Entity::ID>;
 
 auto parse_postfix_(ParseContext&, AstNode::Ptr<>&&)    -> Result<AstNode::Ptr<>>;
 auto parse_subscript_(ParseContext&, AstNode::Ptr<> &&) -> Result<AstNode::Ptr<>>;

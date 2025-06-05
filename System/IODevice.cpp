@@ -64,6 +64,13 @@ auto IODevice::from_stdin() -> IODevice {
   return device;
 }
 
+auto IODevice::from(ValueType vt, uint8_t perms) -> IODevice {
+  IODevice device;
+  device.value_ = vt;
+  device.perms_ = perms;
+  return device;
+}
+
 #else // IF WINDOWS
 
 auto IODevice::write(const Bytes &bytes) -> Result<void> {

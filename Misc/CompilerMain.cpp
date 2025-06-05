@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include "Frontend/EntityTable.hpp"
+#include "System/BackTrace.hpp"
 
 #define ARGNUM_HARD_LIMIT 40
 

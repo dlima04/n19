@@ -30,6 +30,7 @@ using IODeviceBase_ = Handle<int>;
 
 class IODevice : public IODeviceBase_ {
 public:
+  using IODeviceBase_::ValueType;
   enum Permissions : uint8_t {
     NoAccess = 0x00,
     Read     = 0x01,
@@ -51,6 +52,7 @@ public:
   static auto from_stdout() -> IODevice;
   static auto from_stderr() -> IODevice;
   static auto from_stdin()  -> IODevice;
+  static auto from(ValueType vt, uint8_t perms = Read | Write) -> IODevice;
   static auto create_pipe() -> Result<std::array<IODevice, 2>>;
 
   IODevice() = default;

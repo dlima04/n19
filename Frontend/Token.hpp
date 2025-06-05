@@ -97,6 +97,7 @@ BEGIN_NAMESPACE(n19);
   X(Default, "default")          \
   X(Fallthrough, "fallthrough")  \
   X(Namespace, "namespace")      \
+  X(Compose, "compose")          \
   X(Defer, "defer")              \
   X(DeferIf, "defer_if")         \
   X(Block, "block")              \

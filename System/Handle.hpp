@@ -22,6 +22,8 @@ public:
 
   NODISCARD_ auto value() const -> Value;
   explicit operator bool() const;
+
+  using ValueType = Value;
 protected:
   Value value_{};
 };

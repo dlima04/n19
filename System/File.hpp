@@ -27,6 +27,7 @@ public:
 
   NODISCARD_ auto path() const -> std::filesystem::path;
   NODISCARD_ auto size() const -> Result<size_t>;
+  NODISCARD_ auto dev()  const -> IODevice;
   auto seek(SeekDist dist, FSeek method) const -> Result<SeekDist>;
 
   NODISCARD_ static auto create_or_open(

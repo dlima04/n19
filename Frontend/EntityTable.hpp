@@ -268,6 +268,10 @@ auto EntityTable::swap_placeholder(
   N19_ENTITY_TYPE_LIST
   #undef X
 
+  if(old->to_be_ == EntityType::None) {
+    old->to_be_ = type;
+  }
+
   if(old->to_be_ != type) {
     auto msg = fmt(
       "Expected entity \"{}\" to be of type "
@@ -309,6 +313,10 @@ auto EntityTable::swap_placeholder(
 
   N19_ENTITY_TYPE_LIST
   #undef X
+
+  if(old->to_be_ == EntityType::None) {
+    old->to_be_ = type;
+  }
 
   if(old->to_be_ != type) {
     auto msg = fmt(

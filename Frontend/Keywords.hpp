@@ -26,6 +26,7 @@
   KEYWORD_X("typeof", Typeof, Keyword | UnaryOp | ValidPrefix)  \
   KEYWORD_X("fallthrough", Fallthrough, Keyword | ControlFlow)  \
   KEYWORD_X("namespace", Namespace, Keyword)                    \
+  KEYWORD_X("compose", Compose, Keyword)                        \
   KEYWORD_X("where", Where, Keyword)                            \
   KEYWORD_X("otherwise", Otherwise, Keyword)                    \
   KEYWORD_X("proc", Proc, Keyword)                              \

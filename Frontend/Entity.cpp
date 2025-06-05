@@ -289,14 +289,14 @@ auto Proc::print(
   OStream &stream, EntityTable &table) const -> void
 {
   print_(depth, stream);
-  stream << "Parameters: { " << Con::BlueFG;
+  stream << "Parameters: ( " << Con::BlueFG;
   for(Entity::ID id : parameters_) {
     stream << id << " ";
   }
 
   stream
     << Con::Reset
-    << "}, "
+    << "), "
     << "ReturnType="
     << Con::BlueFG
     << return_type_
