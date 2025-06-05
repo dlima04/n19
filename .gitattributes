@@ -1,1 +1,5 @@
 * text=auto eol=lf
+
+# Binary files
+*.bmp binary
+*.png binary
