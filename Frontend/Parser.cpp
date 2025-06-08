@@ -5,6 +5,7 @@
 
 #include <Frontend/Parser.hpp>
 #include <Core/StringUtil.hpp>
+#include <Frontend/FrontendContext.hpp>
 #include <System/File.hpp>
 #include <algorithm>
 #include <utility>
@@ -12,7 +13,7 @@
 BEGIN_NAMESPACE(n19::detail_);
 
 auto is_node_toplevel_valid_(const AstNode::Ptr<> &ptr) -> bool {
-#if 0
+#if 1
   switch (ptr->type_) {
   case AstNode::Type::Namespace:         FALLTHROUGH_;
   case AstNode::Type::Where:             FALLTHROUGH_;
@@ -29,7 +30,6 @@ auto is_valid_subexpression_(const AstNode::Ptr<>& ptr) -> bool {
   switch (ptr->type_) {
   case AstNode::Type::Call:              FALLTHROUGH_;
   case AstNode::Type::QualifiedRef:      FALLTHROUGH_;
-  case AstNode::Type::QualifiedRefThunk: FALLTHROUGH_;
   case AstNode::Type::EntityRef:         FALLTHROUGH_;
   case AstNode::Type::EntityRefThunk:    FALLTHROUGH_;
   case AstNode::Type::BinExpr:           FALLTHROUGH_;
@@ -68,8 +68,7 @@ auto parse_begin_(
   }
 
   ///
-  /// Check categories, recursive descent on da dih
-  /// frm ts 🍆
+  /// Check categories
   if(curr.cat_.isa(TokenCategory::Punctuator)) {
     expr = TRY(parse_punctuator_(ctx));
   }
@@ -87,13 +86,13 @@ auto parse_begin_(
   }
 
   ///
-  /// Illegal token, reject ts...
+  /// Illegal token
   else if(curr == TokenType::Illegal) {
     return Error{ErrC::BadToken, "Illegal token."};
   }
 
   ///
-  /// gang wtf is this token ❓user tweaking 😭
+  /// Unknown token
   else {
     return Error{ErrC::BadToken, "Wtf is this shit bro"};
   }
@@ -101,18 +100,30 @@ auto parse_begin_(
   ///
   /// Special exceptions: these expressions NEVER
   /// require a terminal character (';' or ',')
-  if(node_never_needs_terminal_(expr)) {
+  if(expr == nullptr || node_never_needs_terminal_(expr)) {
     return Result<AstNode::Ptr<>>(std::move(expr));
   }
 
   ///
   /// Check for postfixes
   while(ctx.lxr.current().cat_.isa(TokenCategory::ValidPostfix)) {
+    const auto curr = ctx.lxr.current();
     expr = TRY(parse_postfix_(ctx, std::move(expr)));
+    if(expr == nullptr) {
+      ctx.lxr.revert_before(curr);
+      return Error(ErrC::BadExpr, "Invalid expression.");
+    }
   }
 
+  ///
+  /// Check for binary operators following the expression
   while(!parse_single && ctx.lxr.current().cat_.isa(TokenCategory::BinaryOp)) {
+    const auto curr = ctx.lxr.current();
     expr = TRY(parse_binexpr_(ctx, std::move(expr)));
+    if(expr == nullptr) {
+      ctx.lxr.revert_before(curr);
+      return Error(ErrC::BadExpr, "Invalid expression.");
+    }
   }
 
   ///
@@ -147,7 +158,7 @@ auto parse_begin_(
 auto parse_impl_(ParseContext &ctx) -> bool {
   do {
     while (true) {
-      auto toplevel_decl = detail_::parse_begin_(ctx, false, false);
+      auto toplevel_decl = parse_begin_(ctx, false, false);
 
       /// An error has occurred, or EOF was reached. We're done.
       if (!toplevel_decl.has_value()) {
@@ -170,7 +181,7 @@ auto parse_impl_(ParseContext &ctx) -> bool {
 
       /// Verify that the returned node is valid at the toplevel
       /// (i.e. can exist at the global scope).
-      if (!detail_::is_node_toplevel_valid_(*toplevel_decl)) {
+      if (!is_node_toplevel_valid_(*toplevel_decl)) {
         ErrorCollector::display_error(
           "Expression is invalid at the toplevel.",
           ctx.lxr.file_name_,
@@ -191,7 +202,7 @@ auto parse_impl_(ParseContext &ctx) -> bool {
       return false;
     }
 
-  } while (detail_::get_next_include_(ctx));
+  } while (get_next_include_(ctx));
 
   return true;
 }
@@ -204,7 +215,7 @@ auto parse_binexpr_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNo
     curr.pos_,
     curr.line_,
     nullptr,
-    ctx.lxr.file_name_);
+    ctx.curr_file);
 
   node->op_type_ = curr.type_;
   node->op_cat_  = curr.cat_;
@@ -213,14 +224,15 @@ auto parse_binexpr_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNo
 
   ctx.lxr.consume(1);
   node->right_ = TRY(parse_begin_(ctx, true, true));
-  node->right_->parent_ = node.get();
 
-  if(!is_valid_subexpression_(node->right_)) {
+  if(node->right_ == nullptr || !is_valid_subexpression_(node->right_)) {
     ctx.lxr.revert_before(curr);
     return Error{ErrC::BadExpr, "Invalid expression following binary operator."};
   }
 
+  node->right_->parent_ = node.get();
   curr = ctx.lxr.current();
+
   while(curr.cat_.isa(TokenCategory::BinaryOp) && curr.type_.prec() <= node->op_type_.prec()) {
     node->right_ = TRY(parse_binexpr_(ctx, std::move(node->right_)));
     curr = ctx.lxr.current();
@@ -229,6 +241,11 @@ auto parse_binexpr_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNo
   return Result<AstNode::Ptr<>>::create(std::move(node));
 }
 
+/* parse_scalar_lit_ parses a scalar literal, i.e. 34.2, 100, "foo", etc.
+ * string literals are considered to be scalars, because their type resolves
+ * to a const i8*. Non-decimal values like hex and octal literals are
+ * converted to their respective decimal values by this function.
+ */
 auto parse_scalar_lit_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
   const auto curr = ctx.lxr.current();
   ASSERT(curr.cat_.isa(TokenCategory::Literal));
@@ -237,7 +254,7 @@ auto parse_scalar_lit_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
     curr.pos_,
     curr.line_,
     nullptr,
-    ctx.lxr.file_name_);
+    ctx.curr_file);
 
   auto val_ = curr.value(ctx.lxr);
   ASSERT(val_.has_value());
@@ -302,21 +319,22 @@ auto parse_aggregate_lit_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
     ctx.lxr.current().pos_,
     ctx.lxr.current().line_,
     nullptr,
-    ctx.lxr.file_name_
+    ctx.curr_file
   );
 
   ctx.lxr.consume(1);
   while(ctx.lxr.current() != TokenType::RightBrace) {
     const auto curr = ctx.lxr.current();
-    auto child      = TRY(parse_begin_(ctx, true, false));
-    child->parent_  = node.get();
+    auto child = TRY(parse_begin_(ctx, true, false));
 
-    if(!is_valid_subexpression_(child)) {
+    if(child == nullptr || !is_valid_subexpression_(child)) {
       ctx.lxr.revert_before(curr);
       return Error{ErrC::BadExpr, "Invalid subexpression within aggregate literal."};
     }
 
+    child->parent_ = node.get();
     node->children_.emplace_back(std::move(child));
+
     if(ctx.lxr.current() == TokenType::Comma)
       ctx.lxr.consume(1);
   }
@@ -333,7 +351,7 @@ auto parse_parens_(ParseContext& ctx) -> Result<AstNode::Ptr<>>{
   const auto curr = ctx.lxr.current();
   auto expr = TRY(parse_begin_(ctx, true, false));
 
-  if(!is_valid_subexpression_(expr)) {
+  if(expr == nullptr || !is_valid_subexpression_(expr)) {
     ctx.lxr.revert_before(curr);
     return Error{ErrC::BadExpr, "Expression cannot be used inside of parentheses."};
   }
@@ -358,6 +376,22 @@ auto parse_directive_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
   return Error{ErrC::NotImplimented};
 }
 
+/* parse_deep_ident_ parses something like foo::bar::baz
+ * in situations where we do not want to treat the expression as a
+ * sequence of binary operators. Note that typically such a thing
+ * is parsed as:
+ *
+ *                            ::
+ *                           /  \
+ *                          ::  baz
+ *                         /  \
+ *                        foo bar
+ *
+ * However, in particular cases, such as for the return values or
+ * parameters of functions, and in namespace declarations, we want to
+ * simply iterate over the chain of namespace operators, and add each
+ * identifier as a placeholder entity if need be.
+ */
 auto parse_deep_ident_(ParseContext& ctx) -> Result<Entity::ID> {
   const auto begin  = ctx.lxr.current();
   Entity::ID old_id = ctx.curr_namespace;
@@ -393,7 +427,7 @@ auto parse_deep_ident_(ParseContext& ctx) -> Result<Entity::ID> {
         ctx.curr_namespace,
         curr_tok.pos_,
         curr_tok.line_,
-        ctx.lxr.file_name_,
+        ctx.curr_file,
         curr_name);
       ctx.curr_namespace = new_ent->id_;
     }
@@ -422,7 +456,7 @@ auto parse_namespacedecl_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
       ent_ptr->parent_,
       begin.pos_,
       begin.line_,
-      ctx.lxr.file_name_));
+      ctx.curr_file));
   }
 
   ctx.curr_namespace = ent_ptr->id_;
@@ -435,7 +469,7 @@ auto parse_namespacedecl_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
     begin.pos_,
     begin.line_,
     nullptr,
-    ctx.lxr.file_name_);
+    ctx.curr_file);
 
   node->id_ = ctx.curr_namespace;
 
@@ -443,14 +477,17 @@ auto parse_namespacedecl_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
   if(ctx.lxr.current() != TokenType::LeftBrace) {
     const auto curr = ctx.lxr.current();
     auto child      = TRY(parse_begin_(ctx, false, false));
-    child->parent_  = node.get();
 
-    if(!is_node_toplevel_valid_(child)) {
-      ctx.lxr.revert_before(curr);
-      return Error{ErrC::BadExpr, "Expression is invalid at the toplevel."};
+    if(child != nullptr) {
+      if(!is_node_toplevel_valid_(child)) {
+        ctx.lxr.revert_before(curr);
+        return Error{ErrC::BadExpr, "Expression is invalid at the toplevel."};
+      }
+
+      child->parent_ = node.get();
+      node->body_.emplace_back(std::move(child));
     }
 
-    node->body_.emplace_back(std::move(child));
     ctx.curr_namespace = old_id;
     return Result<AstNode::Ptr<>>::create(std::move(node));
   }
@@ -460,14 +497,16 @@ auto parse_namespacedecl_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
   while(!ctx.on_type(TokenType::RightBrace)) {
     const auto curr = ctx.lxr.current();
     auto child      = TRY(parse_begin_(ctx, false, false));
-    child->parent_  = node.get();
 
-    if(!is_node_toplevel_valid_(child)) {
-      ctx.lxr.revert_before(curr);
-      return Error{ErrC::BadExpr, "Expression is invalid at the toplevel."};
+    if(child != nullptr) {
+      if(!is_node_toplevel_valid_(child)) {
+        ctx.lxr.revert_before(curr);
+        return Error{ErrC::BadExpr, "Expression is invalid at the toplevel."};
+      }
+
+      child->parent_ = node.get();
+      node->body_.emplace_back(std::move(child));
     }
-
-    node->body_.emplace_back(std::move(child));
   }
 
   ctx.lxr.consume(1);
@@ -497,7 +536,7 @@ auto parse_procdecl_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
       temp_ptr->parent_,
       begin.pos_,
       begin.line_,
-      ctx.lxr.file_name_
+      ctx.curr_file
     ));
     temp_ptr.reset();
   } else {
@@ -516,7 +555,7 @@ auto parse_procdecl_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
     begin.pos_,
     begin.line_,
     nullptr,
-    ctx.lxr.file_name_
+    ctx.curr_file
   );
 
   node->id_ = proc_ptr->id_;
@@ -539,7 +578,13 @@ auto parse_procdecl_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
   /// Parse procedure body
   TRY(ctx.lxr.expect_type(TokenType::LeftBrace));
   while(ctx.lxr.current() != TokenType::RightBrace) {
-    auto child     = TRY(parse_begin_(ctx, false, false));
+    const auto curr = ctx.lxr.current();
+    auto child = TRY(parse_begin_(ctx, false, false));
+    if(child == nullptr) {
+      ctx.lxr.revert_before(curr);
+      return Error(ErrC::BadExpr, "Invalid expression within procedure body.");
+    }
+
     child->parent_ = node.get();
     node->body_.emplace_back(std::move(child));
   }
@@ -549,6 +594,115 @@ auto parse_procdecl_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
   return Result<AstNode::Ptr<>>::create(std::move(node));
 }
 
+/* NOTE:
+ * there is no notion of a "scope" at the AST level. Scopes
+ * are checked and verified by the checker exclusively. A "scope"
+ * in this context is the scope keyword followed by a block,
+ * which creates an arbitrary logical scope. i.e.
+ *
+ * scope {
+ *   defer thing(); # this is called on scope-exit.
+ *   ...
+ * }
+ *
+ * This is similar to arbitrary block scopes in C/C++.
+ */
+auto parse_scope_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
+  const Token begin = MUST(ctx.lxr.expect_type(TokenType::Scope));
+  TRY(ctx.lxr.expect_type(TokenType::LeftBrace));
+
+  auto node = AstNode::create<AstScopeBlock>(
+    begin.pos_,
+    begin.line_,
+    nullptr,
+    ctx.curr_file
+  );
+
+  while(!ctx.on_type(TokenType::RightBrace)) {
+    const auto curr = ctx.lxr.current();
+    auto child = TRY(parse_begin_(ctx, false, false));
+    if(child == nullptr) {
+      ctx.lxr.revert_before(curr);
+      return Error(ErrC::BadExpr, "Invalid expression inside scope block.");
+    }
+
+    child->parent_ = node.get();
+    node->children_.emplace_back(std::move(child));
+  }
+
+  ctx.lxr.consume(1);
+  return Result<AstNode::Ptr<>>::create(std::move(node));
+}
+
+auto parse_ret_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
+  const Token begin = MUST(ctx.lxr.expect_type(TokenType::Return));
+
+  auto node = AstNode::create<AstReturn>(
+    begin.pos_,
+    begin.line_,
+    nullptr,
+    ctx.curr_file
+  );
+
+  /// Check for an empty return.
+  if(!ctx.lxr.current().is_terminator()) {
+    const Token curr = ctx.lxr.current();
+    node->value_ = TRY(parse_begin_(ctx, true, false));
+    if(node->value_ == nullptr || !is_valid_subexpression_(node->value_)) {
+      ctx.lxr.revert_before(curr);
+      return Error(ErrC::BadExpr, "Invalid expression after return statement.");
+    }
+    node->value_->parent_ = node.get();
+  }
+
+  return Result<AstNode::Ptr<>>::create(std::move(node));
+}
+
+auto parse_cont_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
+  const Token begin = MUST(ctx.lxr.expect_type(TokenType::Continue));
+
+  auto node = AstNode::create<AstContinue>(
+    begin.pos_,
+    begin.line_,
+    nullptr,
+    ctx.curr_file);
+
+  return Result<AstNode::Ptr<>>::create(std::move(node));
+}
+
+auto parse_qualtype_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
+  const Token begin = ctx.lxr.current();
+  const Entity::ID ent_id = TRY(parse_deep_ident_(ctx));
+
+  auto node = AstNode::create<AstQualifiedRef>(
+    begin.pos_,
+    begin.line_,
+    nullptr,
+    ctx.curr_file
+  );
+
+  return Error(ErrC::InvalidArg, "asdfasd");
+}
+
+auto parse_break_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
+  const Token begin = MUST(ctx.lxr.expect_type(TokenType::Break));
+
+  auto node = AstNode::create<AstBreak>(
+    begin.pos_,
+    begin.line_,
+    nullptr,
+    ctx.curr_file);
+
+  return Result<AstNode::Ptr<>>::create(std::move(node));
+}
+
+auto parse_usingstmt_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
+  return nullptr;
+}
+
+/* Dispatch function for all keywords that precede
+ * some expression.
+ */
 auto parse_keyword_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
   const auto curr = ctx.lxr.current();
 
@@ -556,6 +710,9 @@ auto parse_keyword_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
   switch(curr.type_.value) {
   case TokenType::Proc:      return parse_procdecl_(ctx);
   case TokenType::Namespace: return parse_namespacedecl_(ctx);
+  case TokenType::Scope:     return parse_scope_(ctx);
+  case TokenType::Return:    return parse_ret_(ctx);
+  case TokenType::Continue:  return parse_cont_(ctx);
   default: /* TODO */ break;
   }
 
@@ -571,7 +728,7 @@ auto parse_unary_prefix_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
     begin.pos_,
     begin.line_,
     nullptr,
-    ctx.lxr.file_name_
+    ctx.curr_file
   );
 
   node->op_type_    = begin.type_;
@@ -579,12 +736,12 @@ auto parse_unary_prefix_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
   node->is_postfix_ = false;
   node->operand_    = TRY(parse_begin_(ctx, true, true));
 
-  node->operand_->parent_ = node.get();
-  if(!is_valid_subexpression_(node->operand_)) {
+  if(node->operand_ == nullptr || !is_valid_subexpression_(node->operand_)) {
     ctx.lxr.revert_before(begin);
     return Error{ErrC::BadExpr, "Unexpected expression following unary operator."};
   }
 
+  node->operand_->parent_ = node.get();
   return Result<AstNode::Ptr<>>::create(std::move(node));
 }
 
@@ -603,7 +760,7 @@ auto parse_postfix_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNo
       curr.pos_,
       curr.line_,
       nullptr,
-      ctx.lxr.file_name_);
+      ctx.curr_file);
 
     node->op_type_    = curr.type_;
     node->op_cat_     = curr.cat_;
@@ -629,7 +786,7 @@ auto parse_call_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNode:
     curr.pos_,
     curr.line_,
     nullptr,
-    ctx.lxr.file_name_);
+    ctx.curr_file);
 
   node->target_ = std::move(operand);
   ctx.lxr.consume(1);
@@ -643,7 +800,7 @@ auto parse_call_(ParseContext& ctx, AstNode::Ptr<>&& operand) -> Result<AstNode:
   while(old_paren_lvl < ctx.paren_level) {
     curr = ctx.lxr.current();
     auto expr = TRY(parse_begin_(ctx, true, false));
-    if(!is_valid_subexpression_(expr)) {
+    if(expr == nullptr || !is_valid_subexpression_(expr)) {
       ctx.lxr.revert_before(curr);
       return Error{ErrC::BadExpr, "Invalid subexpression within call."};
     }
@@ -673,7 +830,7 @@ auto parse_identifier_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
     curr.pos_,
     curr.line_,
     nullptr,
-    ctx.lxr.file_name_);
+    ctx.curr_file);
 
   auto val = curr.value(ctx.lxr);
   ASSERT(val.has_value());
@@ -684,19 +841,20 @@ auto parse_identifier_(ParseContext &ctx) -> Result<AstNode::Ptr<>> {
 }
 
 auto get_next_include_(ParseContext& ctx) -> bool {
-  if (ctx.includes_.empty()) {
+  auto& frontend_ctx = Context::the();
+  if(frontend_ctx.inputs_.empty()) {
     return false;
   }
   
-  auto next = std::ranges::find_if(ctx.includes_, [](const IncludedFile& f) {
-    return f.state_ == IncludeState::Pending;
+  auto next = std::ranges::find_if(frontend_ctx.inputs_, [](const InputFile& f) {
+    return f.state == InputFileState::Pending && f.kind == InputFileKind::Included;
   });
 
-  if(next == ctx.includes_.end())
+  if(next == frontend_ctx.inputs_.end())
     return false;
 
   /// ts is so fucking retarded 🥀💔
-  std::filesystem::path path(next->name_);
+  std::filesystem::path path(next->name);
 
 #ifdef N19_WIN32
   auto file = sys::File::open(path.wstring());
@@ -710,16 +868,17 @@ auto get_next_include_(ParseContext& ctx) -> bool {
       << "\nError:"
       << Con::Reset
       << " could not open included file "
-      << next->name_
+      << next->name
       << ".\n\n";
     return false;
   }
 
-  next->state_       = IncludeState::Finished;
+  next->state        = InputFileState::Finished;
   ctx.curr_namespace = N19_ROOT_ENTITY_ID;
   ctx.paren_level    = 0;
 
   ASSERT(ctx.lxr.reset(*file));
+  ctx.curr_file = next->id;
   return true;
 }
 

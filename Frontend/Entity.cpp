@@ -3,10 +3,9 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Frontend/Entity.hpp>
-#include <IO/Console.hpp>
 #include <Frontend/EntityTable.hpp>
 #include <IO/Fmt.hpp>
+#include <IO/Console.hpp>
 BEGIN_NAMESPACE(n19);
 
 BuiltinType::BuiltinType(const Type type) {
@@ -183,13 +182,13 @@ auto Entity::print_(
     << "> -- ";
 
   /// Display entity type
-#define X(TYPE)              \
-  case EntityType::TYPE:     \
-  stream                     \
-    << Con::GreenFG          \
-    << #TYPE                 \
-    << Con::Reset            \
-    << " with ";             \
+#define X(TYPE)           \
+  case EntityType::TYPE:  \
+  stream                  \
+    << Con::GreenFG       \
+    << #TYPE              \
+    << Con::Reset         \
+    << " with ";          \
   break;
 
   switch(type_.value) {
@@ -204,11 +203,9 @@ auto Entity::print_(
     << Con::GreenFG
     << this->id_
     << Con::Reset
-    << ", File="
+    << ", FileID="
     << Con::GreenFG
-    << "\""
     << this->file_
-    << "\""
     << Con::Reset
     << " ";
 }
@@ -349,6 +346,9 @@ auto RootEntity::print(
   print_children_(depth, stream, table);
 }
 
+/*
+ * Convert the entity to a string representation.
+ */
 auto EntityType::to_string() const -> std::string {
   #define X(NAME) case EntityType::NAME: return #NAME;
   switch(this->value) {
@@ -358,6 +358,19 @@ auto EntityType::to_string() const -> std::string {
   }
   #undef X
   UNREACHABLE_ASSERTION;
+}
+
+/*
+ * Is this entity a user-defined type?
+ */
+auto EntityType::is_udt() const -> bool {
+  switch(this->value) {
+    case Struct:      FALLTHROUGH_;
+    case Type:        FALLTHROUGH_;
+    case BuiltinType: FALLTHROUGH_;
+    case AliasType:   return true;
+    default:          return false;
+  }
 }
 
 END_NAMESPACE(n19);

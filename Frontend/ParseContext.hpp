@@ -15,19 +15,8 @@
 #include <cstdint>
 BEGIN_NAMESPACE(n19);
 
-namespace detail_ {
-  enum class IncludeState : uint8_t {
-    Pending  = 0, /// File needs to be parsed.
-    Finished = 1, /// File has already been parsed.
-  };
-
-  struct IncludedFile {
-    std::string name_;
-    IncludeState state_ = IncludeState::Pending;
-  };
-}
-
 struct ParseContext {
+  InputFile::ID   curr_file;
   Entity::ID      curr_namespace;
   OStream&        errstream;
   ErrorCollector& errors;
@@ -35,15 +24,16 @@ struct ParseContext {
   uint16_t        paren_level;
   EntityTable&    entities;
 
-  std::vector<detail_::IncludedFile> includes_;
   std::vector<AstNode::Ptr<>> toplevel_decls_;
 
   ParseContext(
+    InputFile::ID inf_id,
     OStream& errstream,
     ErrorCollector& errors,
     Lexer& lxr,
     EntityTable& entities
-  ) : curr_namespace(N19_ROOT_ENTITY_ID)
+  ) : curr_file(inf_id)
+    , curr_namespace(N19_ROOT_ENTITY_ID)
     , errstream(errstream)
     , errors(errors)
     , lxr(lxr)

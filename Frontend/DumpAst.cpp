@@ -16,17 +16,24 @@ auto AstNode::print_(
     stream << "  |";
   if(depth) 
     stream << "_ ";
+
+  auto file_name = Context::the().get_input_by_id(file_);
   
   stream              ////////////////////////////////////
     << Con::Bold      // Begin "title":
     << Con::MagentaFG // Bold, magenta.
     << node_name      // The node's name.
+    << Con::Reset     // Reset colour.
+    << " "            // Empty space.
+    << "FileID="      // Show the file ID.
+    << Con::YellowFG  // On a yellow foreground.
+    << file_          // ...
     << Con::Reset;    // Reset colour.
   stream              //
     << " <"           // Line, position info.
     << Con::YellowFG  // Line number: yellow.
-    << this->line_    // 
-    << Con::Reset     // 
+    << this->line_    //
+    << Con::Reset     //
     << ','            // Reset colour for ','.
     << Con::YellowFG  //
     << this->pos_     // Print position in yellow.
@@ -192,7 +199,7 @@ auto AstReturn::print(
   stream
     << Con::WhiteFG
     << "has_value = "
-    << (value_ ? "true" : "false")
+    << (value_ ? "true\n" : "false\n")
     << Con::Reset;
 
   if(value_ != nullptr)
@@ -618,22 +625,6 @@ auto AstQualifiedRef::print(
   const Maybe<std::string> &alias ) const -> void
 {
   print_(depth, stream, "TypeRef");
-  if(alias.has_value()) 
-    stream
-      << Con::GreenFG
-      << fmt("\"{}\" ", *alias)
-      << Con::Reset;
-
-  const auto formatted = descriptor_.format();
-  stream << formatted << '\n';
-}
-
-auto AstQualifiedRefThunk::print(
-  const uint32_t depth,
-  OStream& stream,
-  const Maybe<std::string> &alias ) const -> void
-{
-  print_(depth, stream, "TypeRefThunk");
   if(alias.has_value()) 
     stream
       << Con::GreenFG

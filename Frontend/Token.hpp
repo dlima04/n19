@@ -100,12 +100,12 @@ BEGIN_NAMESPACE(n19);
   X(Compose, "compose")          \
   X(Defer, "defer")              \
   X(DeferIf, "defer_if")         \
-  X(Block, "block")              \
+  X(Scope, "scope")              \
   X(Typeof, "typeof")            \
   X(Sizeof, "sizeof")            \
   X(As, "as")                    \
   X(Where, "where")              \
-  X(With, "with")                \
+  X(Using, "using")              \
   X(Otherwise, "otherwise")      \
   X(SkinnyArrow, "->")           \
   X(FatArrow, "=>")              \

@@ -139,10 +139,12 @@ int main(int argc, char** argv) {
 
   if(!parser.to_skip.empty()) {
     ctx.suites_to_skip_ = std::move(parser.to_skip);
-  } if(!parser.to_run.empty()) {
+  }
+  if(!parser.to_run.empty()) {
     ctx.suites_to_run_  = std::move(parser.to_run);
   }
 
+  detail_::allow_con_colours_ = parser.colours;
   test::g_registry.run_all();
 
   ins().clear();

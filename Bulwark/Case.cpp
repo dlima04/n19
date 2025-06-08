@@ -8,7 +8,7 @@
 BEGIN_NAMESPACE(n19::test);
 
 auto Result::to_colour() const -> Con {
-  switch(val_) {
+  switch(value) {
     case Failed:    return Con::RedFG;
     case Passed:    return Con::GreenFG;
     case Exception: return Con::YellowFG;
@@ -20,7 +20,7 @@ auto Result::to_colour() const -> Con {
 }
 
 auto Result::to_string() const -> std::string {
-  switch(val_) {
+  switch(value) {
     case Failed:    return "FAIL";
     case Passed:    return "PASS";
     case Exception: return "EXCT";

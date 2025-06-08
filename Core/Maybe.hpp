@@ -22,20 +22,15 @@ public:
   using ReferenceType = T&;
   using PointerType   = T*;
     
-  FORCEINLINE_ auto value() & -> ReferenceType {
+  FORCEINLINE_ auto value() -> ReferenceType {
     ASSERT(has_value_, "Maybe_ has no contained type!");
     return *std::launder<T>(reinterpret_cast<T*>(&value_));
   }
 
-  FORCEINLINE_ auto value() const& -> const T& {
+  FORCEINLINE_ auto value() const -> const T& {
     ASSERT(has_value_, "Maybe_ has no contained type!");
     return *std::launder<const T>(reinterpret_cast<const T*>(&value_));
   }
-
-  FORCEINLINE_ auto value() && -> ValueType {
-    ASSERT(has_value_, "Maybe_ has no contained type!");
-    return release_value(); /// rvalues should release the contained type.
-  }                         ///
 
   FORCEINLINE_ auto release_value() -> ValueType {
     ASSERT(has_value_, "Maybe_ has no contained type!");

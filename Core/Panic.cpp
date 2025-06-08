@@ -11,7 +11,10 @@
 #include <utility>
 #include <mutex>
 
-static std::mutex s_mtx_;
+namespace {
+  std::mutex s_mtx_;
+}
+
 BEGIN_NAMESPACE(n19);
 
 auto PanicHandler::add_callback(Callback&& callback) -> bool {

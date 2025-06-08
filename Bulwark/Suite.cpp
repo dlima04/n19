@@ -21,7 +21,7 @@ auto Suite::run_all(OStream& s) -> void {
     case_(ctx);               /// Report the test case result.
     report(case_, ctx.result, s);
 
-    switch(ctx.result.val_) {
+    switch(ctx.result.value) {
     case Result::Failed:    ++g_total_failed;  break;
     case Result::Passed:    ++g_total_passed;  break;
     case Result::Exception: ++g_total_exc;     break;
@@ -29,7 +29,7 @@ auto Suite::run_all(OStream& s) -> void {
     default: UNREACHABLE_ASSERTION;
     }
 
-    if(stopfail && ctx.result.val_ != Result::Passed)
+    if(stopfail && ctx.result.value != Result::Passed)
       break;
   }
 

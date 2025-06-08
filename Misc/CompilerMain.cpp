@@ -3,8 +3,6 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#define CURRENT_TEST "/Users/Diago/Desktop/compiler_tests/test2.txt"
-
 #include <Frontend/Lexer.hpp>
 #include <Frontend/FrontendContext.hpp>
 #include <Frontend/CompilationCycle.hpp>
@@ -14,13 +12,10 @@
 #include <cstdlib>
 #include <utility>
 #include <Core/Result.hpp>
-#include <Core/Try.hpp>
 #include <Core/StringUtil.hpp>
 #include <Core/Defer.hpp>
 #include <iostream>
-
-#include "Frontend/EntityTable.hpp"
-#include "System/BackTrace.hpp"
+#include <System/BackTrace.hpp>
 
 #define ARGNUM_HARD_LIMIT 40
 
@@ -62,6 +57,17 @@ struct MainArgParser : argp::Parser {
     _nstr("-dump-ir"),
     _nstr("Dump the program's lowered IR."));
 
+  bool& colours = arg<bool>(
+    _nstr("--colours"),
+    _nstr("-colours"),
+    _nstr("Allow output with colours. Enabled by default."),
+    true);
+
+  bool& dump_ctx = arg<bool>(
+    _nstr("--dump-frontend-context"),
+    _nstr("-dump-frontend-context"),
+    _nstr("Dump the frontend Context object."));
+
   bool& show_help = arg<bool>(
     _nstr("--help"),
     _nstr("-h"),
@@ -79,6 +85,8 @@ static auto verify_args(MainArgParser& parser) -> bool {
     parser.help(stream);
     return false;
   }
+
+  detail_::allow_con_colours_ = parser.colours;
 
   if (parser.version) {
     auto ver = Context::get_version_info();
@@ -131,9 +139,19 @@ static auto verify_args(MainArgParser& parser) -> bool {
   if (parser.dump_toks) context.flags_ |= Context::DumpToks;
   if (parser.dump_ir)   context.flags_ |= Context::DumpIR;
   if (parser.verbose)   context.flags_ |= Context::Verbose;
+  if (parser.dump_ctx)  context.flags_ |= Context::DumpCtx;
+  if (parser.colours)   context.flags_ |= Context::Colours;
 
-  Context::the().inputs_ = std::move(parser.inputs);
-  Context::the().outputs_ = std::move(parser.outputs);
+  context.inputs_.reserve(parser.inputs.size());
+  context.outputs_.reserve(parser.outputs.size());
+
+  for(auto& input_file : parser.inputs) {
+    context.inputs_.emplace_back(std::move(input_file));
+  }
+
+  for(auto& output_file : parser.outputs) {
+    context.outputs_.emplace_back(std::move(output_file));
+  }
 
   return true;
 }

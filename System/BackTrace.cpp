@@ -9,9 +9,8 @@
 #include <string_view>
 
 ///
-/// TODO: demangle symbol names,
-/// or just use <backtrace> if it's available
-/// for the target compiler.
+/// Demangle symbol names via cxxabi.h,
+/// if it is available (GNU)
 #ifdef __has_include
 #if __has_include(<cxxabi.h>)
 #include <cxxabi.h>
@@ -19,6 +18,9 @@
 #endif
 #endif
 
+///
+/// <backtrace> is not yet widely supported
+/// by most C++ compilers.
 #ifdef __has_include
 #if __has_include(<backtrace>)
 #include <backtrace>
@@ -31,9 +33,6 @@
 #include <DbgHelp.h>
 BEGIN_NAMESPACE(n19::sys);
 
-///
-/// Not on Windows yet, would be too much work
-/// for something this minor
 auto BackTrace::get() -> Result<void> {
   return Error{ErrC::NotImplimented, "No backtraces on Windows yet."};
 }
@@ -53,20 +52,22 @@ END_NAMESPACE(n19::sys);
 #include <dlfcn.h>
 BEGIN_NAMESPACE(n19::sys);
 
+#ifdef N19_HAS_CXXABI_H_
+
 ///
 /// Retrieve the maximum amount of stack frames.
 /// Store them inside of the backtrace object.
 auto BackTrace::get() -> Result<void> {
   void *trace[N19_BACKTRACE_MAX_FRAMES]{ nullptr };
-  Dl_info dlinfo{ nullptr };
+  ::Dl_info dlinfo{ nullptr };
 
   int status = 0;
   const char* symname = nullptr;
   char* demangled = nullptr;
 
-  int trace_size = backtrace(trace, N19_BACKTRACE_MAX_FRAMES);
+  int trace_size = ::backtrace(trace, N19_BACKTRACE_MAX_FRAMES);
   for(int i = 0; i < trace_size; i++) {
-    if(!dladdr(trace[i], &dlinfo))
+    if(!::dladdr(trace[i], &dlinfo))
       continue;
 
     symname = dlinfo.dli_sname;
@@ -81,7 +82,7 @@ auto BackTrace::get() -> Result<void> {
     frames_[i] = BacktraceFrame{ .name_ = demangled, .addr_ = trace[i] };
 
     if (demangled)
-      free(demangled);
+      ::free(demangled);
   }
 
   return Result<void>::create();
@@ -89,15 +90,15 @@ auto BackTrace::get() -> Result<void> {
 
 auto BackTrace::dump_to(OStream& stream) -> Result<void> {
   void *trace[N19_BACKTRACE_MAX_FRAMES]{ nullptr };
-  Dl_info dlinfo{ nullptr };
+  ::Dl_info dlinfo{ nullptr };
 
   int status = 0;
   const char* symname = nullptr;
   char* demangled = nullptr;
 
-  int trace_size = backtrace(trace, N19_BACKTRACE_MAX_FRAMES);
+  int trace_size = ::backtrace(trace, N19_BACKTRACE_MAX_FRAMES);
   for(int i = 0; i < trace_size; i++) {
-    if(!dladdr(trace[i], &dlinfo))
+    if(!::dladdr(trace[i], &dlinfo))
       continue;
 
     symname = dlinfo.dli_sname;
@@ -112,7 +113,7 @@ auto BackTrace::dump_to(OStream& stream) -> Result<void> {
     stream << "At " << trace[i] << " " << symname << "\n";
 
     if (demangled)
-      free(demangled);
+      ::free(demangled);
   }
 
   stream
@@ -131,7 +132,7 @@ auto BackTrace::dump_to(File& file) -> Result<void> {
   using namespace std::string_view_literals;
 
   void *trace[N19_BACKTRACE_MAX_FRAMES]{ nullptr };
-  Dl_info dlinfo{ nullptr };
+  ::Dl_info dlinfo{ nullptr };
 
   int status = 0;
   const char* symname = nullptr;
@@ -139,9 +140,9 @@ auto BackTrace::dump_to(File& file) -> Result<void> {
 
   auto stream = OStream::from(file.dev());
 
-  int trace_size = backtrace(trace, N19_BACKTRACE_MAX_FRAMES);
+  int trace_size = ::backtrace(trace, N19_BACKTRACE_MAX_FRAMES);
   for(int i = 0; i < trace_size; i++) {
-    if(!dladdr(trace[i], &dlinfo))
+    if(!::dladdr(trace[i], &dlinfo))
       continue;
 
     symname = dlinfo.dli_sname;
@@ -151,7 +152,7 @@ auto BackTrace::dump_to(File& file) -> Result<void> {
       symname = demangled;
     } else {
       if(demangled)
-        free(demangled);
+        ::free(demangled);
       continue;
     }
 
@@ -165,7 +166,7 @@ auto BackTrace::dump_to(File& file) -> Result<void> {
       << "\n";
 
     if (demangled)
-      free(demangled);
+      ::free(demangled);
   }
 
   /// Again, very stupid but necessary
@@ -177,6 +178,52 @@ auto BackTrace::dump_to(File& file) -> Result<void> {
     << " max.\n";
   return Result<void>::create();
 }
+
+#else //NO CXXABI HEADER:
+
+auto BackTrace::get() -> Result<void> {
+  constexpr int maxframes = N19_BACKTRACE_MAX_FRAMES;
+  void* f_[maxframes]{};
+
+  const int res = ::backtrace(f_, maxframes);
+  char** syms = ::backtrace_symbols(f_, res);
+  if(syms != nullptr) {
+    for(int i = 0; i < res; i++) {
+      frames_[i] = BacktraceFrame{ .name_ = syms[i], .addr_ = f_[i] };
+    }
+    ::free(syms);
+  }
+  return Result<void>::create();
+}
+
+auto BackTrace::dump_to(OStream& stream) -> Result<void> {
+  constexpr int maxframes = N19_BACKTRACE_MAX_FRAMES;
+  void* f_[maxframes]{};
+
+  const int res = ::backtrace(f_, maxframes);
+  char** syms = ::backtrace_symbols(f_, res);
+  if(syms != nullptr) {
+    for(int i = 0; i < res; i++)
+      stream << "At " << syms[i] << "\n";
+
+    stream << "\nTraced " << res << " frames,\n";
+    stream << "Out of " << maxframes << " max." << Endl;
+    ::free(syms);
+  }
+  return Result<void>::create();
+}
+
+auto BackTrace::dump_to(File& file) -> Result<void> {
+  constexpr int maxframes = N19_BACKTRACE_MAX_FRAMES;
+  void* f_[maxframes]{};
+  auto stream = OStream::from(file);
+
+  const int res = ::backtrace(f_, maxframes);
+  ::backtrace_symbols_fd(f_, res, file.value());
+  return Result<void>::create();
+}
+
+#endif //N19_HAS_CXXABI_H_
 
 END_NAMESPACE(n19::sys);
 #endif

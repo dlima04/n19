@@ -6,6 +6,11 @@
 #include <IO/Console.hpp>
 BEGIN_NAMESPACE(n19);
 
+namespace detail_ {
+  /// If false, all uses of ASCII colours are ignored.
+  constinit bool allow_con_colours_ = true;
+}
+
 #if defined(N19_WIN32)
 auto win32_are_vsequences_enabled() -> bool {
   DWORD mode_stdout = 0, mode_stderr = 0;

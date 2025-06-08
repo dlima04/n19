@@ -19,7 +19,7 @@
   KEYWORD_X("switch", Switch, Keyword | ControlFlow)            \
   KEYWORD_X("case", Case, Keyword | ControlFlow)                \
   KEYWORD_X("default", Default, Keyword | ControlFlow)          \
-  KEYWORD_X("block", Block, Keyword)                            \
+  KEYWORD_X("scope", Scope, Keyword)                            \
   KEYWORD_X("defer", Defer, Keyword)                            \
   KEYWORD_X("defer_if", DeferIf, Keyword)                       \
   KEYWORD_X("sizeof", Sizeof, Keyword | UnaryOp | ValidPrefix)  \
@@ -33,7 +33,7 @@
   KEYWORD_X("let", Let, Keyword)                                \
   KEYWORD_X("const", Const, Keyword)                            \
   KEYWORD_X("as", As, Keyword | BinaryOp)                       \
-  KEYWORD_X("with", With, Keyword | UnaryOp | ValidPostfix)     \
+  KEYWORD_X("using", Using, Keyword)                            \
   KEYWORD_X("true", BooleanLiteral, Literal)                    \
   KEYWORD_X("false", BooleanLiteral, Literal)                   \
   KEYWORD_X("null", NullLiteral, Literal)                       \

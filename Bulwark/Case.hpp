@@ -14,20 +14,20 @@
 BEGIN_NAMESPACE(n19::test);
 
 struct Result {
-  N19_MAKE_COMPARABLE_MEMBER(Result, val_);
+  N19_MAKE_COMPARABLE_MEMBER(Result, value);
   enum Value_ : uint8_t {
     Failed    = 0x00,    /// The test has failed.
     Passed    = 0x01,    /// The test passed.
     Exception = 0x02,    /// An uncaught exception interrupted the test case.
     Skipped   = 0x03     /// The test case was skipped.
   };
-                         ///
-  Value_ val_ = Passed;  /// Underlying value.
+                          ///
+  Value_ value = Passed;  /// Underlying value.
   auto to_string() const -> std::string;
   auto to_colour() const -> Con;
 
   constexpr Result() = default;
-  constexpr Result(const Value_ val) : val_(val) {}
+  constexpr Result(const Value_ val) : value(val) {}
 };
 
 struct ExecutionContext {

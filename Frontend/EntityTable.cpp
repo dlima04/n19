@@ -10,13 +10,14 @@ BEGIN_NAMESPACE(n19);
 EntityTable::EntityTable(const sys::String& name) {
   /// Initialize the root entity.
   root_         = std::make_shared<RootEntity>();
-  root_->file_  = name;
   root_->id_    = N19_ROOT_ENTITY_ID;
+  root_->file_  = N19_INVALID_INFILE_ID;
   root_->line_  = 0;
   root_->pos_   = 0;
   root_->type_  = EntityType::RootEntity;
   root_->lname_ = "::";
   root_->name_  = "::";
+  root_->tbl_name_ = name;
 
   /// Create all builtin types and initialize them.
   /// Ensure that their parent is the root entity.
@@ -33,6 +34,7 @@ EntityTable::EntityTable(const sys::String& name) {
     ptr->parent_ = root_->id_;
     ptr->id_     = id;
     ptr->type_   = EntityType::BuiltinType;
+    ptr->file_   = N19_INVALID_INFILE_ID;
 
     root_->chldrn_.emplace_back(id);
     map_[id] = std::move(ptr);

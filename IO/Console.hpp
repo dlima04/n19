@@ -9,6 +9,10 @@
 #include <IO/Fmt.hpp>
 BEGIN_NAMESPACE(n19);
 
+namespace detail_ {
+  constinit extern bool allow_con_colours_;
+}
+
 ///
 /// Windows specific initialization.
 #if defined(N19_WIN32)
@@ -57,19 +61,18 @@ inline auto ins() -> IStream& {
 }
 
 inline auto operator<<(OStream& stream, const Con code) -> OStream& {
-  stream << "\x1b[" << static_cast<uint16_t>(code) << 'm';
+  if(detail_::allow_con_colours_) {
+    stream << "\x1b[" << static_cast<uint16_t>(code) << 'm';
+  }
   return stream;
-}
-
-template<AreAll<Con> ...Args>
-inline auto set_console(Args... values) -> void {
-  ((outs() << values), ...);
 }
 
 template<AreAll<Con> ...Args>
 inline auto manip_string(Args... values) -> std::string {
   std::string buff;
-  ((buff += fmt( "\x1b[{}m", static_cast<uint16_t>(values) )), ...);
+  if(detail_::allow_con_colours_) {
+    ((buff += fmt( "\x1b[{}m", static_cast<uint16_t>(values) )), ...);
+  }
   return buff;
 }
 

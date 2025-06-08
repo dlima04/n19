@@ -85,9 +85,7 @@ auto Parser::print_chunk_error_(
       continue;                           ///
     }
 
-    stream << Con::Bold << Con::RedFG;    /// Error chunk, use red+bold
     stream << args_[i] << _nchr(' ');     /// display the problem
-    stream << Con::Reset;                 ///
   }
 
   stream << '\n';

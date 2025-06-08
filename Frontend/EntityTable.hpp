@@ -25,7 +25,7 @@ public:
     Entity::ID parent_id,
     size_t pos,
     uint32_t line,
-    const sys::String& file,
+    InputFile::ID file,
     const std::string& lname,
     Args&&... args
   ) -> Entity::Ptr<T>;
@@ -35,7 +35,7 @@ public:
     const Entity::Ptr<>& parent,
     size_t pos,
     uint32_t line,
-    const sys::String& file,
+    InputFile::ID file,
     const std::string& lname,
     Args&&... args
   ) -> Entity::Ptr<T>;
@@ -46,7 +46,7 @@ public:
     Entity::ID parent_id,
     size_t new_pos,
     uint32_t new_line,
-    const sys::String& new_file,
+    InputFile::ID new_file,
     Args&&... args
   ) -> Entity::Ptr<T>;
 
@@ -56,7 +56,7 @@ public:
     const Entity::Ptr<>& parent_ptr,
     size_t new_pos,
     uint32_t new_line,
-    const sys::String& new_file,
+    InputFile::ID new_file,
     Args&&... args
   ) -> Entity::Ptr<T>;
 
@@ -66,7 +66,7 @@ public:
     Entity::ID parent_id,
     size_t new_pos,
     uint32_t new_line,
-    const sys::String& new_file,
+    InputFile::ID new_file,
     Args&&... args
   ) -> Result<Entity::Ptr<T>>;
 
@@ -76,7 +76,7 @@ public:
     const Entity::Ptr<>& parent_ptr,
     size_t new_pos,
     uint32_t new_line,
-    const sys::String& new_file,
+    InputFile::ID new_file,
     Args&&... args
   ) -> Result<Entity::Ptr<T>>;
 
@@ -105,7 +105,7 @@ auto EntityTable::insert(
   const Entity::Ptr<>& parent,
   const size_t pos,
   const uint32_t line,
-  const sys::String& file,
+  const InputFile::ID file,
   const std::string& lname,
   Args&&... args ) -> Entity::Ptr<T>
 {
@@ -141,7 +141,7 @@ auto EntityTable::insert(
   const Entity::ID parent_id,
   const size_t pos,
   const uint32_t line,
-  const sys::String& file,
+  const InputFile::ID file,
   const std::string& lname,
   Args&&... args ) -> Entity::Ptr<T>
 {
@@ -180,7 +180,7 @@ auto EntityTable::swap_entity(
   const Entity::Ptr<>& parent_ptr,
   const size_t new_pos,
   const uint32_t new_line,
-  const sys::String& new_file,
+  const InputFile::ID new_file,
   Args&&... args ) -> Entity::Ptr<T>
 {
   ASSERT(exists(parent_ptr->id_));
@@ -217,7 +217,7 @@ auto EntityTable::swap_entity(
   const Entity::ID parent_id,
   const size_t new_pos,
   const uint32_t new_line,
-  const sys::String& new_file,
+  const InputFile::ID new_file,
   Args &&... args ) -> Entity::Ptr<T>
 {
   ASSERT(new_line != 0);
@@ -254,7 +254,7 @@ auto EntityTable::swap_placeholder(
   const Entity::Ptr<>& parent_ptr,
   const size_t new_pos,
   const uint32_t new_line,
-  const sys::String& new_file,
+  const InputFile::ID new_file,
   Args&&... args ) -> Result<Entity::Ptr<T>>
 {
   EntityType type = EntityType::None;
@@ -268,7 +268,9 @@ auto EntityTable::swap_placeholder(
   N19_ENTITY_TYPE_LIST
   #undef X
 
-  if(old->to_be_ == EntityType::None) {
+  if(old->to_be_ == EntityType::None
+    || ( old->to_be_.is_udt() && type.is_udt() ))
+  {
     old->to_be_ = type;
   }
 
@@ -300,7 +302,7 @@ auto EntityTable::swap_placeholder(
   const Entity::ID parent_id,
   const size_t new_pos,
   const uint32_t new_line,
-  const sys::String& new_file,
+  const InputFile::ID new_file,
   Args&&... args ) -> Result<Entity::Ptr<T>>
 {
   EntityType type = EntityType::None;
@@ -314,7 +316,9 @@ auto EntityTable::swap_placeholder(
   N19_ENTITY_TYPE_LIST
   #undef X
 
-  if(old->to_be_ == EntityType::None) {
+  if(old->to_be_ == EntityType::None
+    || ( old->to_be_.is_udt() && type.is_udt() ))
+  {
     old->to_be_ = type;
   }
 

@@ -12,6 +12,7 @@
 #include <Core/Concepts.hpp>
 #include <Frontend/Token.hpp>
 #include <Frontend/Entity.hpp>
+#include <Frontend/FrontendContext.hpp>
 #include <System/String.hpp>
 #include <vector>
 #include <memory>
@@ -23,7 +24,6 @@
   ASTNODE_X(EntityRef)         \
   ASTNODE_X(EntityRefThunk)    \
   ASTNODE_X(QualifiedRef)      \
-  ASTNODE_X(QualifiedRefThunk) \
   ASTNODE_X(ScalarLiteral)     \
   ASTNODE_X(AggregateLiteral)  \
   ASTNODE_X(BinExpr)           \
@@ -84,8 +84,8 @@ public:
   static auto create(
     size_t pos,
     uint32_t line,
-    AstNode* parent = nullptr,
-    const sys::String& file = _nstr("")
+    AstNode* parent,
+    InputFile::ID file
   ) -> Ptr<T>;
 
   // Public fields //
@@ -93,7 +93,7 @@ public:
   AstNode* parent_ = nullptr;
   size_t pos_      = 0;
   uint32_t line_   = 1;
-  sys::String file_;
+  InputFile::ID file_ = N19_INVALID_INFILE_ID;
   Type type_;
   //////////////////////////////////////////
 
@@ -191,19 +191,6 @@ public:
 
   ~AstEntityRefThunk() override = default;
   AstEntityRefThunk() = default;
-};
-
-class AstQualifiedRefThunk final : public AstNode {
-public:
-  EntityQualifierThunk descriptor_;
-
-  auto print(uint32_t depth,
-    OStream& stream,
-    const Maybe<std::string> &alias
-  ) const -> void override;
-
-  ~AstQualifiedRefThunk() override = default;
-  AstQualifiedRefThunk() = default;
 };
 
 class AstQualifiedRef final : public AstNode {
@@ -519,20 +506,21 @@ public:
   AstSubscript() = default;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
 auto AstNode::create(
   const size_t pos,
   const uint32_t line,
   AstNode* parent,
-  const sys::String& file ) -> Ptr<T>
+  const InputFile::ID file ) -> Ptr<T>
 {
   auto ptr     = std::make_unique<T>();
   ptr->parent_ = parent;
   ptr->pos_    = pos;
   ptr->line_   = line;
   ptr->file_   = file;
+  ptr->parent_ = parent;
 
   #define ASTNODE_X(NAME)              \
   if constexpr(IsSame<T, Ast##NAME>) { \
@@ -542,7 +530,6 @@ auto AstNode::create(
   N19_ASTNODE_TYPE_LIST
   #undef ASTNODE_X
 
-  if(parent != nullptr) ptr->parent_ = parent;
   return ptr;
 }
 
