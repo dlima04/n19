@@ -104,9 +104,8 @@ BEGIN_NAMESPACE(n19);
   X(Typeof, "typeof")            \
   X(Sizeof, "sizeof")            \
   X(As, "as")                    \
-  X(Where, "where")              \
+  X(CompEval, "compeval")        \
   X(Using, "using")              \
-  X(Otherwise, "otherwise")      \
   X(SkinnyArrow, "->")           \
   X(FatArrow, "=>")              \
 

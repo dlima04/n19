@@ -69,7 +69,7 @@ auto AstConstBranch::print(
   const Maybe<std::string> &alias ) const -> void
 {
   print_(depth, stream, "ConstBranch");
-  if(alias.has_value()) 
+  if(alias.has_value())
     stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
@@ -77,13 +77,13 @@ auto AstConstBranch::print(
 
   stream
     << Con::WhiteFG
-    << "has_otherwise = "
-    << (otherwise_ ? "true" : "false")
+    << "has_else = "
+    << (else_ ? "true" : "false")
     << Con::Reset;
 
-  where_->print(depth + 1, stream, "ConstBranch.Where");
-  if(otherwise_ != nullptr)
-    otherwise_->print(depth + 1, stream, "ConstBranch.Otherwise");
+  if_->print(depth + 1, stream, "ConstBranch.If");
+  if(else_ != nullptr)
+    else_->print(depth + 1, stream, "ConstBranch.Else");
 }
 
 auto AstIf::print(
@@ -121,31 +121,31 @@ auto AstElse::print(
     child->print(depth + 1, stream, Nothing);
 }
 
-auto AstWhere::print(
+auto AstConstIf::print(
   const uint32_t depth,
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  print_(depth, stream, "Where");
-  if(alias.has_value()) 
+  print_(depth, stream, "ConstIf");
+  if(alias.has_value())
     stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)
       << Con::Reset;
 
   stream << '\n';
-  condition_->print(depth + 1, stream, "Where.Condition");
+  condition_->print(depth + 1, stream, "ConstIf.Condition");
   for(const auto& child : body_)
     child->print(depth + 1, stream, Nothing);
 }
 
-auto AstOtherwise::print(
+auto AstConstElse::print(
   const uint32_t depth,
   OStream& stream,
   const Maybe<std::string> &alias ) const -> void
 {
-  print_(depth, stream, "Otherwise");
-  if(alias.has_value()) 
+  print_(depth, stream, "ConstElse");
+  if(alias.has_value())
     stream
       << Con::GreenFG
       << fmt("\"{}\" ", *alias)

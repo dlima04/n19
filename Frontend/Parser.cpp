@@ -16,7 +16,7 @@ auto is_node_toplevel_valid_(const AstNode::Ptr<> &ptr) -> bool {
 #if 1
   switch (ptr->type_) {
   case AstNode::Type::Namespace:         FALLTHROUGH_;
-  case AstNode::Type::Where:             FALLTHROUGH_;
+  case AstNode::Type::ConstBranch:       FALLTHROUGH_;
   case AstNode::Type::ProcDecl:          FALLTHROUGH_;
   case AstNode::Type::Vardecl:           return true;
   default:                               return false;

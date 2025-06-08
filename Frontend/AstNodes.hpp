@@ -37,8 +37,8 @@
   ASTNODE_X(For)               \
   ASTNODE_X(While)             \
   ASTNODE_X(ConstBranch)       \
-  ASTNODE_X(Where)             \
-  ASTNODE_X(Otherwise)         \
+  ASTNODE_X(ConstIf)           \
+  ASTNODE_X(ConstElse)         \
   ASTNODE_X(ScopeBlock)        \
   ASTNODE_X(Namespace)         \
   ASTNODE_X(Call)              \
@@ -247,7 +247,7 @@ public:
   AstNamespace() = default;
 };
 
-class AstWhere final : public AstNode {
+class AstConstIf final : public AstNode {
 public:
   AstNode::Children<> body_;
   AstNode::Ptr<> condition_ = nullptr;
@@ -257,11 +257,11 @@ public:
     const Maybe<std::string> &alias
   ) const -> void override;
 
-  ~AstWhere() override = default;
-  AstWhere() = default;
+  ~AstConstIf() override = default;
+  AstConstIf() = default;
 };
 
-class AstOtherwise final : public AstNode {
+class AstConstElse final : public AstNode {
 public:
   AstNode::Children<> body_;
 
@@ -270,8 +270,8 @@ public:
     const Maybe<std::string> &alias
   ) const -> void override;
 
-  ~AstOtherwise() override = default;
-  AstOtherwise() = default;
+  ~AstConstElse() override = default;
+  AstConstElse() = default;
 };
 
 class AstBranch final : public AstNode {
@@ -290,8 +290,8 @@ public:
 
 class AstConstBranch final : public AstNode {
 public:
-  AstNode::Ptr<AstWhere> where_ = nullptr;
-  AstNode::Ptr<AstOtherwise> otherwise_ = nullptr; // Can be null!
+  AstNode::Ptr<AstConstIf> if_ = nullptr;
+  AstNode::Ptr<AstConstElse> else_ = nullptr; // Can be null!
 
   auto print(uint32_t depth,
     OStream& stream,

@@ -27,8 +27,7 @@
   KEYWORD_X("fallthrough", Fallthrough, Keyword | ControlFlow)  \
   KEYWORD_X("namespace", Namespace, Keyword)                    \
   KEYWORD_X("compose", Compose, Keyword)                        \
-  KEYWORD_X("where", Where, Keyword)                            \
-  KEYWORD_X("otherwise", Otherwise, Keyword)                    \
+  KEYWORD_X("compeval", CompEval, Keyword)                      \
   KEYWORD_X("proc", Proc, Keyword)                              \
   KEYWORD_X("let", Let, Keyword)                                \
   KEYWORD_X("const", Const, Keyword)                            \
