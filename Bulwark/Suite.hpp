@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_TEST_SUITE_HPP
-#define N19_TEST_SUITE_HPP
+#ifndef N19_BULWARK_SUITE_HPP
+#define N19_BULWARK_SUITE_HPP
 #include <System/String.hpp>
 #include <Bulwark/Case.hpp>
 #include <vector>
@@ -21,4 +21,4 @@ public:
 };
 
 END_NAMESPACE(n19::test);
-#endif //N19_TEST_SUITE_HPP
+#endif //N19_BULWARK_SUITE_HPP

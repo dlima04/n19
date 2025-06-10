@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef STREAM_HPP
-#define STREAM_HPP
+#ifndef N19_IO_STREAM_HPP
+#define N19_IO_STREAM_HPP
 #include <System/String.hpp>
 #include <System/IODevice.hpp>
 #include <Core/Bytes.hpp>
@@ -67,6 +67,10 @@ public:
   FORCEINLINE_ auto write_boolean(const bool value) -> OStream& {
     if(value) return *this << "true";
     return *this << "false";
+  }
+
+  FORCEINLINE_ auto dev() const -> sys::IODevice {
+    return this->fd_;
   }
 
   template<Character T>
@@ -392,4 +396,4 @@ private:
 };
 
 END_NAMESPACE(n19);
-#endif //STREAM_HPP
+#endif //N19_IO_STREAM_HPP

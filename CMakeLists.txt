@@ -24,6 +24,7 @@ set(N19_ENUMERATE_GLOBAL_SOURCES
   System/Time.cpp
   System/BackTrace.cpp
   System/File.cpp
+  System/Process.cpp
   Core/Panic.cpp
   Core/ArgParse.cpp
   Core/StringUtil.cpp
@@ -40,6 +41,7 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   System/BackTrace.hpp
   System/File.hpp
   System/Win32.hpp
+  System/Process.hpp
   Frontend/Token.hpp
   Frontend/ErrorCollector.hpp
   Frontend/AstNodes.hpp

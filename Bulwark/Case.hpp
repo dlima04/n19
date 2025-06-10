@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_TEST_CASE_HPP
-#define N19_TEST_CASE_HPP
+#ifndef N19_BULWARK_CASE_HPP
+#define N19_BULWARK_CASE_HPP
 #include <Core/ClassTraits.hpp>
 #include <IO/Console.hpp>
 #include <string_view>
@@ -69,4 +69,4 @@ inline auto operator<<(OStream& stream, const Case& c) -> OStream& {
 }
 
 END_NAMESPACE(n19::test);
-#endif //N19_TEST_CASE_HPP
+#endif //N19_BULWARK_CASE_HPP

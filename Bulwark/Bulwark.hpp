@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_TEST_ALL_HPP
-#define N19_TEST_ALL_HPP
+#ifndef N19_BULWARK_ALL_HPP
+#define N19_BULWARK_ALL_HPP
 #include <Misc/Macros.hpp>
 #include <Core/Panic.hpp>
 #include <Bulwark/Registry.hpp>
@@ -96,4 +96,4 @@
     ::n19::test::diagnostic(MESSAGE, ::n19::test::Diagnostic::Debug, TESTCASE_CTX_.out);    \
   }                                                                                         \
 
-#endif //N19_TEST_ALL_HPP
+#endif //N19_BULWARK_ALL_HPP

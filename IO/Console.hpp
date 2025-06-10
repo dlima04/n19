@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef CORE_CONIO_HPP
-#define CORE_CONIO_HPP
+#ifndef N19_IO_CONSOLE_HPP
+#define N19_IO_CONSOLE_HPP
 #include <IO/Stream.hpp>
 #include <IO/Fmt.hpp>
 BEGIN_NAMESPACE(n19);
@@ -77,4 +77,4 @@ inline auto manip_string(Args... values) -> std::string {
 }
 
 END_NAMESPACE(n19);
-#endif //CONIO_HPP
+#endif //N19_IO_CONSOLE_HPP

@@ -55,7 +55,7 @@ public:
   static auto from(ValueType vt, uint8_t perms = Read | Write) -> IODevice;
   static auto create_pipe() -> Result<std::array<IODevice, 2>>;
 
-  IODevice() = default;
+  IODevice();
  ~IODevice() override = default;
 
   uint8_t perms_ = NoAccess;
@@ -92,6 +92,11 @@ FORCEINLINE_ auto IODevice::invalidate() -> void {
   perms_ = IODevice::NoAccess;
 }
 
+inline IODevice::IODevice() {
+  value_ = -1;
+  perms_ = IODevice::NoAccess;
+}
+
 FORCEINLINE_ auto IODevice::close() -> void {
   ::close(value_);
   invalidate();
@@ -111,6 +116,11 @@ FORCEINLINE_ auto IODevice::invalidate() -> void {
   perms_ = IODevice::NoAccess;
 }
 
+inline IODevice::IODevice() {
+  value_ = (::HANDLE)nullptr;
+  perms_ = IODevice::NoAccess;
+}
+
 FORCEINLINE_ auto IODevice::close() -> void {
   ::CancelIoEx(value_, nullptr);
   ::CloseHandle(value_);
@@ -122,7 +132,7 @@ FORCEINLINE_ auto IODevice::is_invalid() -> bool {
 }
 
 FORCEINLINE_ auto IODevice::flush_handle() const -> void {
-  ::FlushFileBuffers(value_); // Flush Win32 file buff.
+  ::FlushFileBuffers(value_);
 }
 
 #endif //IF defined(N19_POSIX)

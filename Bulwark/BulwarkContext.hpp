@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_TEST_CONTEXT_HPP
-#define N19_TEST_CONTEXT_HPP
+#ifndef N19_BULWARK_CONTEXT_HPP
+#define N19_BULWARK_CONTEXT_HPP
 #include <System/String.hpp>
 #include <Core/Platform.hpp>
 #include <Core/ArgParse.hpp>
@@ -51,4 +51,4 @@ private:
 };
 
 END_NAMESPACE(n19::test);
-#endif //N19_TEST_CONTEXT_HPP
+#endif //N19_BULWARK_CONTEXT_HPP

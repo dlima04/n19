@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_TEST_REPORTING_HPP
-#define N19_TEST_REPORTING_HPP
+#ifndef N19_BULWARK_REPORTING_HPP
+#define N19_BULWARK_REPORTING_HPP
 #include <Bulwark/Case.hpp>
 #include <Bulwark/Suite.hpp>
 #include <IO/Console.hpp>
@@ -71,4 +71,4 @@ constinit extern size_t g_total_skipped;
 constinit extern size_t g_total_suites;
 
 END_NAMESPACE(n19::test);
-#endif //N19_TEST_REPORTING_HPP
+#endif //N19_BULWARK_REPORTING_HPP
