@@ -288,7 +288,7 @@ auto AstProcDecl::print(
       << Con::Reset;
 
   stream
-    << "ID="
+    << "EntityID="
     << Con::BlueFG
     << id_
     << Con::Reset
@@ -648,7 +648,7 @@ auto AstNamespace::print(
       << Con::Reset;
 
   stream
-    << "ID="
+    << "EntityID="
     << Con::BlueFG
     << id_
     << Con::Reset;

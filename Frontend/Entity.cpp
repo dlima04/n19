@@ -199,7 +199,7 @@ auto Entity::print_(
 
   /// Entity ID and other info
   stream
-    << "ID="
+    << "EntityID="
     << Con::GreenFG
     << this->id_
     << Con::Reset
