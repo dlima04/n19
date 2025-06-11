@@ -58,10 +58,10 @@ int main() {
   outs() << Con::Reset;
 
   BulwarkArgParser parser;
-  LPWSTR cmdline = ::GetCommandLineW();
+  ::LPWSTR cmdline = ::GetCommandLineW();
 
   int arg_count = 0;
-  LPWSTR* args = ::CommandLineToArgvW(cmdline, &arg_count);
+  ::LPWSTR* args = ::CommandLineToArgvW(cmdline, &arg_count);
   if (args == nullptr) {
     outs()
       << "Could not retrieve win32 argv. Error code="
