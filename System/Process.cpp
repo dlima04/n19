@@ -4,7 +4,10 @@
 */
 
 #include <System/Process.hpp>
+#include <IO/Fmt.hpp>
 #include <Core/Panic.hpp>
+#include <Core/Defer.hpp>
+#include <algorithm>
 
 #ifdef N19_POSIX
 #include <sys/wait.h>
@@ -17,8 +20,176 @@
 BEGIN_NAMESPACE(n19::sys);
 #ifdef N19_WIN32
 
+auto NaiveProcess_::launch(
+  std::vector<String>& args,
+  String& pathname,
+  String& working_dir,
+  Maybe<IODevice> output_dev,
+  Maybe<IODevice> error_dev,
+  Maybe<IODevice> input_dev ) -> Result<NaiveProcess_>
+{
+  if(pathname.empty()) {
+    return Error(ErrC::InvalidArg, "Empty pathname");
+  }
+
+  /// Disallow empty arguments.
+  for(size_t i = 0; i < args.size(); ++i) {
+    if (args[i].empty()) {
+      return Error(
+        ErrC::InvalidArg, fmt("Empty argument at position {}.", i));
+    }
+  }
+
+  auto to_backslashes = [](const Char ch) -> Char {
+    return ch == L'/' ? L'\\' : ch;
+  };
+
+  if(!working_dir.empty())
+    std::ranges::transform(working_dir, working_dir.begin(), to_backslashes);
+
+  std::ranges::transform(pathname, pathname.begin(), to_backslashes);
+
+  String full_buff = pathname;
+  for(const auto& arg : args) {
+    full_buff += _nstr(" ");
+    full_buff += arg;
+  }
+
+  ::PROCESS_INFORMATION pi = { 0 };
+  ::STARTUPINFOW si = { 0 };
+  si.cb = sizeof(::STARTUPINFOW);
+
+  ::SECURITY_ATTRIBUTES nul_sa = { 0 };
+  nul_sa.nLength = sizeof(::SECURITY_ATTRIBUTES);
+  nul_sa.lpSecurityDescriptor = nullptr;
+  nul_sa.bInheritHandle = TRUE;
+
+  // Open handle to NUL device.
+  /// NOTE: this is basically the equivalent of /dev/null on Windows.
+  ::HANDLE h_nul = ::CreateFileA("NUL",
+    GENERIC_READ | GENERIC_WRITE,
+    FILE_SHARE_READ | FILE_SHARE_WRITE,
+    &nul_sa,
+    OPEN_EXISTING,
+    FILE_ATTRIBUTE_NORMAL,
+    nullptr);
+
+  DEFER({
+    if (h_nul != INVALID_HANDLE_VALUE && h_nul != nullptr) {
+      ::CloseHandle(h_nul);
+    }
+  });
+
+  /// Redirect -- stdout
+  if(output_dev.has_value() && !output_dev->is_invalid()) {
+    si.dwFlags |= STARTF_USESTDHANDLES;
+    si.hStdOutput = output_dev->value();
+  } else if (h_nul != INVALID_HANDLE_VALUE) {
+    si.dwFlags |= STARTF_USESTDHANDLES;
+    si.hStdOutput = h_nul;
+  }
+
+  /// Redirect -- stderr
+  if(error_dev.has_value() && !error_dev->is_invalid()) {
+    si.dwFlags |= STARTF_USESTDHANDLES;
+    si.hStdError = error_dev->value();
+  } else if (h_nul != INVALID_HANDLE_VALUE) {
+    si.dwFlags |= STARTF_USESTDHANDLES;
+    si.hStdError = h_nul;
+  }
+
+  /// Redirect -- stdin
+  if(input_dev.has_value() && !input_dev->is_invalid()) {
+    si.dwFlags |= STARTF_USESTDHANDLES;
+    si.hStdInput = input_dev->value();
+  } else if (h_nul != INVALID_HANDLE_VALUE) {
+    si.dwFlags |= STARTF_USESTDHANDLES;
+    si.hStdInput = h_nul;
+  }
+
+  full_buff += static_cast<Char>(0);
+
+  if(!::CreateProcessW(
+    nullptr,
+    full_buff.data(),
+    nullptr,
+    nullptr,
+    TRUE,
+    0,
+    nullptr,
+    working_dir.empty() ? nullptr : working_dir.c_str(),
+    &si,
+    &pi
+  )) {
+    return Error::from_native();
+  }
+
+  ::CloseHandle(pi.hThread);
+  return NaiveProcess_(pi.hProcess);
+}
+
 NaiveProcess_::NaiveProcess_(ValueType vt) {
   this->value_ = vt;
+}
+
+auto NaiveProcess_::close() -> void {
+  if (is_invalid()) return;
+  if (get_exit_code().type == ExitCode::Type::NotExited) {
+    ::TerminateProcess(value_, 0);
+  }
+
+  ::CloseHandle(value_);
+  invalidate();
+}
+
+NaiveProcess_::NaiveProcess_(NaiveProcess_&& other) noexcept {
+  this->value_ = other.value_;
+  other.invalidate();
+}
+
+NaiveProcess_& NaiveProcess_::operator=(NaiveProcess_&& other) noexcept {
+  this->value_ = other.value_;
+  other.invalidate();
+  return *this;
+}
+
+auto NaiveProcess_::get_id() -> size_t {
+  return (size_t)(::GetProcessId(value_));
+}
+
+auto NaiveProcess_::exited() -> bool {
+  return get_exit_code().type == ExitCode::Type::NotExited;
+}
+
+auto NaiveProcess_::get_exit_code() -> ExitCode {
+  ::DWORD codeval = 0;
+  if(!::GetExitCodeProcess(value_, &codeval)) {
+    return {0, ExitCode::Type::Unknown};
+  }
+  if(codeval == STILL_ACTIVE) {
+    return {codeval, ExitCode::Type::NotExited};
+  }
+
+  return {codeval, ExitCode::Type::Normal};
+}
+
+auto NaiveProcess_::wait() -> ExitCode {
+  if(::WaitForSingleObject(value_, INFINITE) == WAIT_FAILED) {
+    return {0, ExitCode::Type::Unknown};
+  }
+
+  const auto the_code = get_exit_code();
+  ::CloseHandle(value_);
+  invalidate();
+  return the_code;
+}
+
+auto NaiveProcess_::invalidate() -> void {
+  value_ = (::HANDLE)nullptr;
+}
+
+auto NaiveProcess_::is_invalid() -> bool {
+  return value_ == (::HANDLE)nullptr;
 }
 
 #else // POSIX
@@ -26,13 +197,13 @@ NaiveProcess_::NaiveProcess_(ValueType vt) {
 auto NaiveProcess_::launch(
   std::vector<String>& args,
   String& pathname,
-  const String& working_dir,
+  String& working_dir,
   Maybe<IODevice> output_dev,
   Maybe<IODevice> error_dev,
   Maybe<IODevice> input_dev ) -> Result<NaiveProcess_>
 {
   if(pathname.empty()) {
-    return Error(ErrC::InvalidArg, "Invalid pathname");
+    return Error(ErrC::InvalidArg, "Empty pathname");
   }
 
   const pid_t pid = ::fork();
@@ -117,6 +288,7 @@ NaiveProcess_::NaiveProcess_(ValueType vt)
 auto NaiveProcess_::close() -> void {
   if(is_invalid()) return;
   ::kill(value_, SIGTERM);
+  invalidate();
 }
 
 auto NaiveProcess_::invalidate() -> void {

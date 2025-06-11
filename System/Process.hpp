@@ -92,7 +92,7 @@ private:
   static auto launch(
     std::vector<String>& args,
     String& pathname,
-    const String& working_dir,
+    String& working_dir,
     Maybe<IODevice> output_dev,
     Maybe<IODevice> error_dev,
     Maybe<IODevice> input_dev ) -> Result<NaiveProcess_>;

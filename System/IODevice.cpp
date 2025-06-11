@@ -140,5 +140,12 @@ auto IODevice::from_stdin() -> IODevice {
   return device;
 }
 
+auto IODevice::from(ValueType vt, uint8_t perms) -> IODevice {
+  IODevice device;
+  device.value_ = vt;
+  device.perms_ = perms;
+  return device;
+}
+
 #endif
 END_NAMESPACE(n19::sys);

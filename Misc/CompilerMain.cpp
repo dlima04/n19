@@ -171,10 +171,10 @@ int main() {
   });
 
   MainArgParser parser;
-  LPWSTR cmdline = ::GetCommandLineW();
+  ::LPWSTR cmdline = ::GetCommandLineW();
 
   int arg_count = 0;
-  LPWSTR* args = ::CommandLineToArgvW(cmdline, &arg_count);
+  ::LPWSTR* args = ::CommandLineToArgvW(cmdline, &arg_count);
   if (args == nullptr) {
     outs()
       << "Could not retrieve win32 argv. Error code="
@@ -192,7 +192,7 @@ int main() {
 
   /// Initialize context
   auto stream = OStream::from_stdout();
-  if (arg_count > 1 && args && !parser.take_argv(arg_count, args).parse(stream)) {
+  if (arg_count > 1 && !parser.take_argv(arg_count, args).parse(stream)) {
     ::LocalFree(args);
     return EXIT_FAILURE;
   }
@@ -207,7 +207,6 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  outs() << "Build complete.\n";
   return EXIT_SUCCESS;
 }
 

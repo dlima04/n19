@@ -79,7 +79,7 @@ int main() {
   
   /// Initialize context
   auto stream = OStream::from_stdout();
-  if (arg_count > 1 && args && !parser.take_argv(arg_count, args).parse(stream)) {
+  if (arg_count > 1 && !parser.take_argv(arg_count, args).parse(stream)) {
     ::LocalFree(args);
     return EXIT_FAILURE;
   }
