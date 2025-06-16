@@ -3,8 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_KEYWORDS_HPP
-#define N19_KEYWORDS_HPP
+#pragma once
 
 #define N19_HIR_KEYWORDS                                        \
   KEYWORD_X("return", Return, Keyword)                          \
@@ -39,4 +38,3 @@
 
 #define N19_LIR_KEYWORDS                                        \
 
-#endif //N19_KEYWORDS_HPP

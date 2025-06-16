@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_ARGPARSE_HPP
-#define N19_ARGPARSE_HPP
+#pragma once
+
 #include <System/String.hpp>
 #include <Core/Concepts.hpp>
 #include <Core/Maybe.hpp>
@@ -182,4 +182,3 @@ protected:
 };
 
 END_NAMESPACE(n19::argp);
-#endif //N19_ARGPARSE_HPP

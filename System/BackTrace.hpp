@@ -3,9 +3,10 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_BACKTRACE_HPP
-#define N19_BACKTRACE_HPP
+#pragma once
+
 #define N19_BACKTRACE_MAX_FRAMES 42
+
 #include <Core/Platform.hpp>
 #include <Core/Result.hpp>
 #include <System/File.hpp>
@@ -30,4 +31,3 @@ struct BackTrace {
 };
 
 END_NAMESPACE(n19::sys);
-#endif //N19_BACKTRACE_HPP

@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef FRONTEND_TOKEN_HPP
-#define FRONTEND_TOKEN_HPP
+#pragma once
+
 #include <Core/ClassTraits.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Platform.hpp>
@@ -217,4 +217,3 @@ FORCEINLINE_ auto TokenCategory::isa(const TokenCategory val) const -> bool {
 }
 
 END_NAMESPACE(n19);
-#endif //FRONTEND_TOKEN_HPP

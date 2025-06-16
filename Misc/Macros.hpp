@@ -3,8 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef CORE_MACRO_UTIL_HPP
-#define CORE_MACRO_UTIL_HPP
+#pragma once
 
 #define N19_MACRO_CONCAT_IMPL_(X, Y) X##Y
 #define N19_MACRO_CONCAT(X, Y) N19_MACRO_CONCAT_IMPL_(X, Y)
@@ -19,5 +18,3 @@
 #define EXPAND(...) __VA_ARGS__
 #define STRINGIFY_IMPL(EXPR) #EXPR
 #define STRINGIFY(EXPR) STRINGIFY_IMPL(EXPR)
-
-#endif //CORE_MACRO_UTIL_HPP

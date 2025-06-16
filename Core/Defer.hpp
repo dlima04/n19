@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef DEFER_HPP
-#define DEFER_HPP
+#pragma once
+
 #include <Core/Concepts.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
@@ -52,4 +52,3 @@ FORCEINLINE_ auto DeferBase_<T>::operator()(Args&&... args) -> decltype(auto) {
 }
 
 END_NAMESPACE(n19);
-#endif //DEFER_HPP

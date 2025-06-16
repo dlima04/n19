@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef RINGBUFFER_HPP
-#define RINGBUFFER_HPP
+#pragma once
+
 #include <Core/RingBase.hpp>
 #include <Core/Result.hpp>
 #include <Core/Maybe.hpp>
@@ -109,4 +109,3 @@ FORCEINLINE_ auto RingBuffer<T, size_>::current() const -> ValueType {
 }
 
 END_NAMESPACE(n19);
-#endif //RINGBUFFER_HPP

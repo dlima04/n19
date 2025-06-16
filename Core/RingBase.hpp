@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef RINGBASE_HPP
-#define RINGBASE_HPP
+#pragma once
+
 #include <Core/Platform.hpp>
 #include <Core/Iterator.hpp>
 #include <atomic>
@@ -83,4 +83,3 @@ FORCEINLINE_ auto RingBase<T, size_>::end() -> IteratorType {
 }
 
 END_NAMESPACE(n19);
-#endif //RINGBASE_HPP

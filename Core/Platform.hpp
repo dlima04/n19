@@ -3,8 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef PLATFORM_HPP
-#define PLATFORM_HPP
+#pragma once
 
 ///
 /// Should be 64 on the vast majority of architectures...
@@ -126,5 +125,3 @@
 #  define NORETURN_
 #  warning "No cpp attribute present -- [[noreturn]]"
 #endif
-
-#endif //PLATFORM_HPP

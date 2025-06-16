@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef ENTITY_HPP
-#define ENTITY_HPP
+#pragma once
+
 #include <Core/Maybe.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Concepts.hpp>
@@ -357,4 +357,3 @@ public:
 };
 
 END_NAMESPACE(n19);
-#endif //ENTITY_HPP

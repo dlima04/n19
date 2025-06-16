@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_PARSECONTEXT_HPP
-#define N19_PARSECONTEXT_HPP
+#pragma once
+
 #include <Core/Panic.hpp>
 #include <Frontend/ErrorCollector.hpp>
 #include <Frontend/Lexer.hpp>
@@ -51,4 +51,3 @@ struct ParseContext {
 };
 
 END_NAMESPACE(n19);
-#endif //N19_PARSECONTEXT_HPP

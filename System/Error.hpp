@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef SYS_LASTERROR_HPP
-#define SYS_LASTERROR_HPP
+#pragma once
+
 #include <System/String.hpp>
 #include <Core/Platform.hpp>
 
@@ -23,5 +23,3 @@ namespace n19::sys {
   NODISCARD_ auto last_error() -> std::string;
   NODISCARD_ auto translate_native_error(ErrorCode) -> std::string;
 }
-
-#endif //SYS_LASTERROR_HPP

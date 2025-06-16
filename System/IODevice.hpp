@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef NATIVE_IODEVICE_HPP
-#define NATIVE_IODEVICE_HPP
+#pragma once
+
 #include <System/Handle.hpp>
 #include <System/String.hpp>
 #include <Core/Bytes.hpp>
@@ -137,4 +137,3 @@ FORCEINLINE_ auto IODevice::flush_handle() const -> void {
 
 #endif //IF defined(N19_POSIX)
 END_NAMESPACE(n19::sys);
-#endif //NATIVE_IODEVICE_HPP

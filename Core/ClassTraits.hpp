@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_CLASSTRAITS_HPP
-#define N19_CLASSTRAITS_HPP
+#pragma once
+
 #include <compare>
 
 #define N19_MAKE_COMPARABLE_IMPL_(OP, MB, CLASS)      \
@@ -60,4 +60,3 @@
 #define N19_MAKE_SPACESHIP(C)                         \
   public: auto operator<=>(const C&) const = default; \
 
-#endif //CLASSTRAITS_HPP

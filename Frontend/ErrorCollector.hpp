@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef ERRORCOLLECTOR_HPP
-#define ERRORCOLLECTOR_HPP
+#pragma once
+
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
 #include <System/File.hpp>
@@ -105,4 +105,3 @@ FORCEINLINE_ auto ErrorCollector::has_errors() const -> bool {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 END_NAMESPACE(n19);
-#endif //ERRORCOLLECTOR_HPP

@@ -3,15 +3,16 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef TRY_HPP
-#define TRY_HPP
+#pragma once
+
 #include <Core/Panic.hpp>
 #include <Core/TypeTraits.hpp>
 #include <Core/Platform.hpp>
 
-#ifndef RESULT_HPP
-#include <Core/Result.hpp>
-#endif
+/*
+* Note: this file assumes that Core/Result.hpp
+* has already been included.
+*/
 
 #if N19_MSVC
 #error "MSVC does not support statement expressions."
@@ -41,4 +42,4 @@
     if(!(EXPR)) { return ::n19::Error{ __VA_ARGS__ }; }                            \
   } while(0)                                                                       \
 
-#endif //TRY_HPP
+

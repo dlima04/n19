@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_HIR_PARSER_HPP
-#define N19_HIR_PARSER_HPP
+#pragma once
+
 #include <Core/Result.hpp>
 #include <Core/Try.hpp>
 #include <Frontend/ParseContext.hpp>
@@ -60,4 +60,3 @@ auto parse_call_(ParseContext&, AstNode::Ptr<>&&)       -> Result<AstNode::Ptr<>
 auto parse_binexpr_(ParseContext&, AstNode::Ptr<>&&)    -> Result<AstNode::Ptr<>>;
 
 END_NAMESPACE(n19::detail_);
-#endif //N19_HIR_PARSER_HPP

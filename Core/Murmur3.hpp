@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef MURMUR3_HPP
-#define MURMUR3_HPP
+#pragma once
+
 #include <Core/Platform.hpp>
 #include <cstdint>
 #include <string_view>
@@ -203,4 +203,3 @@ constexpr auto operator ""_mm128(const char8_t* str, size_t len) -> Murmur3_128 
 }
 
 END_NAMESPACE(n19);
-#endif // MURMUR3_HPP

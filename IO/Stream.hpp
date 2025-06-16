@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_IO_STREAM_HPP
-#define N19_IO_STREAM_HPP
+#pragma once
+
 #include <System/String.hpp>
 #include <System/IODevice.hpp>
 #include <Core/Bytes.hpp>
@@ -396,4 +396,3 @@ private:
 };
 
 END_NAMESPACE(n19);
-#endif //N19_IO_STREAM_HPP

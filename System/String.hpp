@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef SYS_STRING_HPP
-#define SYS_STRING_HPP
+#pragma once
+
 #include <string>
 #include <string_view>
 
@@ -27,5 +27,3 @@ namespace n19::sys {
   using Char       = char;
 #endif
 }
-
-#endif //SYS_STRING_HPP

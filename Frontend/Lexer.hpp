@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef LEXER_HPP
-#define LEXER_HPP
+#pragma once
+
 #include <Core/Bytes.hpp>
 #include <Core/Platform.hpp>
 #include <Core/ClassTraits.hpp>
@@ -185,4 +185,3 @@ inline auto Lexer::current() const -> const Token& {
 }
 
 END_NAMESPACE(n19);
-#endif //LEXER_HPP

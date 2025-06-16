@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_STRINGUTIL_HPP
-#define N19_STRINGUTIL_HPP
+#pragma once
+
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
 #include <System/String.hpp>
@@ -19,4 +19,3 @@ auto unescape_raw_string(std::string_view)    -> Result<std::string>;
 auto unescape_raw_quoted_string(std::string_view) -> Result<std::string>;
 
 END_NAMESPACE(n19);
-#endif //N19_STRINGUTIL_HPP

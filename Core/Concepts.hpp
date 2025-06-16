@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_CONCEPTS_HPP
-#define N19_CONCEPTS_HPP
+#pragma once
+
 #include <Core/TypeTraits.hpp>
 #include <utility>
 BEGIN_NAMESPACE(n19);
@@ -45,4 +45,3 @@ concept CallableWith = requires(T&& t, Us&&... us){
 };
 
 END_NAMESPACE(n19);
-#endif //N19_CONCEPTS_HPP

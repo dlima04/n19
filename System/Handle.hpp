@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef NATIVE_HANDLE_HPP
-#define NATIVE_HANDLE_HPP
+#pragma once
+
 #include <Core/Platform.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/TypeTraits.hpp>
@@ -39,4 +39,3 @@ FORCEINLINE_ Handle<Value>::operator bool() const {
 }
 
 END_NAMESPACE(n19::sys);
-#endif //NATIVE_HANDLE_HPP

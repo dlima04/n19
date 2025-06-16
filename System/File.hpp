@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_SYS_FILE_HPP
-#define N19_SYS_FILE_HPP
+#pragma once
+
 #include <System/IODevice.hpp>
 #include <cstdint>
 #include <filesystem>
@@ -51,4 +51,3 @@ public:
 };
 
 END_NAMESPACE(n19::sys);
-#endif //N19_SYS_FILE_HPP

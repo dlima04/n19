@@ -19,6 +19,7 @@ set(N19_ENUMERATE_GLOBAL_SOURCES
   Frontend/FrontendContext.cpp
   Frontend/Parser.cpp
   Frontend/CompilationCycle.cpp
+  Frontend/Interpreter.cpp
   System/Error.cpp
   System/IODevice.cpp
   System/Time.cpp
@@ -53,6 +54,7 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Frontend/Parser.hpp
   Frontend/FrontendContext.hpp
   Frontend/CompilationCycle.hpp
+  Frontend/Interpreter.hpp
   Misc/Global.hpp
   Misc/Macros.hpp
   Core/Panic.hpp

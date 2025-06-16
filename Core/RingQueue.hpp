@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef RINGQUEUE_HPP
-#define RINGQUEUE_HPP
+#pragma once
+
 #include <Core/Panic.hpp>
 #include <Core/RingBase.hpp>
 #include <Core/Maybe.hpp>
@@ -191,4 +191,3 @@ FORCEINLINE_ auto RingQueue<T, size_>::try_current() const -> Maybe<ValueType> {
 }
 
 END_NAMESPACE(n19);
-#endif //RINGQUEUE_HPP

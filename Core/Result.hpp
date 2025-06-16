@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef RESULT_HPP
-#define RESULT_HPP
+#pragma once
+
 #include <Core/Platform.hpp>
 #include <Core/Panic.hpp>
 #include <Core/ClassTraits.hpp>
@@ -184,4 +184,3 @@ inline auto ErrorType_::from_error_code(sys::ErrorCode e) -> ErrorType_ {
 }
 
 END_NAMESPACE(n19);
-#endif //RESULT_HPP

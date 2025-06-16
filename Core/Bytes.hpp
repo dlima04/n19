@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef BYTES_HPP
-#define BYTES_HPP
+#pragma once
+
 #include <Core/Panic.hpp>
 #include <Core/Concepts.hpp>
 #include <Core/Platform.hpp>
@@ -153,4 +153,3 @@ FORCEINLINE_ auto construct_bytecopy(Args&&... args) -> ByteCopy<T> {
 }
 
 END_NAMESPACE(n19);
-#endif //BYTES_HPP

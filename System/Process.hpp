@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_SYS_PROCESS_HPP
-#define N19_SYS_PROCESS_HPP
+#pragma once
+
 #include <Core/ClassTraits.hpp>
 #include <System/Win32.hpp>
 #include <Core/Platform.hpp>
@@ -156,4 +156,3 @@ FORCEINLINE_ NaiveProcess_::Builder NaiveProcess(const String& str) {
 }
 
 END_NAMESPACE(n19::sys);
-#endif //N19_SYS_PROCESS_HPP

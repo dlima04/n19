@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef ENTITYTABLE_HPP
-#define ENTITYTABLE_HPP
+#pragma once
+
 #include <Frontend/Entity.hpp>
 #include <Core/ClassTraits.hpp>
 #include <IO/Fmt.hpp>
@@ -355,4 +355,3 @@ auto EntityTable::find_if(T&& pred) const -> Maybe<Entity::Ptr<>> {
 }
 
 END_NAMESPACE(n19);
-#endif //ENTITYTABLE_HPP

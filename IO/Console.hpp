@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_IO_CONSOLE_HPP
-#define N19_IO_CONSOLE_HPP
+#pragma once
+
 #include <IO/Stream.hpp>
 #include <IO/Fmt.hpp>
 BEGIN_NAMESPACE(n19);
@@ -77,4 +77,3 @@ inline auto manip_string(Args... values) -> std::string {
 }
 
 END_NAMESPACE(n19);
-#endif //N19_IO_CONSOLE_HPP

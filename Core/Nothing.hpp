@@ -3,8 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef NOTHING_HPP
-#define NOTHING_HPP
+#pragma once
 
 struct Nothing_ {
   unsigned char dummy_value_ = 0;
@@ -12,4 +11,3 @@ struct Nothing_ {
 };
 
 constexpr inline Nothing_ Nothing;
-#endif //NOTHING_HPP

@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef PANIC_HPP
-#define PANIC_HPP
+#pragma once
+
 #include <Core/Platform.hpp>
 #include <Core/ClassTraits.hpp>
 #include <string>
@@ -47,4 +47,3 @@ private:
 };
 
 END_NAMESPACE(n19);
-#endif //PANIC_HPP

@@ -6,6 +6,6 @@
 #pragma once
 BEGIN_NAMESPACE(n19);
 
-auto begin_global_compilation_cycles() -> bool;
+
 
 END_NAMESPACE(n19);

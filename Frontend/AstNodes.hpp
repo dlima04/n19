@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef ASTNODES_HPP
-#define ASTNODES_HPP
+#pragma once
+
 #include <Core/Platform.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
@@ -534,4 +534,3 @@ auto AstNode::create(
 }
 
 END_NAMESPACE(n19);
-#endif //ASTNODES_HPP

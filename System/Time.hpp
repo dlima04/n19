@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef SYS_TIME_HPP
-#define SYS_TIME_HPP
+#pragma once
+
 #include <Core/Platform.hpp>
 #include <Core/Result.hpp>
 #include <Core/ClassTraits.hpp>
@@ -57,4 +57,3 @@ public:
 };
 
 END_NAMESPACE(n19::sys);
-#endif //SYS_TIME_HPP

@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef ITERATOR_HPP
-#define ITERATOR_HPP
+#pragma once
+
 #include <Core/Platform.hpp>
 #include <Core/ClassTraits.hpp>
 #include <utility>
@@ -61,4 +61,3 @@ protected:
 };
 
 END_NAMESPACE(n19);
-#endif //ITERATOR_HPP

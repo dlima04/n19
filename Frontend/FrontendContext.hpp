@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef N19_FRONTENDCONTEXT_HPP
-#define N19_FRONTENDCONTEXT_HPP
+#pragma once
+
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Maybe.hpp>
@@ -114,4 +114,3 @@ private:
 };
 
 END_NAMESPACE(n19);
-#endif //N19_FRONTENDCONTEXT_HPP

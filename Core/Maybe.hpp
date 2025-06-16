@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef MAYBE_HPP
-#define MAYBE_HPP
+#pragma once
+
 #include <Core/Platform.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Nothing.hpp>
@@ -142,4 +142,3 @@ template<typename T>
 using Maybe = typename MaybeDispatch_<T>::Type;
 
 END_NAMESPACE(n19);
-#endif //MAYBE_HPP

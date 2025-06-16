@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef TYPETRAITS_HPP
-#define TYPETRAITS_HPP
+#pragma once
+
 BEGIN_NAMESPACE(n19);
 
 template<typename...>
@@ -269,4 +269,3 @@ template<typename T>
 inline constexpr bool IsSame<T, T> = true;
 
 END_NAMESPACE(n19);
-#endif //TYPETRAITS_HPP
