@@ -58,7 +58,7 @@ using ProcessHandleType_ = Handle<::pid_t>;
  * Specifically:
  * - It does not concern itself with permissions or security.
  * - It does not allow for the grouping of processes into workgroups.
- * - It does not allow for manipulation of the process' address space.
+ * - It does not allow for manipulation of a process' address space.
  *
  * This class should be used when you "just need to run something" and
  * aren't particularly concerned with the details.

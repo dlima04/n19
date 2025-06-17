@@ -1,5 +1,3 @@
-/*
-* Copyright (c) 2025 Diago Lima
-* SPDX-License-Identifier: BSD-3-Clause
-*/
-
+//
+// Created by Diago on 2025-06-16.
+//

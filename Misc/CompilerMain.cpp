@@ -6,13 +6,13 @@
 #include <Frontend/Lexer.hpp>
 #include <Frontend/FrontendContext.hpp>
 #include <Frontend/CompilationCycle.hpp>
+#include <Frontend/StringPool.hpp>
 #include <IO/Console.hpp>
 #include <IO/Fmt.hpp>
 #include <Core/ArgParse.hpp>
 #include <cstdlib>
 #include <utility>
 #include <Core/Result.hpp>
-#include <System/Process.hpp>
 #include <Core/Defer.hpp>
 #include <Core/Try.hpp>
 #include <iostream>
