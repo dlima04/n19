@@ -11,7 +11,7 @@
 #include <Core/TypeTraits.hpp>
 #include <Core/Nothing.hpp>
 #include <System/Error.hpp>
-#include <IO/Fmt.hpp>
+#include <Core/Fmt.hpp>
 #include <string>
 #include <utility>
 #include <functional>

@@ -4,8 +4,8 @@
 */
 
 #include <Bulwark/Bulwark.hpp>
-#include <Frontend/Lexer.hpp>
-#include <Frontend/Token.hpp>
+#include <Frontend/Lexer/Lexer.hpp>
+#include <Frontend/Lexer/Token.hpp>
 #include <vector>
 #include <string>
 using namespace n19;

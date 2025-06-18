@@ -3,12 +3,12 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Frontend/Lexer.hpp>
+#include <Frontend/Lexer/Lexer.hpp>
 #include <Frontend/FrontendContext.hpp>
-#include <Frontend/CompilationCycle.hpp>
-#include <Frontend/StringPool.hpp>
-#include <IO/Console.hpp>
-#include <IO/Fmt.hpp>
+#include <Frontend/Common/CompilationCycle.hpp>
+#include <Frontend/Common/StringPool.hpp>
+#include <Core/Console.hpp>
+#include <Core/Fmt.hpp>
 #include <Core/ArgParse.hpp>
 #include <cstdlib>
 #include <utility>

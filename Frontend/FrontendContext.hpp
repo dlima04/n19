@@ -9,7 +9,7 @@
 #include <Core/Platform.hpp>
 #include <Core/Maybe.hpp>
 #include <System/String.hpp>
-#include <IO/Console.hpp>
+#include <Core/Console.hpp>
 #include <vector>
 #include <algorithm>
 #include <cstdint>

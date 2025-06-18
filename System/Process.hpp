@@ -11,7 +11,7 @@
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
 #include <System/String.hpp>
-#include <IO/Console.hpp>
+#include <Core/Console.hpp>
 #include <cstdint>
 #include <vector>
 #include <utility>

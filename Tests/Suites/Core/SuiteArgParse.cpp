@@ -5,7 +5,7 @@
 
 #include <Bulwark/Bulwark.hpp>
 #include <Core/ArgParse.hpp>
-#include <IO/Console.hpp>
+#include <Core/Console.hpp>
 
 using namespace n19;
 

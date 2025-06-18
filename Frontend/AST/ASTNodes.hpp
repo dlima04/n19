@@ -8,10 +8,10 @@
 #include <Core/Platform.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
-#include <IO/Console.hpp>
+#include <Core/Console.hpp>
 #include <Core/Concepts.hpp>
-#include <Frontend/Token.hpp>
-#include <Frontend/Entity.hpp>
+#include <Frontend/Lexer/Token.hpp>
+#include <Frontend/Entities/Entity.hpp>
 #include <Frontend/FrontendContext.hpp>
 #include <System/String.hpp>
 #include <vector>

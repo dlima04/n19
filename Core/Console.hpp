@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <IO/Stream.hpp>
-#include <IO/Fmt.hpp>
+#include <Core/Stream.hpp>
+#include <Core/Fmt.hpp>
 BEGIN_NAMESPACE(n19);
 
 namespace detail_ {

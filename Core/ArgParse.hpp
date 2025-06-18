@@ -8,9 +8,9 @@
 #include <System/String.hpp>
 #include <Core/Concepts.hpp>
 #include <Core/Maybe.hpp>
-#include <IO/Console.hpp>
+#include <Core/Console.hpp>
 #include <Core/ClassTraits.hpp>
-#include <IO/Stream.hpp>
+#include <Core/Stream.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Result.hpp>
 #include <string>

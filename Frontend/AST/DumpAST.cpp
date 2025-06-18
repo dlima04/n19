@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Frontend/AstNodes.hpp>
+#include <Frontend/AST/ASTNodes.hpp>
 #include <cctype>
 BEGIN_NAMESPACE(n19);
 

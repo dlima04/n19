@@ -4,8 +4,8 @@
 */
 
 #include <Core/Panic.hpp>
-#include <IO/Console.hpp>
-#include <IO/Fmt.hpp>
+#include <Core/Console.hpp>
+#include <Core/Fmt.hpp>
 #include <System/BackTrace.hpp>
 #include <cstdlib>
 #include <utility>

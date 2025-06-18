@@ -11,7 +11,7 @@
 #include <Core/Result.hpp>
 #include <System/File.hpp>
 #include <System/IODevice.hpp>
-#include <IO/Console.hpp>
+#include <Core/Console.hpp>
 #include <array>
 #include <cstdint>
 #include <utility>

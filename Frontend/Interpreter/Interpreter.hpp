@@ -6,8 +6,8 @@
 #pragma once
 
 #include <Core/Result.hpp>
-#include <Frontend/AstNodes.hpp>
-#include <Frontend/StringPool.hpp>
+#include <Frontend/AST/ASTNodes.hpp>
+#include <Frontend/Common/StringPool.hpp>
 #include <Core/ClassTraits.hpp>
 #include <variant>
 #include <utility>
@@ -45,7 +45,7 @@ using Operand = std::variant<
   Nothing_           /// Empty (no operand)
 >;
 
-struct Opcode {
+struct OpCode {
   N19_MAKE_COMPARABLE_MEMBER(OpCode, value);
 public:
   #define X(VALUE) VALUE,
@@ -61,7 +61,7 @@ public:
 };
 
 struct Instruction {
-  Opcode op;
+  OpCode op;
   Operand operand = Nothing_{};
 };
 

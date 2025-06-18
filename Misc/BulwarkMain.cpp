@@ -4,7 +4,7 @@
 */
 
 #include <Core/ArgParse.hpp>
-#include <IO/Console.hpp>
+#include <Core/Console.hpp>
 #include <Bulwark/Bulwark.hpp>
 #include <Bulwark/BulwarkContext.hpp>
 #include <cstdlib>

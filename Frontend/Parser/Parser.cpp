@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Frontend/Parser.hpp>
+#include <Frontend/Parser/Parser.hpp>
 #include <Core/StringUtil.hpp>
 #include <Frontend/FrontendContext.hpp>
 #include <System/File.hpp>

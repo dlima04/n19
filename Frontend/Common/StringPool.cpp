@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Frontend/StringPool.hpp>
-#include <IO/Fmt.hpp>
+#include <Frontend/Common/StringPool.hpp>
+#include <Core/Fmt.hpp>
 #include <Core/Panic.hpp>
 BEGIN_NAMESPACE(n19);
 

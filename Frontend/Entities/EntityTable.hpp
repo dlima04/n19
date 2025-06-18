@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <Frontend/Entity.hpp>
+#include <Frontend/Entities/Entity.hpp>
 #include <Core/ClassTraits.hpp>
-#include <IO/Fmt.hpp>
+#include <Core/Fmt.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>

@@ -11,8 +11,8 @@
 #include <System/File.hpp>
 #include <Core/Result.hpp>
 #include <Core/Maybe.hpp>
-#include <IO/Stream.hpp>
-#include <Frontend/Token.hpp>
+#include <Core/Stream.hpp>
+#include <Frontend/Lexer/Token.hpp>
 #include <System/String.hpp>
 #include <memory>
 #include <vector>

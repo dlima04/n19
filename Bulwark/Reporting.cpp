@@ -5,7 +5,7 @@
 
 #include <Bulwark/Reporting.hpp>
 #include <Bulwark/BulwarkContext.hpp>
-#include <IO/Fmt.hpp>
+#include <Core/Fmt.hpp>
 #include <Core/Panic.hpp>
 BEGIN_NAMESPACE(n19::test);
 

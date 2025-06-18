@@ -7,8 +7,8 @@
 
 #include <Core/Result.hpp>
 #include <Core/Try.hpp>
-#include <Frontend/ParseContext.hpp>
-#include <Frontend/AstNodes.hpp>
+#include <Frontend/Parser/ParseContext.hpp>
+#include <Frontend/AST/ASTNodes.hpp>
 
 ///
 /// Public parsing functions

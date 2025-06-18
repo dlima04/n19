@@ -4,7 +4,7 @@
 */
 
 #include <Bulwark/Bulwark.hpp>
-#include <Frontend/EntityTable.hpp>
+#include <Frontend/Entities/EntityTable.hpp>
 using namespace n19;
 
 TEST_CASE(Entity, SymLinks) {

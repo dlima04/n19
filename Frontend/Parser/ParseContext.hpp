@@ -6,11 +6,11 @@
 #pragma once
 
 #include <Core/Panic.hpp>
-#include <Frontend/ErrorCollector.hpp>
-#include <Frontend/Lexer.hpp>
-#include <Frontend/EntityTable.hpp>
-#include <Frontend/AstNodes.hpp>
-#include <IO/Stream.hpp>
+#include <Frontend/Diagnostics/ErrorCollector.hpp>
+#include <Frontend/Lexer/Lexer.hpp>
+#include <Frontend/Entities/EntityTable.hpp>
+#include <Frontend/AST/ASTNodes.hpp>
+#include <Core/Stream.hpp>
 #include <string>
 #include <cstdint>
 BEGIN_NAMESPACE(n19);

@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Frontend/EntityTable.hpp>
+#include <Frontend/Entities/EntityTable.hpp>
 #include <algorithm>
 BEGIN_NAMESPACE(n19);
 

@@ -8,7 +8,7 @@
 #include <Core/ClassTraits.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Platform.hpp>
-#include <Frontend/Keywords.hpp>
+#include <Frontend/Lexer/Keywords.hpp>
 #include <string_view>
 #include <string>
 #include <cstdint>

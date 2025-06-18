@@ -3,9 +3,9 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Frontend/EntityTable.hpp>
-#include <IO/Fmt.hpp>
-#include <IO/Console.hpp>
+#include <Frontend/Entities/EntityTable.hpp>
+#include <Core/Fmt.hpp>
+#include <Core/Console.hpp>
 BEGIN_NAMESPACE(n19);
 
 BuiltinType::BuiltinType(const Type type) {

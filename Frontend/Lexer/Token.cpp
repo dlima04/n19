@@ -3,8 +3,8 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Frontend/Lexer.hpp>
-#include <IO/Fmt.hpp>
+#include <Frontend/Lexer/Lexer.hpp>
+#include <Core/Fmt.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Murmur3.hpp>
 #include <algorithm>

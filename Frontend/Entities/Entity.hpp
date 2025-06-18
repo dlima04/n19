@@ -9,7 +9,7 @@
 #include <Core/Platform.hpp>
 #include <Core/Concepts.hpp>
 #include <Core/Panic.hpp>
-#include <IO/Console.hpp>
+#include <Core/Console.hpp>
 #include <Frontend/FrontendContext.hpp>
 #include <System/String.hpp>
 #include <cstdint>

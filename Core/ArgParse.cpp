@@ -5,7 +5,7 @@
 
 #include <Core/ArgParse.hpp>
 #include <Core/Panic.hpp>
-#include <IO/Fmt.hpp>
+#include <Core/Fmt.hpp>
 #include <string>
 #include <algorithm>
 #include <ranges>

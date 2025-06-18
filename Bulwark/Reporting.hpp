@@ -7,7 +7,7 @@
 
 #include <Bulwark/Case.hpp>
 #include <Bulwark/Suite.hpp>
-#include <IO/Console.hpp>
+#include <Core/Console.hpp>
 #include <Core/ClassTraits.hpp>
 BEGIN_NAMESPACE(n19::test);
 

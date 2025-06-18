@@ -10,17 +10,17 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 option(ENABLE_ASAN "clang asan" ON)
 
 set(N19_ENUMERATE_GLOBAL_SOURCES
-  Frontend/ErrorCollector.cpp
-  Frontend/EntityTable.cpp
-  Frontend/Entity.cpp
-  Frontend/DumpAst.cpp
-  Frontend/Lexer.cpp
-  Frontend/Token.cpp
+  Frontend/Diagnostics/ErrorCollector.cpp
+  Frontend/Entities/EntityTable.cpp
+  Frontend/Entities/Entity.cpp
+  Frontend/AST/DumpAST.cpp
+  Frontend/Lexer/Lexer.cpp
+  Frontend/Lexer/Token.cpp
   Frontend/FrontendContext.cpp
-  Frontend/Parser.cpp
-  Frontend/CompilationCycle.cpp
-  Frontend/Interpreter.cpp
-  Frontend/StringPool.cpp
+  Frontend/Parser/Parser.cpp
+  Frontend/Common/CompilationCycle.cpp
+  Frontend/Interpreter/Interpreter.cpp
+  Frontend/Common/StringPool.cpp
   System/Error.cpp
   System/IODevice.cpp
   System/Time.cpp
@@ -30,8 +30,8 @@ set(N19_ENUMERATE_GLOBAL_SOURCES
   Core/Panic.cpp
   Core/ArgParse.cpp
   Core/StringUtil.cpp
-  IO/Console.cpp
-  IO/Stream.cpp
+  Core/Console.cpp
+  Core/Stream.cpp
 )
 
 set(N19_ENUMERATE_GLOBAL_HEADERS
@@ -44,19 +44,19 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   System/File.hpp
   System/Win32.hpp
   System/Process.hpp
-  Frontend/Token.hpp
-  Frontend/ErrorCollector.hpp
-  Frontend/AstNodes.hpp
-  Frontend/EntityTable.hpp
-  Frontend/Entity.hpp
-  Frontend/Lexer.hpp
-  Frontend/Keywords.hpp
-  Frontend/ParseContext.hpp
-  Frontend/Parser.hpp
+  Frontend/Lexer/Token.hpp
+  Frontend/Diagnostics/ErrorCollector.hpp
+  Frontend/AST/ASTNodes.hpp
+  Frontend/Entities/EntityTable.hpp
+  Frontend/Entities/Entity.hpp
+  Frontend/Lexer/Lexer.hpp
+  Frontend/Lexer/Keywords.hpp
+  Frontend/Parser/ParseContext.hpp
+  Frontend/Parser/Parser.hpp
   Frontend/FrontendContext.hpp
-  Frontend/CompilationCycle.hpp
-  Frontend/Interpreter.hpp
-  Frontend/StringPool.hpp
+  Frontend/Common/CompilationCycle.hpp
+  Frontend/Interpreter/Interpreter.hpp
+  Frontend/Common/StringPool.hpp
   Misc/Global.hpp
   Misc/Macros.hpp
   Core/Panic.hpp
@@ -77,9 +77,9 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Core/Try.hpp
   Core/ArgParse.hpp
   Core/StringUtil.hpp
-  IO/Console.hpp
-  IO/Fmt.hpp
-  IO/Stream.hpp
+  Core/Console.hpp
+  Core/Fmt.hpp
+  Core/Stream.hpp
 )
 
 set(N19_ENUMERATE_SUITES_CORE
@@ -92,15 +92,12 @@ set(N19_ENUMERATE_SUITES_CORE
   Tests/Suites/Core/SuiteMurmur3.cpp
   Tests/Suites/Core/SuiteRingStructures.cpp
   Tests/Suites/Core/SuiteStringUtil.cpp
+  Tests/Suites/Core/SuiteStream.cpp
 )
 
 set(N19_ENUMERATE_SUITES_FRONTEND
   Tests/Suites/Frontend/SuiteLexer.cpp
   Tests/Suites/Frontend/SuiteEntity.cpp
-)
-
-set(N19_ENUMERATE_SUITES_IO
-  Tests/Suites/IO/SuiteStream.cpp
 )
 
 set(N19_ENUMERATE_SUITES_SYSTEM

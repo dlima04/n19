@@ -5,7 +5,7 @@
 
 #include <System/Time.hpp>
 #include <System/Error.hpp>
-#include <IO/Fmt.hpp>
+#include <Core/Fmt.hpp>
 BEGIN_NAMESPACE(n19::sys);
 
 auto STFormatter_::weekday() const -> std::string {

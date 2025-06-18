@@ -3,10 +3,10 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Frontend/CompilationCycle.hpp>
+#include <Frontend/Common/CompilationCycle.hpp>
 #include <Frontend/FrontendContext.hpp>
-#include <Frontend/Parser.hpp>
-#include <IO/Console.hpp>
+#include <Frontend/Parser/Parser.hpp>
+#include <Core/Console.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Defer.hpp>
 BEGIN_NAMESPACE(n19);

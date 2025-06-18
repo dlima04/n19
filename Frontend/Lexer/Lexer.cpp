@@ -5,16 +5,16 @@
 
 #include <Core/Try.hpp>
 #include <Core/Murmur3.hpp>
-#include <Frontend/Lexer.hpp>
-#include <Frontend/ErrorCollector.hpp>
-#include <Frontend/Keywords.hpp>
+#include <Frontend/Lexer/Lexer.hpp>
+#include <Frontend/Diagnostics/ErrorCollector.hpp>
+#include <Frontend/Lexer/Keywords.hpp>
 #include <filesystem>
 #include <algorithm>
 #include <limits>
 #include <functional>
 #include <array>
 
-#include <IO/Console.hpp>
+#include <Core/Console.hpp>
 
 BEGIN_NAMESPACE(n19);
 

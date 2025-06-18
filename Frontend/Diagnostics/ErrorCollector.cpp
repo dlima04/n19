@@ -9,9 +9,9 @@
 #include <Core/Bytes.hpp>
 #include <Core/Try.hpp>
 #include <Core/Panic.hpp>
-#include <IO/Console.hpp>
-#include <Frontend/ErrorCollector.hpp>
-#include <Frontend/Lexer.hpp>
+#include <Core/Console.hpp>
+#include <Frontend/Diagnostics/ErrorCollector.hpp>
+#include <Frontend/Lexer/Lexer.hpp>
 #include <algorithm>
 #include <cctype>
 

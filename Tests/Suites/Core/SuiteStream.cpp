@@ -4,7 +4,7 @@
 */
 
 #include <Bulwark/Bulwark.hpp>
-#include <IO/Stream.hpp>
+#include <Core/Stream.hpp>
 #include <Core/Bytes.hpp>
 #include <string>
 #include <vector>

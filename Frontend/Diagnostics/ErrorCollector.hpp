@@ -8,7 +8,7 @@
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
 #include <System/File.hpp>
-#include <IO/Stream.hpp>
+#include <Core/Stream.hpp>
 #include <Core/Bytes.hpp>
 #include <System/String.hpp>
 #include <string>
