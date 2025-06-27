@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <System/String.hpp>
 #include <Core/Platform.hpp>
 #include <Core/ArgParse.hpp>

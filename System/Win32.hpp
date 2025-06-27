@@ -11,10 +11,6 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#ifndef NOSERVICE
-#define NOSERVICE
-#endif
-
 #ifndef NOMCX
 #define NOMCX
 #endif
@@ -59,6 +55,7 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 1
 #endif
 
+// TODO: replace these magic constants
 #ifndef WINVER
 #define WINVER 0x0A00
 #endif

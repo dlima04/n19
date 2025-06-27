@@ -7,6 +7,7 @@
 
 #define N19_BACKTRACE_MAX_FRAMES 42
 
+#include <Core/Common.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Result.hpp>
 #include <System/File.hpp>

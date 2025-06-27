@@ -62,7 +62,7 @@ int main() {
 
   int arg_count = 0;
   ::LPWSTR* args = ::CommandLineToArgvW(cmdline, &arg_count);
-  if (args == nullptr) {
+  if(args == nullptr) {
     outs()
       << "Could not retrieve win32 argv. Error code="
       << ::GetLastError()
@@ -70,7 +70,7 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  if (arg_count > ARGNUM_HARD_LIMIT) {
+  if(arg_count > ARGNUM_HARD_LIMIT) {
     outs() << "Too many command-line arguments passed.";
     outs() << Endl;
     ::LocalFree(args);
@@ -79,7 +79,7 @@ int main() {
   
   /// Initialize context
   auto stream = OStream::from_stdout();
-  if (arg_count > 1 && !parser.take_argv(arg_count, args).parse(stream)) {
+  if(arg_count > 1 && !parser.take_argv(arg_count, args).parse(stream)) {
     ::LocalFree(args);
     return EXIT_FAILURE;
   }
@@ -91,14 +91,14 @@ int main() {
   }
 
   auto& ctx = test::Context::the();
-  if (parser.verbose)  ctx.flags_ |= test::Context::Verbose;
-  if (parser.stopfail) ctx.flags_ |= test::Context::StopFail;
-  if (parser.debug)    ctx.flags_ |= test::Context::Debug;
-  if (parser.colours)  ctx.flags_ |= test::Context::Colours;
+  if(parser.verbose)  ctx.flags_ |= test::Context::Verbose;
+  if(parser.stopfail) ctx.flags_ |= test::Context::StopFail;
+  if(parser.debug)    ctx.flags_ |= test::Context::Debug;
+  if(parser.colours)  ctx.flags_ |= test::Context::Colours;
 
-  if (!parser.to_skip.empty()) {
+  if(!parser.to_skip.empty()) {
     ctx.suites_to_skip_ = std::move(parser.to_skip);
-  } if (!parser.to_run.empty()) {
+  } if(!parser.to_run.empty()) {
     ctx.suites_to_run_ = std::move(parser.to_run);
   }
 

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/TypeTraits.hpp>
 #include <utility>
 BEGIN_NAMESPACE(n19);

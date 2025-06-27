@@ -5,7 +5,7 @@
 
 #include <System/BackTrace.hpp>
 #include <Core/Try.hpp>
-#include <Misc/Macros.hpp>
+#include <Core/MacroUtil.hpp>
 #include <string_view>
 
 ///

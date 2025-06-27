@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Concepts.hpp>
@@ -17,32 +18,30 @@
 #include <vector>
 #include <memory>
 
-#define N19_ROOT_ENTITY_ID 1
-#define N19_INVALID_ENTITY_ID 0
+#define RL_ROOT_ENTITY_ID 1
+#define RL_INVALID_ENTITY_ID 0
 
-#define N19_EQ_FLAG_LIST                   \
+#define RL_EQ_FLAG_LIST                    \
   X(None,      0ULL)                       \
   X(Constant,  1ULL)                       \
   X(Reference, 1ULL << 1)                  \
   X(Rvalue,    1ULL << 2)                  \
-  X(Volatile,  1ULL << 3)                  \
-  X(Poison,    1ULL << 4)                  \
 
-#define N19_ENTITY_BUILTIN_LIST            \
-  X(I8,   "i8",  N19_ROOT_ENTITY_ID + 1)   \
-  X(U8,   "u8",  N19_ROOT_ENTITY_ID + 2)   \
-  X(I16,  "i16", N19_ROOT_ENTITY_ID + 3)   \
-  X(U16,  "u16", N19_ROOT_ENTITY_ID + 4)   \
-  X(I32,  "i32", N19_ROOT_ENTITY_ID + 5)   \
-  X(U32,  "u32", N19_ROOT_ENTITY_ID + 6)   \
-  X(I64,  "i64", N19_ROOT_ENTITY_ID + 7)   \
-  X(U64,  "u64", N19_ROOT_ENTITY_ID + 8)   \
-  X(F32,  "f32", N19_ROOT_ENTITY_ID + 9)   \
-  X(F64,  "f64", N19_ROOT_ENTITY_ID + 10)  \
-  X(Ptr,  "ptr", N19_ROOT_ENTITY_ID + 11)  \
-  X(Bool, "bool",N19_ROOT_ENTITY_ID + 12)  \
+#define RL_ENTITY_BUILTIN_LIST             \
+  X(I8,   "i8",  RL_ROOT_ENTITY_ID + 1)    \
+  X(U8,   "u8",  RL_ROOT_ENTITY_ID + 2)    \
+  X(I16,  "i16", RL_ROOT_ENTITY_ID + 3)    \
+  X(U16,  "u16", RL_ROOT_ENTITY_ID + 4)    \
+  X(I32,  "i32", RL_ROOT_ENTITY_ID + 5)    \
+  X(U32,  "u32", RL_ROOT_ENTITY_ID + 6)    \
+  X(I64,  "i64", RL_ROOT_ENTITY_ID + 7)    \
+  X(U64,  "u64", RL_ROOT_ENTITY_ID + 8)    \
+  X(F32,  "f32", RL_ROOT_ENTITY_ID + 9)    \
+  X(F64,  "f64", RL_ROOT_ENTITY_ID + 10)   \
+  X(Ptr,  "ptr", RL_ROOT_ENTITY_ID + 11)   \
+  X(Bool, "bool",RL_ROOT_ENTITY_ID + 12)   \
 
-#define N19_ENTITY_TYPE_LIST               \
+#define RL_ENTITY_TYPE_LIST                \
   X(Entity)      /* Base class for all  */ \
   X(RootEntity)  /* First in the tree   */ \
   X(Proc)        /* Callable procedures */ \
@@ -55,11 +54,14 @@
   X(AliasType)   /* Indirection, Type   */ \
   X(BuiltinType) /* Builtin, e.g. "int" */ \
 
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
+
+using namespace n19;
+
 class EntityTable;
 
 #define X(NAME) class NAME;
-  N19_ENTITY_TYPE_LIST
+  RL_ENTITY_TYPE_LIST
 #undef X
 
 class EntityType {
@@ -67,7 +69,7 @@ class EntityType {
 public:
   #define X(NAME) NAME,
   enum Value : uint16_t {
-    N19_ENTITY_TYPE_LIST
+    RL_ENTITY_TYPE_LIST
     None,
   };
   #undef X
@@ -87,12 +89,12 @@ public:
   using ID  = uint32_t;
   using Children = std::vector<ID>;
 
-  Entity::ID    id_     = N19_INVALID_ENTITY_ID;
-  Entity::ID    parent_ = N19_INVALID_ENTITY_ID;
+  Entity::ID    id_     = RL_INVALID_ENTITY_ID;
+  Entity::ID    parent_ = RL_INVALID_ENTITY_ID;
   uint32_t      line_   = 0;
   size_t        pos_    = 0;
   EntityType    type_   = EntityType::None;
-  InputFile::ID file_   = N19_INVALID_INFILE_ID;
+  InputFile::ID file_   = RL_INVALID_INFILE_ID;
   std::string   lname_;
   std::string   name_;
   Children      chldrn_;
@@ -142,8 +144,8 @@ public:
  ~RootEntity() override = default;
 };
 
-/// Base class. Represents a reference to a n19::Type.
-/// n19::TypeDescriptorBase applies qualifications to this type,
+/// Base class. Represents a reference to a rl::Type.
+/// rl::TypeDescriptorBase applies qualifications to this type,
 /// namely pointer depth, constness and array lengths.
 /// this class does not represent the type itself.
 class EntityQualifierBase {
@@ -156,7 +158,7 @@ public:
 
   enum Flags : uint8_t {
   #define X(NAME, VALUE) NAME = VALUE,
-    N19_EQ_FLAG_LIST
+    RL_EQ_FLAG_LIST
   #undef X
   };
 
@@ -168,7 +170,7 @@ public:
   EntityQualifierBase() = default;
 };
 
-/// Represents a fully resolved reference to a n19::Type.
+/// Represents a fully resolved reference to a rl::Type.
 /// Holds an entity ID and provides a way to access this
 /// entity.
 class EntityQualifier final
@@ -191,10 +193,10 @@ public:
   EntityQualifier()  = default;
 };
 
-/// Represents an unresolved reference to a n19::Type.
+/// Represents an unresolved reference to a rl::Type.
 /// Each type is represented as a relative namespace path to
 /// a type that may or may not exist. Can be resolved into
-/// a n19::EntityQualifier.
+/// a rl::EntityQualifier.
 class EntityQualifierThunk final
   : public EntityQualifierBase {
 public:
@@ -244,7 +246,7 @@ public:
     EntityTable &table
   ) const -> void override;
 
-  Entity::ID link_ = N19_INVALID_ENTITY_ID;
+  Entity::ID link_ = RL_INVALID_ENTITY_ID;
   SymLink() = default;
  ~SymLink() override = default;
 };
@@ -257,7 +259,7 @@ public:
   ) const -> void override;
 
   EntityQualifierBase quals_;
-  Entity::ID type_ = N19_INVALID_ENTITY_ID;
+  Entity::ID type_ = RL_INVALID_ENTITY_ID;
 
   Variable() = default;
  ~Variable() override = default;
@@ -299,7 +301,7 @@ public:
 
 ///
 /// For callable procedures.
-/// if the return_type_ is N19_INVALID_ENTITY_ID,
+/// if the return_type_ is RL_INVALID_ENTITY_ID,
 /// the return type is void.
 class Proc : public Entity {
 public:
@@ -309,7 +311,7 @@ public:
   ) const -> void override;
 
   std::vector<Entity::ID> parameters_;
-  Entity::ID return_type_ = N19_INVALID_ENTITY_ID;
+  Entity::ID return_type_ = RL_INVALID_ENTITY_ID;
 
   Proc() = default;
  ~Proc() override = default;
@@ -342,7 +344,7 @@ class BuiltinType final : public Type {
 public:
 #define X(TYPE, UNUSED, VALUE) TYPE = VALUE,
   enum Type : Entity::ID {
-    N19_ENTITY_BUILTIN_LIST
+    RL_ENTITY_BUILTIN_LIST
     AfterLastID
   } builtin_type_ = AfterLastID;
 #undef X
@@ -356,4 +358,4 @@ public:
   explicit BuiltinType(Type type);
 };
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

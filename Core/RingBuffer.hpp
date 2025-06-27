@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/RingBase.hpp>
 #include <Core/Result.hpp>
 #include <Core/Maybe.hpp>

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Frontend/Entities/Entity.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/Fmt.hpp>
@@ -14,7 +15,9 @@
 #include <unordered_map>
 #include <print>
 #include <utility>
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
+
+using namespace n19;
 
 class EntityTable {
   N19_MAKE_NONCOPYABLE(EntityTable);
@@ -121,7 +124,7 @@ auto EntityTable::insert(
   map_[id]->lname_  = lname;
   map_[id]->pos_    = pos;
   map_[id]->line_   = line;
-  map_[id]->name_   = parent->id_ == N19_ROOT_ENTITY_ID
+  map_[id]->name_   = parent->id_ == RL_ROOT_ENTITY_ID
     ? fmt("::{}", lname) : parent->name_ + fmt("::{}", lname);
 
   #define X(NAME)                       \
@@ -129,7 +132,7 @@ auto EntityTable::insert(
     map_[id]->type_ = EntityType::NAME; \
   }
 
-  N19_ENTITY_TYPE_LIST
+  RL_ENTITY_TYPE_LIST
   #undef X
 
   ++curr_id_;
@@ -158,7 +161,7 @@ auto EntityTable::insert(
   map_[id]->lname_  = lname;
   map_[id]->pos_    = pos;
   map_[id]->line_   = line;
-  map_[id]->name_   = parent->id_ == N19_ROOT_ENTITY_ID
+  map_[id]->name_   = parent->id_ == RL_ROOT_ENTITY_ID
     ? fmt("::{}", lname) : parent->name_ + fmt("::{}", lname);
 
   #define X(NAME)                       \
@@ -166,7 +169,7 @@ auto EntityTable::insert(
     map_[id]->type_ = EntityType::NAME; \
   }
 
-  N19_ENTITY_TYPE_LIST
+  RL_ENTITY_TYPE_LIST
   #undef X
 
   parent->chldrn_.emplace_back(id);
@@ -196,7 +199,7 @@ auto EntityTable::swap_entity(
     map_[id_of]->type_ = EntityType::NAME; \
   }
 
-  N19_ENTITY_TYPE_LIST
+  RL_ENTITY_TYPE_LIST
   #undef X
 
   map_[id_of]->file_   = new_file;
@@ -233,7 +236,7 @@ auto EntityTable::swap_entity(
     map_[id_of]->type_ = EntityType::NAME; \
   }
 
-  N19_ENTITY_TYPE_LIST
+  RL_ENTITY_TYPE_LIST
   #undef X
 
   map_[id_of]->file_   = new_file;
@@ -265,7 +268,7 @@ auto EntityTable::swap_placeholder(
     type = EntityType::NAME;      \
   }
 
-  N19_ENTITY_TYPE_LIST
+  RL_ENTITY_TYPE_LIST
   #undef X
 
   if(old->to_be_ == EntityType::None
@@ -313,7 +316,7 @@ auto EntityTable::swap_placeholder(
     type = EntityType::NAME;      \
   }
 
-  N19_ENTITY_TYPE_LIST
+  RL_ENTITY_TYPE_LIST
   #undef X
 
   if(old->to_be_ == EntityType::None
@@ -354,4 +357,4 @@ auto EntityTable::find_if(T&& pred) const -> Maybe<Entity::Ptr<>> {
   return Nothing;
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

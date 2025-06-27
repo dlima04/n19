@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <System/String.hpp>
 #include <Core/Concepts.hpp>
 #include <Core/Maybe.hpp>

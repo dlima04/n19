@@ -5,7 +5,7 @@
 
 #include <Frontend/AST/ASTNodes.hpp>
 #include <cctype>
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
 
 auto AstNode::print_(
   const uint32_t depth,
@@ -658,4 +658,4 @@ auto AstNamespace::print(
     child->print(depth + 1, stream, Nothing);
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

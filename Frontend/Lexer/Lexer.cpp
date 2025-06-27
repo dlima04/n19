@@ -14,9 +14,7 @@
 #include <functional>
 #include <array>
 
-#include <Core/Console.hpp>
-
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
 
 inline auto Lexer::token_hyphen_() -> Token {
   Token curr_tok;
@@ -1021,4 +1019,4 @@ auto Lexer::reset(sys::File& ref) -> Result<void> {
   return Result<void>::create();
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

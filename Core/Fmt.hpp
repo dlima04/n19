@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <string>
 #include <format>
 BEGIN_NAMESPACE(n19);

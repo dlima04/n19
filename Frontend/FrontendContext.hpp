@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Maybe.hpp>
@@ -14,10 +15,12 @@
 #include <algorithm>
 #include <cstdint>
 
-#define N19_INVALID_INFILE_ID  0
-#define N19_INVALID_OUTFILE_ID 0
+#define RL_INVALID_INFILE_ID  0
+#define RL_INVALID_OUTFILE_ID 0
 
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
+using namespace n19;
+
 struct VersionInfo {
   uint16_t major{};  /// Major version number.
   uint16_t minor{};  /// Minor version number.
@@ -41,7 +44,7 @@ struct InputFile {
   sys::String name;
   InputFileState state = InputFileState::Pending;
   InputFileKind kind = InputFileKind::CoreUnit;
-  ID id = N19_INVALID_INFILE_ID;
+  ID id = RL_INVALID_INFILE_ID;
 
   InputFile() = default;
   InputFile(sys::String&& n);
@@ -50,13 +53,13 @@ struct InputFile {
 struct OutputFile {
   using ID = uint32_t;
   sys::String name;
-  ID id = N19_INVALID_OUTFILE_ID;
+  ID id = RL_INVALID_OUTFILE_ID;
 
   OutputFile() = default;
   OutputFile(sys::String&& n);
 };
 
-#define N19_FRONTEND_CONTEXT_FLAG_LIST                            \
+#define RL_FRONTEND_CONTEXT_FLAG_LIST                             \
   X(None,     0x00 << 0) /* Default flag value.               */  \
   X(Verbose,  0x01 << 0) /* Enable verbose output.            */  \
   X(Colours,  0x01 << 1) /* Pretty colours!                   */  \
@@ -72,7 +75,7 @@ class Context {
 public:
   #define X(NAME, VALUE) NAME = VALUE,
   enum Flags : uint32_t {
-    N19_FRONTEND_CONTEXT_FLAG_LIST
+    RL_FRONTEND_CONTEXT_FLAG_LIST
   };
   #undef X
 
@@ -113,4 +116,4 @@ private:
   Context() = default;
 };
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

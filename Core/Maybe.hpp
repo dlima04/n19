@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Nothing.hpp>
@@ -13,7 +14,7 @@
 #include <new>
 #include <concepts>
 #include <functional>
-BEGIN_NAMESPACE(n19)
+BEGIN_NAMESPACE(n19);
 
 template<Concrete T>
 class Maybe_ {
@@ -59,8 +60,8 @@ public:
     if(&other == this) return *this;
     clear();                /// clear the current value
     if(other.has_value_) {  /// Check the other Maybe_'s state...
-      has_value_ = true;
       ::new (&value_) T(other.release_value());
+      has_value_ = true;
     }
 
     return *this;
@@ -70,8 +71,8 @@ public:
     if(&other == this) return *this;
     clear();                /// clear the current value
     if(other.has_value_) {  /// Check the other Maybe_'s state...
-      has_value_ = true;
       ::new(&value_) T(other.value());
+      has_value_ = true;
     }
     
     return *this;

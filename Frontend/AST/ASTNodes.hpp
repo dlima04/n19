@@ -5,11 +5,13 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
 #include <Core/Console.hpp>
 #include <Core/Concepts.hpp>
+#include <Core/Poly.hpp>
 #include <Frontend/Lexer/Token.hpp>
 #include <Frontend/Entities/Entity.hpp>
 #include <Frontend/FrontendContext.hpp>
@@ -17,7 +19,7 @@
 #include <vector>
 #include <memory>
 
-#define N19_ASTNODE_TYPE_LIST  \
+#define RL_ASTNODE_TYPE_LIST   \
   ASTNODE_X(Node)              \
   ASTNODE_X(Vardecl)           \
   ASTNODE_X(ProcDecl)          \
@@ -49,13 +51,14 @@
   ASTNODE_X(DeferIf)           \
   ASTNODE_X(Subscript)         \
 
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
+using namespace n19;
 
 class AstNode {
 public:
   #define ASTNODE_X(NAME) NAME,
   enum class Type : uint16_t {
-    N19_ASTNODE_TYPE_LIST
+    RL_ASTNODE_TYPE_LIST
   };
   #undef ASTNODE_X
 
@@ -66,8 +69,7 @@ public:
 
   template<typename T = AstNode>
   using Children = std::vector<Ptr<T>>;
-  //////////////////////////////////////////
-  
+
   auto print_(
     uint32_t depth,
     OStream& stream,
@@ -93,7 +95,7 @@ public:
   AstNode* parent_ = nullptr;
   size_t pos_      = 0;
   uint32_t line_   = 1;
-  InputFile::ID file_ = N19_INVALID_INFILE_ID;
+  InputFile::ID file_ = RL_INVALID_INFILE_ID;
   Type type_;
   //////////////////////////////////////////
 
@@ -169,7 +171,7 @@ public:
 
 class AstEntityRef final : public AstNode {
 public:
-  Entity::ID id_= N19_INVALID_ENTITY_ID;
+  Entity::ID id_= RL_INVALID_ENTITY_ID;
 
   auto print(uint32_t depth,
     OStream& stream,
@@ -236,7 +238,7 @@ public:
 class AstNamespace final : public AstNode {
 public:
   AstNode::Children<> body_;
-  Entity::ID id_ = N19_INVALID_ENTITY_ID;
+  Entity::ID id_ = RL_INVALID_ENTITY_ID;
 
   auto print(uint32_t depth,
     OStream& stream,
@@ -415,7 +417,7 @@ public:
 
 class AstProcDecl final : public AstNode {
 public:
-  Entity::ID id_ = N19_INVALID_ENTITY_ID;
+  Entity::ID id_ = RL_INVALID_ENTITY_ID;
   AstNode::Children<> arg_decls_; // The parameter declarations (if any)
   AstNode::Children<> body_;      // The body of the procedure
 
@@ -527,10 +529,10 @@ auto AstNode::create(
     ptr->type_ = Type::NAME;           \
   }
 
-  N19_ASTNODE_TYPE_LIST
+  RL_ASTNODE_TYPE_LIST
   #undef ASTNODE_X
 
   return ptr;
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

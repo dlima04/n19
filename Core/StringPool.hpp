@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/ClassTraits.hpp>
 #include <string_view>
@@ -41,4 +42,4 @@ private:
   std::vector<char> buff_;
 };
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

@@ -14,13 +14,13 @@
 
 namespace {
   constinit
-  n19::InputFile::ID  g_inputfile_id_  = N19_INVALID_INFILE_ID + 1;
+  rl::InputFile::ID g_inputfile_id_  = RL_INVALID_INFILE_ID + 1;
 
   constinit
-  n19::OutputFile::ID g_outputfile_id_ = N19_INVALID_OUTFILE_ID + 1;
+  rl::OutputFile::ID g_outputfile_id_ = RL_INVALID_OUTFILE_ID + 1;
 }
 
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
 auto Context::get_version_info() -> VersionInfo {
   VersionInfo ver;
   ver.major = 0;
@@ -113,7 +113,7 @@ auto Context::dump(OStream& stream) -> void {
       buff += #NAME " | ";        \
     }
 
-  N19_FRONTEND_CONTEXT_FLAG_LIST
+  RL_FRONTEND_CONTEXT_FLAG_LIST
   #undef X
 
   if(!buff.empty()) {
@@ -169,4 +169,4 @@ auto Context::dump(OStream& stream) -> void {
     << "\n\n";
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

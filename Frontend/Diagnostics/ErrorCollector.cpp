@@ -14,8 +14,9 @@
 #include <Frontend/Lexer/Lexer.hpp>
 #include <algorithm>
 #include <cctype>
+BEGIN_NAMESPACE(rl);
 
-auto n19::ErrorCollector::store_error(
+auto ErrorCollector::store_error(
   const std::string& msg,
   const sys::String& file_name,
   const size_t pos,
@@ -27,7 +28,7 @@ auto n19::ErrorCollector::store_error(
   return *this;
 }
 
-auto n19::ErrorCollector::store_warning(
+auto ErrorCollector::store_warning(
   const std::string& msg,
   const sys::String& file_name,
   const size_t pos,
@@ -39,7 +40,7 @@ auto n19::ErrorCollector::store_warning(
   return *this;
 }
 
-auto n19::ErrorCollector::store_error_or_warning(
+auto ErrorCollector::store_error_or_warning(
   const sys::String& file_name,
   const ErrorLocation& err ) -> ErrorCollector&
 {
@@ -54,7 +55,7 @@ auto n19::ErrorCollector::store_error_or_warning(
   return *this;
 }
 
-auto n19::ErrorCollector::display_error(
+auto ErrorCollector::display_error(
   const std::string& msg,
   const Lexer &lxr,
   OStream& stream,
@@ -71,7 +72,7 @@ auto n19::ErrorCollector::display_error(
     is_warn);        ///
 }
 
-auto n19::ErrorCollector::display_error(
+auto ErrorCollector::display_error(
   const std::string& msg,
   const Lexer &lxr,
   const Token& tok,
@@ -88,7 +89,7 @@ auto n19::ErrorCollector::display_error(
     is_warn);        ///
 }
 
-auto n19::ErrorCollector::display_error(
+auto ErrorCollector::display_error(
   const std::string& msg,
   sys::File& file,
   OStream& stream,
@@ -113,7 +114,7 @@ auto n19::ErrorCollector::display_error(
       is_warn);
 }
 
-auto n19::ErrorCollector::display_error(
+auto ErrorCollector::display_error(
   const std::string& msg,
   const sys::String& fname,
   const std::vector<char8_t>& buff,
@@ -174,7 +175,7 @@ auto n19::ErrorCollector::display_error(
     << "\n\n";       ///
 }
 
-auto n19::ErrorCollector::emit(OStream& stream) const -> Result<void> {
+auto ErrorCollector::emit(OStream& stream) const -> Result<void> {
   std::vector<char8_t> buff;
   for(const auto &[file_name, errs] : errs_) {
     auto file = TRY(sys::File::open(file_name));
@@ -200,3 +201,5 @@ auto n19::ErrorCollector::emit(OStream& stream) const -> Result<void> {
 
   return Result<void>::create();
 }
+
+END_NAMESPACE(rl);

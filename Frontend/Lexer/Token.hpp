@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Platform.hpp>
@@ -13,9 +14,11 @@
 #include <string>
 #include <cstdint>
 #include <vector>
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
 
-#define N19_TOKEN_TYPE_LIST      \
+using namespace n19;
+
+#define RL_TOKEN_TYPE_LIST       \
   X(None, "")                    \
   X(EndOfFile, "\\0")            \
   X(Illegal, "")                 \
@@ -109,7 +112,7 @@ BEGIN_NAMESPACE(n19);
   X(SkinnyArrow, "->")           \
   X(FatArrow, "=>")              \
 
-#define N19_TOKEN_CATEGORY_LIST  \
+#define RL_TOKEN_CATEGORY_LIST  \
   X(NonCategorical, 0ULL)        \
   X(Punctuator, 1ULL)            \
   X(UnaryOp, 1ULL << 1)          \
@@ -137,7 +140,7 @@ class TokenType {
 public:
   #define X(TOKEN_TYPE, STR_UNUSED) TOKEN_TYPE,
   enum Value : uint16_t {
-    N19_TOKEN_TYPE_LIST
+    RL_TOKEN_TYPE_LIST
   };
   #undef X
 
@@ -162,7 +165,7 @@ class TokenCategory {
 public:
   #define X(CAT, MASK) CAT = MASK,
   enum Value : size_t {
-    N19_TOKEN_CATEGORY_LIST
+    RL_TOKEN_CATEGORY_LIST
   };
   #undef X
 
@@ -216,4 +219,4 @@ FORCEINLINE_ auto TokenCategory::isa(const TokenCategory val) const -> bool {
   return this->value & val.value;
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

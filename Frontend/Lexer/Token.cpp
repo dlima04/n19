@@ -9,7 +9,7 @@
 #include <Core/Murmur3.hpp>
 #include <algorithm>
 #include <new>
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
 
 auto Token::eof(
   const uint32_t pos, const uint32_t line ) -> Token
@@ -40,7 +40,7 @@ auto Token::illegal(
 auto TokenType::to_string() const -> std::string {
   #define X(TYPE, STR) case TokenType::TYPE: return #TYPE;
   switch(value) {
-    N19_TOKEN_TYPE_LIST
+    RL_TOKEN_TYPE_LIST
     default: return "Unknown"; // Failsafe
   }
   #undef X
@@ -55,7 +55,7 @@ auto TokenType::to_string() const -> std::string {
 auto TokenType::string_repr() const -> std::string {
 #define X(TYPE, STR) case TokenType::TYPE: return STR;
   switch(value) {
-    N19_TOKEN_TYPE_LIST
+    RL_TOKEN_TYPE_LIST
     default: return "Unknown"; // Failsafe
   }
 #undef X
@@ -66,7 +66,7 @@ auto TokenType::string_repr() const -> std::string {
 auto TokenCategory::to_string() const -> std::string {
   #define X(CAT, UNUSED) if(value & CAT) buff += (std::string(#CAT) + " | ");
    std::string buff;
-   N19_TOKEN_CATEGORY_LIST
+   RL_TOKEN_CATEGORY_LIST
   #undef X
 
   if(!buff.empty() && buff[buff.size() - 2] == '|') {
@@ -89,7 +89,7 @@ auto TokenCategory::from_keyword(const std::u8string_view& str)
 
   switch(murmur3_x86_32(str, seed)) {
 #define KEYWORD_X(NAME, UNUSED, CAT) case u8##NAME##_mm32: return CAT;
-    N19_HIR_KEYWORDS; default: break;
+    LR_KEYWORDS; default: break;
 #undef KEYWORD_X
   }
 
@@ -138,7 +138,7 @@ auto TokenType::from_keyword(const std::u8string_view& keyword)
 
   switch(murmur3_x86_32(keyword, seed)) {
 #define KEYWORD_X(NAME, TYPE, UNUSED) case u8##NAME##_mm32: return TYPE;
-  N19_HIR_KEYWORDS; default: break;
+  LR_KEYWORDS; default: break;
 #undef KEYWORD_X
   }
 
@@ -192,4 +192,4 @@ auto TokenType::prec() const -> Precedence::Value {
   PANIC("TokenType::prec(): default assertion.");
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

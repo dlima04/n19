@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Bulwark/Case.hpp>
 #include <Bulwark/Suite.hpp>
 #include <System/String.hpp>

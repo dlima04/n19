@@ -3,24 +3,22 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Frontend/Lexer/Lexer.hpp>
 #include <Frontend/FrontendContext.hpp>
 #include <Frontend/Common/CompilationCycle.hpp>
-#include <Frontend/Common/StringPool.hpp>
 #include <Core/Console.hpp>
 #include <Core/Fmt.hpp>
 #include <Core/ArgParse.hpp>
 #include <cstdlib>
 #include <utility>
-#include <Core/Result.hpp>
 #include <Core/Defer.hpp>
+#include <Core/Poly.hpp>
 #include <Core/Try.hpp>
-#include <iostream>
 #include <System/BackTrace.hpp>
+#include <System/SharedRegion.hpp>
 
 #define ARGNUM_HARD_LIMIT 40
 
-using namespace n19;
+using namespace rl;
 
 struct MainArgParser : argp::Parser {
   argp::PackType& inputs  = arg<argp::PackType>(
@@ -175,7 +173,7 @@ int main() {
 
   int arg_count = 0;
   ::LPWSTR* args = ::CommandLineToArgvW(cmdline, &arg_count);
-  if (args == nullptr) {
+  if(args == nullptr) {
     outs()
       << "Could not retrieve win32 argv. Error code="
       << ::GetLastError()
@@ -183,7 +181,7 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  if (arg_count > ARGNUM_HARD_LIMIT) {
+  if(arg_count > ARGNUM_HARD_LIMIT) {
     outs() << "Too many command-line arguments passed.";
     outs() << "\n";
     ::LocalFree(args);
@@ -192,17 +190,17 @@ int main() {
 
   /// Initialize context
   auto stream = OStream::from_stdout();
-  if (arg_count > 1 && !parser.take_argv(arg_count, args).parse(stream)) {
+  if(arg_count > 1 && !parser.take_argv(arg_count, args).parse(stream)) {
     ::LocalFree(args);
     return EXIT_FAILURE;
   }
 
   ::LocalFree(args);
-  if (!verify_args(parser)) {
+  if(!verify_args(parser)) {
     return EXIT_FAILURE;
   }
 
-  if (!begin_global_compilation_cycles()) {
+  if(!begin_global_compilation_cycles()) {
     errs() << "Build failed.\n";
     return EXIT_FAILURE;
   }
@@ -211,6 +209,7 @@ int main() {
 }
 
 #else /// POSIX
+
 int main(int argc, char** argv){
   outs() << Con::Reset;
   DEFER({
@@ -231,11 +230,11 @@ int main(int argc, char** argv){
     return EXIT_FAILURE;
   }
 
-  if (!verify_args(parser)) {
+  if(!verify_args(parser)) {
     return EXIT_FAILURE;
   }
 
-  if (!begin_global_compilation_cycles()) {
+  if(!begin_global_compilation_cycles()) {
     errs() << "Build failed.\n";
     return EXIT_FAILURE;
   }

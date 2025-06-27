@@ -5,10 +5,11 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/Concepts.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/Platform.hpp>
-#include <Misc/Macros.hpp>
+#include <Core/MacroUtil.hpp>
 #include <utility>
 BEGIN_NAMESPACE(n19);
 

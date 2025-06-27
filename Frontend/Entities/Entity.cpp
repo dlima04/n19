@@ -6,11 +6,11 @@
 #include <Frontend/Entities/EntityTable.hpp>
 #include <Core/Fmt.hpp>
 #include <Core/Console.hpp>
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
 
 BuiltinType::BuiltinType(const Type type) {
   #define X(TYPE, STR, _1) if(type == TYPE){ lname_ = STR; name_ = "::" STR; }
-  N19_ENTITY_BUILTIN_LIST
+  RL_ENTITY_BUILTIN_LIST
   #undef X
 }
 
@@ -18,10 +18,10 @@ auto EntityQualifier::format() const -> std::string {
   std::string buff;
 
   #define X(EQ_FLAG, UNUSED)                      \
-  if(flags_ & n19::EntityQualifierBase::EQ_FLAG){ \
+  if(flags_ & rl::EntityQualifierBase::EQ_FLAG){  \
     buff += #EQ_FLAG " | ";                       \
   }
-    N19_EQ_FLAG_LIST
+    RL_EQ_FLAG_LIST
   #undef X
 
   if(!buff.empty()) {
@@ -50,10 +50,10 @@ auto EntityQualifierThunk::format() const -> std::string {
   std::string buff;
 
   #define X(EQ_FLAG, UNUSED)                      \
-  if(flags_ & n19::EntityQualifierBase::EQ_FLAG){ \
+  if(flags_ & rl::EntityQualifierBase::EQ_FLAG){  \
     buff += #EQ_FLAG " | ";                       \
   }
-    N19_EQ_FLAG_LIST
+    RL_EQ_FLAG_LIST
   #undef X
 
   if(!buff.empty()) {
@@ -110,7 +110,7 @@ auto EntityQualifier::to_string(
 
   if(include_qualifiers) {
     #define X(VAL, UNUSED) if(flags_ & VAL) buff.append(#VAL " ");
-    N19_EQ_FLAG_LIST /* convert to string repr */
+    RL_EQ_FLAG_LIST /* convert to string repr */
     #undef X
   }
 
@@ -131,7 +131,7 @@ auto EntityQualifierThunk::to_string(
   buff.reserve(name_.size() + 6);
   if(include_qualifiers) {
     #define X(VAL, UNUSED) if(flags_ & VAL) buff.append(#VAL " ");
-    N19_EQ_FLAG_LIST /* convert to string repr */
+    RL_EQ_FLAG_LIST /* convert to string repr */
     #undef X
   }
 
@@ -192,7 +192,7 @@ auto Entity::print_(
   break;
 
   switch(type_.value) {
-    N19_ENTITY_TYPE_LIST
+    RL_ENTITY_TYPE_LIST
     default: UNREACHABLE_ASSERTION;
   }
 #undef X
@@ -251,10 +251,10 @@ auto AliasType::print(
   std::string buff;
 
   #define X(EQ_FLAG, UNUSED)                             \
-  if(quals_.flags_ & n19::EntityQualifierBase::EQ_FLAG){ \
+  if(quals_.flags_ & rl::EntityQualifierBase::EQ_FLAG){ \
     buff += #EQ_FLAG " | ";                              \
   }
-    N19_EQ_FLAG_LIST
+    RL_EQ_FLAG_LIST
   #undef X
 
   if(!buff.empty()) {
@@ -352,7 +352,7 @@ auto RootEntity::print(
 auto EntityType::to_string() const -> std::string {
   #define X(NAME) case EntityType::NAME: return #NAME;
   switch(this->value) {
-    N19_ENTITY_TYPE_LIST
+    RL_ENTITY_TYPE_LIST
     case EntityType::None: return "None";
     default: break;
   }
@@ -373,4 +373,4 @@ auto EntityType::is_udt() const -> bool {
   }
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

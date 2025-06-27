@@ -5,13 +5,13 @@
 
 #include <Frontend/Entities/EntityTable.hpp>
 #include <algorithm>
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
 
 EntityTable::EntityTable(const sys::String& name) {
   /// Initialize the root entity.
   root_         = std::make_shared<RootEntity>();
-  root_->id_    = N19_ROOT_ENTITY_ID;
-  root_->file_  = N19_INVALID_INFILE_ID;
+  root_->id_    = RL_ROOT_ENTITY_ID;
+  root_->file_  = RL_INVALID_INFILE_ID;
   root_->line_  = 0;
   root_->pos_   = 0;
   root_->type_  = EntityType::RootEntity;
@@ -23,7 +23,7 @@ EntityTable::EntityTable(const sys::String& name) {
   /// Ensure that their parent is the root entity.
   constexpr BuiltinType::Type builtins[] = {
   #define X(TYPE, _1, _2) BuiltinType::Type{BuiltinType::TYPE},
-    N19_ENTITY_BUILTIN_LIST
+    RL_ENTITY_BUILTIN_LIST
   #undef X
   };
 
@@ -34,7 +34,7 @@ EntityTable::EntityTable(const sys::String& name) {
     ptr->parent_ = root_->id_;
     ptr->id_     = id;
     ptr->type_   = EntityType::BuiltinType;
-    ptr->file_   = N19_INVALID_INFILE_ID;
+    ptr->file_   = RL_INVALID_INFILE_ID;
 
     root_->chldrn_.emplace_back(id);
     map_[id] = std::move(ptr);
@@ -52,7 +52,7 @@ auto EntityTable::resolve_link(Entity::Ptr<SymLink> ptr) const -> Entity::Ptr<> 
   Entity::Ptr<SymLink> next = ptr;
 
   do {
-    ASSERT(next->link_ != N19_INVALID_ENTITY_ID);
+    ASSERT(next->link_ != RL_INVALID_ENTITY_ID);
     ASSERT(exists(next->link_));
     curr = map_.at(next->link_);
     next = Entity::try_cast<SymLink>(curr);
@@ -62,7 +62,7 @@ auto EntityTable::resolve_link(Entity::Ptr<SymLink> ptr) const -> Entity::Ptr<> 
 }
 
 auto EntityTable::exists(const Entity::ID id) const -> bool {
-  ASSERT(id != N19_INVALID_ENTITY_ID);
+  ASSERT(id != RL_INVALID_ENTITY_ID);
   return map_.contains(id);
 }
 
@@ -106,7 +106,7 @@ auto EntityTable::dump_structures(OStream& stream) -> void {
         if(ptr->members_[i].quals_.flags_ & EntityQualifierBase::VAL) \
         { stream << #VAL " "; }
 
-        N19_EQ_FLAG_LIST
+        RL_EQ_FLAG_LIST
     #undef X
 
       stream << Con::Reset;
@@ -125,4 +125,4 @@ auto EntityTable::dump_structures(OStream& stream) -> void {
   stream << "\n";
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

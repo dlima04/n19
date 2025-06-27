@@ -12,13 +12,13 @@
 
 ///
 /// Public parsing functions
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
 auto parse(ParseContext& ctx) -> bool;
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);
 
 ///
 /// Internal parsing functions
-BEGIN_NAMESPACE(n19::detail_);
+BEGIN_NAMESPACE(rl::detail_);
 
 auto parse_begin_(
   ParseContext& ctx,
@@ -59,4 +59,4 @@ auto parse_subscript_(ParseContext&, AstNode::Ptr<> &&) -> Result<AstNode::Ptr<>
 auto parse_call_(ParseContext&, AstNode::Ptr<>&&)       -> Result<AstNode::Ptr<>>;
 auto parse_binexpr_(ParseContext&, AstNode::Ptr<>&&)    -> Result<AstNode::Ptr<>>;
 
-END_NAMESPACE(n19::detail_);
+END_NAMESPACE(rl::detail_);

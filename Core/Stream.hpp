@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <System/String.hpp>
 #include <System/IODevice.hpp>
 #include <Core/Bytes.hpp>

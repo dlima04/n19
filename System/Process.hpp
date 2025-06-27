@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/ClassTraits.hpp>
 #include <System/Win32.hpp>
 #include <Core/Platform.hpp>

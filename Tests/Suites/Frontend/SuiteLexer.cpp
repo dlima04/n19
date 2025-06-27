@@ -8,7 +8,7 @@
 #include <Frontend/Lexer/Token.hpp>
 #include <vector>
 #include <string>
-using namespace n19;
+using namespace rl;
 
 static auto create_lexer(const std::string& source) -> std::shared_ptr<Lexer> {
   std::vector<char8_t> buffer;
@@ -448,18 +448,18 @@ TEST_CASE(Lexer, Expect) {
   SECTION(ExpectTokenType, {
     auto lexer = create_lexer("42 + 10");
     
-    REQUIRE(lexer->expect_type(n19::TokenType::IntLiteral).has_value());
-    REQUIRE(lexer->expect_type(n19::TokenType::Plus).has_value());
-    REQUIRE(lexer->expect_type(n19::TokenType::IntLiteral).has_value());
-    REQUIRE(lexer->expect_type(n19::TokenType::EndOfFile).has_value());
+    REQUIRE(lexer->expect_type(rl::TokenType::IntLiteral).has_value());
+    REQUIRE(lexer->expect_type(rl::TokenType::Plus).has_value());
+    REQUIRE(lexer->expect_type(rl::TokenType::IntLiteral).has_value());
+    REQUIRE(lexer->expect_type(rl::TokenType::EndOfFile).has_value());
   });
 
   SECTION(ExpectTokenCategory, {
     auto lexer = create_lexer("42 + 10");
 
-    REQUIRE(lexer->expect(n19::TokenCategory::Literal).has_value());
-    REQUIRE(lexer->expect(n19::TokenCategory::ArithmeticOp).has_value());
-    REQUIRE(lexer->expect(n19::TokenCategory::Literal).has_value());
+    REQUIRE(lexer->expect(rl::TokenCategory::Literal).has_value());
+    REQUIRE(lexer->expect(rl::TokenCategory::ArithmeticOp).has_value());
+    REQUIRE(lexer->expect(rl::TokenCategory::Literal).has_value());
     REQUIRE(lexer->current() == TokenType::EndOfFile);
   });
 

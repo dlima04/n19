@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 BEGIN_NAMESPACE(n19);
 
 template<typename...>

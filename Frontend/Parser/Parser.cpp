@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <utility>
 #include <filesystem>
-BEGIN_NAMESPACE(n19::detail_);
+BEGIN_NAMESPACE(rl::detail_);
 
 auto is_node_toplevel_valid_(const AstNode::Ptr<> &ptr) -> bool {
 #if 1
@@ -402,7 +402,7 @@ auto parse_deep_ident_(ParseContext& ctx) -> Result<Entity::ID> {
 
   /// In case of the unary "::".
   if(ctx.on_type(TokenType::NamespaceOperator)) {
-    ctx.curr_namespace = N19_ROOT_ENTITY_ID;
+    ctx.curr_namespace = RL_ROOT_ENTITY_ID;
     ctx.lxr.consume(1);
   }
 
@@ -874,7 +874,7 @@ auto get_next_include_(ParseContext& ctx) -> bool {
   }
 
   next->state        = InputFileState::Finished;
-  ctx.curr_namespace = N19_ROOT_ENTITY_ID;
+  ctx.curr_namespace = RL_ROOT_ENTITY_ID;
   ctx.paren_level    = 0;
 
   ASSERT(ctx.lxr.reset(*file));
@@ -882,11 +882,11 @@ auto get_next_include_(ParseContext& ctx) -> bool {
   return true;
 }
 
-END_NAMESPACE(n19::detail_);
-BEGIN_NAMESPACE(n19);
+END_NAMESPACE(rl::detail_);
+BEGIN_NAMESPACE(rl);
 
 auto parse(ParseContext& ctx) -> bool {
   return detail_::parse_impl_(ctx);
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

@@ -9,56 +9,12 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 # Build options
 option(ENABLE_ASAN "clang asan" ON)
 
-set(N19_ENUMERATE_GLOBAL_SOURCES
-  Frontend/Diagnostics/ErrorCollector.cpp
-  Frontend/Entities/EntityTable.cpp
-  Frontend/Entities/Entity.cpp
-  Frontend/AST/DumpAST.cpp
-  Frontend/Lexer/Lexer.cpp
-  Frontend/Lexer/Token.cpp
-  Frontend/FrontendContext.cpp
-  Frontend/Parser/Parser.cpp
-  Frontend/Common/CompilationCycle.cpp
-  Frontend/Interpreter/Interpreter.cpp
-  Frontend/Common/StringPool.cpp
-  System/Error.cpp
-  System/IODevice.cpp
-  System/Time.cpp
-  System/BackTrace.cpp
-  System/File.cpp
-  System/Process.cpp
-  Core/Panic.cpp
-  Core/ArgParse.cpp
-  Core/StringUtil.cpp
-  Core/Console.cpp
-  Core/Stream.cpp
-)
 
-set(N19_ENUMERATE_GLOBAL_HEADERS
-  System/String.hpp
-  System/Error.hpp
-  System/IODevice.hpp
-  System/Handle.hpp
-  System/Time.hpp
-  System/BackTrace.hpp
-  System/File.hpp
-  System/Win32.hpp
-  System/Process.hpp
-  Frontend/Lexer/Token.hpp
-  Frontend/Diagnostics/ErrorCollector.hpp
-  Frontend/AST/ASTNodes.hpp
-  Frontend/Entities/EntityTable.hpp
-  Frontend/Entities/Entity.hpp
-  Frontend/Lexer/Lexer.hpp
-  Frontend/Lexer/Keywords.hpp
-  Frontend/Parser/ParseContext.hpp
-  Frontend/Parser/Parser.hpp
-  Frontend/FrontendContext.hpp
-  Frontend/Common/CompilationCycle.hpp
-  Frontend/Interpreter/Interpreter.hpp
-  Frontend/Common/StringPool.hpp
-  Misc/Global.hpp
-  Misc/Macros.hpp
+########################################################
+# ENUMERATE HEADERS BY CATEGORY
+########################################################
+
+set(N19_ENUMERATE_HEADERS_CORE
   Core/Panic.hpp
   Core/Concepts.hpp
   Core/RingBase.hpp
@@ -80,7 +36,96 @@ set(N19_ENUMERATE_GLOBAL_HEADERS
   Core/Console.hpp
   Core/Fmt.hpp
   Core/Stream.hpp
+  Core/Poly.hpp
+  Core/StringPool.hpp
+  Core/MacroUtil.hpp
+  Core/Common.hpp
 )
+
+set(N19_ENUMERATE_HEADERS_FRONTEND
+  Frontend/Lexer/Token.hpp
+  Frontend/Diagnostics/ErrorCollector.hpp
+  Frontend/AST/ASTNodes.hpp
+  Frontend/Entities/EntityTable.hpp
+  Frontend/Entities/Entity.hpp
+  Frontend/Lexer/Lexer.hpp
+  Frontend/Lexer/Keywords.hpp
+  Frontend/Parser/ParseContext.hpp
+  Frontend/Parser/Parser.hpp
+  Frontend/FrontendContext.hpp
+  Frontend/Common/CompilationCycle.hpp
+)
+
+set(N19_ENUMERATE_HEADERS_SYSTEM
+  System/String.hpp
+  System/Error.hpp
+  System/IODevice.hpp
+  System/Handle.hpp
+  System/Time.hpp
+  System/BackTrace.hpp
+  System/File.hpp
+  System/Win32.hpp
+  System/Process.hpp
+  System/SharedRegion.hpp
+)
+
+
+########################################################
+# ENUMERATE SOURCES BY CATEGORY
+########################################################
+
+set(N19_ENUMERATE_SOURCES_CORE
+  Core/Panic.cpp
+  Core/ArgParse.cpp
+  Core/StringUtil.cpp
+  Core/Console.cpp
+  Core/Stream.cpp
+  Core/StringPool.cpp
+)
+
+set(N19_ENUMERATE_SOURCES_FRONTEND
+  Frontend/Diagnostics/ErrorCollector.cpp
+  Frontend/Entities/EntityTable.cpp
+  Frontend/Entities/Entity.cpp
+  Frontend/AST/DumpAST.cpp
+  Frontend/Lexer/Lexer.cpp
+  Frontend/Lexer/Token.cpp
+  Frontend/FrontendContext.cpp
+  Frontend/Parser/Parser.cpp
+  Frontend/Common/CompilationCycle.cpp
+)
+
+set(N19_ENUMERATE_SOURCES_SYSTEM
+  System/Error.cpp
+  System/IODevice.cpp
+  System/Time.cpp
+  System/BackTrace.cpp
+  System/File.cpp
+  System/Process.cpp
+  System/SharedRegion.cpp
+)
+
+
+########################################################
+# ENUMERATE HEADERS/SOURCES GLOBALLY
+########################################################
+
+set(N19_ENUMERATE_GLOBAL_HEADERS
+  ${N19_ENUMERATE_HEADERS_CORE}
+  ${N19_ENUMERATE_HEADERS_FRONTEND}
+  ${N19_ENUMERATE_HEADERS_SYSTEM}
+)
+
+set(N19_ENUMERATE_GLOBAL_SOURCES
+  ${N19_ENUMERATE_SOURCES_CORE}
+  ${N19_ENUMERATE_SOURCES_FRONTEND}
+  ${N19_ENUMERATE_SOURCES_SYSTEM}
+)
+
+
+########################################################
+# ENUMERATE TEST SUITES
+########################################################
 
 set(N19_ENUMERATE_SUITES_CORE
   Tests/Suites/Core/SuiteMaybe.cpp
@@ -109,6 +154,11 @@ set(N19_ENUMERATE_PRIMARY_EXECUTABLES
   bulwark  # The unit test executable
 )
 
+
+########################################################
+# SET BUILD CONFIG
+########################################################
+
 set(N19_BUILD_PLATFORM ${CMAKE_HOST_SYSTEM_NAME})
 set(N19_IS_DARWIN OFF)
 set(N19_IS_LINUX OFF)
@@ -128,14 +178,46 @@ else()
   message(FATAL_ERROR "Unsupported build platform.")
 endif()
 
-# Build the main compiler executable
+
+########################################################
+# FUNCTIONS
+########################################################
+
+function(add_platform_macros target)
+  if(N19_IS_LINUX)
+    target_compile_definitions(${target} PRIVATE N19_POSIX)
+    target_compile_definitions(${target} PRIVATE N19_LINUX)
+  elseif(N19_IS_DARWIN)
+    target_compile_definitions(${target} PRIVATE N19_POSIX)
+    target_compile_definitions(${target} PRIVATE N19_DARWIN)
+  else()
+    target_compile_definitions(${target} PRIVATE N19_WIN32)
+  endif()
+endfunction()
+
+function(enable_clang_sanitizer target)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    list(REMOVE_AT ARGV 0)
+    string(REPLACE ";" "," sanitizer "${ARGV}")
+    message(STATUS "Build Target ${target} -- Clang Sanitizer Enabled: ${sanitizer}")
+    target_compile_options(${target} PRIVATE -fsanitize=${sanitizer} -g -fno-omit-frame-pointer)
+    target_link_libraries(${target} PRIVATE -fsanitize=${sanitizer})
+  else()
+    message(FATAL_ERROR "enable_clang_sanitizer must be used with Clang!")
+  endif()
+endfunction()
+
+
+########################################################
+# BUILD EXECUTABLES
+########################################################
+
 add_executable(n19
-  Misc/CompilerMain.cpp
+  Frontend/FrontendMain.cpp
   ${N19_ENUMERATE_GLOBAL_SOURCES}
   ${N19_ENUMERATE_GLOBAL_HEADERS}
 )
 
-# Build the unit test executable
 add_executable(bulwark
   Misc/BulwarkMain.cpp
   Bulwark/Reporting.cpp
@@ -156,45 +238,14 @@ add_executable(bulwark
   ${N19_ENUMERATE_GLOBAL_HEADERS}
 )
 
-function(add_platform_macros target)
-  if(N19_IS_LINUX)
-    target_compile_definitions(${target} PRIVATE N19_POSIX)
-    target_compile_definitions(${target} PRIVATE N19_LINUX)
-  elseif(N19_IS_DARWIN)
-    target_compile_definitions(${target} PRIVATE N19_POSIX)
-    target_compile_definitions(${target} PRIVATE N19_DARWIN)
-  else()
-    target_compile_definitions(${target} PRIVATE N19_WIN32)
-  endif()
-endfunction()
-
-function(enable_clang_sanitizer target) 
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    list(REMOVE_AT ARGV 0)
-    string(REPLACE ";" "," sanitizer "${ARGV}")
-    message(STATUS "Build Target ${target} -- Clang Sanitizer Enabled: ${sanitizer}")
-    target_compile_options(${target} PRIVATE -fsanitize=${sanitizer} -g -fno-omit-frame-pointer)
-    target_link_libraries(${target} PRIVATE -fsanitize=${sanitizer})
-  else()
-    message(FATAL_ERROR "enable_clang_sanitizer must be used with Clang!")
-  endif()
-endfunction()
-
-# Build all executables
 foreach(executable ${N19_ENUMERATE_PRIMARY_EXECUTABLES})
   target_include_directories(${executable} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
   add_platform_macros(${executable})
 
-  # TODO: this is temporary, and can be done better.
+  # TODO: this can be done better.
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     if(NOT N19_IS_WINDOWS AND ENABLE_ASAN)
       enable_clang_sanitizer(${executable} address)
     endif()
-  endif()
-
-  if(MSVC)
-    target_compile_options(${executable} PRIVATE /FI Misc/Global.hpp)
-  else()
-    target_compile_options(${executable} PRIVATE -include Misc/Global.hpp)
   endif()
 endforeach()

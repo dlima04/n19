@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <Misc/Macros.hpp>
+#include <Core/Common.hpp>
+#include <Core/MacroUtil.hpp>
 #include <Core/Panic.hpp>
 #include <Bulwark/Registry.hpp>
 #include <Bulwark/Reporting.hpp>

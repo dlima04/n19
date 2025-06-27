@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <System/String.hpp>
 #include <Bulwark/Case.hpp>
 #include <vector>

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/Bytes.hpp>
 #include <Core/Platform.hpp>
 #include <Core/ClassTraits.hpp>
@@ -28,7 +29,9 @@
 #define CH_IS_SPACE(CH)  (std::isspace((uint8_t)CH))
 #define CH_IS_DIGIT(CH)  (std::isdigit((uint8_t)CH))
 
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
+using namespace n19;
+
 class Lexer final : public std::enable_shared_from_this<Lexer> {
   N19_MAKE_NONCOPYABLE(Lexer);
   N19_MAKE_COMPARABLE_MEMBER(Lexer, file_name_);
@@ -184,4 +187,4 @@ inline auto Lexer::current() const -> const Token& {
   return curr_;
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

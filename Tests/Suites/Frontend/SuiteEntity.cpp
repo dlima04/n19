@@ -5,15 +5,15 @@
 
 #include <Bulwark/Bulwark.hpp>
 #include <Frontend/Entities/EntityTable.hpp>
-using namespace n19;
+using namespace rl;
 
 TEST_CASE(Entity, SymLinks) {
   SECTION(BasicResolution, {
     EntityTable table(_nstr("MyTable"));
-    auto ptr1 = table.insert<SymLink>(N19_ROOT_ENTITY_ID, 1,  1, 1, "entity1");
+    auto ptr1 = table.insert<SymLink>(RL_ROOT_ENTITY_ID, 1,  1, 1, "entity1");
     REQUIRE(ptr1);
 
-    auto ptr2 = table.insert<Struct>(N19_ROOT_ENTITY_ID, 10,  10, 1, "entity2");
+    auto ptr2 = table.insert<Struct>(RL_ROOT_ENTITY_ID, 10,  10, 1, "entity2");
     REQUIRE(ptr2);
 
     ptr1->link_ = ptr2->id_;
@@ -25,13 +25,13 @@ TEST_CASE(Entity, SymLinks) {
 
   SECTION(MultiLevelResolution, {
     EntityTable table(_nstr("MyTable"));
-    auto ptr1 = table.insert<SymLink>(N19_ROOT_ENTITY_ID, 1,  1, 1, "entity1");
+    auto ptr1 = table.insert<SymLink>(RL_ROOT_ENTITY_ID, 1,  1, 1, "entity1");
     REQUIRE(ptr1);
 
-    auto ptr2 = table.insert<AliasType>(N19_ROOT_ENTITY_ID, 10,  10, 1, "entity2");
+    auto ptr2 = table.insert<AliasType>(RL_ROOT_ENTITY_ID, 10,  10, 1, "entity2");
     REQUIRE(ptr2);
 
-    auto ptr3 = table.insert<Struct>(N19_ROOT_ENTITY_ID, 20,  30, 1, "entity3");
+    auto ptr3 = table.insert<Struct>(RL_ROOT_ENTITY_ID, 20,  30, 1, "entity3");
     REQUIRE(ptr3);
 
     ptr1->link_ = ptr2->id_;

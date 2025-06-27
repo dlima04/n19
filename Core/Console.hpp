@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/Stream.hpp>
 #include <Core/Fmt.hpp>
 BEGIN_NAMESPACE(n19);

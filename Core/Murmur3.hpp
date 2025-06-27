@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/Platform.hpp>
 #include <cstdint>
 #include <string_view>

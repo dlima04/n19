@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Concepts.hpp>
 #include <Core/Platform.hpp>

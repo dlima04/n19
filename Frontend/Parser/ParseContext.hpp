@@ -13,7 +13,9 @@
 #include <Core/Stream.hpp>
 #include <string>
 #include <cstdint>
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
+
+using namespace n19;
 
 struct ParseContext {
   InputFile::ID   curr_file;
@@ -33,7 +35,7 @@ struct ParseContext {
     Lexer& lxr,
     EntityTable& entities
   ) : curr_file(inf_id)
-    , curr_namespace(N19_ROOT_ENTITY_ID)
+    , curr_namespace(RL_ROOT_ENTITY_ID)
     , errstream(errstream)
     , errors(errors)
     , lxr(lxr)
@@ -50,4 +52,4 @@ struct ParseContext {
   ~ParseContext() = default;
 };
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

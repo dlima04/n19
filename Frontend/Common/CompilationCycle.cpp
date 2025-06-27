@@ -9,7 +9,9 @@
 #include <Core/Console.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Defer.hpp>
-BEGIN_NAMESPACE(n19);
+BEGIN_NAMESPACE(rl);
+
+using namespace n19;
 
 bool begin_global_compilation_cycles() {
   [[maybe_unused]] auto& inputs  = Context::the().inputs_;
@@ -112,4 +114,4 @@ bool begin_global_compilation_cycles() {
   return true;
 }
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);

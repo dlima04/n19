@@ -5,7 +5,7 @@
 
 #pragma once
 
-#define N19_HIR_KEYWORDS                                        \
+#define LR_KEYWORDS                                             \
   KEYWORD_X("return", Return, Keyword)                          \
   KEYWORD_X("break", Break, Keyword)                            \
   KEYWORD_X("continue", Continue, Keyword | ControlFlow)        \
@@ -35,6 +35,4 @@
   KEYWORD_X("true", BooleanLiteral, Literal)                    \
   KEYWORD_X("false", BooleanLiteral, Literal)                   \
   KEYWORD_X("null", NullLiteral, Literal)                       \
-
-#define N19_LIR_KEYWORDS                                        \
 

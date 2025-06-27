@@ -4,8 +4,10 @@
 */
 
 #pragma once
-BEGIN_NAMESPACE(n19);
+
+#include <Core/Common.hpp>
+BEGIN_NAMESPACE(rl);
 
 auto begin_global_compilation_cycles() -> bool;
 
-END_NAMESPACE(n19);
+END_NAMESPACE(rl);
