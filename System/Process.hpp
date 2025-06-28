@@ -6,13 +6,13 @@
 #pragma once
 
 #include <Core/Common.hpp>
-#include <Core/ClassTraits.hpp>
-#include <System/Win32.hpp>
 #include <Core/Platform.hpp>
+#include <Core/ClassTraits.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
-#include <System/String.hpp>
 #include <Core/Console.hpp>
+#include <System/Win32.hpp>
+#include <System/String.hpp>
 #include <cstdint>
 #include <vector>
 #include <utility>

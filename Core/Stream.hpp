@@ -6,10 +6,10 @@
 #pragma once
 
 #include <Core/Common.hpp>
+#include <Core/Platform.hpp>
 #include <System/String.hpp>
 #include <System/IODevice.hpp>
 #include <Core/Bytes.hpp>
-#include <Core/Platform.hpp>
 #include <Core/Concepts.hpp>
 #include <string_view>
 #include <cstdint>

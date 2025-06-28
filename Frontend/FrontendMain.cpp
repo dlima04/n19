@@ -3,18 +3,18 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Frontend/FrontendContext.hpp>
-#include <Frontend/Common/CompilationCycle.hpp>
 #include <Core/Console.hpp>
 #include <Core/Fmt.hpp>
 #include <Core/ArgParse.hpp>
-#include <cstdlib>
-#include <utility>
 #include <Core/Defer.hpp>
-#include <Core/Poly.hpp>
 #include <Core/Try.hpp>
+#include <Core/Platform.hpp>
+#include <Frontend/FrontendContext.hpp>
+#include <Frontend/Common/CompilationCycle.hpp>
 #include <System/BackTrace.hpp>
 #include <System/SharedRegion.hpp>
+#include <cstdlib>
+#include <utility>
 
 #define ARGNUM_HARD_LIMIT 40
 

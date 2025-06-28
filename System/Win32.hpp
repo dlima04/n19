@@ -5,6 +5,8 @@
 
 #ifndef N19_SYS_WIN32_HPP
 #define N19_SYS_WIN32_HPP
+
+#include <Core/Platform.hpp>
 #ifdef N19_WIN32
 
 #ifndef WIN32_LEAN_AND_MEAN

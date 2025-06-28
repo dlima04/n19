@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
+#include <Core/Platform.hpp>
 #include <Core/Result.hpp>
 #include <Core/Try.hpp>
 #include <Frontend/Parser/ParseContext.hpp>

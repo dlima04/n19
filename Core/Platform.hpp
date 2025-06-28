@@ -31,18 +31,23 @@
 #  define N19_CLANG 0
 #  define N19_MSVC  1
 #else
-#  warning "Core/Platform.hpp: Unknown compiler!"
-#  warning "Expected Clang, GCC, or MSVC."
+#  error "Core/Platform.hpp: Unsupported target!"
 #endif
 
 ///
-/// Weird edge case where we're using Apple's version of Clang,
-/// not sure if this will actually make any difference (probably not)
-/// but probably still worth keeping here.
-#if N19_CLANG && defined(N19_MACOS)
-#  define N19_CLANG_APPLE 1
+/// Attempt to detect target operating system...
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#  define N19_WIN32
+#elif defined(__APPLE__) && defined(__MACH__)
+#  define N19_DARWIN
+#elif defined(__linux__)
+#  define N19_LINUX
 #else
-#  define N19_CLANG_APPLE 0
+#  error "Core/Platform.hpp: Unsupported target!"
+#endif
+
+#if defined(N19_DARWIN) || defined(N19_LINUX)
+#  define N19_POSIX
 #endif
 
 ///
@@ -51,7 +56,7 @@
 #  define PLATFORM_PAGE_SIZE_ 4096
 #else
 #  include <unistd.h>
-#  define PLATFORM_PAGE_SIZE_ sysconf(_SC_PAGESIZE)
+#  define PLATFORM_PAGE_SIZE_ ::sysconf(_SC_PAGESIZE)
 #endif
 
 ///
@@ -95,33 +100,31 @@
 #endif
 
 ///
-/// Portable macro for specifying naked functions,
-/// i.e. ones that don't have prologues/epilogues in their generated code.
+/// Portable macro for specifying naked functions.
 #if N19_CLANG || N19_GCC
 #  define NAKED_ __attribute__((naked))
 #elif N19_MSVC
 #  define NAKED_ __declspec(naked)
+#else
+#  error "No cpp attribute present -- naked"
 #endif
 
 ///
 /// Attribute macros that aren't compiler specific.
 #if __has_cpp_attribute(nodiscard)
-#  define NODISCARD_   [[nodiscard]]
+#  define NODISCARD_ [[nodiscard]]
 #else
-#  define NODISCARD_
-#  warning "No cpp attribute present -- [[nodiscard]]"
+#  error "No cpp attribute present -- [[nodiscard]]"
 #endif
 
 #if __has_cpp_attribute(fallthrough)
 #  define FALLTHROUGH_ [[fallthrough]]
 #else
-#  define FALLTHROUGH_
-#  warning "No cpp attribute present -- [[fallthrough]]"
+#  error "No cpp attribute present -- [[fallthrough]]"
 #endif
 
 #if __has_cpp_attribute(noreturn)
-#  define NORETURN_    [[noreturn]]
+#  define NORETURN_ [[noreturn]]
 #else
-#  define NORETURN_
-#  warning "No cpp attribute present -- [[noreturn]]"
+#  error "No cpp attribute present -- [[noreturn]]"
 #endif

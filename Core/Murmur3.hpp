@@ -9,6 +9,7 @@
 #include <Core/Platform.hpp>
 #include <cstdint>
 #include <string_view>
+#include <bit>
 
 #define U32_CONSTANT(X) X##LU
 #define U64_CONSTANT(X) X##LLU
@@ -16,7 +17,7 @@
 #define AS_U32(CT_EXPR) static_cast<uint32_t>(CT_EXPR)
 
 BEGIN_NAMESPACE(n19);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
 
 struct Murmur3_128 {
   uint64_t first_  = 0;

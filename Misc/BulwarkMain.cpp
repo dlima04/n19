@@ -3,6 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include <Core/Platform.hpp>
 #include <Core/ArgParse.hpp>
 #include <Core/Console.hpp>
 #include <Bulwark/Bulwark.hpp>

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <Core/Common.hpp>
+#include <Core/Platform.hpp>
 #include <Core/ClassTraits.hpp>
 #include <Core/Console.hpp>
 #include <string_view>

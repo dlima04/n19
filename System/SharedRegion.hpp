@@ -6,11 +6,14 @@
 #pragma once
 
 #include <Core/Common.hpp>
+#include <Core/Platform.hpp>
+#include <System/Win32.hpp>
 #include <System/Handle.hpp>
 #include <System/String.hpp>
 #include <Core/Result.hpp>
 #include <Core/Panic.hpp>
 #include <memory>
+#include <cstdint>
 BEGIN_NAMESPACE(n19::sys);
 
 /*

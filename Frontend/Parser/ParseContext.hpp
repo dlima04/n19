@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Common.hpp>
 #include <Core/Panic.hpp>
 #include <Frontend/Diagnostics/ErrorCollector.hpp>
 #include <Frontend/Lexer/Lexer.hpp>

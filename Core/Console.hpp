@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <Core/Platform.hpp>
 #include <Core/Common.hpp>
 #include <Core/Stream.hpp>
 #include <Core/Fmt.hpp>

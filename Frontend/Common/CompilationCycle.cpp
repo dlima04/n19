@@ -9,6 +9,7 @@
 #include <Core/Console.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Defer.hpp>
+#include <Core/Platform.hpp>
 BEGIN_NAMESPACE(rl);
 
 using namespace n19;

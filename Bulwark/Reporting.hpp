@@ -6,6 +6,7 @@
 #pragma once
 
 #include <Core/Common.hpp>
+#include <Core/Platform.hpp>
 #include <Bulwark/Case.hpp>
 #include <Bulwark/Suite.hpp>
 #include <Core/Console.hpp>

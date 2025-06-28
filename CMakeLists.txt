@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 project(n19)
 
-# Cmake Configurations
+# CMake Configurations
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -166,6 +166,8 @@ set(N19_IS_POSIX OFF)
 set(N19_IS_WINDOWS OFF)
 
 # Determine build platform...
+# note: this can also be determined in C++ code
+# programmatically by including Core/Platform.hpp.
 if(WIN32 OR N19_BUILD_PLATFORM STREQUAL "Windows")
   set(N19_IS_WINDOWS ON)
 elseif(N19_BUILD_PLATFORM STREQUAL "Linux")
@@ -182,18 +184,6 @@ endif()
 ########################################################
 # FUNCTIONS
 ########################################################
-
-function(add_platform_macros target)
-  if(N19_IS_LINUX)
-    target_compile_definitions(${target} PRIVATE N19_POSIX)
-    target_compile_definitions(${target} PRIVATE N19_LINUX)
-  elseif(N19_IS_DARWIN)
-    target_compile_definitions(${target} PRIVATE N19_POSIX)
-    target_compile_definitions(${target} PRIVATE N19_DARWIN)
-  else()
-    target_compile_definitions(${target} PRIVATE N19_WIN32)
-  endif()
-endfunction()
 
 function(enable_clang_sanitizer target)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -240,7 +230,6 @@ add_executable(bulwark
 
 foreach(executable ${N19_ENUMERATE_PRIMARY_EXECUTABLES})
   target_include_directories(${executable} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-  add_platform_macros(${executable})
 
   # TODO: this can be done better.
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")

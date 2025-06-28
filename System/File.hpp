@@ -6,6 +6,7 @@
 #pragma once
 
 #include <Core/Common.hpp>
+#include <Core/Platform.hpp>
 #include <System/IODevice.hpp>
 #include <cstdint>
 #include <filesystem>

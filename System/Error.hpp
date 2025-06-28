@@ -6,8 +6,8 @@
 #pragma once
 
 #include <Core/Common.hpp>
-#include <System/String.hpp>
 #include <Core/Platform.hpp>
+#include <System/String.hpp>
 
 #ifdef N19_WIN32
 #include <System/Win32.hpp>
