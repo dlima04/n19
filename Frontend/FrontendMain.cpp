@@ -86,6 +86,7 @@ static auto verify_args(MainArgParser& parser) -> bool {
   }
 
   detail_::allow_con_colours_ = parser.colours;
+  outs() << Con::Reset;
 
   if (parser.version) {
     auto ver = Context::get_version_info();
@@ -160,7 +161,6 @@ static auto verify_args(MainArgParser& parser) -> bool {
 
 int main() {
   win32_init_console();
-  outs() << Con::Reset;
 
   DEFER({
     ins().clear();
@@ -211,7 +211,6 @@ int main() {
 #else /// POSIX
 
 int main(int argc, char** argv){
-  outs() << Con::Reset;
   DEFER({
     ins().clear();
     outs().flush();

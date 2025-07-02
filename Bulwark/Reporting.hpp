@@ -11,9 +11,10 @@
 #include <Bulwark/Suite.hpp>
 #include <Core/Console.hpp>
 #include <Core/ClassTraits.hpp>
+#include <cstdint>
 BEGIN_NAMESPACE(n19::test);
 
-struct Diagnostic final {
+struct Diagnostic {
   N19_MAKE_COMPARABLE_MEMBER(Diagnostic, val_);
   enum Value_ : uint8_t {
     Warn   = 0x00,           /// Warning diagnostic.
@@ -30,7 +31,17 @@ struct Diagnostic final {
   constexpr Diagnostic(const Value_ val) : val_(val) {}
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using TallyType = uint32_t;
+struct TallyBox {
+  TallyType total_passed;
+  TallyType total_failed;
+  TallyType total_exc;
+  TallyType total_skipped;
+  TallyType total_suites;
+  TallyType total_cases;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 auto diagnostic(             /// Display a diagnostic message.
   const std::string_view& m, /// Diagnostic message to be displayed.
@@ -64,12 +75,12 @@ auto report(                 /// Report that a test suite is about to be ran.
   OStream& stream = outs()   /// ...
 ) -> void;                   ///
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-constinit extern size_t g_total_passed;
-constinit extern size_t g_total_failed;
-constinit extern size_t g_total_exc;
-constinit extern size_t g_total_skipped;
-constinit extern size_t g_total_suites;
+constinit extern TallyType g_total_passed;
+constinit extern TallyType g_total_failed;
+constinit extern TallyType g_total_exc;
+constinit extern TallyType g_total_skipped;
+constinit extern TallyType g_total_suites;
 
 END_NAMESPACE(n19::test);

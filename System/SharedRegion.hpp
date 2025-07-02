@@ -7,6 +7,7 @@
 
 #include <Core/Common.hpp>
 #include <Core/Platform.hpp>
+#include <Core/Panic.hpp>
 #include <System/Win32.hpp>
 #include <System/Handle.hpp>
 #include <System/String.hpp>
@@ -56,13 +57,17 @@ public:
     const String& name,
     size_t size) -> Result<SharedRegion>;
 
-  void* get()   const { return addr_; }
   size_t size() const { return size_; }
   const String& name() const { return name_; }
 
+  void* get() const {
+    ASSERT(addr_ != nullptr);
+    return addr_;
+  }
+
+  SharedRegion() = default;
  ~SharedRegion() = default;
 private:
-  SharedRegion() = default;
   static auto create_impl_(
     const String& name,
     size_t max_length,

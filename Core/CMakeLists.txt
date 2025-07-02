@@ -1,0 +1,16 @@
+include(Common)
+
+add_library(Core STATIC
+  ArgParse.cpp
+  Console.cpp
+  Panic.cpp
+  Stream.cpp
+  StringPool.cpp
+  StringUtil.cpp
+)
+
+target_link_libraries(Core PUBLIC
+  project_options
+  project_warnings
+  System
+)

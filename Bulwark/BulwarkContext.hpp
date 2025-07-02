@@ -8,6 +8,7 @@
 #include <Core/Common.hpp>
 #include <Core/Platform.hpp>
 #include <System/String.hpp>
+#include <System/SharedRegion.hpp>
 #include <Core/ArgParse.hpp>
 #include <vector>
 #include <cstdint>
@@ -47,6 +48,7 @@ public:
   std::underlying_type_t<Flags> flags_ = None;
   argp::PackType suites_to_run_;
   argp::PackType suites_to_skip_;
+  sys::SharedRegion shared_region_;
 private:
   Context() = default;
 };

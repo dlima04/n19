@@ -1,0 +1,12 @@
+function(print_box MESSAGE)
+    string(REPEAT "#" 60 BORDER)
+    message("\n${BORDER}")
+    message("# ${MESSAGE}")
+    message("${BORDER}\n")
+endfunction()
+
+function(has_compiler_flag flag result_var)
+    include(CheckCXXCompilerFlag)
+    check_cxx_compiler_flag(${flag} _flag_supported)
+    set(${result_var} ${_flag_supported} PARENT_SCOPE)
+endfunction()
