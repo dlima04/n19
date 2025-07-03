@@ -272,7 +272,7 @@ auto AstVardecl::print(
 
   stream << '\n';
   name_->print(depth + 1, stream, "VarDecl.Name");
-  type_->print(depth + 1, stream, "Vardecl.Type");
+  vartype_->print(depth + 1, stream, "Vardecl.Type");
 }
 
 auto AstProcDecl::print(

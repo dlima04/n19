@@ -7,6 +7,7 @@
 
 #include <Core/Common.hpp>
 #include <Core/Platform.hpp>
+#include <Core/ClassTraits.hpp>
 #include <System/IODevice.hpp>
 #include <cstdint>
 #include <filesystem>
@@ -23,6 +24,8 @@ enum class FSeek : uint8_t {
 };
 
 class File final : public IODevice {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(File);
+  N19_MAKE_DEFAULT_ASSIGNABLE(File);
 public:
   File() = default;
  ~File() override = default;

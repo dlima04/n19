@@ -7,6 +7,7 @@
 
 #include <Core/Common.hpp>
 #include <Core/Platform.hpp>
+#include <Core/ClassTraits.hpp>
 #include <System/String.hpp>
 #include <System/IODevice.hpp>
 #include <Core/Bytes.hpp>
@@ -45,6 +46,8 @@ inline constexpr struct Endl_ {
 } Endl;
 
 class OStream {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(OStream);
+  N19_MAKE_DEFAULT_ASSIGNABLE(OStream);
 public:
   using Index_ = size_t;
   using Char_  = Byte;
@@ -118,29 +121,35 @@ public:
 
 #if defined(N19_WIN32)
   auto operator<<(const std::wstring_view& str) -> OStream& {
-    if(str.empty()) return *this;
+    if(str.empty())
+      return *this;
+
+    if(str.size() > std::numeric_limits<int>::max())
+      return *this;
 
     const int req_size = ::WideCharToMultiByte(
-      CP_UTF8,          /// Code page: UTF-8
-      0,                /// Conversion flags
-      str.data(),       /// Source UTF-16 string
-      str.size(),       /// Number of codepoints
-      nullptr,          /// No output buffer yet
-      0,                /// Request buffer size
-      nullptr, nullptr  /// Default char mappings (unused for UTF-8)
+      CP_UTF8,         /// Code page: UTF-8
+      0,               /// Conversion flags
+      str.data(),      /// Source UTF-16 string
+      static_cast<int>(str.size()),
+      nullptr,         /// No output buffer yet
+      0,               /// Request buffer size
+      nullptr, nullptr /// Default char mappings (unused for UTF-8)
     );
 
-    if(req_size == 0) return *this;
-    std::vector<char> outbuf(static_cast<size_t>(req_size), '\0');
+    if(req_size <= 0) return *this;
+    std::vector<char> outbuf(
+      static_cast<std::vector<char>::size_type>(req_size),
+      '\0');
 
     const int result = ::WideCharToMultiByte(
-      CP_UTF8,          /// Code page: UTF-8
-      0,                /// Conversion flags
-      str.data(),       /// Source UTF-16 string
-      str.size(),       /// Number of codepoints
-      outbuf.data(),    /// Destination buffer
-      outbuf.size(),    /// Buffer size
-      nullptr, nullptr  /// Default char mappings (unused for UTF-8)
+      CP_UTF8,         /// Code page: UTF-8
+      0,               /// Conversion flags
+      str.data(),      /// Source UTF-16 string
+      static_cast<int>(str.size()),
+      outbuf.data(),   /// Destination buffer
+      static_cast<int>(outbuf.size()),
+      nullptr, nullptr /// Default char mappings (unused for UTF-8)
     );
 
     if (result == 0) {
@@ -148,7 +157,8 @@ public:
     }
 
     std::string_view the_view{ outbuf.begin(), outbuf.end() };
-    return *this << the_view;
+    *this << the_view;
+    return *this;
   }
 
 #else // POSIX
@@ -177,6 +187,8 @@ protected:
 
 template<size_t size_ = N19_OSTREAM_BUFFSIZE>
 class BufferedOStream : public OStream {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(BufferedOStream);
+  N19_MAKE_DEFAULT_ASSIGNABLE(BufferedOStream);
 public:
   constexpr static size_t len_   = size_;
   constexpr static size_t begin_ = 0;
@@ -264,6 +276,8 @@ private:
 };
 
 class NullOStream final : public OStream {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(NullOStream);
+  N19_MAKE_DEFAULT_ASSIGNABLE(NullOStream);
 public:
   auto write(const Span_&) -> OStream & override { return *this; }
   auto flush() -> OStream & override { return *this; }
@@ -273,6 +287,8 @@ public:
 };
 
 class IStream {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(IStream);
+  N19_MAKE_DEFAULT_ASSIGNABLE(IStream);
 public:
   static auto from_stdin() -> IStream;
   static auto from(const sys::IODevice&) -> IStream;
@@ -285,7 +301,7 @@ public:
   auto operator>>(T& value) -> IStream& {
     if(in_failstate_) return *this;
     std::string word;
-    size_t size = readword(word);
+    const size_t size = readword(word);
     if(!word.empty() && size) {
       ASSERT(size <= word.size());
       auto conv = std::from_chars(word.data(), word.data() + size, value);
@@ -298,7 +314,7 @@ public:
   auto operator>>(T& value) -> IStream& {
     if(in_failstate_) return *this;
     std::string word;
-    size_t size = readword(word);
+    const size_t size = readword(word);
     if(!word.empty() && size) {
       ASSERT(size <= word.size());
       uintptr_t int_ = 0;

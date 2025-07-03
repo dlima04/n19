@@ -112,7 +112,7 @@ using namespace n19;
   X(SkinnyArrow, "->")           \
   X(FatArrow, "=>")              \
 
-#define RL_TOKEN_CATEGORY_LIST  \
+#define RL_TOKEN_CATEGORY_LIST   \
   X(NonCategorical, 0ULL)        \
   X(Punctuator, 1ULL)            \
   X(UnaryOp, 1ULL << 1)          \
@@ -137,6 +137,8 @@ using namespace n19;
 
 class TokenType {
   N19_MAKE_COMPARABLE_MEMBER(TokenType, value);
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(TokenType);
+  N19_MAKE_DEFAULT_ASSIGNABLE(TokenType);
 public:
   #define X(TOKEN_TYPE, STR_UNUSED) TOKEN_TYPE,
   enum Value : uint16_t {
@@ -157,11 +159,13 @@ public:
 
   Value value  = None;
   constexpr TokenType() = default;
-  constexpr TokenType(const Value value) : value(value) {}
+  constexpr TokenType(const Value v) : value(v) {}
 };
 
 class TokenCategory {
   N19_MAKE_COMPARABLE_MEMBER(TokenCategory, value);
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(TokenCategory);
+  N19_MAKE_DEFAULT_ASSIGNABLE(TokenCategory);
 public:
   #define X(CAT, MASK) CAT = MASK,
   enum Value : size_t {
@@ -178,12 +182,14 @@ public:
 
   size_t value = NonCategorical;
   constexpr TokenCategory() = default;
-  constexpr TokenCategory(const size_t value) : value(value) {}
+  constexpr TokenCategory(const size_t v) : value(v) {}
 };
 
 class Token {
   N19_MAKE_COMPARABLE_ON(TokenType, type_);
   N19_MAKE_COMPARABLE_MEMBER(Token, type_);
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(Token);
+  N19_MAKE_DEFAULT_ASSIGNABLE(Token);
 public:
   uint32_t pos_  = 0;   /// File offset.
   uint32_t len_  = 0;   /// Length of the token.
@@ -198,6 +204,7 @@ public:
   static auto eof(uint32_t pos, uint32_t line) -> Token;
   static auto illegal(uint32_t pos, uint32_t length, uint32_t line) -> Token;
   ~Token() = default;
+  Token() = default;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

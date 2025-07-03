@@ -25,6 +25,9 @@ BEGIN_NAMESPACE(n19::sys);
  * when a process is finished.
  */
 struct ExitCode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(ExitCode);
+  N19_MAKE_DEFAULT_ASSIGNABLE(ExitCode);
+public:
 #ifdef N19_WIN32
   using Value = ::DWORD;
 #else
@@ -70,16 +73,17 @@ class NaiveProcess_ : protected ProcessHandleType_ {
 public:
   NaiveProcess_(NaiveProcess_&&) noexcept;
   NaiveProcess_& operator=(NaiveProcess_&&) noexcept;
+  ~NaiveProcess_() override = default;
 
   // inherited from Handle
   auto close()      -> void override;
   auto invalidate() -> void override;
   auto is_invalid() -> bool override;
 
-  NODISCARD_ auto wait()       -> ExitCode;
-  NODISCARD_ auto exited()     -> bool;
+  NODISCARD_ auto wait()   -> ExitCode;
+  NODISCARD_ auto exited() -> bool;
   NODISCARD_ auto get_exit_code() -> ExitCode;
-  NODISCARD_ auto get_id()     -> size_t;
+  NODISCARD_ auto get_id() -> size_t;
 
   class Builder;
   friend class Builder;
@@ -112,6 +116,8 @@ protected:
  * be specified using NaiveProcess_::Builder.
  */
 class NaiveProcess_::Builder {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(Builder);
+  N19_MAKE_DEFAULT_ASSIGNABLE(Builder);
 public:
   template<typename ...Args>
     requires((std::constructible_from<sys::String, Args> && ...))

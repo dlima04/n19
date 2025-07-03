@@ -94,3 +94,4 @@ TEST_CASE(Maybe, Operators) {
   REQUIRE(has_cptr);
   REQUIRE(has_ptr);
 }
+

@@ -9,6 +9,7 @@
 #include <Core/Maybe.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Concepts.hpp>
+#include <Core/ClassTraits.hpp>
 #include <Core/Panic.hpp>
 #include <Core/Console.hpp>
 #include <Frontend/FrontendContext.hpp>
@@ -66,6 +67,8 @@ class EntityTable;
 
 class EntityType {
   N19_MAKE_COMPARABLE_MEMBER(EntityType, value);
+  N19_MAKE_DEFAULT_ASSIGNABLE(EntityType);
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(EntityType);
 public:
   #define X(NAME) NAME,
   enum Value : uint16_t {
@@ -79,10 +82,12 @@ public:
 
   Value value = None;
   constexpr EntityType() = default;
-  constexpr EntityType(const Value value) : value(value) {}
+  constexpr EntityType(const Value v) : value(v) {}
 };
 
 class Entity {
+  N19_MAKE_DEFAULT_ASSIGNABLE(Entity);
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(Entity);
 public:
   template<typename T = Entity>
   using Ptr = std::shared_ptr<T>;
@@ -133,6 +138,8 @@ public:
 };
 
 class RootEntity final : public Entity {
+  N19_MAKE_DEFAULT_ASSIGNABLE(RootEntity);
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(RootEntity);
 public:
   sys::String tbl_name_;
   auto print(uint32_t depth,
@@ -149,6 +156,8 @@ public:
 /// namely pointer depth, constness and array lengths.
 /// this class does not represent the type itself.
 class EntityQualifierBase {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(EntityQualifierBase);
+  N19_MAKE_DEFAULT_ASSIGNABLE(EntityQualifierBase);
 public:
   NODISCARD_ auto is_constant() const -> bool;
   NODISCARD_ auto is_rvalue()   const -> bool;
@@ -173,8 +182,9 @@ public:
 /// Represents a fully resolved reference to a rl::Type.
 /// Holds an entity ID and provides a way to access this
 /// entity.
-class EntityQualifier final
-  : public EntityQualifierBase {
+class EntityQualifier final : public EntityQualifierBase {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(EntityQualifier);
+  N19_MAKE_DEFAULT_ASSIGNABLE(EntityQualifier);
 public:
   NODISCARD_ auto to_string(
     const EntityTable& tbl,
@@ -197,8 +207,9 @@ public:
 /// Each type is represented as a relative namespace path to
 /// a type that may or may not exist. Can be resolved into
 /// a rl::EntityQualifier.
-class EntityQualifierThunk final
-  : public EntityQualifierBase {
+class EntityQualifierThunk final : public EntityQualifierBase {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(EntityQualifierThunk);
+  N19_MAKE_DEFAULT_ASSIGNABLE(EntityQualifierThunk);
 public:
   NODISCARD_ auto to_string(
     bool include_qualifiers = true,
@@ -228,6 +239,8 @@ inline auto EntityQualifierBase::is_matrix()   const -> bool { return arr_length
 /// a type exists yet (i.e. it's used somewhere
 /// before the declaration).
 class PlaceHolder final : public Entity {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(PlaceHolder);
+  N19_MAKE_DEFAULT_ASSIGNABLE(PlaceHolder);
 public:
   EntityType to_be_ = EntityType::None;
   auto print(uint32_t depth,
@@ -240,6 +253,8 @@ public:
 };
 
 class SymLink : public Entity {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(SymLink);
+  N19_MAKE_DEFAULT_ASSIGNABLE(SymLink);
 public:
   auto print(uint32_t depth,
     OStream &stream,
@@ -252,6 +267,8 @@ public:
 };
 
 class Variable final : public Entity {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(Variable);
+  N19_MAKE_DEFAULT_ASSIGNABLE(Variable);
 public:
   auto print(uint32_t depth,
     OStream &stream,
@@ -259,13 +276,15 @@ public:
   ) const -> void override;
 
   EntityQualifierBase quals_;
-  Entity::ID type_ = RL_INVALID_ENTITY_ID;
+  Entity::ID vartype_ = RL_INVALID_ENTITY_ID;
 
   Variable() = default;
  ~Variable() override = default;
 };
 
 class Type : public Entity {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(Type);
+  N19_MAKE_DEFAULT_ASSIGNABLE(Type);
 public:
   auto print(uint32_t depth,
     OStream &stream,
@@ -277,6 +296,8 @@ public:
 };
 
 class AliasType final : public SymLink {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AliasType);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AliasType);
 public:
   auto print(uint32_t depth,
     OStream &stream,
@@ -289,6 +310,8 @@ public:
 };
 
 class Static final : public Entity {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(Static);
+  N19_MAKE_DEFAULT_ASSIGNABLE(Static);
 public:
   auto print(uint32_t depth,
     OStream &stream,
@@ -304,6 +327,8 @@ public:
 /// if the return_type_ is RL_INVALID_ENTITY_ID,
 /// the return type is void.
 class Proc : public Entity {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(Proc);
+  N19_MAKE_DEFAULT_ASSIGNABLE(Proc);
 public:
   auto print(uint32_t depth,
     OStream &stream,
@@ -318,6 +343,8 @@ public:
 };
 
 class Struct : public Type {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(Struct);
+  N19_MAKE_DEFAULT_ASSIGNABLE(Struct);
 public:
   auto print(uint32_t depth,
     OStream &stream,
@@ -341,6 +368,8 @@ public:
 /// in the table by default, and should never be inserted
 /// after the table is created.
 class BuiltinType final : public Type {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(BuiltinType);
+  N19_MAKE_DEFAULT_ASSIGNABLE(BuiltinType);
 public:
 #define X(TYPE, UNUSED, VALUE) TYPE = VALUE,
   enum Type : Entity::ID {

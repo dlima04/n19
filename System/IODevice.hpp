@@ -49,8 +49,11 @@ public:
   auto read_into(WritableBytes& bytes) -> Result<void>;
   auto flush_handle() const -> void;
 
-  template<typename T> auto operator<<(const T&) -> IODevice&;
-  template<typename T> auto operator>>(T& val)   -> IODevice&;
+  template<typename T>
+  auto operator<<(const T&) -> IODevice&;
+
+  template<typename T>
+  auto operator>>(T& val) -> IODevice&;
 
   static auto from_stdout() -> IODevice;
   static auto from_stderr() -> IODevice;
@@ -58,11 +61,19 @@ public:
   static auto from(ValueType vt, uint8_t perms = Read | Write) -> IODevice;
   static auto create_pipe() -> Result<std::array<IODevice, 2>>;
 
+  IODevice(const IODevice& other);
+  IODevice& operator=(const IODevice& other);
+
+  IODevice(IODevice&& other) noexcept;
+  IODevice& operator=(IODevice&& other) noexcept;
+
   IODevice();
  ~IODevice() override = default;
 
   uint8_t perms_ = NoAccess;
 };
+
+///////////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
 auto IODevice::operator<<(const T& val) -> IODevice& {
@@ -87,6 +98,37 @@ auto IODevice::operator>>(T& val) -> IODevice & {
   return *this;
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
+inline IODevice::IODevice(const IODevice& other) {
+  value_ = other.value_;
+  perms_ = other.perms_;
+}
+
+inline IODevice::IODevice(IODevice&& other) noexcept {
+  value_ = other.value_;
+  perms_ = other.perms_;
+  other.invalidate();
+}
+
+inline IODevice& IODevice::operator=(const IODevice& other) {
+  if(this != &other) {
+    value_ = other.value_;
+    perms_ = other.perms_;
+  }
+  return *this;
+}
+
+inline IODevice& IODevice::operator=(IODevice&& other) noexcept {
+  if(this != &other) {
+    value_ = other.value_;
+    perms_ = other.perms_;
+    other.invalidate();
+  }
+  return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////////
 #if defined(N19_POSIX)
 FORCEINLINE_ auto IODevice::invalidate() -> void {
   value_ = -1;
@@ -111,6 +153,7 @@ FORCEINLINE_ auto IODevice::flush_handle() const -> void {
   ::fsync(value_);
 }
 
+///////////////////////////////////////////////////////////////////////////////////
 #else // IF WINDOWS
 FORCEINLINE_ auto IODevice::invalidate() -> void {
   value_ = (::HANDLE)nullptr;

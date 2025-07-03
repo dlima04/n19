@@ -64,7 +64,6 @@ target_compile_options(project_warnings INTERFACE
 if(N19_IS_CLANGCL_WINDOWS)
   target_compile_options(project_warnings INTERFACE
     -Wno-c++98-compat-pedantic
-    -Wno-newline-eof
     -Wno-reserved-macro-identifier
     -Wno-extra-semi
     -Wno-c++20-compat

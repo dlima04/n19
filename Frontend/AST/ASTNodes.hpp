@@ -9,6 +9,7 @@
 #include <Core/Platform.hpp>
 #include <Core/Maybe.hpp>
 #include <Core/Result.hpp>
+#include <Core/ClassTraits.hpp>
 #include <Core/Console.hpp>
 #include <Core/Concepts.hpp>
 #include <Core/Poly.hpp>
@@ -55,6 +56,8 @@ BEGIN_NAMESPACE(rl);
 using namespace n19;
 
 class AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstNode);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstNode);
 public:
   #define ASTNODE_X(NAME) NAME,
   enum class Type : uint16_t {
@@ -99,10 +102,13 @@ public:
   Type type_;
   //////////////////////////////////////////
 
+  AstNode() = default;
   virtual ~AstNode() = default;
 };
 
 class AstBinExpr final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstBinExpr);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstBinExpr);
 public:
   TokenType op_type_    = TokenType::None;
   TokenCategory op_cat_ = TokenCategory::NonCategorical;
@@ -119,6 +125,8 @@ public:
 };
 
 class AstUnaryExpr final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstUnaryExpr);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstUnaryExpr);
 public:
   TokenType op_type_      = TokenType::None;
   TokenCategory op_cat_   = TokenCategory::NonCategorical;
@@ -135,6 +143,8 @@ public:
 };
 
 class AstScalarLiteral final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstScalarLiteral);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstScalarLiteral);
 public:
   std::string value_;
   enum : uint8_t {
@@ -157,6 +167,8 @@ public:
 };
 
 class AstAggregateLiteral final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstAggregateLiteral);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstAggregateLiteral);
 public:
   AstNode::Children<> children_;
 
@@ -170,6 +182,8 @@ public:
 };
 
 class AstEntityRef final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstEntityRef);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstEntityRef);
 public:
   Entity::ID id_= RL_INVALID_ENTITY_ID;
 
@@ -183,6 +197,8 @@ public:
 };
 
 class AstEntityRefThunk final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstEntityRefThunk);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstEntityRefThunk);
 public:
   std::string name_;
 
@@ -196,6 +212,8 @@ public:
 };
 
 class AstQualifiedRef final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstQualifiedRef);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstQualifiedRef);
 public:
   EntityQualifier descriptor_;
 
@@ -209,6 +227,8 @@ public:
 };
 
 class AstIf final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstIf);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstIf);
 public:
   AstNode::Children<> body_;
   AstNode::Ptr<> condition_ = nullptr;
@@ -223,6 +243,8 @@ public:
 };
 
 class AstElse final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstElse);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstElse);
 public:
   AstNode::Children<> body_;
 
@@ -236,6 +258,8 @@ public:
 };
 
 class AstNamespace final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstNamespace);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstNamespace);
 public:
   AstNode::Children<> body_;
   Entity::ID id_ = RL_INVALID_ENTITY_ID;
@@ -250,6 +274,8 @@ public:
 };
 
 class AstConstIf final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstConstIf);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstConstIf);
 public:
   AstNode::Children<> body_;
   AstNode::Ptr<> condition_ = nullptr;
@@ -264,6 +290,8 @@ public:
 };
 
 class AstConstElse final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstConstElse);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstConstElse);
 public:
   AstNode::Children<> body_;
 
@@ -277,6 +305,8 @@ public:
 };
 
 class AstBranch final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstBranch);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstBranch);
 public:
   AstNode::Ptr<AstIf> if_     = nullptr; // If condition + block
   AstNode::Ptr<AstElse> else_ = nullptr; // Can be null!
@@ -291,6 +321,8 @@ public:
 };
 
 class AstConstBranch final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstConstBranch);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstConstBranch);
 public:
   AstNode::Ptr<AstConstIf> if_ = nullptr;
   AstNode::Ptr<AstConstElse> else_ = nullptr; // Can be null!
@@ -305,6 +337,8 @@ public:
 };
 
 class AstCase final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstCase);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstCase);
 public:
   bool is_fallthrough = false;
   AstNode::Ptr<> value_ = nullptr;
@@ -320,6 +354,8 @@ public:
 };
 
 class AstDefault final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstDefault);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstDefault);
 public:
   AstNode::Children<> children_;
 
@@ -333,6 +369,8 @@ public:
 };
 
 class AstSwitch final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstSwitch);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstSwitch);
 public:
   AstNode::Ptr<> target_         = nullptr;
   AstNode::Ptr<AstDefault> dflt_ = nullptr;
@@ -348,6 +386,8 @@ public:
 };
 
 class AstScopeBlock final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstScopeBlock);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstScopeBlock);
 public:
   AstNode::Children<> children_;
 
@@ -361,6 +401,8 @@ public:
 };
 
 class AstCall final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstCall);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstCall);
 public:
   AstNode::Ptr<> target_ = nullptr;
   AstNode::Children<> arguments_;
@@ -375,6 +417,8 @@ public:
 };
 
 class AstDefer final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstDefer);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstDefer);
 public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
 
@@ -388,6 +432,8 @@ public:
 };
 
 class AstDeferIf final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstDeferIf);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstDeferIf);
 public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
   AstNode::Ptr<> condition_ = nullptr;  // The condition on which we call this.
@@ -402,9 +448,11 @@ public:
 };
 
 class AstVardecl final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstVardecl);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstVardecl);
 public:
-  AstNode::Ptr<> name_ = nullptr;  // EntityRef or EntityRefThunk
-  AstNode::Ptr<> type_ = nullptr;  // TypeRef or TypeRefThunk
+  AstNode::Ptr<> name_ = nullptr;    // EntityRef or EntityRefThunk
+  AstNode::Ptr<> vartype_ = nullptr; // TypeRef or TypeRefThunk
 
   auto print(uint32_t depth,
     OStream& stream,
@@ -416,6 +464,8 @@ public:
 };
 
 class AstProcDecl final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstProcDecl);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstProcDecl);
 public:
   Entity::ID id_ = RL_INVALID_ENTITY_ID;
   AstNode::Children<> arg_decls_; // The parameter declarations (if any)
@@ -431,6 +481,8 @@ public:
 };
 
 class AstReturn final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstReturn);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstReturn);
 public:
   AstNode::Ptr<> value_ = nullptr; // Can be null!
 
@@ -444,6 +496,8 @@ public:
 };
 
 class AstBreak final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstBreak);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstBreak);
 public:
   auto print(uint32_t depth,
     OStream& stream,
@@ -455,15 +509,21 @@ public:
 };
 
 class AstContinue final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstContinue);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstContinue);
 public:
   auto print(uint32_t depth,
     OStream& stream,
     const Maybe<std::string> &alias
   ) const -> void override;
+
+  AstContinue() = default;
   ~AstContinue() override = default;
 };
 
 class AstFor final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstFor);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstFor);
 public:
   AstNode::Ptr<> body_    = nullptr;
   AstNode::Ptr<> init_    = nullptr; // Can be null!
@@ -480,6 +540,8 @@ public:
 };
 
 class AstWhile final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstWhile);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstWhile);
 public:
   AstNode::Children<> body_;
   AstNode::Ptr<> cond_ = nullptr; // The loop condition
@@ -495,6 +557,8 @@ public:
 };
 
 class AstSubscript final : public AstNode {
+  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstSubscript);
+  N19_MAKE_DEFAULT_ASSIGNABLE(AstSubscript);
 public:
   AstNode::Ptr<> operand_ = nullptr; // The thing being subscripted.
   AstNode::Ptr<> value_   = nullptr; // The index value.

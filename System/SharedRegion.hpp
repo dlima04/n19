@@ -66,7 +66,7 @@ public:
   }
 
   SharedRegion() = default;
- ~SharedRegion() = default;
+ ~SharedRegion() override = default;
 private:
   static auto create_impl_(
     const String& name,

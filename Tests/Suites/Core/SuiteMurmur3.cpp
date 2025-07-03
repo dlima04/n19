@@ -122,4 +122,5 @@ TEST_CASE(Murmur3, CollisionResistance) {
     REQUIRE(hash1_128.first_ != hash2_128.first_);
     REQUIRE(hash1_128.second_ != hash2_128.second_);
   });
-} 
+}
+

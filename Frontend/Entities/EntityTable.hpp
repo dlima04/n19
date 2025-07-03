@@ -117,7 +117,7 @@ auto EntityTable::insert(
   ASSERT(line != 0);
 
   const auto id     = curr_id_;
-  map_[id]          = std::make_shared<T>(std::forward(args)...);
+  map_[id]          = std::make_shared<T>(std::forward<Args>(args)...);
   map_[id]->file_   = file;
   map_[id]->id_     = id;
   map_[id]->parent_ = parent->id_;
@@ -154,7 +154,7 @@ auto EntityTable::insert(
   const auto id = curr_id_;
   const auto parent = find(parent_id);
 
-  map_[id]          = std::make_shared<T>(std::forward(args)...);
+  map_[id]          = std::make_shared<T>(std::forward<Args>(args)...);
   map_[id]->file_   = file;
   map_[id]->id_     = id;
   map_[id]->parent_ = parent->id_;
@@ -192,7 +192,7 @@ auto EntityTable::swap_entity(
   auto old = find(id_of);
   ASSERT(old->parent_ == parent_ptr->id_);
 
-  map_[id_of] = std::make_shared<T>(std::forward(args)...);
+  map_[id_of] = std::make_shared<T>(std::forward<Args>(args)...);
 
   #define X(NAME)                          \
   if constexpr(IsSame<T, NAME>) {          \
@@ -229,7 +229,7 @@ auto EntityTable::swap_entity(
 
   ASSERT(old->parent_ == parent_ptr->id_);
 
-  map_[id_of] = std::make_shared<T>(std::forward(args)...);
+  map_[id_of] = std::make_shared<T>(std::forward<Args>(args)...);
 
   #define X(NAME)                          \
   if constexpr(IsSame<T, NAME>) {          \
@@ -296,7 +296,7 @@ auto EntityTable::swap_placeholder(
     new_pos,
     new_line,
     new_file,
-    std::forward(args)...);
+    std::forward<Args>(args)...);
 }
 
 template<typename T, typename... Args>
@@ -344,7 +344,7 @@ auto EntityTable::swap_placeholder(
     new_pos,
     new_line,
     new_file,
-    std::forward(args)...);
+    std::forward<Args>(args)...);
 }
 
 template<typename T>
@@ -358,3 +358,4 @@ auto EntityTable::find_if(T&& pred) const -> Maybe<Entity::Ptr<>> {
 }
 
 END_NAMESPACE(rl);
+
