@@ -107,8 +107,8 @@ public:
 };
 
 class AstBinExpr final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstBinExpr);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstBinExpr);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstBinExpr);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstBinExpr);
 public:
   TokenType op_type_    = TokenType::None;
   TokenCategory op_cat_ = TokenCategory::NonCategorical;
@@ -125,8 +125,8 @@ public:
 };
 
 class AstUnaryExpr final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstUnaryExpr);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstUnaryExpr);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstUnaryExpr);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstUnaryExpr);
 public:
   TokenType op_type_      = TokenType::None;
   TokenCategory op_cat_   = TokenCategory::NonCategorical;
@@ -167,8 +167,8 @@ public:
 };
 
 class AstAggregateLiteral final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstAggregateLiteral);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstAggregateLiteral);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstAggregateLiteral);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstAggregateLiteral);
 public:
   AstNode::Children<> children_;
 
@@ -227,8 +227,8 @@ public:
 };
 
 class AstIf final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstIf);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstIf);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstIf);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstIf);
 public:
   AstNode::Children<> body_;
   AstNode::Ptr<> condition_ = nullptr;
@@ -243,8 +243,8 @@ public:
 };
 
 class AstElse final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstElse);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstElse);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstElse);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstElse);
 public:
   AstNode::Children<> body_;
 
@@ -258,8 +258,8 @@ public:
 };
 
 class AstNamespace final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstNamespace);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstNamespace);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstNamespace);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstNamespace);
 public:
   AstNode::Children<> body_;
   Entity::ID id_ = RL_INVALID_ENTITY_ID;
@@ -274,8 +274,8 @@ public:
 };
 
 class AstConstIf final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstConstIf);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstConstIf);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstConstIf);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstConstIf);
 public:
   AstNode::Children<> body_;
   AstNode::Ptr<> condition_ = nullptr;
@@ -290,8 +290,8 @@ public:
 };
 
 class AstConstElse final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstConstElse);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstConstElse);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstConstElse);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstConstElse);
 public:
   AstNode::Children<> body_;
 
@@ -305,8 +305,8 @@ public:
 };
 
 class AstBranch final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstBranch);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstBranch);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstBranch);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstBranch);
 public:
   AstNode::Ptr<AstIf> if_     = nullptr; // If condition + block
   AstNode::Ptr<AstElse> else_ = nullptr; // Can be null!
@@ -321,8 +321,8 @@ public:
 };
 
 class AstConstBranch final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstConstBranch);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstConstBranch);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstConstBranch);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstConstBranch);
 public:
   AstNode::Ptr<AstConstIf> if_ = nullptr;
   AstNode::Ptr<AstConstElse> else_ = nullptr; // Can be null!
@@ -337,8 +337,8 @@ public:
 };
 
 class AstCase final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstCase);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstCase);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstCase);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstCase);
 public:
   bool is_fallthrough = false;
   AstNode::Ptr<> value_ = nullptr;
@@ -354,8 +354,8 @@ public:
 };
 
 class AstDefault final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstDefault);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstDefault);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstDefault);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstDefault);
 public:
   AstNode::Children<> children_;
 
@@ -369,8 +369,8 @@ public:
 };
 
 class AstSwitch final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstSwitch);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstSwitch);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstSwitch);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstSwitch);
 public:
   AstNode::Ptr<> target_         = nullptr;
   AstNode::Ptr<AstDefault> dflt_ = nullptr;
@@ -386,8 +386,8 @@ public:
 };
 
 class AstScopeBlock final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstScopeBlock);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstScopeBlock);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstScopeBlock);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstScopeBlock);
 public:
   AstNode::Children<> children_;
 
@@ -401,8 +401,8 @@ public:
 };
 
 class AstCall final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstCall);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstCall);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstCall);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstCall);
 public:
   AstNode::Ptr<> target_ = nullptr;
   AstNode::Children<> arguments_;
@@ -417,8 +417,8 @@ public:
 };
 
 class AstDefer final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstDefer);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstDefer);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstDefer);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstDefer);
 public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
 
@@ -432,8 +432,8 @@ public:
 };
 
 class AstDeferIf final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstDeferIf);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstDeferIf);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstDeferIf);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstDeferIf);
 public:
   AstNode::Ptr<> call_ = nullptr;       // Should ALWAYS be AstCall under the hood
   AstNode::Ptr<> condition_ = nullptr;  // The condition on which we call this.
@@ -448,8 +448,8 @@ public:
 };
 
 class AstVardecl final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstVardecl);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstVardecl);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstVardecl);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstVardecl);
 public:
   AstNode::Ptr<> name_ = nullptr;    // EntityRef or EntityRefThunk
   AstNode::Ptr<> vartype_ = nullptr; // TypeRef or TypeRefThunk
@@ -464,8 +464,8 @@ public:
 };
 
 class AstProcDecl final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstProcDecl);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstProcDecl);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstProcDecl);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstProcDecl);
 public:
   Entity::ID id_ = RL_INVALID_ENTITY_ID;
   AstNode::Children<> arg_decls_; // The parameter declarations (if any)
@@ -481,8 +481,8 @@ public:
 };
 
 class AstReturn final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstReturn);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstReturn);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstReturn);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstReturn);
 public:
   AstNode::Ptr<> value_ = nullptr; // Can be null!
 
@@ -522,8 +522,8 @@ public:
 };
 
 class AstFor final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstFor);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstFor);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstFor);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstFor);
 public:
   AstNode::Ptr<> body_    = nullptr;
   AstNode::Ptr<> init_    = nullptr; // Can be null!
@@ -540,8 +540,8 @@ public:
 };
 
 class AstWhile final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstWhile);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstWhile);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstWhile);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstWhile);
 public:
   AstNode::Children<> body_;
   AstNode::Ptr<> cond_ = nullptr; // The loop condition
@@ -557,8 +557,8 @@ public:
 };
 
 class AstSubscript final : public AstNode {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(AstSubscript);
-  N19_MAKE_DEFAULT_ASSIGNABLE(AstSubscript);
+  N19_MAKE_DEFAULT_MOVE_CONSTRUCTIBLE(AstSubscript);
+  N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(AstSubscript);
 public:
   AstNode::Ptr<> operand_ = nullptr; // The thing being subscripted.
   AstNode::Ptr<> value_   = nullptr; // The index value.
