@@ -385,6 +385,7 @@ public:
     return fd_.read_into(bytes);
   }
 
+  auto dev() const -> sys::IODevice { return fd_; }
   auto failed() const -> bool { return in_failstate_; }
   auto clear() -> void { in_failstate_ = false; }
 

@@ -117,7 +117,7 @@ auto EntityQualifier::to_string(
   buff += ent->name_;
   if(include_postfixes) {
     for(const auto& len : arr_lengths_) buff.append(fmt("[{}]", len));
-    for(int i = 0; i < ptr_depth_; i++) buff.append("*");
+    for(size_t i = 0; i < ptr_depth_; i++) buff.append("*");
   }
 
   return buff;
@@ -137,7 +137,7 @@ auto EntityQualifierThunk::to_string(
 
   buff += name_;
   if(include_postfixes) {
-    for(int i = 0; i < ptr_depth_; i++) buff.append("*");
+    for(size_t i = 0; i < ptr_depth_; i++) buff.append("*");
     for(const auto& len : arr_lengths_) buff.append(fmt("[{}]", len));
   }
 

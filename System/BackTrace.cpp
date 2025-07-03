@@ -58,8 +58,8 @@ BEGIN_NAMESPACE(n19::sys);
 /// Retrieve the maximum amount of stack frames.
 /// Store them inside of the backtrace object.
 auto BackTrace::get() -> Result<void> {
-  void *trace[N19_BACKTRACE_MAX_FRAMES]{ nullptr };
-  ::Dl_info dlinfo{ nullptr };
+  void *trace[N19_BACKTRACE_MAX_FRAMES]{};
+  ::Dl_info dlinfo{};
 
   int status = 0;
   const char* symname = nullptr;
@@ -89,8 +89,8 @@ auto BackTrace::get() -> Result<void> {
 }
 
 auto BackTrace::dump_to(OStream& stream) -> Result<void> {
-  void *trace[N19_BACKTRACE_MAX_FRAMES]{ nullptr };
-  ::Dl_info dlinfo{ nullptr };
+  void *trace[N19_BACKTRACE_MAX_FRAMES]{};
+  ::Dl_info dlinfo{};
 
   int status = 0;
   const char* symname = nullptr;
@@ -131,8 +131,8 @@ auto BackTrace::dump_to(OStream& stream) -> Result<void> {
 auto BackTrace::dump_to(File& file) -> Result<void> {
   using namespace std::string_view_literals;
 
-  void *trace[N19_BACKTRACE_MAX_FRAMES]{ nullptr };
-  ::Dl_info dlinfo{ nullptr };
+  void *trace[N19_BACKTRACE_MAX_FRAMES]{};
+  ::Dl_info dlinfo{};
 
   int status = 0;
   const char* symname = nullptr;

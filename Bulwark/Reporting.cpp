@@ -9,11 +9,12 @@
 #include <Core/Panic.hpp>
 BEGIN_NAMESPACE(n19::test);
 
-constinit TallyType g_total_passed  = 0;
-constinit TallyType g_total_failed  = 0;
-constinit TallyType g_total_exc     = 0;
-constinit TallyType g_total_skipped = 0;
-constinit TallyType g_total_suites  = 0;
+constinit TallyType g_total_cases_passed   = 0;
+constinit TallyType g_total_cases_failed   = 0;
+constinit TallyType g_total_cases_exc      = 0;
+constinit TallyType g_total_cases_skipped  = 0;
+constinit TallyType g_total_suites_skipped = 0;
+constinit TallyType g_total_suites_ran     = 0;
 
 auto report(const std::string_view& e, Result r, OStream& stream, size_t indent) -> void {
   auto should_use_colours = Context::the().flags_ & Context::Colours;

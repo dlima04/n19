@@ -48,43 +48,53 @@ auto Registry::run_all(OStream &stream) -> void {
 
   for(Suite& suite : *suites_) {
     if(Context::the().should_skip(suite.name_)) {
-      g_total_skipped += suite.cases_.size();
+      ++g_total_suites_skipped;
+      g_total_cases_skipped += suite.cases_.size(); /// Skip test suite
       continue;
     } if(!Context::the().suites_to_run_.empty() && !Context::the().should_run(suite.name_)) {
-      g_total_skipped += suite.cases_.size();
+      ++g_total_suites_skipped;
+      g_total_cases_skipped += suite.cases_.size(); /// Skip test suite
       continue;
     }
 
-    ++g_total_suites;
+    ++g_total_suites_ran;
     report(suite, stream);
     suite.run_all(stream);
   }
 
   /// Add up the total cases ran.
-  const TallyType total = g_total_exc
-    + g_total_failed
-    + g_total_passed
-    + g_total_skipped;
+  const TallyType total = g_total_cases_exc
+    + g_total_cases_failed
+    + g_total_cases_passed
+    + g_total_cases_skipped;
 
   /// If we're not tallying up test case results via IPC, just dump them to stdout.
   if(Context::the().shared_region_.is_invalid()) {
-    stream << "\nRan " << g_total_suites << " out of " << suites_->size() << " suites.\n";
-    stream << total << " cases total,\n";
-    stream << "  "  << g_total_passed  << " passed,\n";
-    stream << "  "  << g_total_failed  << " failed,\n";
-    stream << "  "  << g_total_exc     << " interrupted by exceptions,\n";
-    stream << "  "  << g_total_skipped << " skipped.\n";
+    stream
+      << "\nRan "
+      << g_total_suites_ran
+      << " out of "
+      << g_total_suites_ran + g_total_suites_skipped
+      << " suites.\n"
+      << total
+      << " cases total,\n  "
+      << g_total_cases_passed  << " passed,\n  "
+      << g_total_cases_failed  << " failed,\n  "
+      << g_total_cases_exc     << " interrupted by exceptions,\n  "
+      << g_total_cases_skipped << " skipped.\n";
   }
 
   /// Otherwise we're in "IPC mode" and we need to report our results to the parent process.
+  /// TODO: make these operations atomic in the future once we parallelize everything
   else {
-    auto* tally = static_cast<TallyBox*>(Context::the().shared_region_.get());
-    tally->total_passed  += g_total_passed;
-    tally->total_failed  += g_total_failed;
-    tally->total_exc     += g_total_exc;
-    tally->total_skipped += g_total_skipped;
-    tally->total_suites  += g_total_suites;
-    tally->total_cases   += total;
+    auto tally = static_cast<volatile TallyBox*>(Context::the().shared_region_.get());
+    tally->total_cases_passed   += g_total_cases_passed;
+    tally->total_cases_failed   += g_total_cases_failed;
+    tally->total_cases_exc      += g_total_cases_exc;
+    tally->total_cases_skipped  += g_total_cases_skipped;
+    tally->total_suites_ran     += g_total_suites_ran;
+    tally->total_suites_skipped += g_total_suites_skipped;
+    tally->total_cases_ran      += total;
   }
 }
 

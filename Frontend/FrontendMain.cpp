@@ -63,8 +63,8 @@ struct MainArgParser : argp::Parser {
     true);
 
   bool& dump_ctx = arg<bool>(
-    _nstr("--dump-frontend-context"),
-    _nstr("-dump-frontend-context"),
+    _nstr("--dump-context"),
+    _nstr("-dump-context"),
     _nstr("Dump the frontend Context object."));
 
   bool& show_help = arg<bool>(
@@ -91,7 +91,7 @@ static auto verify_args(MainArgParser& parser) -> bool {
   if (parser.version) {
     auto ver = Context::get_version_info();
     outs()
-      << "n19 compiler -- version "
+      << "n19 Reference Language Compiler -- version "
       << n19::fmt("{}.{}.{}\n", ver.major, ver.minor, ver.patch)
       << n19::fmt("Target: {} ({})\n", ver.arch, ver.os)
 #ifdef __DATE__

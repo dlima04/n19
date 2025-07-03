@@ -137,7 +137,7 @@ auto SharedRegion::create_impl_(
   const size_t length ) -> Result<SharedRegion>
 {
   constexpr int oflags = O_CREAT | O_RDWR;
-  struct ::stat statbuff = { 0 };
+  struct ::stat statbuff{};
   SharedRegion sr;
 
   sr.name_ = name;
@@ -228,7 +228,7 @@ auto SharedRegion::open(
     return Error::from_native();
   }
 
-  struct ::stat statbuff = { 0 };
+  struct ::stat statbuff{};
   if(::fstat(sr.value_, &statbuff) == -1) {
     ::close(sr.value_);
     return Error::from_native();

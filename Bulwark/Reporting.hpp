@@ -33,12 +33,13 @@ struct Diagnostic {
 
 using TallyType = uint32_t;
 struct TallyBox {
-  TallyType total_passed;
-  TallyType total_failed;
-  TallyType total_exc;
-  TallyType total_skipped;
-  TallyType total_suites;
-  TallyType total_cases;
+  TallyType total_cases_passed;
+  TallyType total_cases_failed;
+  TallyType total_cases_exc;
+  TallyType total_cases_skipped;
+  TallyType total_suites_ran;
+  TallyType total_suites_skipped;
+  TallyType total_cases_ran;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,10 +78,11 @@ auto report(                 /// Report that a test suite is about to be ran.
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-constinit extern TallyType g_total_passed;
-constinit extern TallyType g_total_failed;
-constinit extern TallyType g_total_exc;
-constinit extern TallyType g_total_skipped;
-constinit extern TallyType g_total_suites;
+constinit extern TallyType g_total_cases_passed;
+constinit extern TallyType g_total_cases_failed;
+constinit extern TallyType g_total_cases_exc;
+constinit extern TallyType g_total_cases_skipped;
+constinit extern TallyType g_total_suites_skipped;
+constinit extern TallyType g_total_suites_ran;
 
 END_NAMESPACE(n19::test);

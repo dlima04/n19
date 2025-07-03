@@ -50,7 +50,7 @@ struct BulwarkArgParser : argp::Parser {
     _nstr("-shared-region-name"),
     _nstr("Shared memory region name"));
 
-  uint64_t& shared_region_size = arg<uint64_t>(
+  int64_t& shared_region_size = arg<int64_t>(
     _nstr("--shared-region-size"),
     _nstr("-shared-region-size"),
     _nstr("Shared memory region size"));
@@ -60,7 +60,7 @@ struct BulwarkArgParser : argp::Parser {
     _nstr("-skip"),
     _nstr("Test suites to be skipped (optional)"));
 
-  argp::PackType& to_run  = arg<argp::PackType>(
+  argp::PackType& to_run = arg<argp::PackType>(
     _nstr("--run"),
     _nstr("-run"),
     _nstr("Run only these test suites (optional)"));
@@ -81,7 +81,7 @@ static NOINLINE_ bool verify_args(BulwarkArgParser& parser) {
   } if(!parser.to_run.empty()) {
     ctx.suites_to_run_ = std::move(parser.to_run);
   } if(!parser.shared_region_name.empty() && parser.shared_region_size > 0) {
-    ASSERT(parser.shared_region_size >= sizeof(test::TallyBox));
+    ASSERT(static_cast<uint64_t>(parser.shared_region_size) >= sizeof(test::TallyBox));
     ctx.shared_region_ = MUST(sys::SharedRegion::open(parser.shared_region_name, parser.shared_region_size));
   }
 

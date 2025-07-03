@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <vector>
 #include <utility>
+#include <concepts>
 BEGIN_NAMESPACE(n19::sys);
 
 /* n19::sys::ExitCode
@@ -113,8 +114,19 @@ protected:
 class NaiveProcess_::Builder {
 public:
   template<typename ...Args>
+    requires((std::constructible_from<sys::String, Args> && ...))
   FORCEINLINE_ auto args(Args&&... args) -> Builder& {
     args_ = decltype(args_){ args... };
+    return *this;
+  }
+
+  FORCEINLINE_ auto args(std::vector<String>&& args) -> Builder& {
+    args_ = std::move(args);
+    return *this;
+  }
+
+  FORCEINLINE_ auto args(const std::vector<String>& args) -> Builder& {
+    args_ = args;
     return *this;
   }
 

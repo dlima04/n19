@@ -114,7 +114,7 @@ END_NAMESPACE(n19::sys);
 BEGIN_NAMESPACE(n19::sys);
 
 Result<SeekDist> File::seek(SeekDist dist, FSeek method) const {
-  DWORD whence;        ///
+  DWORD whence{};      ///
   switch(method) {     /// Determine positioning method.
   case FSeek::Beg:
     whence = FILE_BEGIN;

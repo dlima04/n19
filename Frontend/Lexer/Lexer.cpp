@@ -386,12 +386,11 @@ inline auto Lexer::token_uparrow_() -> Token {
 }
 
 inline auto Lexer::token_pipe_() -> Token {
-  Token curr_tok {
-    .pos_  = index_,
-    .len_  = 2,
-    .line_ = line_,
-    .cat_  = TokenCategory::BinaryOp
-  };
+  Token curr_tok;
+  curr_tok.pos_  = index_;
+  curr_tok.len_  = 2;
+  curr_tok.line_ = line_;
+  curr_tok.cat_  = TokenCategory::BinaryOp;
 
   switch(peek_char_()) {
   case u8'|': // '||'
@@ -416,11 +415,10 @@ inline auto Lexer::token_pipe_() -> Token {
 }
 
 inline auto Lexer::token_lthan_() -> Token {
-  Token curr_tok {
-    .pos_  = index_,
-    .line_ = line_,
-    .cat_  = TokenCategory::BinaryOp
-  };
+  Token curr_tok;
+  curr_tok.pos_  = index_;
+  curr_tok.line_ = line_;
+  curr_tok.cat_  = TokenCategory::BinaryOp;
 
   if(peek_char_(1) == u8'=') { // '<='
     curr_tok.type_ = TokenType::Lte;

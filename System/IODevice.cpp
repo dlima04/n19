@@ -29,8 +29,8 @@ auto IODevice::read_into(WritableBytes& bytes) -> Result<void> {
 }
 
 auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
-  int pipefds[ 2 ] = { 0 };
-  std::array<IODevice, 2> arr = { };
+  int pipefds[ 2 ]{};
+  std::array<IODevice, 2> arr{};
   if(::pipe(pipefds) == -1) {
     return Error(ErrC::Native, last_error());
   }
@@ -75,7 +75,7 @@ auto IODevice::from(ValueType vt, uint8_t perms) -> IODevice {
 
 auto IODevice::write(const Bytes &bytes) -> Result<void> {
   ASSERT(!bytes.empty());
-  if(!WriteFile(               ///
+  if(!::WriteFile(             ///
     value_,                    /// The output file handle.
     (void*)bytes.data(),       /// Output buffer.
     (DWORD)bytes.size_bytes(), /// Size of the input buffer.
@@ -90,7 +90,7 @@ auto IODevice::write(const Bytes &bytes) -> Result<void> {
 
 auto IODevice::read_into(WritableBytes& bytes) -> Result<void> {
   ASSERT(!bytes.empty());
-  if(!ReadFile(                ///
+  if(!::ReadFile(              ///
     value_,                    /// The input file handle.
     (void*)bytes.data(),       /// The input buffer.
     (DWORD)bytes.size_bytes(), /// Size of our buffer.
@@ -104,13 +104,13 @@ auto IODevice::read_into(WritableBytes& bytes) -> Result<void> {
 }
 
 auto IODevice::create_pipe() -> Result<std::array<IODevice, 2>> {
-  SECURITY_ATTRIBUTES sa  = { 0 };
+  SECURITY_ATTRIBUTES sa{};
   sa.nLength              = sizeof(sa);
   sa.lpSecurityDescriptor = nullptr;
   sa.bInheritHandle       = TRUE;
 
   std::array<IODevice, 2> arr{};
-  if(!CreatePipe(&arr[0].value_, &arr[1].value_, &sa, 0)) {
+  if(!::CreatePipe(&arr[0].value_, &arr[1].value_, &sa, 0)) {
     return Error(ErrC::Native, last_error());
   }
 

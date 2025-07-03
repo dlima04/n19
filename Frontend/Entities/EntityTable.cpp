@@ -112,7 +112,7 @@ auto EntityTable::dump_structures(OStream& stream) -> void {
       stream << Con::Reset;
       stream << member_ent->name_;
 
-      for(int i = 0; i < ptr->members_[i].quals_.ptr_depth_; i++) {
+      for(size_t i = 0; i < ptr->members_[i].quals_.ptr_depth_; i++) {
         stream << "*";
       } for(const auto& len : ptr->members_[i].quals_.arr_lengths_) {
         stream << fmt("[{}]", len);

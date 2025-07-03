@@ -55,11 +55,11 @@ auto NaiveProcess_::launch(
     full_buff += arg;
   }
 
-  ::PROCESS_INFORMATION pi = { 0 };
-  ::STARTUPINFOW si = { 0 };
+  ::PROCESS_INFORMATION pi{};
+  ::STARTUPINFOW si{};
   si.cb = sizeof(::STARTUPINFOW);
 
-  ::SECURITY_ATTRIBUTES nul_sa = { 0 };
+  ::SECURITY_ATTRIBUTES nul_sa{};
   nul_sa.nLength = sizeof(::SECURITY_ATTRIBUTES);
   nul_sa.lpSecurityDescriptor = nullptr;
   nul_sa.bInheritHandle = TRUE;

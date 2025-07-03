@@ -22,10 +22,10 @@ auto Suite::run_all(OStream& s) -> void {
     report(case_, ctx.result, s);
 
     switch(ctx.result.value) {
-    case Result::Failed:    ++g_total_failed;  break;
-    case Result::Passed:    ++g_total_passed;  break;
-    case Result::Exception: ++g_total_exc;     break;
-    case Result::Skipped:   ++g_total_skipped; break;
+    case Result::Failed:    ++g_total_cases_failed;  break;
+    case Result::Passed:    ++g_total_cases_passed;  break;
+    case Result::Exception: ++g_total_cases_exc;     break;
+    case Result::Skipped:   ++g_total_cases_skipped; break;
     default: UNREACHABLE_ASSERTION;
     }
 

@@ -66,7 +66,7 @@ END_NAMESPACE(n19::sys);
 BEGIN_NAMESPACE(n19::sys);
 
 NODISCARD_ auto last_error() -> String {
-  Char buffer[256] = { 0 };
+  Char buffer[256]{};
   if(strerror_r(errno, buffer, sizeof(buffer) - 2) == 0) {
     return String{ buffer };
   }
@@ -75,7 +75,7 @@ NODISCARD_ auto last_error() -> String {
 }
 
 NODISCARD_ auto translate_native_error(ErrorCode err) -> String {
-  Char buffer[256] = { 0 };
+  Char buffer[256]{};
   if(strerror_r(err, buffer, sizeof(buffer) - 2) == 0) {
     return String{ buffer };
   }

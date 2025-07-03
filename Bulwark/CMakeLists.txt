@@ -11,5 +11,4 @@ target_link_libraries(Bulwark PUBLIC
   project_options
   project_warnings
   Core
-  System
 )
