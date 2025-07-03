@@ -137,6 +137,10 @@ int main() {
   }
 
   test::g_registry.run_all();
+  if(!test::Context::the().shared_region_.is_invalid()) {
+    test::Context::the().shared_region_.close();
+  }
+
   return EXIT_SUCCESS;
 }
 
@@ -170,6 +174,10 @@ int main(int argc, char** argv) {
   }
 
   test::g_registry.run_all();
+  if(!test::Context::the().shared_region_.is_invalid()) {
+    test::Context::the().shared_region_.close();
+  }
+
   return EXIT_SUCCESS;
 }
 
