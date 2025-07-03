@@ -86,3 +86,4 @@ constinit extern TallyType g_total_suites_skipped;
 constinit extern TallyType g_total_suites_ran;
 
 END_NAMESPACE(n19::test);
+

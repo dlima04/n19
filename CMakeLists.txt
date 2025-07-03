@@ -48,7 +48,7 @@ list(APPEND CMAKE_MODULE_PATH "${N19_SOURCE_DIR}/Meta/CMake")
 include(Common)
 include(Sanitizers)
 
-# Add project root as an include directory
+print_box("The n19 Project")
 include_directories(${N19_SOURCE_DIR})
 
 add_library(project_options INTERFACE)

@@ -1,8 +1,8 @@
-function(print_box MESSAGE)
-    string(REPEAT "#" 60 BORDER)
-    message("\n${BORDER}")
-    message("# ${MESSAGE}")
-    message("${BORDER}\n")
+function(print_box message)
+    string(REPEAT "#" 60 border)
+    message("\n${border}")
+    message("# ${message}")
+    message("${border}\n")
 endfunction()
 
 function(has_compiler_flag flag result_var)
