@@ -29,9 +29,9 @@ public:
   constexpr static bool can_mod_opt_ = (size_ & (size_ - 1)) == 0;
   constexpr static size_t size_mask_ = size_ - 1;
 
-  static_assert( std::is_trivially_destructible_v<T> );
-  static_assert( can_mod_opt_, "size must be a power of 2!" );
-  static_assert( size_ > 1, "Size must be greater than 1!" );
+  static_assert(std::is_trivially_destructible_v<T>);
+  static_assert(can_mod_opt_, "size must be a power of 2!");
+  static_assert(size_ > 1, "Size must be greater than 1!");
 
   auto is_full()  const -> bool;
   auto is_empty() const -> bool;

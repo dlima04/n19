@@ -156,9 +156,30 @@ struct RemoveConst_<T const> {
   using Type = T;
 };
 
+template<typename T, T val_>
+struct IntegralConstant {
+  static constexpr T value = val_;
+  using ValueType = T;
+
+  constexpr operator ValueType()   const { return value; }
+  constexpr ValueType operator()() const { return value; }
+};
+
+template<bool val_>
+using BoolConstant = IntegralConstant<bool, val_>;
+
+using TrueConstant = BoolConstant<true>;
+using FalseConstant = BoolConstant<false>;
+
+template<typename T>
+struct FalseType : FalseConstant {};
+
+template<typename T>
+struct TrueType : TrueConstant {};
+
 template<typename T>
 struct FunctorTraits {
-  static_assert("Could not deduce FunctorTraits of T.");
+  static_assert(FalseType<T>::value, "Could not deduce FunctorTraits of T.");
 };
 
 template<typename T, typename... Args>

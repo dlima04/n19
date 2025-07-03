@@ -7,6 +7,7 @@
 
 #include <Core/Common.hpp>
 #include <Core/Platform.hpp>
+#include <Core/TypeTraits.hpp>
 #include <System/Handle.hpp>
 #include <System/String.hpp>
 #include <Core/Bytes.hpp>
@@ -72,9 +73,7 @@ auto IODevice::operator<<(const T& val) -> IODevice& {
     auto copy = as_bytecopy(val);
     write(copy.bytes());
   } else {
-    static_assert(
-    "IODevice::operator<< must be called with "
-    "a type easily convertible to n19::Bytes.");
+    static_assert(FalseType<T>::value, "Invalid type.");
   }
 
   return *this;
