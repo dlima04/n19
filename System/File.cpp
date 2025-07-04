@@ -133,7 +133,7 @@ Result<SeekDist> File::seek(SeekDist dist, FSeek method) const {
   LARGE_INTEGER out_dist{};
 
   in_dist.QuadPart = dist;
-  if(!SetFilePointerEx(value_, in_dist, &out_dist, whence)) {
+  if(!::SetFilePointerEx(value_, in_dist, &out_dist, whence)) {
     return Error::from_native();
   }
 
@@ -234,7 +234,7 @@ NODISCARD_ auto File::create_trunc(
 
 NODISCARD_ auto File::size() const -> Result<size_t> {
   LARGE_INTEGER file_size{};
-  if(!GetFileSizeEx(value_, &file_size)) return Error::from_native();
+  if(!::GetFileSizeEx(value_, &file_size)) return Error::from_native();
   return Result<size_t>::create(static_cast<size_t>(file_size.QuadPart));
 }
 

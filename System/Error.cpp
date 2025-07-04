@@ -18,7 +18,7 @@ NODISCARD_ auto last_error() -> std::string {
   flags |= FORMAT_MESSAGE_IGNORE_INSERTS;
 
   LPSTR outbuf  = nullptr;
-  if(!FormatMessageA(
+  if(!::FormatMessageA(
     flags,
     nullptr,
     err_code,
@@ -42,7 +42,7 @@ NODISCARD_ auto translate_native_error(ErrorCode err) -> std::string {
   flags |= FORMAT_MESSAGE_IGNORE_INSERTS;
 
   LPSTR outbuf  = nullptr;
-  if(!FormatMessageA(
+  if(!::FormatMessageA(
     flags,
     nullptr,
     err,
@@ -67,7 +67,7 @@ BEGIN_NAMESPACE(n19::sys);
 
 NODISCARD_ auto last_error() -> String {
   Char buffer[256]{};
-  if(strerror_r(errno, buffer, sizeof(buffer) - 2) == 0) {
+  if(::strerror_r(errno, buffer, sizeof(buffer) - 2) == 0) {
     return String{ buffer };
   }
 
@@ -76,7 +76,7 @@ NODISCARD_ auto last_error() -> String {
 
 NODISCARD_ auto translate_native_error(ErrorCode err) -> String {
   Char buffer[256]{};
-  if(strerror_r(err, buffer, sizeof(buffer) - 2) == 0) {
+  if(::strerror_r(err, buffer, sizeof(buffer) - 2) == 0) {
     return String{ buffer };
   }
 

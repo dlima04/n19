@@ -67,8 +67,8 @@ auto SystemTime::strings() const -> STFormatter_ {
 
 #ifdef N19_WIN32
 auto SystemTime::from_utc() -> Result<SystemTime> {
-  SystemTime time = {}; /// To return.
-  SysRepr_ repr   = {}; /// Windows SYSTEMTIME.
+  SystemTime time{}; /// To return.
+  SysRepr_ repr{};   /// Windows SYSTEMTIME.
 
   ::GetSystemTime(&repr);
   time.second_  = repr.wSecond;
@@ -82,8 +82,8 @@ auto SystemTime::from_utc() -> Result<SystemTime> {
 }
 
 auto SystemTime::from_local() -> Result<SystemTime> {
-  SystemTime time = {}; /// To return.
-  SysRepr_ repr   = {}; /// Windows SYSTEMTIME.
+  SystemTime time{}; /// To return.
+  SysRepr_ repr{};   /// Windows SYSTEMTIME.
 
   ::GetLocalTime(&repr);
   time.second_  = repr.wSecond;
@@ -98,9 +98,9 @@ auto SystemTime::from_local() -> Result<SystemTime> {
 
 #else // POSIX
 auto SystemTime::from_utc() -> Result<SystemTime> {
-  SystemTime time = {}; /// To return.
-  Epoch_ epoch   = {};  /// UNIX epoch.
-  SysRepr_ repr  = {};  /// POSIX time struct.
+  SystemTime time{}; /// To return.
+  Epoch_ epoch{};    /// UNIX epoch.
+  SysRepr_ repr{};   /// POSIX time struct.
 
   ::time(&epoch);
   if(::gmtime_r(&epoch, &repr) == nullptr) {
@@ -118,9 +118,9 @@ auto SystemTime::from_utc() -> Result<SystemTime> {
 }
 
 auto SystemTime::from_local() -> Result<SystemTime> {
-  SystemTime time = {}; /// To return.
-  Epoch_ epoch   = {};  /// UNIX epoch.
-  SysRepr_ repr  = {};  /// POSIX time struct.
+  SystemTime time{}; /// To return.
+  Epoch_ epoch{};    /// UNIX epoch.
+  SysRepr_ repr{};   /// POSIX time struct.
 
   ::time(&epoch);
   if(::localtime_r(&epoch, &repr) == nullptr) {
