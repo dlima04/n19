@@ -11,8 +11,8 @@
 #include <string_view>
 #include <bit>
 
-#define U32_CONSTANT(X) X##LU
-#define U64_CONSTANT(X) X##LLU
+#define U32_CONSTANT(X) X##UL
+#define U64_CONSTANT(X) X##ULL
 #define AS_U64(CT_EXPR) static_cast<uint64_t>(CT_EXPR)
 #define AS_U32(CT_EXPR) static_cast<uint32_t>(CT_EXPR)
 

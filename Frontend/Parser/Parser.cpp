@@ -569,7 +569,7 @@ auto parse_procdecl_(ParseContext& ctx) -> Result<AstNode::Ptr<>> {
 
   /// Parse return type
   TRY(ctx.lxr.expect_type(TokenType::RightParen));
-  TRY(ctx.lxr.expect_type(TokenType::FatArrow));
+  TRY(ctx.lxr.expect_type(TokenType::SkinnyArrow));
 
   if(ctx.lxr.current() != TokenType::LeftBrace) {
     TRY(try_parse_return_type_(ctx, node, proc_ptr));
