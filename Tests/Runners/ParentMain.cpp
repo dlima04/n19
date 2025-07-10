@@ -174,6 +174,8 @@ static NOINLINE_ bool do_runall(const int argc, sys::Char** argv) {
     + tally->total_cases_skipped;
 
   outs()
+    << "\n"
+    << fmt("{:=<80}", "=")
     << "\nRan " << tally->total_suites_ran
     << " out of "
     << tally->total_suites_ran + tally->total_suites_skipped
@@ -188,7 +190,9 @@ static NOINLINE_ bool do_runall(const int argc, sys::Char** argv) {
     << tally->total_cases_exc
     << " interrupted by exceptions,\n  "
     << tally->total_cases_skipped
-    << " skipped.\n";
+    << " skipped.\n"
+    << fmt("{:=<80}", "=")
+    << "\n";
 
   return true;
 }

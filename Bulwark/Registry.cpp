@@ -71,6 +71,8 @@ auto Registry::run_all(OStream &stream) -> void {
   /// If we're not tallying up test case results via IPC, just dump them to stdout.
   if(Context::the().shared_region_.is_invalid()) {
     stream
+      << "\n"
+      << fmt("{:=<80}", "=")
       << "\nRan "
       << g_total_suites_ran
       << " out of "
@@ -81,7 +83,8 @@ auto Registry::run_all(OStream &stream) -> void {
       << g_total_cases_passed  << " passed,\n  "
       << g_total_cases_failed  << " failed,\n  "
       << g_total_cases_exc     << " interrupted by exceptions,\n  "
-      << g_total_cases_skipped << " skipped.\n";
+      << g_total_cases_skipped << " skipped.\n"
+      << fmt("{:=<80}", "=") << "\n";
   }
 
   /// Otherwise we're in "IPC mode" and we need to report our results to the parent process.
