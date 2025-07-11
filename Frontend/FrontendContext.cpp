@@ -104,7 +104,7 @@ OutputFile::OutputFile(sys::String&& n) : name(n) {
 auto Context::dump(OStream& stream) -> void {
   stream
     << Con::MagentaFG
-    << "Flags :: "
+    << "Flags: "
     << Con::Reset;
   std::string buff;
 
@@ -123,7 +123,7 @@ auto Context::dump(OStream& stream) -> void {
   stream
     << buff
     << Con::MagentaFG
-    << "\nInputs ::\n"
+    << "\nInputs:\n"
     << Con::Reset;
 
   for(const InputFile& input : inputs_) {
@@ -145,7 +145,7 @@ auto Context::dump(OStream& stream) -> void {
 
   stream
     << Con::MagentaFG
-    << "Outputs ::\n"
+    << "Outputs:\n"
     << Con::Reset;
 
   for(const OutputFile& output : outputs_) {
@@ -163,7 +163,7 @@ auto Context::dump(OStream& stream) -> void {
 
   stream
     << Con::MagentaFG
-    << "RawFlags :: "
+    << "RawFlags: "
     << std::bitset<sizeof(flags_)>(flags_).to_string()
     << Con::Reset
     << "\n\n";

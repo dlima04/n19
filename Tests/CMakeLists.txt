@@ -1,55 +1,24 @@
 include(Common)
 
-# testrunner-core
-add_executable(testrunner-core
-  Runners/RunnerMain.cpp
-  Suites/Core/SuiteArgParse.cpp
-  Suites/Core/SuiteBytes.cpp
-  Suites/Core/SuiteDefer.cpp
-  Suites/Core/SuiteMaybe.cpp
-  Suites/Core/SuiteMurmur3.cpp
-  Suites/Core/SuiteResult.cpp
-  Suites/Core/SuiteRingStructures.cpp
-  Suites/Core/SuiteStream.cpp
-  Suites/Core/SuiteStringUtil.cpp
+enable_testing()
+include(FetchContent)
+FetchContent_Declare(
+  catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG v3.8.1
 )
 
-target_link_libraries(testrunner-core PRIVATE
-  project_options
-  project_warnings
-  Bulwark
-)
+FetchContent_MakeAvailable(catch2)
 
-# testrunner-system
-add_executable(testrunner-system
-  Runners/RunnerMain.cpp
-  Suites/System/SuiteSystemError.cpp
-)
+add_subdirectory(Core)
+add_subdirectory(Frontend)
+add_subdirectory(System)
 
-target_link_libraries(testrunner-system PRIVATE
-  project_options
-  project_warnings
-  Bulwark
-)
+add_executable(runtests Entry.cpp)
+target_link_libraries(runtests PRIVATE TestCore)
+target_link_libraries(runtests PRIVATE TestFrontend)
+target_link_libraries(runtests PRIVATE TestSystem)
 
-# testrunner-rl (reference language)
-add_executable(testrunner-rl
-  Runners/RunnerMain.cpp
-  Suites/Frontend/SuiteEntity.cpp
-  Suites/Frontend/SuiteLexer.cpp
-)
-
-target_link_libraries(testrunner-rl PRIVATE
-  project_options
-  project_warnings
-  Bulwark
-  Frontend
-)
-
-# build parent test runner
-add_executable(runtests Runners/ParentMain.cpp)
-target_link_libraries(runtests PRIVATE
-  project_options
-  project_warnings
-  Bulwark
-)
+include(CTest)
+include(Catch)
+catch_discover_tests(runtests)

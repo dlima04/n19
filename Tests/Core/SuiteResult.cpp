@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Bulwark/Bulwark.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <Core/Result.hpp>
 #include <Core/Try.hpp>
 using namespace n19;
@@ -26,7 +26,7 @@ struct DTORHelper {
  ~DTORHelper() { ref_ += 1; }
 };
 
-TEST_CASE(Result, Construct) {
+TEST_CASE("Construct", "[Core.Result]") {
   Result<CTORHelper> obj1(300, 400);
   Result<CTORHelper> obj2 = Error{ErrC::Internal};
   auto obj3 = Result<CTORHelper>::create(100, 200);
@@ -44,7 +44,7 @@ TEST_CASE(Result, Construct) {
   REQUIRE(val == obj3.value());
 }
 
-TEST_CASE(Result, Destroy) {
+TEST_CASE("Destroy", "[Core.Result]") {
   int num = 20;
   {
     Result<DTORHelper> obj1(static_cast<int&>(num));
@@ -57,7 +57,7 @@ TEST_CASE(Result, Destroy) {
   REQUIRE(err.msg == "blabla");
 }
 
-TEST_CASE(Result, Try) {
+TEST_CASE("Try", "[Core.Result]") {
   int num = 20;
   auto func1 = []() -> Result<int> {
     return Error{ErrC::Internal};

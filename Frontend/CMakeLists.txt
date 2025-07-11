@@ -16,10 +16,11 @@ add_library(Frontend STATIC
   ${FRONTEND_SOURCES}
 )
 
+# TODO: link Framework when that is created
 target_link_libraries(Frontend PUBLIC
   project_options
   project_warnings
-  Framework
+  Core
 )
 
 add_executable(rl FrontendMain.cpp)

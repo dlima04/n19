@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Bulwark/Bulwark.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <Frontend/Entities/EntityTable.hpp>
 #include <Core/ClassTraits.hpp>
 #include <string>
@@ -36,8 +36,8 @@ namespace rl {
   };
 }
 
-TEST_CASE(Entity, SymLinks) {
-  SECTION(BasicResolution, {
+TEST_CASE("SymLinks", "[Frontend.Entity]") {
+  SECTION("BasicResolution") {
     EntityTable table(_nstr("MyTable"));
     auto ptr1 = table.insert<SymLink>(RL_ROOT_ENTITY_ID, 1,  1, 1, "entity1");
     REQUIRE(ptr1);
@@ -50,9 +50,9 @@ TEST_CASE(Entity, SymLinks) {
 
     REQUIRE(resolved);
     REQUIRE(resolved->id_ == ptr2->id_);
-  });
+  }
 
-  SECTION(MultiLevelResolution, {
+  SECTION("MultiLevelResolution") {
     EntityTable table(_nstr("MyTable"));
     auto ptr1 = table.insert<SymLink>(RL_ROOT_ENTITY_ID, 1,  1, 1, "entity1");
     REQUIRE(ptr1);
@@ -70,10 +70,10 @@ TEST_CASE(Entity, SymLinks) {
     auto resolved = table.resolve_link(ptr1);
     REQUIRE(resolved);
     REQUIRE(resolved->id_ == ptr3->id_);
-  });
+  }
 }
 
-TEST_CASE(Entity, Construction) {
+TEST_CASE("Construction", "[Frontend.Entity]") {
   EntityTable table(_nstr("MyTable"));
   std::string tempstr = "foobar";
   auto ptr4 = table.insert<EntFooBar>(

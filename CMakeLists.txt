@@ -18,38 +18,20 @@ option(ENABLE_ASAN "Enable Clang Address Sanitizer" ON)
 option(ENABLE_UBSAN "Enable Clang UB Sanitizer" OFF)
 option(ALLOW_LOGGING "Allow logging features" OFF)
 
-set(N19_BUILD_PLATFORM ${CMAKE_HOST_SYSTEM_NAME})
-set(N19_IS_DARWIN OFF)
-set(N19_IS_LINUX OFF)
-set(N19_IS_POSIX OFF)
-set(N19_IS_WINDOWS OFF)
-set(N19_IS_CLANGCL_WINDOWS OFF)
-
-if(WIN32 OR N19_BUILD_PLATFORM STREQUAL "Windows")
-  set(N19_IS_WINDOWS ON)
-elseif(N19_BUILD_PLATFORM STREQUAL "Linux")
-  set(N19_IS_LINUX ON)
-  set(N19_IS_POSIX ON)
-elseif(N19_BUILD_PLATFORM STREQUAL "Darwin")
-  set(N19_IS_DARWIN ON)
-  set(N19_IS_POSIX ON)
-else()
-  message(FATAL_ERROR "Unsupported build platform.")
-endif()
-
-if(N19_IS_WINDOWS AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  set(N19_IS_CLANGCL_WINDOWS ON)
-endif()
-
 set(N19_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-list(APPEND CMAKE_MODULE_PATH "${N19_SOURCE_DIR}/Meta/CMake")
+list(APPEND CMAKE_MODULE_PATH "${N19_SOURCE_DIR}/CMake")
 
 # include Meta/CMake modules
 include(Common)
-include(Sanitizers)
+include(ClangSanitizers)
+include(Arch)
+include(Platform)
+
+n19_enumerate_build_platform()
+n19_enumerate_arch()
 
 print_box("The n19 Project")
-include_directories(${N19_SOURCE_DIR})
+include_directories("${N19_SOURCE_DIR}")
 
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_23)
@@ -73,17 +55,15 @@ endif()
 # Address sanitizer.
 # Note: ignore this option if on Windows.
 if(ENABLE_ASAN AND NOT N19_IS_WINDOWS)
-  configure_clang_sanitizer(address)
-  link_clang_sanitizer(address)
+  n19_configure_clang_sanitizer(address)
+  n19_link_clang_sanitizer(address)
 endif()
 
 add_subdirectory(Core)
-add_subdirectory(Framework)
 add_subdirectory(System)
 
 # Optional - build unit tests
 if(BUILD_TESTS)
-  add_subdirectory(Bulwark)
   add_subdirectory(Tests)
 endif()
 

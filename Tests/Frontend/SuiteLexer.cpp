@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Bulwark/Bulwark.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <Frontend/Lexer/Lexer.hpp>
 #include <Frontend/Lexer/Token.hpp>
 #include <vector>
@@ -20,8 +20,8 @@ static auto create_lexer(const std::string& source) -> std::shared_ptr<Lexer> {
   return Lexer::create_shared(std::move(buffer)).value();
 }
 
-TEST_CASE(Lexer, BasicTokenRecognition) {
-  SECTION(SimpleTokens, {
+TEST_CASE("BasicTokenRecognition", "[Frontend.Lexer]") {
+  SECTION("SimpleTokens") {
     auto lexer = create_lexer("(){}[];,");
     
     REQUIRE(lexer->current().type_ == TokenType::LeftParen);
@@ -49,9 +49,9 @@ TEST_CASE(Lexer, BasicTokenRecognition) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(Operators, {
+  SECTION("Operators") {
     auto lexer = create_lexer("+ - * / % == != < > <= >=&|^");
     
     REQUIRE(lexer->current().type_ == TokenType::Plus);
@@ -97,9 +97,9 @@ TEST_CASE(Lexer, BasicTokenRecognition) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(CompoundOperators, {
+  SECTION("CompoundOperators") {
     auto lexer = create_lexer("+= -= *= /= %= &= |= ^= << >>");
     
     REQUIRE(lexer->current().type_ == TokenType::PlusEq);
@@ -133,11 +133,11 @@ TEST_CASE(Lexer, BasicTokenRecognition) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 }
 
-TEST_CASE(Lexer, Literals) {
-  SECTION(IntegerLiterals, {
+TEST_CASE("Literals", "[Frontend.Lexer]") {
+  SECTION("IntegerLiterals") {
     auto lexer = create_lexer("42 0 123456789");
     
     REQUIRE(lexer->current().type_ == TokenType::IntLiteral);
@@ -153,9 +153,9 @@ TEST_CASE(Lexer, Literals) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(FloatLiterals, {
+  SECTION("FloatLiterals") {
     auto lexer = create_lexer("3.14 0.0 1e10 1.2e-3");
     
     REQUIRE(lexer->current().type_ == TokenType::FloatLiteral);
@@ -175,9 +175,9 @@ TEST_CASE(Lexer, Literals) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(HexLiterals, {
+  SECTION("HexLiterals") {
     auto lexer = create_lexer("0x42 0xFF 0xABCD");
     
     REQUIRE(lexer->current().type_ == TokenType::HexLiteral);
@@ -193,9 +193,9 @@ TEST_CASE(Lexer, Literals) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(OctalLiterals, {
+  SECTION("OctalLiterals") {
     auto lexer = create_lexer("042 0777");
     
     REQUIRE(lexer->current().type_ == TokenType::OctalLiteral);
@@ -207,9 +207,9 @@ TEST_CASE(Lexer, Literals) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(StringLiterals, {
+  SECTION("StringLiterals") {
     auto lexer = create_lexer("\"hello\" \"world\" \"escaped\\\"quote\"");
 
     REQUIRE(lexer->current().type_ == TokenType::StringLiteral);
@@ -225,9 +225,9 @@ TEST_CASE(Lexer, Literals) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(BooleanLiterals, {
+  SECTION("BooleanLiterals") {
     auto lexer = create_lexer("true false");
     
     REQUIRE(lexer->current().type_ == TokenType::BooleanLiteral);
@@ -239,9 +239,9 @@ TEST_CASE(Lexer, Literals) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(NullLiteral, {
+  SECTION("NullLiteral") {
     auto lexer = create_lexer("null");
     
     REQUIRE(lexer->current().type_ == TokenType::NullLiteral);
@@ -249,11 +249,11 @@ TEST_CASE(Lexer, Literals) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 }
 
-TEST_CASE(Lexer, IdentifiersAndKeywords) {
-  SECTION(Identifiers, {
+TEST_CASE("IdentifiersAndKeywords", "[Frontend.Lexer]") {
+  SECTION("Identifiers") {
     auto lexer = create_lexer("foo bar123 _underscore");
     
     REQUIRE(lexer->current().type_ == TokenType::Identifier);
@@ -269,9 +269,9 @@ TEST_CASE(Lexer, IdentifiersAndKeywords) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(Keywords, {
+  SECTION("Keywords") {
     auto lexer = create_lexer("proc let const if else while for return");
     
     REQUIRE(lexer->current().type_ == TokenType::Proc);
@@ -307,11 +307,11 @@ TEST_CASE(Lexer, IdentifiersAndKeywords) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 }
 
-TEST_CASE(Lexer, Peeking) {
-  SECTION(PeekSingleToken, {
+TEST_CASE("Peeking", "[Frontend.Lexer]") {
+  SECTION("PeekSingleToken") {
     auto lexer = create_lexer("42 + 10");
     
     REQUIRE(lexer->current().type_ == TokenType::IntLiteral);
@@ -328,9 +328,9 @@ TEST_CASE(Lexer, Peeking) {
     // Now consume and verify
     lexer->consume(1);
     REQUIRE(lexer->current().type_ == TokenType::Plus);
-  });
+  }
 
-  SECTION(PeekMultipleTokens, {
+  SECTION("PeekMultipleTokens") {
     auto lexer = create_lexer("42 + 10 * 5");
     
     REQUIRE(lexer->current().type_ == TokenType::IntLiteral);
@@ -345,9 +345,9 @@ TEST_CASE(Lexer, Peeking) {
     // Consume and verify
     lexer->consume(3);
     REQUIRE(lexer->current().type_ == TokenType::Mul);
-  });
+  }
 
-  SECTION(BatchedPeek, {
+  SECTION("BatchedPeek") {
     auto lexer = create_lexer("42 + 10 * 5");
 
     auto tok = lexer->current();
@@ -364,11 +364,11 @@ TEST_CASE(Lexer, Peeking) {
     REQUIRE(lexer->current().cat_  == tok.cat_);
     REQUIRE(lexer->current().line_ == tok.line_);
     REQUIRE(lexer->current().pos_  == tok.pos_);
-  });
+  }
 }
 
-TEST_CASE(Lexer, ErrorHandling) {
-  SECTION(IllegalTokens, {
+TEST_CASE("ErrorHandling", "[Frontend.Lexer]") {
+  SECTION("IllegalTokens") {
     auto lexer = create_lexer("42 ? 10");
     
     REQUIRE(lexer->current().type_ == TokenType::IntLiteral);
@@ -376,28 +376,28 @@ TEST_CASE(Lexer, ErrorHandling) {
     
     REQUIRE(lexer->current().type_ == TokenType::Illegal);
     lexer->consume(1);
-  });
+  }
 
-  SECTION(UnterminatedString, {
+  SECTION("UnterminatedString") {
     auto lexer = create_lexer("\"hello");
     
     REQUIRE(lexer->current().type_ == TokenType::Illegal);
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(InvalidNumberFormat, {
+  SECTION("InvalidNumberFormat") {
     auto lexer1 = create_lexer("1.2.3");
     auto lexer2 = create_lexer("0xGG");
     
     REQUIRE(lexer1->current().type_ == TokenType::Illegal);
     REQUIRE(lexer2->current().type_ == TokenType::Illegal);
-  });
+  }
 }
 
-TEST_CASE(Lexer, LineCounting) {
-  SECTION(BasicLineCounting, {
+TEST_CASE("LineCounting", "[Frontend.Lexer]") {
+  SECTION("BasicLineCounting") {
     auto lexer = create_lexer("42\n+ 10\n* 5");
     
     REQUIRE(lexer->current().line_ == 1);
@@ -422,9 +422,9 @@ TEST_CASE(Lexer, LineCounting) {
     
     REQUIRE(lexer->current().line_ == 3);
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(Comments, {
+  SECTION("Comments") {
     auto lexer = create_lexer("42 # This is a comment\n+ 10");
     
     REQUIRE(lexer->current().line_ == 1);
@@ -441,36 +441,36 @@ TEST_CASE(Lexer, LineCounting) {
     
     REQUIRE(lexer->current().line_ == 2);
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 }
 
-TEST_CASE(Lexer, Expect) {
-  SECTION(ExpectTokenType, {
+TEST_CASE("Expect", "[Frontend.Lexer]") {
+  SECTION("ExpectTokenType") {
     auto lexer = create_lexer("42 + 10");
     
     REQUIRE(lexer->expect_type(rl::TokenType::IntLiteral).has_value());
     REQUIRE(lexer->expect_type(rl::TokenType::Plus).has_value());
     REQUIRE(lexer->expect_type(rl::TokenType::IntLiteral).has_value());
     REQUIRE(lexer->expect_type(rl::TokenType::EndOfFile).has_value());
-  });
+  }
 
-  SECTION(ExpectTokenCategory, {
+  SECTION("ExpectTokenCategory") {
     auto lexer = create_lexer("42 + 10");
 
     REQUIRE(lexer->expect(rl::TokenCategory::Literal).has_value());
     REQUIRE(lexer->expect(rl::TokenCategory::ArithmeticOp).has_value());
     REQUIRE(lexer->expect(rl::TokenCategory::Literal).has_value());
     REQUIRE(lexer->current() == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(ExpectFailure, {
+  SECTION("ExpectFailure") {
     auto lexer = create_lexer("42 + 10");
     REQUIRE(!lexer->expect_type(TokenType::Plus).has_value());
     /// TODO: add more here
-  });
+  }
 }
 
-TEST_CASE(Lexer, Revert) {  
+TEST_CASE("Revert", "[Frontend.Lexer]") {
   auto lexer = create_lexer("42 + 10");    
   REQUIRE(lexer->current().type_ == TokenType::IntLiteral);
   auto token = lexer->current();
@@ -482,8 +482,8 @@ TEST_CASE(Lexer, Revert) {
   REQUIRE(lexer->current().type_ == TokenType::IntLiteral);
 }
 
-TEST_CASE(Lexer, UTF8Parsing) {
-  SECTION(UTF8Identifiers, {
+TEST_CASE("UTF8Parsing", "[Frontend.Lexer]") {
+  SECTION("UTF8Identifiers") {
     // Create a lexer with UTF-8 encoded identifiers
     std::u8string chinese = u8"世界";  // "World" in Chinese
     std::u8string japanese = u8"こんにちは";  // "Hello" in Japanese
@@ -510,9 +510,9 @@ TEST_CASE(Lexer, UTF8Parsing) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(UTF8InStringLiterals, {
+  SECTION("UTF8InStringLiterals") {
     // Create a lexer with UTF-8 encoded string literals
     std::u8string chinese = u8"世界";  // "World" in Chinese
     std::u8string japanese = u8"こんにちは";  // "Hello" in Japanese
@@ -544,9 +544,9 @@ TEST_CASE(Lexer, UTF8Parsing) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(UTF8EscapedInStringLiterals, {
+  SECTION("UTF8EscapedInStringLiterals") {
     // Create a lexer with UTF-8 encoded string literals containing escaped characters
     std::u8string chinese = u8"世界";  // "World" in Chinese
     
@@ -568,11 +568,11 @@ TEST_CASE(Lexer, UTF8Parsing) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 }
 
-TEST_CASE(Lexer, CharacterLiterals) {
-  SECTION(ValidCharacterLiterals, {
+TEST_CASE("CharacterLiterals", "[Frontend.Lexer]") {
+  SECTION("ValidCharacterLiterals") {
     auto lexer = create_lexer("'a' 'b' 'c' '\\n' '\\t' '\\r' '\\0'");
     
     REQUIRE(lexer->current().type_ == TokenType::ByteLiteral);
@@ -604,9 +604,9 @@ TEST_CASE(Lexer, CharacterLiterals) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
+  }
 
-  SECTION(InvalidCharacterLiterals, {
+  SECTION("InvalidCharacterLiterals") {
     // Multiple characters in single quotes should be illegal
     auto lexer1 = create_lexer("'aa'");
     REQUIRE(lexer1->current().type_ == TokenType::Illegal);
@@ -628,11 +628,11 @@ TEST_CASE(Lexer, CharacterLiterals) {
     auto lexer3 = create_lexer("'a");
 
     REQUIRE(lexer3->current().type_ == TokenType::Illegal);
-  });
+  }
 }
 
-TEST_CASE(Lexer, InvalidTokens) {
-  SECTION(InvalidNumbers, {
+TEST_CASE("InvalidTokens", "[Frontend.Lexer]") {
+  SECTION("InvalidNumbers") {
     // Invalid number formats
     auto lexer1 = create_lexer("1.2.3");
     auto lexer3 = create_lexer("091");
@@ -641,9 +641,9 @@ TEST_CASE(Lexer, InvalidTokens) {
     REQUIRE(lexer1->current() == TokenType::Illegal);
     REQUIRE(lexer2->current() == TokenType::Illegal);
     REQUIRE(lexer3->current() == TokenType::Illegal);
-  });
+  }
 
-  SECTION(InvalidIdentifiers, {
+  SECTION("InvalidIdentifiers") {
     // Identifiers starting with numbers
     auto lexer = create_lexer("123abc");
     
@@ -654,5 +654,5 @@ TEST_CASE(Lexer, InvalidTokens) {
     lexer->consume(1);
     
     REQUIRE(lexer->current().type_ == TokenType::EndOfFile);
-  });
-} 
+  }
+}

@@ -3,13 +3,13 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Bulwark/Bulwark.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <System/Error.hpp>
 #include <string>
 using namespace n19;
 using namespace n19::sys;
 
-TEST_CASE(SystemError, LastError) {
+TEST_CASE("LastError", "[System.SystemError]") {
 #ifdef N19_WIN32
   SetLastError(ERROR_FILE_NOT_FOUND);
 #else
@@ -26,8 +26,8 @@ TEST_CASE(SystemError, LastError) {
 #endif
 } 
 
-TEST_CASE(SystemError, Translation) {
-  SECTION(TranslateNativeError, {
+TEST_CASE("Translation", "[System.SystemError]") {
+  SECTION("TranslateNativeError") {
     /// Test translating a known error code...
     /// On windows, this is ERROR_FILE_NOT_FOUND.
     /// On POSIX, this is ENOENT.
@@ -37,11 +37,12 @@ TEST_CASE(SystemError, Translation) {
     REQUIRE(!error_msg.empty());
     
     ///  Check that the error message contains expected text
-    REQUIRE(error_msg.find("file") != std::string::npos ||
-            error_msg.find("File") != std::string::npos);
-  });
+    const bool is_ok = error_msg.find("file") != std::string::npos ||
+            error_msg.find("File") != std::string::npos;
+    REQUIRE(is_ok);
+  }
 
-  SECTION(CommonErrorCodes, {
+  SECTION("CommonErrorCodes") {
     /// Test a few common error codes...
     std::vector<ErrorCode> common_codes;
     
@@ -57,5 +58,5 @@ TEST_CASE(SystemError, Translation) {
       std::string error_msg = translate_native_error(code);
       REQUIRE(!error_msg.empty());
     }
-  });
+  }
 }

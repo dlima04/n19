@@ -3,7 +3,7 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <Bulwark/Bulwark.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <Core/ArgParse.hpp>
 #include <Core/Console.hpp>
 
@@ -80,7 +80,7 @@ struct DummyParser3 : public argp::Parser {
     _nstr(""));
 };
 
-TEST_CASE(ArgParse, Defaults) {
+TEST_CASE("Defaults", "[Core.ArgParse]") {
   DummyParser1 parser1;
 
   /// Check that default arguments were added correctly
@@ -91,16 +91,12 @@ TEST_CASE(ArgParse, Defaults) {
 
   /// pack type
   REQUIRE(parser1.pack_param.size() == 3);
-  if(parser1.pack_param.size() != 3) {
-    TEST_DIE();
-  }
-
   REQUIRE(parser1.pack_param[0] == _nstr("foo"));
   REQUIRE(parser1.pack_param[1] == _nstr("bar"));
   REQUIRE(parser1.pack_param[2] == _nstr("baz"));
 }
 
-TEST_CASE(ArgParse, UnixStyle) {
+TEST_CASE("UnixStyle", "[Core.ArgParse]") {
   std::vector<sys::String> longform_unix =
   { _nstr("--i64-arg"),    _nstr("341"),
     _nstr("--bool-arg"),   _nstr("false"),
@@ -117,7 +113,7 @@ TEST_CASE(ArgParse, UnixStyle) {
     _nstr("-pack=bim,bam,pow,bar")
   };
 
-  REF_SECTION(unix_longform, {
+  SECTION("unix_longform") {
     DummyParser1 parser1;
     auto res = parser1
       .style(argp::ArgStyle::UNIX)
@@ -131,15 +127,13 @@ TEST_CASE(ArgParse, UnixStyle) {
     REQUIRE(parser1.str_param == _nstr("idk"));
 
     REQUIRE(parser1.pack_param.size() == 4);
-    if(parser1.pack_param.size() == 4) {
-      REQUIRE(parser1.pack_param[0] == _nstr("bim"));
-      REQUIRE(parser1.pack_param[1] == _nstr("bam"));
-      REQUIRE(parser1.pack_param[2] == _nstr("pow"));
-      REQUIRE(parser1.pack_param[3] == _nstr("bar"));
-    }
-  });
+    REQUIRE(parser1.pack_param[0] == _nstr("bim"));
+    REQUIRE(parser1.pack_param[1] == _nstr("bam"));
+    REQUIRE(parser1.pack_param[2] == _nstr("pow"));
+    REQUIRE(parser1.pack_param[3] == _nstr("bar"));
+  }
 
-  REF_SECTION(unix_shortform, {
+  SECTION("unix_shortform") {
     DummyParser1 parser1;
     auto res = parser1
       .style(argp::ArgStyle::UNIX)
@@ -159,10 +153,10 @@ TEST_CASE(ArgParse, UnixStyle) {
       REQUIRE(parser1.pack_param[2] == _nstr("pow"));
       REQUIRE(parser1.pack_param[3] == _nstr("bar"));
     }
-  });
+  }
 }
 
-TEST_CASE(ArgParse, MasqStyle) {
+TEST_CASE("MasqStyle", "[Core.ArgParse]") {
   std::vector<sys::String> masq =
   { _nstr(":i64-arg"),    _nstr("341"),
     _nstr(":bool-arg"),   /// This should be implicitly true once parsed.
@@ -191,7 +185,7 @@ TEST_CASE(ArgParse, MasqStyle) {
   }
 }
 
-TEST_CASE(ArgParse, DosStyle) {
+TEST_CASE("DosStyle", "[Core.ArgParse]") {
   /// Let's use a vector this time
   std::vector<sys::String> dos =
   { _nstr("/i64"),    _nstr("341"),
@@ -214,10 +208,6 @@ TEST_CASE(ArgParse, DosStyle) {
   REQUIRE(parser1.str_param == _nstr("idk"));
 
   REQUIRE(parser1.pack_param.size() == 4);
-  if(parser1.pack_param.size() != 4) {
-    TEST_DIE();
-  }
-
   REQUIRE(parser1.pack_param[0] == _nstr("bim"));
   REQUIRE(parser1.pack_param[1] == _nstr("bam"));
   REQUIRE(parser1.pack_param[2] == _nstr("pow"));
@@ -238,7 +228,7 @@ struct JustBool : public argp::Parser {
   bool& arg_ = arg<bool>(_nstr("--arg"), _nstr("-a"), _nstr(""), false);
 };
 
-TEST_CASE(ArgParse, BadTypes) {
+TEST_CASE("BadTypes", "[Core.ArgParse]") {
   JustI64 parser_i64;
   JustDouble parser_double;
   JustBool parser_bool;
@@ -295,7 +285,7 @@ TEST_CASE(ArgParse, BadTypes) {
     .has_value());
 }
 
-TEST_CASE(ArgParse, BadNames) {
+TEST_CASE("BadNames", "[Core.ArgParse]") {
   DummyParser1 parser1;
   DummyParser1 parser2;
   DummyParser1 parser3;
