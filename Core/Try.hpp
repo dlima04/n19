@@ -30,7 +30,7 @@
   ({                                                                               \
     auto&& temp_result_ = (EXPR);                                                  \
     static_assert(!::n19::IsLvalueReference<decltype((EXPR).release_value())>);    \
-    ASSERT(temp_result_.has_value(), "MUST() expression evaluated to an error!");  \
+    ASSERT(temp_result_.has_value(), "Expr \"" #EXPR "\" evaluated to an error!"); \
     temp_result_.release_value();                                                  \
   })                                                                               \
 
@@ -41,5 +41,4 @@
 #define ERROR_IF_NOT(EXPR, ...) do {                                               \
     if(!(EXPR)) { return ::n19::Error{ __VA_ARGS__ }; }                            \
   } while(0)                                                                       \
-
 

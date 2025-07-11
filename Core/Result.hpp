@@ -151,7 +151,7 @@ public:
 
   Result_(T&& value) : value_(std::forward<T>(value)) {}
   Result_(E&& error) : value_(std::forward<E>(error)) {}
-  Result_(/*.....*/) : value_(E{}  ) {}
+  Result_(/*.....*/) : value_(E{}) {}
 protected:
   Variant_ value_;
 };

@@ -12,7 +12,6 @@
 #include <Core/ClassTraits.hpp>
 #include <Core/Console.hpp>
 #include <Core/Concepts.hpp>
-#include <Core/Poly.hpp>
 #include <Frontend/Lexer/Token.hpp>
 #include <Frontend/Entities/Entity.hpp>
 #include <Frontend/FrontendContext.hpp>
@@ -20,37 +19,37 @@
 #include <vector>
 #include <memory>
 
-#define RL_ASTNODE_TYPE_LIST   \
-  ASTNODE_X(Node)              \
-  ASTNODE_X(Vardecl)           \
-  ASTNODE_X(ProcDecl)          \
-  ASTNODE_X(EntityRef)         \
-  ASTNODE_X(EntityRefThunk)    \
-  ASTNODE_X(QualifiedRef)      \
-  ASTNODE_X(ScalarLiteral)     \
-  ASTNODE_X(AggregateLiteral)  \
-  ASTNODE_X(BinExpr)           \
-  ASTNODE_X(UnaryExpr)         \
-  ASTNODE_X(Branch)            \
-  ASTNODE_X(If)                \
-  ASTNODE_X(Else)              \
-  ASTNODE_X(Switch)            \
-  ASTNODE_X(Case)              \
-  ASTNODE_X(Default)           \
-  ASTNODE_X(For)               \
-  ASTNODE_X(While)             \
-  ASTNODE_X(ConstBranch)       \
-  ASTNODE_X(ConstIf)           \
-  ASTNODE_X(ConstElse)         \
-  ASTNODE_X(ScopeBlock)        \
-  ASTNODE_X(Namespace)         \
-  ASTNODE_X(Call)              \
-  ASTNODE_X(Break)             \
-  ASTNODE_X(Continue)          \
-  ASTNODE_X(Return)            \
-  ASTNODE_X(Defer)             \
-  ASTNODE_X(DeferIf)           \
-  ASTNODE_X(Subscript)         \
+#define RL_ASTNODE_TYPE_LIST \
+  ASTNODE_X(Node) \
+  ASTNODE_X(EntityRef) \
+  ASTNODE_X(Vardecl) \
+  ASTNODE_X(ProcDecl) \
+  ASTNODE_X(EntityRefThunk) \
+  ASTNODE_X(QualifiedRef) \
+  ASTNODE_X(ScalarLiteral) \
+  ASTNODE_X(AggregateLiteral) \
+  ASTNODE_X(BinExpr) \
+  ASTNODE_X(UnaryExpr) \
+  ASTNODE_X(Branch) \
+  ASTNODE_X(If) \
+  ASTNODE_X(Else) \
+  ASTNODE_X(Switch) \
+  ASTNODE_X(Case) \
+  ASTNODE_X(Default) \
+  ASTNODE_X(For) \
+  ASTNODE_X(While) \
+  ASTNODE_X(ConstBranch) \
+  ASTNODE_X(ConstIf) \
+  ASTNODE_X(ConstElse) \
+  ASTNODE_X(ScopeBlock) \
+  ASTNODE_X(Namespace) \
+  ASTNODE_X(Call) \
+  ASTNODE_X(Break) \
+  ASTNODE_X(Continue) \
+  ASTNODE_X(Return) \
+  ASTNODE_X(Defer) \
+  ASTNODE_X(DeferIf) \
+  ASTNODE_X(Subscript) \
 
 BEGIN_NAMESPACE(rl);
 using namespace n19;
