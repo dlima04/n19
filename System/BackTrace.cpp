@@ -8,27 +8,14 @@
 #include <Core/MacroUtil.hpp>
 #include <string_view>
 
-///
-/// Demangle symbol names via cxxabi.h,
-/// if it is available (GNU)
-#ifdef __has_include
-#if __has_include(<cxxabi.h>)
+#  ifdef __has_include
+#  if __has_include(<cxxabi.h>)
 #include <cxxabi.h>
 #define N19_HAS_CXXABI_H_
-#endif
-#endif
+#  endif
+#  endif //__has_include
 
-///
-/// <backtrace> is not yet widely supported
-/// by most C++ compilers.
-#ifdef __has_include
-#if __has_include(<backtrace>)
-#include <backtrace>
-#define N19_HAS_STD_BACKTRACE_H_
-#endif
-#endif
-
-#if defined(N19_WIN32)
+#  if defined(N19_WIN32)
 #include <System/Win32.hpp>
 #include <DbgHelp.h>
 BEGIN_NAMESPACE(n19::sys);
@@ -46,13 +33,14 @@ auto BackTrace::dump_to(File& file) -> Result<void> {
 }
 
 END_NAMESPACE(n19::sys);
-#else /// POSIX
+#  else /// POSIX
+
 #include <execinfo.h>
 #include <stdlib.h>
 #include <dlfcn.h>
 BEGIN_NAMESPACE(n19::sys);
 
-#ifdef N19_HAS_CXXABI_H_
+#  ifdef N19_HAS_CXXABI_H_
 
 ///
 /// Retrieve the maximum amount of stack frames.
@@ -179,7 +167,7 @@ auto BackTrace::dump_to(File& file) -> Result<void> {
   return Result<void>::create();
 }
 
-#else //NO CXXABI HEADER:
+#  else //NO CXXABI HEADER:
 
 auto BackTrace::get() -> Result<void> {
   constexpr int maxframes = N19_BACKTRACE_MAX_FRAMES;
@@ -223,8 +211,8 @@ auto BackTrace::dump_to(File& file) -> Result<void> {
   return Result<void>::create();
 }
 
-#endif //N19_HAS_CXXABI_H_
+#  endif //N19_HAS_CXXABI_H_
 
 END_NAMESPACE(n19::sys);
-#endif
+#  endif
 

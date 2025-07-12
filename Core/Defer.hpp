@@ -13,13 +13,13 @@
 #include <utility>
 BEGIN_NAMESPACE(n19);
 
-#define DEFER_IF(COND, ...)                        \
-  ::n19::DeferImpl N19_UNIQUE_NAME(n19defer_)      \
-  { [&]{ if((COND)){ __VA_ARGS__; }} }             \
+#define DEFER_IF(COND, ...)                     \
+  ::n19::DeferImpl N19_UNIQUE_NAME(n19defer_)   \
+  { [&]{ if((COND)){ __VA_ARGS__; }} }          \
 
-#define DEFER(...)                                 \
-  ::n19::DeferImpl N19_UNIQUE_NAME(n19defer_)      \
-  { [&]{ __VA_ARGS__; } }                          \
+#define DEFER(...)                              \
+  ::n19::DeferImpl N19_UNIQUE_NAME(n19defer_)   \
+  { [&]{ __VA_ARGS__; } }                       \
 
 template<typename T>
 class DeferBase_ {

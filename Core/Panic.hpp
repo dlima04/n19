@@ -13,21 +13,21 @@
 #include <array>
 BEGIN_NAMESPACE(n19);
 
-///
 /// Assertion/panic macros
-#ifndef N19_ASSERTIONS_OFF_
-#   define PANIC(MSG) ::n19::PanicHandler::get().panic(__FILE__, __LINE__, MSG)
-#   define FATAL(MSG) ::n19::PanicHandler::get().fatal(MSG)
-#   define UNREACHABLE_ASSERTION PANIC("Default assertion - unreachable branch.")
-#   define ASSERT(COND, ...) if( !(COND)) PANIC("Assertion \"" #COND "\" failed! " __VA_ARGS__ )
-#else
-#   define PANIC(MSG)
-#   define FATAL(MSG)
-#   define UNREACHABLE_ASSERTION
-#   define ASSERT(COND, ...)
-#endif
+#   ifndef N19_ASSERTIONS_OFF_
+#define PANIC(MSG) ::n19::PanicHandler::get().panic(__FILE__, __LINE__, MSG)
+#define FATAL(MSG) ::n19::PanicHandler::get().fatal(MSG)
+#define UNREACHABLE_ASSERTION PANIC("Default assertion - unreachable branch.")
+#define ASSERT(COND, ...) if( !(COND)) PANIC("Assertion \"" #COND "\" failed! " __VA_ARGS__ )
 
-///
+#   else
+#define PANIC(MSG)
+#define FATAL(MSG)
+#define UNREACHABLE_ASSERTION
+#define ASSERT(COND, ...)
+
+#  endif
+
 /// Panic handler singleton class
 class PanicHandler {
   N19_MAKE_NONMOVABLE(PanicHandler);

@@ -9,11 +9,11 @@
 #define N19_MACRO_CONCAT(X, Y) N19_MACRO_CONCAT_IMPL_(X, Y)
 #define N19_EXPAND_SAFE_IF(COND, ...) do{ if( COND ) __VA_ARGS__ }while(false);
 
-#ifdef __COUNTER__
-#   define N19_UNIQUE_NAME(X) N19_MACRO_CONCAT(X, __COUNTER__)
-#else
-#   define N19_UNIQUE_NAME(X)
-#endif
+#  ifdef __COUNTER__
+#define N19_UNIQUE_NAME(X) N19_MACRO_CONCAT(X, __COUNTER__)
+#  else
+#define N19_UNIQUE_NAME(X)
+#  endif
 
 #define EXPAND(...) __VA_ARGS__
 #define STRINGIFY_IMPL(EXPR) #EXPR
