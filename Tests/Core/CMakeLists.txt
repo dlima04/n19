@@ -5,7 +5,6 @@ add_library(TestCore OBJECT
   SuiteMaybe.cpp
   SuiteMurmur3.cpp
   SuiteResult.cpp
-  SuiteRingStructures.cpp
   SuiteStream.cpp
   SuiteStringUtil.cpp
 )
