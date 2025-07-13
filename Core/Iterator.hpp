@@ -6,8 +6,6 @@
 #pragma once
 
 #include <Core/Common.hpp>
-#include <Core/Platform.hpp>
-#include <Core/ClassTraits.hpp>
 #include <utility>
 #include <iterator>
 #include <cstdint>
@@ -15,50 +13,71 @@ BEGIN_NAMESPACE(n19);
 
 template<typename T>
 class BasicIterator {
-  N19_MAKE_DEFAULT_CONSTRUCTIBLE(BasicIterator);
-  N19_MAKE_SPACESHIP(BasicIterator);
 public:
-  using iterator_category = std::bidirectional_iterator_tag;
-  using value_type        = T;
-  using difference_type   = std::ptrdiff_t;
-  using pointer           = T*;
-  using reference         = T&;
+  using PointerType   = T*;
+  using ReferenceType = T&;
+  using ValueType     = T;
 
-  FORCEINLINE_ auto operator*(this auto&& self) -> auto&& {
+  constexpr auto operator*(this auto&& self) -> auto&& {
     return *std::forward<decltype(self)>(self).ptr_;
   }
 
-  FORCEINLINE_ auto operator->(this auto&& self) -> auto* {
+  constexpr auto operator->(this auto&& self) -> auto* {
     return std::forward<decltype(self)>(self).ptr_;
   }
 
-  FORCEINLINE_ auto operator++() -> BasicIterator& {
+  constexpr auto operator++() -> BasicIterator& {
     ++ptr_;        /// Simply increment the internal pointer
     return *this;  /// and return self.
   }
 
-  FORCEINLINE_ auto operator++(int) -> BasicIterator {
+  constexpr auto operator++(int) -> BasicIterator {
     BasicIterator temp = *this;
     ++(*this);     /// Modify self, return the previous
     return temp;   /// incremented value.
   }
 
-  FORCEINLINE_ auto operator--() -> BasicIterator& {
+  constexpr auto operator--() -> BasicIterator& {
     --ptr_;        /// Simply decrement the internal pointer
     return *this;  /// and return self.
   }
 
-  FORCEINLINE_ auto operator--(int) -> BasicIterator {
+  constexpr auto operator--(int) -> BasicIterator {
     BasicIterator temp = *this;
     --(*this);     /// Modify self, return the previous
     return temp;   /// incremented value.
   }
 
-  BasicIterator(BasicIterator::pointer ptr) : ptr_(ptr) {}
-  BasicIterator() = default;
-  ~BasicIterator() = default;
+  constexpr BasicIterator& operator+=(ptrdiff_t n) {
+    ptr_ += n;     /// increment ptr_ by n.
+    return *this;  /// and return self.
+  }
+
+  constexpr BasicIterator& operator-=(ptrdiff_t n) {
+    ptr_ -= n;     /// decrement ptr_ by n.
+    return *this;  /// and return self.
+  }
+
+  constexpr BasicIterator operator+(ptrdiff_t n) const {
+    return BasicIterator(ptr_ + n);
+  }
+
+  constexpr BasicIterator operator-(ptrdiff_t n) const {
+    return BasicIterator(ptr_ - n);
+  }
+
+  constexpr ptrdiff_t operator-(const BasicIterator& other) const {
+    return ptr_ - other.ptr_;
+  }
+
+  constexpr auto operator<=>(const BasicIterator& other) const = default;
+
+  constexpr BasicIterator(PointerType ptr) : ptr_(ptr) {}
+  constexpr BasicIterator(BasicIterator&&) = default;
+  constexpr BasicIterator(const BasicIterator&) = default;
+  constexpr BasicIterator() = default;
 protected:
-  BasicIterator::pointer ptr_{};
+  PointerType ptr_{};
 };
 
 END_NAMESPACE(n19);

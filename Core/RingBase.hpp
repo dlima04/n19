@@ -8,6 +8,7 @@
 #include <Core/Common.hpp>
 #include <Core/Platform.hpp>
 #include <Core/Iterator.hpp>
+#include <Core/TypeTraits.hpp>
 #include <atomic>
 #include <type_traits>
 BEGIN_NAMESPACE(n19);
@@ -20,8 +21,7 @@ BEGIN_NAMESPACE(n19);
 // NOTE:
 // The size of the buffer should be a power of 2, always.
 // This allows us to eliminate modulo, which not only makes code
-// faster but also simpler to reason about, since 0 % N
-// is technically undefined behaviour and can potentially cause crashes.
+// faster but also simpler to reason about.
 
 template<typename T, size_t size_>
 class RingBase {
@@ -39,18 +39,22 @@ public:
 
   /// Define some iterator methods. These aren't really all that
   /// important for a ring buffer but migh still come in handy.
-  using IteratorType = BasicIterator<T>;
-  NODISCARD_ auto end()   -> IteratorType;
-  NODISCARD_ auto begin() -> IteratorType;
+  using Iterator = BasicIterator<T>;
+  using ConstIterator = BasicIterator<AddConst<T>>;
 
-  ~RingBase() = default;
-  RingBase()  = default;
+  NODISCARD_ ConstIterator end()   const { return buff_ + size_; }
+  NODISCARD_ ConstIterator begin() const { return buff_; }
+
+  NODISCARD_ Iterator end()   { return buff_ + size_; }
+  NODISCARD_ Iterator begin() { return buff_;         }
+
+ ~RingBase() = default;
+  RingBase() = default;
 protected:
-  alignas(N19_CACHE_LINE_SIZE_GUESS) T buff_[ size_ ];
+  alignas(N19_CACHE_LINE_SIZE_GUESS) T buff_[ size_ ]{};
   alignas(N19_CACHE_LINE_SIZE_GUESS) std::atomic<size_t> head_{ 0 };
   alignas(N19_CACHE_LINE_SIZE_GUESS) std::atomic<size_t> tail_{ 0 };
 };
-
 
 template<typename T, size_t size_>
 FORCEINLINE_ auto RingBase<T, size_>::is_full() const -> bool {
@@ -71,16 +75,6 @@ FORCEINLINE_ auto RingBase<T, size_>::is_empty() const -> bool {
 template<typename T, size_t size_>
 FORCEINLINE_ auto RingBase<T, size_>::data() const -> T* {
   return buff_;
-}
-
-template<typename T, size_t size_>
-FORCEINLINE_ auto RingBase<T, size_>::begin() -> IteratorType {
-  return buff_;
-}
-
-template<typename T, size_t size_>
-FORCEINLINE_ auto RingBase<T, size_>::end() -> IteratorType {
-  return buff_ + (sizeof(buff_) / sizeof(T));
 }
 
 END_NAMESPACE(n19);

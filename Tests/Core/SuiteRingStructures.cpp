@@ -57,6 +57,34 @@ TEST_CASE("BasicFunctionality", "[Core.RingBuffer]") {
     buffer.read();
     REQUIRE(buffer.try_current().has_value() == false);
   }
+
+  SECTION("RangeFor") {
+    RingBuffer<int, 4> buffer;
+    REQUIRE(buffer.write(1));
+    REQUIRE(buffer.write(2));
+    REQUIRE(buffer.write(3));
+
+    int total = 0;
+    for(int& val : buffer) {
+      total += val;
+    }
+
+    REQUIRE(total == 6);
+  }
+
+  SECTION("ConstRangeFor") {
+    RingBuffer<int, 4> buffer;
+    REQUIRE(buffer.write(1));
+    REQUIRE(buffer.write(2));
+    REQUIRE(buffer.write(3));
+
+    int total = 0;
+    for(const int& val : buffer) {
+      total += val;
+    }
+
+    REQUIRE(total == 6);
+  }
 }
 
 TEST_CASE("EdgeCases", "[Core.RingBuffer]") {
