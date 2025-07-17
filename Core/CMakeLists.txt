@@ -5,7 +5,6 @@ add_library(Core STATIC
   Console.cpp
   Panic.cpp
   Stream.cpp
-  StringPool.cpp
   StringUtil.cpp
 )
 
