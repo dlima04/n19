@@ -4,8 +4,8 @@
 */
 
 #include <catch2/catch_test_macros.hpp>
-#include <Core/Result.hpp>
-#include <Core/Try.hpp>
+#include <n19/Core/Result.hpp>
+#include <n19/Core/Try.hpp>
 using namespace n19;
 
 /// Note: for this test suite we don't need to be

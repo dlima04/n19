@@ -4,7 +4,7 @@
 */
 
 #include <catch2/catch_test_macros.hpp>
-#include <Core/Murmur3.hpp>
+#include <n19/Core/Murmur3.hpp>
 #include <string>
 using namespace n19;
 

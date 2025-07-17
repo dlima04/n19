@@ -4,7 +4,7 @@
 */
 
 #include <catch2/catch_test_macros.hpp>
-#include <Core/StringUtil.hpp>
+#include <n19/Core/StringUtil.hpp>
 using namespace n19;
 
 TEST_CASE("RegularStringUnescape", "[Core.StringUtil]") {

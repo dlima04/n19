@@ -4,8 +4,8 @@
 */
 
 #include <catch2/catch_test_macros.hpp>
-#include <Core/Maybe.hpp>
-#include <Core/TypeTraits.hpp>
+#include <n19/Core/Maybe.hpp>
+#include <n19/Core/TypeTraits.hpp>
 using namespace n19;
 
 struct CTORHelper1 {

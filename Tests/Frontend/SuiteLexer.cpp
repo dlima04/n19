@@ -4,8 +4,8 @@
 */
 
 #include <catch2/catch_test_macros.hpp>
-#include <Frontend/Lexer/Lexer.hpp>
-#include <Frontend/Lexer/Token.hpp>
+#include <n19/Frontend/Lexer/Lexer.hpp>
+#include <n19/Frontend/Lexer/Token.hpp>
 #include <vector>
 #include <string>
 using namespace rl;

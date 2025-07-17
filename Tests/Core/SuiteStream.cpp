@@ -4,9 +4,9 @@
 */
 
 #include <catch2/catch_test_macros.hpp>
-#include <Core/Panic.hpp>
-#include <Core/Stream.hpp>
-#include <Core/Bytes.hpp>
+#include <n19/Core/Panic.hpp>
+#include <n19/Core/Stream.hpp>
+#include <n19/Core/Bytes.hpp>
 #include <string>
 #include <vector>
 using namespace n19;

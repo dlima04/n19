@@ -59,15 +59,13 @@ if(ENABLE_ASAN AND NOT N19_IS_WINDOWS)
   n19_link_clang_sanitizer(address)
 endif()
 
-add_subdirectory(Core)
-add_subdirectory(System)
+add_subdirectory(n19)
 
 # Optional - build unit tests
 if(BUILD_TESTS)
+  message(STATUS "BuildOpt: build tests.")
   add_subdirectory(Tests)
+else()
+  message(STATUS "BuildOpt: do not build tests.")
 endif()
 
-# Optional - build reference language
-if(BUILD_RL)
-  add_subdirectory(Frontend)
-endif()

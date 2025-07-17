@@ -4,8 +4,8 @@
 */
 
 #include <catch2/catch_test_macros.hpp>
-#include <Core/ArgParse.hpp>
-#include <Core/Console.hpp>
+#include <n19/Core/ArgParse.hpp>
+#include <n19/Core/Console.hpp>
 
 using namespace n19;
 

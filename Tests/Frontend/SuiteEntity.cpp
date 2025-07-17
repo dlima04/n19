@@ -4,8 +4,8 @@
 */
 
 #include <catch2/catch_test_macros.hpp>
-#include <Frontend/Entities/EntityTable.hpp>
-#include <Core/ClassTraits.hpp>
+#include <n19/Frontend/Entities/EntityTable.hpp>
+#include <n19/Core/ClassTraits.hpp>
 #include <string>
 #include <utility>
 using namespace rl;
