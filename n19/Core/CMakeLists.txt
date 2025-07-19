@@ -6,6 +6,7 @@ add_library(Core STATIC
   Panic.cpp
   Stream.cpp
   StringUtil.cpp
+  StringPool.cpp
 )
 
 target_link_libraries(Core PUBLIC

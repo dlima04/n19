@@ -21,7 +21,7 @@
 #include <deque>
 BEGIN_NAMESPACE(n19::argp);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Begin Value Classes:
 // Each class here is a polymorphic wrapper around a value
 // that can be set by the user when passing command line arguments.
@@ -121,16 +121,20 @@ enum class ArgStyle : uint8_t {
   Masq = 2,
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin main Parser class:
+// The class responsible for parsing user-supplied command-line arguments.
+
 class Parser {
   N19_MAKE_DEFAULT_MOVE_ASSIGNABLE(Parser);
   N19_MAKE_NONCOPYABLE(Parser);
 public:
   template<typename T>
   NODISCARD_ auto arg(
-    const sys::StringView& longf,        /// Long form flag name
-    const sys::StringView& shortf,       /// Short form flag name
-    const sys::StringView& desc = _nstr(""),    /// Optional description
-    const Maybe<T>& d = Nothing ) -> T&  /// Default value (optional)
+    const sys::StringView& longf,
+    const sys::StringView& shortf,
+    const sys::StringView& desc = _nstr(""),  /// Optional description
+    const Maybe<T>& d = Nothing ) -> T&       /// Default value (optional)
   {
     Parameter param;
     param.long_  = longf;

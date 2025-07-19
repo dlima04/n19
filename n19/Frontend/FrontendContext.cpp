@@ -128,17 +128,17 @@ auto Context::dump(OStream& stream) -> void {
 
   for(const InputFile& input : inputs_) {
     stream
-      << " - ID="
+      << " -- ID="
       << Con::BlueFG
       << input.id
       << Con::Reset
-      << "\n - Name=\""
+      << ", Name=\""
       << Con::GreenFG
       << input.name
       << Con::Reset
-      << "\"\n - State="
+      << "\", State="
       << static_cast<size_t>(input.state)
-      << "\n - Kind="
+      << ", Kind="
       << static_cast<size_t>(input.kind)
       << "\n";
   }
@@ -150,11 +150,11 @@ auto Context::dump(OStream& stream) -> void {
 
   for(const OutputFile& output : outputs_) {
     stream
-      << " - ID="
+      << " -- ID="
       << Con::BlueFG
       << output.id
       << Con::Reset
-      << "\n - Name=\""
+      << ", Name=\""
       << Con::GreenFG
       << output.name
       << Con::Reset
@@ -164,8 +164,8 @@ auto Context::dump(OStream& stream) -> void {
   stream
     << Con::MagentaFG
     << "RawFlags: "
-    << std::bitset<sizeof(flags_)>(flags_).to_string()
     << Con::Reset
+    << std::bitset<sizeof(flags_)>(flags_).to_string()
     << "\n\n";
 }
 

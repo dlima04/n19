@@ -162,7 +162,7 @@ auto Entity::print_(
   for(uint32_t i = 0; i < depth; i++)
     stream << "  |";
   if(depth)
-    stream << "_ ";
+    stream << "__ ";
 
   /// Preamble
   stream
@@ -185,7 +185,7 @@ auto Entity::print_(
 #define X(TYPE)           \
   case EntityType::TYPE:  \
   stream                  \
-    << Con::GreenFG       \
+    << Con::Bold          \
     << #TYPE              \
     << Con::Reset         \
     << " with ";          \
@@ -200,11 +200,11 @@ auto Entity::print_(
   /// Entity ID and other info
   stream
     << "EntityID="
-    << Con::GreenFG
+    << Con::BlueFG
     << this->id_
     << Con::Reset
     << ", FileID="
-    << Con::GreenFG
+    << Con::BlueFG
     << this->file_
     << Con::Reset
     << " ";

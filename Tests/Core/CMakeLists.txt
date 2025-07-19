@@ -7,6 +7,7 @@ add_library(TestCore OBJECT
   SuiteResult.cpp
   SuiteStream.cpp
   SuiteStringUtil.cpp
+  SuiteStringPool.cpp
 )
 
 target_link_libraries(TestCore PUBLIC

@@ -7,9 +7,12 @@
 
 #include <n19/Core/Common.hpp>
 #include <n19/Core/Platform.hpp>
+#include <n19/Core/Concepts.hpp>
 #include <cstdint>
 #include <string_view>
+#include <concepts>
 #include <bit>
+#include <utility>
 
 #define U32_CONSTANT(X) X##UL
 #define U64_CONSTANT(X) X##ULL
@@ -23,6 +26,8 @@ struct Murmur3_128 {
   uint64_t first_  = 0;
   uint64_t second_ = 0;
 };
+
+using Murmur3_32 = uint32_t;
 
 constexpr auto murmur3_fmix32(uint32_t hash) -> uint32_t {
   hash ^= hash >> 16;
@@ -42,8 +47,9 @@ constexpr auto murmur3_fmix64(uint64_t hash) -> uint64_t {
   return hash;
 }
 
+template<typename Char> requires(AnyOf<Char, char8_t, char>)
 constexpr auto murmur3_x86_32(
-  const std::u8string_view& key, const uint32_t seed ) -> uint32_t
+  const std::basic_string_view<Char>& key, const uint32_t seed ) -> Murmur3_32
 {
   constexpr uint32_t c1 = U32_CONSTANT(0xcc9e2d51);
   constexpr uint32_t c2 = U32_CONSTANT(0x1b873593);
@@ -91,8 +97,9 @@ constexpr auto murmur3_x86_32(
   return hash;
 }
 
+template<typename Char> requires(AnyOf<Char, char8_t, char>)
 constexpr auto murmur3_x64_128(
-  const std::u8string_view& key, const uint32_t seed ) -> Murmur3_128
+  const std::basic_string_view<Char>& key, const uint32_t seed ) -> Murmur3_128
 {
   if(key.empty()) {   // Key size must be at least 1 byte.
     return {};        // reject this call.
@@ -196,12 +203,40 @@ constexpr auto murmur3_x64_128(
   return { .first_ = hash1, .second_ = hash2 };
 }
 
+template<Character CharT>
+constexpr Murmur3_32 murmur3_x86_32(const CharT* cstr, uint32_t seed) {
+  return murmur3_x86_32<CharT>(std::basic_string_view<CharT>(cstr), seed);
+}
+
+template<Character CharT>
+constexpr Murmur3_128 murmur3_x64_128(const CharT* cstr, uint32_t seed) {
+  return murmur3_x64_128(std::basic_string_view<CharT>(cstr), seed);
+}
+
+template<Character CharT>
+constexpr Murmur3_32 murmur3_x86_32(const std::basic_string<CharT>& str, uint32_t seed) {
+  return murmur3_x86_32<CharT>(std::basic_string_view<CharT>(str), seed);
+}
+
+template<Character CharT>
+constexpr Murmur3_128 murmur3_x64_128(const std::basic_string<CharT>& str, uint32_t seed) {
+  return murmur3_x64_128<CharT>(std::basic_string_view<CharT>(str), seed);
+}
+
 constexpr auto operator ""_mm32(const char8_t* str, size_t len) -> uint32_t {
-  return murmur3_x86_32({str, len}, 0xbeef);
+  return murmur3_x86_32(std::u8string_view(str, len), 0xbeef);
 }
 
 constexpr auto operator ""_mm128(const char8_t* str, size_t len) -> Murmur3_128 {
-  return murmur3_x64_128({str, len}, 0xbeef);
+  return murmur3_x64_128(std::u8string_view(str, len), 0xbeef);
+}
+
+constexpr auto operator ""_mm32(const char* str, size_t len) -> uint32_t {
+  return murmur3_x86_32(std::string_view(str, len), 0xbeef);
+}
+
+constexpr auto operator ""_mm128(const char* str, size_t len) -> Murmur3_128 {
+  return murmur3_x64_128(std::string_view(str, len), 0xbeef);
 }
 
 END_NAMESPACE(n19);

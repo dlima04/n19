@@ -18,15 +18,18 @@
 #include <memory>
 #include <new>
 #include <utility>
+#include <string_view>
 BEGIN_NAMESPACE(n19);
 
 using Byte           = std::byte;
 using Bytes          = std::span<const Byte>;
 using WritableBytes  = std::span<Byte>;
 
-template<Concrete T>
+template<Concrete T, typename BuffType = unsigned char>
 class ByteCopy final {
   static_assert(!std::is_array_v<T>);
+  static_assert(AnyOf<BuffType, char, unsigned char>);
+  static_assert(sizeof(BuffType) == 1);
 public:
   using ValueType      = T;
   using ReferenceType  = T&;
@@ -47,10 +50,6 @@ public:
     return release(); // For an Rvalue reference, release ownership.
   }
 
-  NODISCARD_ FORCEINLINE_ auto bytes() const -> Bytes {
-    return Bytes( reinterpret_cast<const Byte*>(&value_), sizeof(value_) );
-  }
-
   FORCEINLINE_ auto operator->(this auto &&self) -> decltype(auto) {
     ASSERT(self.is_active_ == true && "Bad bytecopy access!");
     return &( std::forward<decltype(self)>(self).value() );
@@ -59,6 +58,10 @@ public:
   FORCEINLINE_ auto operator*(this auto &&self) -> decltype(auto) {
     ASSERT(self.is_active_ == true && "Bad bytecopy access!");
     return std::forward<decltype(self)>(self).value();
+  }
+
+  NODISCARD_ FORCEINLINE_ auto bytes() const -> Bytes {
+    return Bytes(reinterpret_cast<const Byte*>(&value_), sizeof(value_));
   }
 
   template<typename O>
@@ -128,7 +131,7 @@ public:
   FORCEINLINE_ ByteCopy()  { /*....*/ }
 private:
   bool is_active_{false};
-  alignas(T) uint8_t value_[ sizeof(T) ]{};
+  alignas(T) BuffType value_[ sizeof(T) ]{};
 };
 
 template<typename T>

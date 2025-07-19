@@ -65,13 +65,6 @@
 #define PACKED_STRUCT_(NAME, BODY) N19_PACKED_IMPL_(struct, NAME, BODY)
 #define PACKED_CLASS_(NAME, BODY)  N19_PACKED_IMPL_(class, NAME, BODY)
 
-#  if defined(N19_WIN32)
-#define PLATFORM_PAGE_SIZE_ 4096
-#  else
-#include <unistd.h>
-#define PLATFORM_PAGE_SIZE_ ::sysconf(_SC_PAGESIZE)
-#  endif
-
 // =========================================
 // Cpp attributes
 // =========================================

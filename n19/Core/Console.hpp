@@ -15,16 +15,12 @@ namespace detail_ {
   constinit extern bool allow_con_colours_;
 }
 
-///
-/// Windows specific initialization.
 #if defined(N19_WIN32)
 auto win32_init_console()            -> void;
 auto win32_are_vsequences_enabled()  -> bool;
 auto win32_enable_vsequences()       -> void;
 #endif
 
-///
-/// Ascii colour values
 enum class Con : uint16_t {
   Reset      = 0,
   Bold       = 1,
@@ -40,8 +36,6 @@ enum class Con : uint16_t {
   RedFG      = 91,
 };
 
-///
-/// Global stream objects
 inline auto outs() -> OStream& {
   static auto outs_ = BufferedOStream<>::from_stdout();
   return outs_;

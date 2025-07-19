@@ -15,7 +15,7 @@ auto AstNode::print_(
   for(uint32_t i = 0; i < depth; i++) 
     stream << "  |";
   if(depth) 
-    stream << "_ ";
+    stream << "__ ";
 
   auto file_name = Context::the().get_input_by_id(file_);
   
