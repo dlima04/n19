@@ -44,6 +44,26 @@ TEST_CASE("Construct", "[Core.Result]") {
   REQUIRE(val == obj3.value());
 }
 
+TEST_CASE("CopyAssignment", "[Core.Result]") {
+  Result<CTORHelper> obj1(300, 400);
+  Result<CTORHelper> obj2(Error::from_error_code(ErrC::InvalidArg));
+
+  obj2 = obj1;
+  REQUIRE(obj2.has_value());
+  REQUIRE(obj2->x_ == 300);
+  REQUIRE(obj2->y_ == 400);
+}
+
+TEST_CASE("MoveAssignment", "[Core.Result]") {
+  Result<CTORHelper> obj1(300, 400);
+  Result<CTORHelper> obj2(Error::from_error_code(ErrC::InvalidArg));
+
+  obj2 = std::move(obj1);
+  REQUIRE(obj2.has_value());
+  REQUIRE(obj2->x_ == 300);
+  REQUIRE(obj2->y_ == 400);
+}
+
 TEST_CASE("Destroy", "[Core.Result]") {
   int num = 20;
   {
